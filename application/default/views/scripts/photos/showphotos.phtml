@@ -1,0 +1,116 @@
+<?php $this->placeholder('currenttab')->set('photos');
+$this->headMeta()->appendName('description', stripslashes($this->data['Description']));
+?>
+<script type='text/javascript' src="http://code.jquery.com/jquery-1.4.4.js"></script>
+<script type='text/javascript' src="<?php echo $this->contentLocation ?>public/js/jquery.tools.min.js"></script>
+<link rel="stylesheet" href="<?php echo $this->contentLocation ?>public/css/photogallery.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="<?php echo $this->contentLocation ?>public/css/scrollable-horizontal.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="<?php echo $this->contentLocation ?>public/css/navigation.css" type="text/css" media="screen" />
+
+<script type='text/javascript'>
+    function getphotos(Sid,Gid) {
+        $('#whiteBox').load('/photos/showphotos/GroupId/', {GroupId: Gid, SiteId: Sid});
+    }
+
+    $(document).ready(function(){
+        $(".navmenu-h li").hover(
+        function() { $(this).addClass("iehover"); },
+        function() { $(this).removeClass("iehover"); }
+    );
+    });
+    $(function() {
+        $(".scrollable").scrollable();
+
+        /*$(".itemphoto").click(function() {
+            window.location = "/photos/?ProjectId="+$(this).attr('id').replace('photo_', '');
+        });*/
+
+        // volunteer activities tab popup
+        $('#volunteers-tab').mouseover(function() {
+            $('#activities-popup').show();
+        });
+        $('#volunteers-tab').mouseout(function() {
+            $('#activities-popup').hide();
+        });
+        $('#activities-popup').mouseout(function() {
+            $('#activities-popup').hide();
+        });
+    });
+
+    function openWindow(pageURL, title, w, h) {
+        var left = (screen.width/2)-(w/2);
+        var top = (screen.height/2)-(h/2);
+        var targetWin = window.open (pageURL, title, 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=no, copyhistory=no, width='+w+', height='+h+', top='+top+', left='+left);
+    }
+
+</script>
+<style>
+    #activities-popup li {
+        background-color: #999898;
+    }
+
+    #activities-popup li:hover {
+        background-color: #e5e5e5;
+    }
+</style>
+
+<div>
+    <div id="mainco2">
+        <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+        <div class="block001">
+            <div class="blst001">
+                <div class="blst002">
+                    <div class="MainBody">
+                            <?php include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/groupheader.php'; ?>
+                            <div class="TabbedPanelsContentGroup"><!-- FIRST TAB -->
+                                <div class="TabbedPanelsContent"></div>
+                                <!-- e o FIRST TAB --> <!-- SECOND TAB -->
+                                <div class="TabbedPanelsContent"></div>
+                                <!-- e o SECOND TAB --> <!-- THIRD TAB -->
+                                <div class="TabbedPanelsContent">
+                                    <div id='whiteBox' class="whiteBox">
+                                        <div class="uiHeader uiHeaderPage">
+                                            <div class="clearfix uiHeaderTop">
+                                                <div>
+                                                    <h2 style="float:left;width:100%;">Photo Album for <?php echo stripslashes($this->project['Name']) ?></h2>
+                                                </div>
+                                            </div>
+                                            <div class="clearfix">
+                                                <div class="uiHeaderSubTitle lfloat">
+                                                    <a id="linkpid" href="/<?php echo $this->data['URLName'] ?>/albums">Back to All Albums</a>
+													<?php if ($this->is_member && (count($this->fundraising_campaigns) > 0 || count($this->brigades) || count($this->past_brigades))) { ?>
+	                                                <a rel="dialog-post" href="javascript:;" onclick="openWindow('/<?php echo $this->data['URLName'] ?>/upload-photos', 'Upload Photo', '600','400')" class="link_icon">
+	                                                    Add New Photo
+	                                                </a>
+	                                                <?php } ?>
+													<?php if($this->isAdmin) { ?>&bull; <a href="/<?php echo $this->project['pURLName'] ?>/manage-photos">Manage Album Photos</a><?php } ?>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div style="width:100%;" align="center">
+                                            <div id="activityPhoto" class="" style="min-height:160px; width:870px;" align="left">
+                                                <?php if (!count($this->photos)) { ?>
+                                                No photos have been uploaded for this activity.
+                                                <?php } else { 
+                                                    foreach($this->photos as $gallery) {
+                                                        if(file_exists("/home/$this->envUsername/public_html/public/Photos/".$gallery['SystemMediaName'])&& !empty($gallery['SystemMediaName'])) { ?>
+                                                        <a href="/<?php echo $this->project['pURLName'] ?>/view-photo/<?php echo $gallery['PhotoId']; ?>"><img class="photopeche" src="<?php echo $this->contentLocation ?>public/Photos/full/<?php echo $gallery['SystemMediaName'] ?>" style="margin: 5px; width:150px; height:150px;"></a>
+                                                <?php }
+                                                    }
+                                                } ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- e o THIRD TAB --> <!-- FOURTH TAB -->
+                            <div class="TabbedPanelsContent"></div>
+                            <!-- e o FOURTH TAB --></div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </div>
+        <div class="block001f01"><div class="blst001"><div class="blst002"></div></div></div>
+    </div>
+</div>

@@ -1,0 +1,76 @@
+<form name="searchMembership">
+Member Id: <input type="text" name="memberId"/> <br />
+Member Email:  <input type="text" name="memberEmail"/>
+<input type="submit" value="search"/>
+</form>
+
+<? if (!empty($this->result)) { ?>
+<script type="text/javascript" src="/public/js/jquery-1.4.2.js"></script>
+<script>
+function activateMember(memId) {
+    $.post('/misc/enablemember', {id: memId}, function(data) {
+        location.href = "/misc/checkpayment?memberId="+memId;
+    });
+}
+function paidMember(memId) {
+    $.post('/misc/paidmember', {id: memId}, function(data) {
+        location.href = "/misc/checkpayment?memberId="+memId;
+    });
+}
+</script>
+
+<table width="100%" border="1">
+<tr>
+    <td>MemberId</td>
+    <td>FullName</td>
+    <td>IsActive</td>
+    <td>Paid</td>
+    <td>PaidUntil</td>
+    <td>Frequency</td>
+</tr>
+<tr>
+    <td><?= $this->result->id ?></td>
+    <td><?= $this->result->fullName ?></td>
+    <td><?= ($this->result->activateEmail) ? 'Yes' : 'No' ?></td>
+    <td><?= ($this->result->paid) ? 'Yes' : 'No' ?></td>
+    <td><?= $this->result->paidUntil ?></td>
+    <td><?= (!empty($this->result->frequencyId)) ? $this->result->frequency->frequency : 'null' ?></td>
+</tr>
+</table>
+
+<? if ($this->result->payments) { ?>
+<br />
+List of Payments
+<br />
+<table width="100%" border="1">
+<tr>
+    <td>TransactionId</td>
+    <td>Group</td>
+    <td>CreatedOn</td>
+    <td>PaidUntil</td>
+    <td>OrderStatus</td>
+</tr>
+<? foreach ($this->result->payments as $payment) { ?>
+<tr>
+    <td><?= $payment->transactionId ?></td>
+    <td><a href="/<?=$payment->group->urlName?>" target="_blank"><?= $payment->group->name ?></a></td>
+    <td><?= $payment->createdOn ?></td>
+    <td><?= $payment->paidUntil ?></td>
+    <td><?= ((int)$payment->orderStatusId === Payment::PROCESSED) ? 'Ok' : 'Canceled' ?></td>
+</tr>
+<? } ?>
+</table>
+<? } ?>
+<? } ?>
+
+<br />
+Actions
+<br />
+<? if (!$this->result->activateEmail) { ?>
+<input type="button" onclick="activateMember('<?= $this->result->id ?>')" value="Activate Member" />
+<? } else { ?>
+<input type="button" onclick="deactivateMember('<?= $this->result->id ?>')" value="Deactivate Member" />
+<? } ?>
+<? if (!$this->result->paid) { ?>
+<input type="button" onclick="paidMember('<?= $this->result->id ?>')" value="User Paid" />
+<? } ?>

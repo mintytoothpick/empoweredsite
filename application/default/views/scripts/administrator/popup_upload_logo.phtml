@@ -1,0 +1,46 @@
+<?php $this->placeholder('popup_upload_logo')->captureStart() ?>
+<script>
+$(function() {
+    $('.uploadLogo').click(function() {
+        $.fancybox($("#upLogoFcyBx").html());
+    });
+});
+
+reset_upload();
+
+function reset_upload() {
+	logo_uploaded = false;	
+}
+
+function validate() {
+	
+	if (logo_uploaded){
+		return true;
+	}
+	alert("Select an image please");
+	return false;
+}
+
+function update_logo(input) {
+	logo_uploaded = true;
+}
+</script>
+
+<!-- logo upload -->
+<div id="upLogoFcyBx" style="display:none;">
+  <form method="post" action="<?= (isset($this->uploadUrlLogo)) ? $this->uploadUrlLogo : '/nonprofit/editlogo' ?>" enctype="multipart/form-data" onsubmit="return validate()">
+    <div style="padding:10px; padding-top:0px">
+      <h3>Upload Logo</h3>
+      <span style="color:#F00;">Please select jpeg, gif and png files that are under 2MB in size.<br />After saving your changes, you will be asked to crop your <?= (isset($this->uploadIdName)) ? strtolower($this->uploadIdName) : 'organization' ?> logo.</span><br /><br />
+      <b>Select an image:&nbsp;</b>
+      <input type="hidden" id="action" name="action" value="upload" />
+      <input type="hidden" name="<?= (isset($this->uploadIdName)) ? $this->uploadIdName.'Id' : 'NetworkId' ?>" value="<?=$this->toolPopupObj->id?>" />
+      <input type="hidden" name="MediaId" value="<?=$this->toolPopupObj->logoMediaId?>" />
+      <input type="file" size="24" name="<?= (isset($this->uploadIdName)) ? $this->uploadIdName.'Logo' : 'NetworkLogo' ?>" id="NetworkLogo" class="textfield" onchange="update_logo()"/><br />
+      <input class="button" type="submit" value="Submit" style="float:right; margin-top:10px; margin-right:5px"">
+      <input class="button" type="button" value="Close" style="float:right; margin-top:10px; margin-right:5px" onclick="$.fancybox.close(); reset_upload();">
+    </div>
+  </form>
+</div>
+<!-- //logo upload -->
+<?php $this->placeholder('popup_upload_logo')->captureEnd() ?>

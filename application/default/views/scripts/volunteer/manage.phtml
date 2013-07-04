@@ -1,0 +1,344 @@
+<script type="text/javascript">
+    function changecheckboxstate(chkbox) {
+        var chkboxes = new Array();
+        chkboxes['accept'] = 'deny';
+        chkboxes['deny'] = 'accept';
+        chkboxes['delete'] = 'adminrights';
+        chkboxes['adminrights'] = 'delete';
+        var chkboxcp = chkbox.split('_');
+        var chckbox_counterpart = chkboxes[chkboxcp[0]]+"_"+chkboxcp[1];
+        if (document.getElementById(chkbox).checked == true && (chkboxcp[0] == 'deny' || chkboxcp[0] == 'accept')) {
+            document.getElementById(chckbox_counterpart).checked = false;
+        }
+    }
+
+    function undo(id, status) {
+        $.post("/volunteer/manage", {_action: "undo", VolunteerId: id, status: status, ProjectId: $('#ProjectId').val()}, function() {
+            alert("You have successfully removed a volunteer from the deleted/denied volunteers list.");
+            window.location.reload(true);
+        });
+    }
+
+    function togglePopup(form, id, val, note) {
+        $('#popup-overlay').toggle();
+        $('.'+form).toggle()
+        $(id).val(val);
+        if (form == 'add-note') {
+            $('#'+form+' .Notes').val(note)
+        } else {
+            $('#'+form+' .Notes').val($('#hidden-note-'+val).val());
+        }
+    }
+
+    function manageNote(form, action) {
+        if (jQuery.trim($(form+' .Notes').val()) == '') {
+            alert("Please enter the volunteer's notes")
+        } else {
+            $.post('/volunteer/'+action, $(form).serialize(), function(data) {
+                alert(data);
+                window.location.reload(true);
+            })
+        }
+        return false;
+    }
+
+    function deleteNote(id) {
+        if (confirm("Are you sure you want to delete the volunteer notes?") == true) {
+            $.post('/volunteer/deletenote', {VolunteerNoteId: id}, function(data) {
+                alert(data);
+                window.location.reload(true);
+            })
+        } else {
+            return false;
+        }
+    }
+
+    function toggleNotes(div, id) {
+        $(div).toggle();
+        $('#view-'+id).toggle();
+        $('#hide-'+id).toggle();
+    }
+</script>
+<style>
+    .popup-box { width: 600px; left: 30%; right: 30%; top:25%; position: fixed; z-index: 999999!important; background-color:#ffffff; border:5px solid #e5e5e5; padding:10px 0 20px 0; -moz-border-radius:5px; margin:auto }
+    #popup-overlay {
+        background: url(<?php echo $this->contentLocation ?>public/images/bg-overlay.png);
+        height:100%;
+        position:fixed;
+        display:block;
+        left:0;
+        top:0;
+        width:100%!important;
+        z-index:998;
+        display:none;
+    }
+    .right {
+        float:right;
+    }
+    .hidden { display:none }
+</style>
+<div class="add-note popup-box hidden" style="margin-bottom:15px; margin-left:15px; padding:10px; font-size:14px">
+    <h2>Add Volunteer Notes</h2>
+    <form id="add-note" onsubmit="manageNote('#add-note', 'addnote'); return false;">
+        <input id="VolunteerId" type="hidden" name="VolunteerId" value="" />
+        <textarea cols="60" rows="3" name="Notes" class="Notes"></textarea>
+        <div class="clear"></div><br>
+        <input type="submit" class="btn btngreen" value="Submit" />&nbsp;
+        <a href="javascript:;" class="btn btngreen" onclick="togglePopup('add-note', '#VolunteerId', '', '')">Close</a>
+    </form>
+</div>
+<div class="edit-note popup-box hidden" style="margin-bottom:15px; margin-left:15px; padding:10px; font-size:14px">
+    <h2>Edit Volunteer Notes</h2>
+    <form id="edit-note" onsubmit="manageNote('#edit-note', 'editnote'); return false;">
+        <input id="VolunteerNoteId" type="hidden" name="VolunteerNoteId" value="" />
+        <textarea cols="60" rows="3" name="Notes" class="Notes"></textarea>
+        <div class="clear"></div><br>
+        <input type="submit" class="btn btngreen" value="Submit" />&nbsp;
+        <a href="javascript:;" class="btn btngreen" onclick="togglePopup('edit-note', '#VolunteerNoteId', '', '')">Close</a>
+    </form>
+</div>
+<div id="popup-overlay"></div>
+<div class="wrapper">
+   <!-- org header -->
+  <?=$this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+      
+    <?php if (isset($this->breadcrumb)) { ?>
+      
+      <!-- breadcrumb -->
+      <?=$this->placeholder('breadcrumb') ?>
+      <!-- // breadcrumb -->
+      <div class="clr"></div>
+
+      <!-- tabs -->
+      <?=$this->placeholder('tabs') ?>
+      <!-- // tabs -->
+
+    <?php } else {
+      include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/profileheader.php'; 
+    } ?>
+
+    <div class="mainC">
+      <div class="box05">
+        <div class="headingStyle02">
+            Manage All <?= $this->project->type == 1 ? 'Fundraisers' : 'Volunteers'; ?>
+        </div>
+        <input type="hidden" id="ProjectId" name="ProjectId" value="<?=$this->project->id?>" />
+        <div id="divActiveVolunteersContent">
+            <div>
+                <div class="clear"></div>
+                <form id="update_candidates_form" name="update_candidates_form" method="post">
+                    <input type="hidden" name="_action" value="update_candidates">
+                    <table id="inactive_volunteers" cellspacing="0" cellpadding="3" border="0" style="border:1px solid #E7E7FF;width:100%; border-collapse:collapse;">
+                        <tr style="color:#F7F7F7;background-color:#000;font-weight:bold;height:25px;">
+                            <th scope="col"><span style="float:left;padding-left:3px;">Volunteer Requests</span></th>
+                            <th scope="col"><span style="float:left;">Email</span></th>
+                            <th scope="col">Notes</th>
+                            <th scope="col">Accept</th>
+                            <th scope="col">Deny</th>
+                        </tr>
+                        <?php
+                        if (count($this->inactive_volunteers)) {
+                            $ctr = 0;
+                            foreach ($this->inactive_volunteers as $volunteer) {
+                                $volunteer_notes = $this->volunteer_notes->getVolunteerNotes($volunteer['VolunteerId']);
+                        ?>
+                        <tr style="background-color:<?php echo $ctr%2 == 1 ? "#e7e7e9" : "white" ?>;">
+                            <td style="width:140px;padding-left:3px;"><?php echo stripslashes($volunteer['FirstName']." ".$volunteer['LastName']) ?></td>
+                            <td style="width:150px;"><?php echo $volunteer['Email'] ?></td>
+                            <td style="width:100px;text-align:center;">
+                                <?php if (count($volunteer_notes) > 0) { ?>
+                                <a id="view-<?php echo $volunteer['VolunteerId'] ?>" href="javascript:;" onclick="toggleNotes('#notes-<?php echo $volunteer['VolunteerId'] ?>', '<?php echo $volunteer['VolunteerId'] ?>');">View</a>
+                                <a id="hide-<?php echo $volunteer['VolunteerId'] ?>" href="javascript:;" onclick="toggleNotes('#notes-<?php echo $volunteer['VolunteerId'] ?>', '<?php echo $volunteer['VolunteerId'] ?>');" class="hidden">Hide</a>
+                                <?php } else { ?>
+                                <a href="javascript:;" onclick="togglePopup('add-note', '#VolunteerId', '<?php echo $volunteer['VolunteerId'] ?>', '')">Add</a>
+                                <?php } ?>
+                            </td>
+                            <td style="width:70px; text-align:center">
+                                <input type='checkbox' class='checkbox' id="accept_<?php echo $volunteer['VolunteerId'] ?>" name="accept_ids[]" value="<?php echo $volunteer['VolunteerId'] ?>" onclick="changecheckboxstate(this.id)"/>
+                            </td>
+                            <td style="width:70px; text-align:center">
+                                <input id="deny_<?php echo $volunteer['VolunteerId'] ?>" type="checkbox" name="deny_ids[]" value="<?php echo $volunteer['VolunteerId'] ?>" onclick="changecheckboxstate(this.id)" <?php echo $volunteer['IsDenied'] == 1 ? "checked" : "" ?> />
+                            </td>
+                        </tr>
+                        <?php if (count($volunteer_notes) > 0) { ?>
+                        <tr style="background-color:<?php echo $ctr%2 == 1 ? "#e7e7e9" : "white" ?>;">
+                            <td colspan="4">
+                                <div id="notes-<?php echo $volunteer['VolunteerId'] ?>" style="width:100%; display:none; font-size:12px">
+                                    <?php foreach($volunteer_notes as $note) { ?>
+                                    <div style="margin-left:20px;">
+                                        <span style="margin-right:20px">&nbsp;-&nbsp;<?php echo stripslashes($note['Notes']) ?></span>
+                                        <span style="font-size:11px">
+                                            <input type="hidden" id="hidden-note-<?php echo $note['VolunteerNoteId'] ?>" value="<?php echo stripslashes($note['Notes']) ?>" />
+                                            <a href="javascript:;" onclick="togglePopup('edit-note', '#VolunteerNoteId', '<?php echo $note['VolunteerNoteId'] ?>', '')">Edit</a>
+                                            &nbsp;/&nbsp;
+                                            <a href="javascript:;" onclick="deleteNote('<?php echo $note['VolunteerNoteId'] ?>')">Delete</a>
+                                        </span>
+                                    </div>
+                                    <?php } ?>
+                                    <div style="margin-left:20px;"><a style="margin-left:10px" href="javascript:;" onclick="togglePopup('add-note', '#VolunteerId', '<?php echo $volunteer['VolunteerId'] ?>')">Add New</a></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php } ?>
+                        <?php $ctr++; } ?>
+                        <?php } else { ?>
+                        <tr>
+                            <td colspan="5" style="padding-left:3px;" >No record(s) found</td>
+                        </tr>
+                        <?php } ?>
+                    </table>
+                    <br />
+                    <?php if (count($this->inactive_volunteers)) { ?>
+                    <div id="divUpdateDesc" style="float:right;">
+                        <input class="btn btngreen" style="font-size:11px" type="button" name="Save" value="Update Candidates" onClick="update_candidates_form.submit()">
+                    </div>
+                    <?php } ?>
+                </form>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <div id="divHideVolunteersContent" style="margin-top:20px;">
+            <div>
+                <form id="update_members_form" name="update_members_form" method="post">
+                    <input type="hidden" name="_action" value="update_members">
+                    <table id="active_volunteers" cellspacing="0" cellpadding="3" border="0" style="border:1px solid #E7E7FF;width:100%; border-collapse:collapse;">
+                        <tr style="color:#F7F7F7;background-color:#000;font-weight:bold;height:25px;">
+                            <th scope="col"><span style="float:left;padding-left:3px;">Active Volunteers</span></th>
+                            <th scope="col"><span style="float:left;">Email</span></th>
+                            <th scope="col"><span style="float:left;">Notes</span></th>
+                            <th scope="col" style="text-align:center;">Delete</th>
+                        </tr>
+                        <?php
+                        if (count($this->active_volunteers)) {
+                            $ctr = 0;
+                            foreach ($this->active_volunteers as $volunteer) {
+                                $volunteer_notes = $this->volunteer_notes->getVolunteerNotes($volunteer['VolunteerId']);
+                        ?>
+                        <tr style="background-color:<?php echo $ctr%2 == 1 ? "#e7e7e9" : "white" ?>;">
+                            <td style="width:140px;padding-left:3px;">
+                                <input type="hidden" name="user_ids[]" id="userid_<?php echo $volunteer['VolunteerId'] ?>" value="<?php echo $volunteer['UserId'] ?>">
+                                <?php echo stripslashes($volunteer['FirstName']." ".$volunteer['LastName']) ?>
+                            </td>
+                            <td style="width:150px;"><?php echo $volunteer['Email'] ?></td>
+                            <td style="width:100px;">
+                                <?php if (count($volunteer_notes) > 0) { ?>
+                                <a id="view-<?php echo $volunteer['VolunteerId'] ?>" href="javascript:;" onclick="toggleNotes('#notes-<?php echo $volunteer['VolunteerId'] ?>', '<?php echo $volunteer['VolunteerId'] ?>');">View</a>
+                                <a id="hide-<?php echo $volunteer['VolunteerId'] ?>" href="javascript:;" onclick="toggleNotes('#notes-<?php echo $volunteer['VolunteerId'] ?>', '<?php echo $volunteer['VolunteerId'] ?>');" class="hidden">Hide</a>
+                                <?php } else { ?>
+                                <a href="javascript:;" onclick="togglePopup('add-note', '#VolunteerId', '<?php echo $volunteer['VolunteerId'] ?>', '')">Add</a>
+                                <?php } ?>
+                            </td>
+                            <td style="width:70px;text-align:center;">
+                                <input id="delete_<?php echo $volunteer['VolunteerId'] ?>" type="checkbox" name="delete_ids[]" value="<?php echo $volunteer['VolunteerId'] ?>" onclick="changecheckboxstate(this.id)" <?php echo $volunteer['IsDeleted'] == 1 ? "checked" : "" ?> />
+                            </td>
+                        </tr>
+                        <?php if (count($volunteer_notes) > 0) { ?>
+                        <tr style="background-color:<?php echo $ctr%2 == 1 ? "#e7e7e9" : "white" ?>;">
+                            <td colspan="4">
+                                <div id="notes-<?php echo $volunteer['VolunteerId'] ?>" style="width:100%; display:none; font-size:12px">
+                                    <?php foreach($volunteer_notes as $note) { ?>
+                                    <div style="margin-left:20px;">
+                                        <input type="hidden" id="hidden-note-<?php echo $note['VolunteerNoteId'] ?>" value="<?php echo stripslashes($note['Notes']) ?>" />
+                                        <span style="margin-right:20px">&nbsp;-&nbsp;<?php echo stripslashes($note['Notes']) ?></span>
+                                        <span style="font-size:11px">
+                                            <a href="javascript:;" onclick="togglePopup('edit-note', '#VolunteerNoteId', '<?php echo $note['VolunteerNoteId'] ?>', '')">Edit</a>
+                                            &nbsp;/&nbsp;
+                                            <a href="javascript:;" onclick="deleteNote('<?php echo $note['VolunteerNoteId'] ?>')">Delete</a>
+                                        </span>
+                                    </div>
+                                    <?php } ?>
+                                    <div style="margin-left:20px;"><a style="margin-left:10px" href="javascript:;" onclick="togglePopup('add-note', '#VolunteerId', '<?php echo $volunteer['VolunteerId'] ?>', '')">Add New</a></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php } ?>
+                        <?php $ctr++; } ?>
+                        <?php } else { ?>
+                        <tr>
+                            <td colspan="4" style="padding-left:3px;">No record(s) found</td>
+                        </tr>
+                        <?php } ?>
+                    </table>
+                    <br />
+                    <?php if (count($this->active_volunteers) > 0 || count($this->inactive_volunteers) > 0) { ?>
+                    <div style="float:right;">
+                        <input class="btn btngreen" style="font-size:11px; margin-bottom:20px;" type="button" name="Save" value="Update Members" onClick="update_members_form.submit()">
+                    </div>
+                    <?php } ?>
+                </form>
+                <br /><br />
+                <table id="deleted_volunteers" cellspacing="0" cellpadding="3" border="0" style="border:1px solid #E7E7FF;width:100%; border-collapse:collapse;">
+                    <tr style="color:#F7F7F7;background-color:#000;font-weight:bold;height:25px;">
+                        <th scope="col"><span style="float:left;padding-left:3px;">Denied / Deleted Volunteers</span></th>
+                        <th scope="col"><span style="float:left;">Email</span></th>
+                        <th scope="col">Notes</th>
+                        <th scope="col" style="text-align:center">Status</th>
+                    </tr>
+                    <?php
+                    if (count($this->deleted_volunteers)) {
+                        $ctr = 0;
+                        foreach ($this->deleted_volunteers as $volunteer) {
+                            $volunteer_notes = $this->volunteer_notes->getVolunteerNotes($volunteer['VolunteerId']);
+                    ?>
+                    <tr style="background-color:<?php echo $ctr%2 == 1 ? "#e7e7e9" : "white" ?>;">
+                        <td style="width:45%;padding-left:3px;"><?php echo stripslashes($volunteer['FirstName']." ".$volunteer['LastName']) ?></td>
+                        <td style="width:40%;"><?php echo $volunteer['Email'] ?></td>
+                        <td style="width:150px;">
+                            <?php if (count($volunteer_notes) > 0) { ?>
+                            <a id="view-<?php echo $volunteer['VolunteerId'] ?>" href="javascript:;" onclick="toggleNotes('#notes-<?php echo $volunteer['VolunteerId'] ?>', '<?php echo $volunteer['VolunteerId'] ?>');">View</a>
+                            <a id="hide-<?php echo $volunteer['VolunteerId'] ?>" href="javascript:;" onclick="toggleNotes('#notes-<?php echo $volunteer['VolunteerId'] ?>', '<?php echo $volunteer['VolunteerId'] ?>');" class="hidden">Hide</a>
+                            <?php } else { ?>
+                            <a href="javascript:;" onclick="togglePopup('add-note', '#VolunteerId', '<?php echo $volunteer['VolunteerId'] ?>', '')">Add</a>
+                            <?php } ?>
+                        </td>
+                        <td style="width:15%; text-align:center">
+                            <?php echo $volunteer['IsDeleted'] == 1 ? "Deleted" : "Denied" ?>
+                            &nbsp;(<a href="javascript:;" style="font-size:85%;" onclick="undo('<?php echo $volunteer['VolunteerId'] ?>', '<?php echo $volunteer['IsDeleted'] == 1 ? "IsDeleted" : "IsDenied" ?>')">Undo</a>)
+                        </td>
+                    </tr>
+                    <?php if (count($volunteer_notes) > 0) { ?>
+                    <tr style="background-color:<?php echo $ctr%2 == 1 ? "#e7e7e9" : "white" ?>;">
+                        <td colspan="4">
+                            <div id="notes-<?php echo $volunteer['VolunteerId'] ?>" style="width:100%; display:none; font-size:12px">
+                                <?php foreach($volunteer_notes as $note) { ?>
+                                <div style="margin-left:20px;">
+                                    <input type="hidden" id="hidden-note-<?php echo $note['VolunteerNoteId'] ?>" value="<?php echo stripslashes($note['Notes']) ?>" />
+                                    <span style="margin-right:20px">&nbsp;-&nbsp;<?php echo stripslashes($note['Notes']) ?></span>
+                                    <span style="font-size:11px">
+                                        <a href="javascript:;" onclick="togglePopup('edit-note', '#VolunteerNoteId', '<?php echo $note['VolunteerNoteId'] ?>', '')">Edit</a>
+                                        &nbsp;/&nbsp;
+                                        <a href="javascript:;" onclick="deleteNote('<?php echo $note['VolunteerNoteId'] ?>')">Delete</a>
+                                    </span>
+                                </div>
+                                <?php } ?>
+                                <div style="margin-left:20px;"><a style="margin-left:10px" href="javascript:;" onclick="togglePopup('add-note', '#VolunteerId', '<?php echo $volunteer['VolunteerId'] ?>', '')">Add New</a></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php } ?>
+                    <?php $ctr++; } ?>
+                    <?php } else { ?>
+                    <tr>
+                        <td colspan="4" style="padding-left:3px;">No record found</td>
+                    </tr>
+                    <?php } ?>
+                </table>
+            </div>
+        </div>
+        <div style="margin-top:30px;">
+            <a class="btn btngreen" title="Back" href="/<?=$this->project->urlName?>">Back</a>
+            <?php if (0) { // notes report needs to be fixed for personal activities then we can add it back }$total_notes > 0) { ?>
+            <a class="btn btngreen" title="Back" href="/volunteer/notesreport?ProjectId=<?=$this->project->id?>">Notes Report</a>
+            <?php } ?>
+        </div>
+		<div class="clear"></div>
+            	</div>
+            </div>
+        <div class="clr"></div>
+        <div class="clr"></div>
+    </div>

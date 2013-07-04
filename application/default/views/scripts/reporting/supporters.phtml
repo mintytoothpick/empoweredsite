@@ -1,0 +1,27 @@
+<script type="text/javascript" src="/public/js/jquery-1.4.2.js"></script>
+<style>
+span {font-size:9px;}
+</style>
+<? $total = 0; ?>
+<table cellpadding="5" cellspacing="0" width="100%" border="1">
+    <tr>
+        <td>User</td>
+        <td>Joined On</td>
+        <td>Last Payment</td>
+        <td>Active</td>
+        <td>Amount</td>
+        <td>Frequency</td>
+    </tr>
+    <?php foreach ($this->paginator as $supp) { ?>
+    <tr>
+        <td><?=($supp->user) ? $supp->fullName : 'Not registered user'?></td>
+        <td><?=$supp->joinedOn?></td>
+        <td><?=$supp->payment->createdOn?></td>
+        <td><?=($supp->isActive) ? 'Yes' : 'No'?></td>
+        <td><?=number_format($supp->payment->amount)?></td>
+        <td><?=$supp->frequency->frequency?></td>
+    </tr>
+    <?php } ?>
+</table>
+
+<?= $this->paginationControl($this->paginator, 'Sliding', '/dashboard/page_selector.phtml'); ?>

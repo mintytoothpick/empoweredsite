@@ -1,0 +1,423 @@
+<?php $this->placeholder('currenttab')->set('events'); ?>
+<script type='text/javascript'>
+    var total_tickets = 1;
+
+    function createProgram() {
+        $('#ProgramId').hide();
+        $('#ProgramId').rules("remove");
+        $('label[for=ProgramId]').remove();
+        $('#ProgramId').val('');
+        $('#ProgramName').show();
+        $('#ProgramName').rules("add",{
+            required: true,
+            notEqualTo: 'New Program Name',
+            messages: {
+                required: "The new program's name cannot be blank.",
+                notEqualTo: "The new program's name cannot be blank."
+            }
+        });
+        $('#CreateProgramLink').hide();
+        groupNameValid();
+    }
+
+    function createGroup() {
+        $('#GroupId').rules("remove");
+        $('#GroupId').val('');
+        $('label[for=GroupId]').remove();
+        groupNameValid();
+    }
+
+    function groupNameValid() {
+        $('#GroupId').hide();
+        $('#GroupName').show();
+        $('#GroupName').rules("add",{
+            required: true,
+            notEqualTo: 'New Chapter Name',
+            messages: {
+                required: "The new chapter's name cannot be blank.",
+                notEqualTo: "The new chapter's name cannot be blank."
+            }
+        });
+        $('#CreateGroupLink').hide();
+    }
+
+    $(function() {
+
+    	$("#EndTime, #StartTime, #StartDate").each(function(){
+            $(this).focusout(function(){
+                   $("#EndDate").valid();
+            });
+         });
+
+        //form contact validate
+        $("#CreateEvent").validate({
+            onfocusout: function(element) { this.element(element); },
+            errorPlacement: function(error, element) {
+                if (element.attr("name") == "StartDate") {
+                    $('#liStartDate').append(error);
+                } else if (element.attr("name") == "EndDate") {
+                    $('#liEndTime').append(error);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            rules: {
+                Title: {
+                    required: true,
+                    notEqualTo: 'My Event'
+                },
+                Description: {
+                    required: true,
+                    notEqualTo: "This is my event. Let's change the world!"
+                },
+                Location: {
+                    required: true,
+                    notEqualTo: "UCLA Auditorium 757 Hilgard, Los Angeles, CA 90405"
+                },
+<?php if($this->level == "organization"){ ?>
+  <?php if ($this->organization->hasPrograms) { ?>
+                ProgramId: {
+                    required: true,
+                },
+  <?php } ?>
+  <?php if ($this->organization->hasGroups) { ?>
+                GroupId: {
+                    required: true,
+                },
+   <?php } ?>
+<?php } ?>
+                StartDate: {
+                    required: true,
+                    dateFormat: true,
+                    dateGT: '<?=date('m/d/Y') ?>'
+                },
+                EndDate: {
+                    required: true,
+                    dateFormat: true,
+                    dateTimeGT: $('#StartDate')
+                },
+                numTickets: {
+                    required: "#isSellTickets03:checked",
+                    number: true,
+                }
+
+            },
+            messages: {
+                Title: {
+                    required: 'Please specify the event title.',
+                    notEqualTo: 'Please specify the event title.'
+                },
+                Description: {
+                    required: 'Please specify the event details.',
+                    notEqualTo: 'Please specify the event details.'
+                },
+                Location: {
+                    required: 'Please specify the event location.',
+                    notEqualTo: 'Please specify the event location.'
+                },
+<?php if($this->level == "organization"){ ?>
+  <?php if ($this->organization->hasPrograms) { ?>
+                ProgramId: {
+                    required: "You must associate this activity with an existing program or create a one to associate with it.",
+                },
+  <?php } ?>
+  <?php if ($this->organization->hasGroups) { ?>
+                GroupId: {
+                    required: 'You must associate this activity with an existing chapter or create a one to associate with it.'
+                },
+  <?php } ?>
+<?php } ?>
+                StartDate: {
+                    required: 'Please specify the event start date.',
+                    dateFormat: 'Please specify a valid start date.',
+                    dateGT: 'Start date must be greater than the current date.'
+                },
+                EndDate: {
+                    required: 'Please specify the event end date.',
+                    dateFormat: 'Please specify a valid end date.',
+                    dateGT: 'End date must be greater than start date.'
+                },
+                numTickets: {
+                    required: 'Please specify the number of tickets.',
+                    number: 'The limit of tickets must be a number.'
+                }
+            }
+        });
+        $('.adv-opts').hide();
+
+        $('#StartDate').datepicker({ changeMonth: true, changeYear: true })
+                       .change(function(){
+                           $(this).focus();
+                       });
+        $('#StartTime').calendricalTime();
+        $('#EndDate').datepicker({ changeMonth: true, changeYear: true })
+                     .change(function(){
+                         $(this).focus();
+                     });
+        $('#EndTime').calendricalTime();
+        $('.date-inp').datepicker({ changeMonth: true, changeYear: true })
+                      .change(function(){
+                          $(this).focus();
+                      });
+        $('input.grey, textarea.grey').focus(function () {
+            $(this).val('');
+            $(this).removeClass('grey');
+        });
+    });
+
+    function cleanInputs() {
+        if ($('#isSellTickets01').attr('checked')) {
+            $('.ticket-dates').each(function() {
+                if ($(this).val() == 'Today' || $(this).val() == 'x date in future') {
+                    $(this).val('');
+                }
+            });
+            $('.ticket-qty').each(function() {
+                if ($(this).val() == '1,000') {
+                    $(this).val('');
+                }
+            });
+        }
+    }
+
+    function addTickets() {
+        $('.tickets').show();
+        validateTickets(total_tickets);
+    }
+
+    function loadGroup(PID) {
+        $('#groups-list').load('/fundraisingcampaign/loadgroups', {ProgramId: PID});
+    }
+
+    function addTicket() {
+        total_tickets++;
+        $('#total_tickets').val(total_tickets);
+        $.post('/event/addticket', {ctr: total_tickets}, function(data) {
+            $('#more-tickets').append(data).ready(function(){
+                validateTickets(total_tickets);
+            });
+        });
+    }
+    function validateTickets(id) {
+        $("#TicketName-"+id).rules("add",{
+            required: "#isSellTickets01:checked",
+            messages: {
+                required: 'Please specify the ticket name.'
+            }
+        });
+        $("#TicketPrice-"+id).rules("add", {
+            number: "#isSellTickets01:checked",
+            messages: {
+                number: "Please specify a valid ticket price, or you may leave it blank if you sell it for FREE"
+            }
+        });
+    }
+
+    function removeTicket(id) {
+        $("#TicketName-"+id).rules("remove");
+        $("#TicketPrice-"+id).rules("remove");
+        $('.new-ticket-'+id).remove();
+        //total_tickets--;
+    }
+
+    function removeTickets() {
+        $('.tickets').hide();
+        $('.adv-opts').hide();
+    }
+</script>
+<style>
+    label.error { color:red; display: block; margin-top: 5px;}
+    .success { color:green; }
+    .date-inp {width: 95px;}
+    .field-label { float:left; font-weight:bold; color:#000; width:200px; margin-bottom:15px;}
+    .field-input { float:left; width:455px; margin-bottom:15px; }
+    .field-input .input { width:300px; }
+    .field-input input { padding:1px; }
+    .field-input .date { width:95px; }
+    .popup-box { width: 370px; left: 40%; right: 40%; top:25%; position: absolute; z-index: 999999!important; background-color:#ffffff; border:5px solid #e5e5e5; padding:10px 0 20px 0; -moz-border-radius:7px }
+    .calendricalTimePopup { width:98px }
+    #ui-datepicker-div { font-size:11px }
+</style>
+<div class="wrapper">
+   <!-- org header -->
+  <?=$this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+
+    <?php if (isset($this->organization)) { ?>
+
+      <!-- breadcrumb -->
+      <?=$this->placeholder('breadcrumb') ?>
+      <!-- // breadcrumb -->
+      <div class="clr"></div>
+
+      <!-- tabs -->
+      <?=$this->placeholder('tabs') ?>
+      <!-- // tabs -->
+
+    <?php } else {
+      include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/profileheader.php';
+    } ?>
+
+    <div class="mainC">
+      <div class="box05">
+        <div class="headingStyle02">
+            <?=($this->isEdit) ? 'Edit' : 'Create an'?> Event
+        </div>
+        <a id="top" href="#top" style="text-decoration:none">&nbsp;</a>
+        <form name="CreateEvent" method="post" id="CreateEvent" >
+            <? if ($this->isEdit) { ?><input type="hidden" name="EventId" value="<?=$this->event->id?>" /><? } ?>
+            <input type="hidden" id="with-end-date" name="with_end_date" value="1" />
+            <ul style="list-style:none; padding-bottom:0px">
+                <li style="width:725px; float:left; padding-left:20px">
+                    <div id="message" class="error" style="width:700px; border:2px solid #e3e3e3; margin-bottom:15px; padding:5px; <?php if(!$this->message) { echo "display:none;"; } ?>"><?php if(isset($this->message)) { echo $this->message; } ?></div><br />
+                    <ul style="list-style:none; padding-bottom:0px; padding-left:0px; margin-bottom:0px">
+                    <?php if ($this->Level == "organization") { ?>
+                        <?php if($this->organization->hasPrograms && !count($this->programs)) { ?>
+                        <div id="CreateProgramExplanation" style="border:1px solid #dcbd00; background-color:#fff7c8; padding:10px; margin-bottom:10px;">You must create a program to associate this volunteer activity with.</div>
+                        <?php } ?>
+                        <?php if ($this->organization->hasPrograms == 1) { ?>
+                            <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Affiliated Program:</li>
+                            <li class="field-input">
+                                <?php if (count($this->programs)) { ?>
+                                <select name="ProgramId" id="ProgramId" onchange="loadGroup(this.value)">
+                                    <option value="">Select a Program</option>
+                                    <?php foreach($this->programs as $program) { ?>
+                                    <option value="<?=$program->id?>" <?php if(isset($_REQUEST['pid']) && $_REQUEST['pid'] == $program->id) { echo 'selected'; } ?>><?=stripslashes($program->name) ?></option>
+                                    <?php } ?>
+                                </select>
+                                <a id="CreateProgramLink" href="javascript:;" onclick="createProgram();" style="margin-left:10px;"> or Create a New Program</a>
+                                <?php } ?>
+                                <input type="text" id="ProgramName" name="ProgramName" value="New Program Name" class="input" onfocus="this.value=''; $('#ProgramName').css('color', '#000');" style="color:#AAA; <?=count($this->programs) == 0 ? '' : 'display:none;'?>" />
+                            </li>
+                            <div class="clear"></div>
+                        <?php } ?>
+                        <?php if(!$this->organization->hasPrograms && $this->organization->hasGroups && !count($this->groups)) { ?>
+                        <div id="CreateProgramExplanation" style="border:1px solid #dcbd00; background-color:#fff7c8; padding:10px; margin-bottom:10px;">You must create a chapter to associate this event with.</div>
+                        <?php } ?>
+                        <?php if ($this->organization->hasGroups) { ?>
+                        <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Affiliated Chapter:</li>
+                        <li class="field-input" id="groups-list">
+                            <?php if (count($this->programs) || count($this->groups)) { ?>
+                            <select name="GroupId" id="GroupId" <?php if(!isset($_REQUEST['pid']) && $this->organization->hasPrograms) { echo 'disabled'; } ?>>
+                                <option value="">Select a Chapter</option>
+                                <?php if(isset($this->groups)) { foreach($this->groups as $group) { ?>
+                                <option value="<?=$group['GroupId'] ?>"><?=stripslashes($group['GroupName']) ?></option>
+                                <?php } } ?>
+                            </select>
+                            <?php if(count($this->groups)) { ?><a id="CreateGroupLink" href="javascript:;" onclick="createGroup();" style="margin-left:10px;"> or Create a New Chapter</a><?php } ?>
+                            <?php } ?>
+                            <input type="text" id="GroupName" name="GroupName" value="New Chapter Name" class="input" onfocus="this.value=''; $('#GroupName').css('color', '#000');" style="color:#AAA; <?=count($this->groups) == 0 ? '' : 'display:none;'?>" />
+                        </li>
+                        <div class="clear"></div>
+                        <?php } ?>
+                            <?php if($this->organization->hasPrograms || $this->organization->hasGroups) { ?>
+                                <br /><span style="font-weight:bold;text-decoration:underline;margin-bottom:12px;">Event Details</span><br /><br />
+                                <div class="clear"></div>
+                            <?php } ?>
+                        <?php } ?>
+                        <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Title:</li>
+                        <li class="field-input">
+                            <input name="Title" type="text" maxlength="50" id="Title" class="input <?=(!$this->isEdit) ? 'grey' : ''?>" value="<?=(!$this->isEdit) ? 'My Event' : $this->event->title?>" />
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Starts:</li>
+                        <li class="field-input" id="liStartDate">
+                            <input style="padding: 4px;<?=(!$this->isEdit)? 'color: gray' : ''?>" class="text smaller" name="StartDate" type="text" maxlength="10" id="StartDate" onchange="$('#EndDate').val($('#StartDate').val()); if ($('#StartDate').css('color') == 'gray') { $('#StartDate').css('color', 'black') }" value="<?=($this->isEdit) ? date_format(date_create($this->event->startDate), 'm/d/Y') : date('m/d/Y')?>"/>
+                            <input style="margin-left:10px;<?=(!$this->isEdit)? 'color: gray' : ''?>" class="time" name="StartTime" type="text" maxlength="10" id="StartTime" onkeypress="return false" onclick="if ($('#StartTime').css('color') == 'gray') { $('#StartTime').css('color', 'black') }" value="<?=($this->isEdit) ? date_format(date_create($this->event->startDate), 'H:i') : '12:00am'?>" />
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label enddate"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Ends:</li>
+                        <li class="field-input enddate" id="liEndTime">
+                            <input style="padding: 4px;" class="text smaller" name="EndDate" type="text" maxlength="10" id="EndDate" value="<?=($this->isEdit) ? date_format(date_create($this->event->endDate), 'm/d/Y') : ''?>" />
+                            <input class="time" style="margin-left:10px" name="EndTime" type="text" maxlength="10" id="EndTime" value="<?=($this->isEdit) ? date_format(date_create($this->event->endDate), 'H:i') : ''?>" onkeypress="return false" />
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Description: </li>
+                        <li class="field-input">
+                            <textarea class="input<?=(!$this->isEdit)? ' grey':''?>" name="Description" rows="3" cols="20" id="Description" onblur="return fnKeepWordLenTrack(this,3000);" onkeyup="return fnKeepWordLenTrack(this,3000);"><?=($this->isEdit) ? $this->event->text : "This is my event. Let's change the world!"?></textarea>
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Location: </li>
+                        <li class="field-input">
+                            <textarea class="input<?=(!$this->isEdit)? ' grey':''?>" name="Location" rows="2" cols="20" id="Location" onblur="return fnKeepWordLenTrack(this,3000);" onkeyup="return fnKeepWordLenTrack(this,3000);"><?=isset($this->isEdit) ? $this->event->location : "UCLA Auditorium 757 Hilgard, Los Angeles, CA 90405" ?></textarea>
+                        </li>
+                        <div class="clear"></div>
+                        <span <?=(!$this->googleId || $this->googleId == 23) && !$this->paypalId ? 'style="display:none;"' : ''; ?>>
+                        <li class="field-label">&nbsp;&nbsp;Do you to want to track<br/>&nbsp;&nbsp;attendees?</li>
+                        <li class="field-input">
+                            <span style="display:none;"><input type="radio" id="isSellTickets01" name="isSellTickets" value="1" onclick="addTickets();$('.rsvp').hide();">&nbsp;Yes</span>
+                            <span style="margin-left:10px"><input type="radio" id="isSellTickets02" name="isSellTickets" value="0" checked onclick="removeTickets();$('.rsvp').hide();">&nbsp;No</span>
+                            <span style="margin-left:10px"><input type="radio" id="isSellTickets03" name="isSellTickets" value="2" onclick="removeTickets();$('.rsvp').show();">&nbsp;Yes (Free Only)</span>
+                        </li></span>
+                        <div class="clear"></div>
+                        <li class="hide field-label rsvp">&nbsp;&nbsp;Limit # of Attendees:</li>
+                        <li class="hide field-input rsvp">
+                            <input type="text" value="1" name="numTickets" id="numTickets" />
+                        </li>
+                        <li class="field-label hidden tickets">&nbsp;</li>
+                        <li class="field-input hidden tickets">
+                            <strong style="color: #669933">Ticket #1</strong>
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label hidden tickets"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Ticket Name?</li>
+                        <li class="field-input hidden tickets">
+                            <input class="input ticket-name grey" type="text" id="TicketName-1" name="TicketName[1]" value="General Admission Ticket" />
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label hidden tickets">Ticket Description?</li>
+                        <li class="field-input hidden tickets">
+                            <textarea class="input ticket-desc grey" type="text" id="TicketDescription-1" name="TicketDescription[1]" cols="20" rows="3">You may describe the ticket here. Feel free to leave this blank.</textarea>
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label hidden tickets"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Ticket Price?</li>
+                        <li class="field-input hidden tickets">
+                            <?= isset($this->group) ? $this->group->currency : $this->organization->currency ?><input class="input ticket-price grey" id="TicketPrice-1" type="text" name="TicketPrice[1]" value="You may leave it blank if you want to sell if for FREE" />
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label hidden tickets">&nbsp;</li>
+                        <li class="field-input hidden tickets">
+                            <a href="javascript:;" onclick="$('.adv-opts-1').toggle()">Advanced Options</a>
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label adv-opts adv-opts-1" style="display: none">&nbsp;&nbsp;Limit ticket quantity:</li>
+                        <li class="field-input adv-opts adv-opts-1" style="display: none">
+                            <input class="input ticket-qty grey" type="text" id="TicketQuantity-1" name="TicketQuantity[1]" value="1,000" />
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label adv-opts adv-opts-1" style="display: none">&nbsp;&nbsp;Limit ticket availability:</li>
+                        <li class="field-input adv-opts adv-opts-1" style="display: none" id="liTicketDate-1">
+                            <input style="padding: 4px;" class="text smaller date-inp ticket-dates grey" id="TicketStartDate-1" name="TicketStartDate[1]" type="text" value="Today" onchange="if ($('#TicketStartDate-1').css('color') == 'gray') { $('#TicketStartDate-1').css('color', 'black'); }" />
+                            &nbsp;thru&nbsp;
+                            <input style="padding: 4px;" class="text smaller date-inp ticket-dates grey" id="TicketEndDate-1" name="TicketEndDate[1]" type="text" value="x date in future" onchange="if ($('#TicketEndDate-1').css('color') == 'gray') { $('#TicketEndDate-1').css('color', 'black'); }" />
+                        </li>
+                        <div class="clear"></div>
+                        <div id="more-tickets">
+
+                        </div>
+                        <li class="field-label hidden tickets" style="margin-bottom:15px">&nbsp;</li>
+                        <li class="field-input hidden tickets" style="margin-bottom:15px">
+                            <a href="javascript:;" onclick="addTicket()">Add Another Ticket</a>
+                            <input type="hidden" id="total_tickets" name="total_tickets" value="0" />
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <div style="margin-left:65px; margin-top:15px; float:left; width:100%; margin-bottom:20px">
+                <? if ($this->isEdit) { ?>
+                <a class="btn btngreen" title="Back" href="/<?= ($this->event->entity) ? $this->event->entity->urlName.'/event?EventId='.$this->event->id : $this->group->urlName.'/event?EventId='.$this->event->id ?>" >Back</a>
+                <? } else { ?>
+                <a class="btn btngreen" title="Back" href="/<?= isset($this->group) ? $this->group->urlName : $this->organization->urlName ?>" >Back</a>
+                <? } ?>
+                <input type="submit" class="btn btngreen" name="btnCreateNew" value="<?=(!$this->isEdit) ?'Create New':'Save Changes'?>" id="btnCreateNew" onclick="cleanInputs()" />
+            </div>
+        </form>
+        <div class="clear"></div>
+                </div>
+            </div>
+        <div class="clr"></div>
+        <div class="clr"></div>
+    </div>

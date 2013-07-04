@@ -1,0 +1,45 @@
+<?php
+$params = "";
+$params .= isset($_REQUEST['ProgramId']) ? "ProgramId={$_REQUEST['ProgramId']}&" : "";
+$params .= isset($_REQUEST['GroupId']) ? "GroupId={$_REQUEST['GroupId']}&" : "";
+$params .= isset($_REQUEST['searchFilter']) ? "searchFilter={$_REQUEST['searchFilter']}&" : "";
+$params .= isset($_REQUEST['FromDate']) ? "FromDate={$_REQUEST['FromDate']}&" : "";
+$params .= isset($_REQUEST['ToDate']) ? "ToDate={$_REQUEST['ToDate']}&" : "";
+$params .= 'page';
+$url     =  "/";
+if (!empty($_REQUEST['URLName'])) {
+    $url .= $_REQUEST['URLName'];
+}
+if (!empty($_REQUEST['subpage'])) {
+    $url .= "/" . $_REQUEST['subpage'];
+}
+?>
+<?php if ($this->pageCount > 1) { ?>
+<center>
+    <div class="paginationControl" style="font-weight:normal">
+
+    <!-- Previous page link -->
+    <?php if (isset($this->previous)) { ?>
+        <a href="<?=$url?>?<?= $params ?>=<?=$this->previous?>" class="paginator"><span class="paginationBox">&laquo; Previous</span></a>
+    <?php } else { ?>
+        <span class="paginationBoxDisabled">&laquo; Previous</span>
+    <?php } ?>
+
+    <!-- Numbered page links -->
+    <?php foreach ($this->pagesInRange as $page) { ?>
+        <?php if ($page != $this->current) { ?>
+            <a href="<?=$url?>?<?= $params ?>=<?=$page?>" class="paginator"><span class="paginationBox"><?=$page?></span></a>
+        <?php } else { ?>
+            <span class="paginationBoxDisabled"><?= $page ?></span>
+        <?php } ?>
+    <?php } ?>
+
+    <!-- Next page link -->
+    <?php if (isset($this->next)) { ?>
+        <a href="<?=$url?>?<?= $params ?>=<?=$this->next?>" class="paginator"><span class="paginationBox">Next &raquo;</span></a>
+    <?php } else { ?>
+        <span class="paginationBoxDisabled">Next &raquo;</span>
+    <?php } ?>
+    </div>
+</center>
+<?php } ?>

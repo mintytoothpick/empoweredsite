@@ -1,0 +1,57 @@
+<?php $this->placeholder('analytics')->captureStart(); ?>
+
+<?php
+$trackControllers = array(
+                        'project',
+                        'profile',
+                        'group',
+                        'nonprofit',
+                        'program',
+);
+
+$controllerName = strtolower( Zend_Controller_Front::getInstance()->getRequest()->getControllerName() );
+
+$trackUrl = '';
+
+if(in_array($controllerName, $trackControllers))
+{
+    $trackUrl = '/' . $controllerName . $_SERVER['REQUEST_URI'];
+}
+
+?>
+
+<script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17384953-2']);
+    
+    <?php
+    if(empty($trackUrl))
+    {
+        echo "_gaq.push(['_trackPageview']);";
+    }
+    else
+    {
+        echo "_gaq.push(['_trackPageview', '$trackUrl']);";
+    }
+    ?>
+    
+    _gaq.push(['_trackPageLoadTime']);
+
+<?php if ($this->createdOrganization) { ?>
+    _gaq.push(['_trackEvent', 'Organization', 'Create', 'GetStarted']);
+<?php } ?>
+
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+    // AddThis Analytics Social Conf
+    var addthis_config = {
+        data_ga_property: 'UA-17384953-2',
+        data_ga_social : true
+    };
+
+</script>
+<?php $this->placeholder('analytics')->captureEnd() ?>

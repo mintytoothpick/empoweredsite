@@ -1,0 +1,190 @@
+<style>
+fieldset {float:left;widht:450px;border:0;}
+fieldset.left {padding:0 20px 0 0;margin-right:7px;border-right:1px solid #CCC;}
+fieldset label {display:block;float:left;width:150px;clear:both;}
+fieldset input {display:block; width:240px;}
+fieldset input.dateInp {width:50px;float:left;}
+label.error {color:red; margin-top: 0; display: block;width:400px}
+fieldset label.error {padding-left:150px;width:200px;margin-bottom:5px;}
+</style>
+<script>
+<!--
+$(function() {
+
+    $("#formMembership").validate({
+        onfocusout: function(element) { this.element(element); },
+        rules: {
+            firstName: 'required',
+            lastName: 'required',
+            street: 'required',
+            city: 'required',
+            state: 'required',
+            zipcode: 'required',
+            country: 'required',
+            email: {
+                required: true,
+                email: true
+            },
+            phone: 'required'
+        },
+        submitHandler: function(form) {
+            $.fancybox.close();
+            $("#btnSub").hide();
+            $("#loading").show();
+            $("#errorInfo").html('').hide();
+            $.ajax({
+                type: "POST",
+                url: "membershippay",
+                data: $("#formMembership").serialize(),
+                dataType: "json",
+                timeout: 60000,
+                success: function(data) {
+                    if (data['status'] == 'ok') {
+<?php
+$session = new Zend_Session_Namespace('volunteer_membership');
+if(!empty($session->projectUrlName)) { ?>
+                        location.href = '/<?=$session->projectUrlName?>/signup';
+<?php
+$session->projectUrlName = null;
+} else { ?>
+                        location.href = 'participate';
+<?php }  ?>
+                    } else {
+                        $("#errorInfo").html(data['msg']).show();
+                        if (data['donationId']) {
+                            $("#DonationId").val(data['donationId']);
+                        }
+                        $("#btnSub").show();
+                        $("#loading").hide();
+                    }
+                },
+                error: function(request, status, err) {
+                    if(status == "timeout") {
+                        alert('Error timeout, please try again later.');
+                        $("#btnSub").show();
+                        $("#loading").hide();
+                    }
+                }
+            });
+        }
+    });
+
+    $('#cardNumber').rules("add",{
+        required:true,
+        creditcard: true,
+        notAmex: true
+    });
+    $('#validationCode').rules("add",{
+        required: true,
+        rangelength: [2,4]
+    });
+    $('#cardExpYear').rules("add",{
+        required: true,
+        creditCardExpDate: {
+            month: "#cardExpMonth",
+            year: "#cardExpYear"
+        }
+    });
+});
+
+function selectAmount(id, time,amnt) {
+    $('.amntSel').html(amnt);
+    $('.timeSel').html(time);
+    if (id == 4) {
+        $('.time2Sel').html('each month');
+    } else if (id == 3) {
+        $('.time2Sel').html('once a year');
+    } else if (id == 2) {
+        $('.time2Sel').html('once a semester');
+    } else if (id == 1) {
+        $('.time2Sel').html('once');
+    }
+}
+
+function showMessage() {
+    if ($("#formMembership").valid()) {
+        $.fancybox($('#messageMembership').html());
+    }
+}
+-->
+</script>
+
+<div id="messageMembership" class="hide">
+<p style="font-size:14px;" align="center"><b>Please note the frequency of your donation is <span class="amntSel"></span> <span class="timeSel"></span>,
+and this donation<br /> will be placed on the following credit/debit card (<span class="time2Sel"></span>).</b></p>
+<p align="center">If you have any questions about your membership, or wish to discontinue your membership donations,<br />
+please email membership@globalbrigades.org.</p>
+<p align="center">Thank you for your support of <?=$this->group->name?>!</p>
+<div class="volunteerBtn02">
+<a onclick="javascript:$('#formMembership').submit();" href="javascript:;">Continue</a>
+</div>
+</div>
+
+<div class="wrapper">
+    <!-- org header -->
+    <?php echo $this->placeholder('header') ?>
+    <!-- // org header -->
+
+    <div class="clr"></div>
+    <div class="BodyCon">
+
+    <!-- breadcrumb -->
+    <?php echo $this->placeholder('breadcrumb') ?>
+    <!-- // breadcrumb -->
+
+        <div class="clr"></div>
+
+        <!-- tabs -->
+        <?=$this->placeholder('tabs') ?>
+        <!-- // tabs -->
+
+        <div class="mainC02">
+            <div class="box05 BG01">
+                <div class="headingStyle02">Welcome to the GB Membership!</div>
+                <div style="padding:0 10px;">
+<? if ($this->msgVolunteer) { ?>
+                    <p><strong>To become a volunteer of <?=$this->group->name?> you need to become a member of this chapter. If you have any questions please email your chapter president or membership@globalbrigades.org</strong></p>
+<? } ?>
+                    <p>As a member of Global Brigades, your contribution will perpetuate year-round health and sustainable development work in the communities in which we serve. Your contribution will also support and sustain the Global Brigades chapter on your campus for future growth. 100% of your recurring membership donations will go towards your local chapter to support future Brigades and on-campus activities. Additionally, you will receive a variety of benefits including:</p>
+
+                    <ul>
+                        <li><b>Priority Consideration for Internships, Fellowships and Full-Time Jobs</b><br />The member portal will consist of professional opportunities both within Global Brigades and other partner organizations, including positions that have been specifically created for students and alumni of Global Brigades.</li>
+                        <li><b>Free Registration at GB Exchanges and Special Offers at Other Industry Conferences</b><br />Join other Global Brigades members in your region for fun and enriching interactive weekend exchanges to discuss health and develop topics.  Additionally, receive Global Brigades negotiated discounts at other international conferences with other leading organizations.</li>
+                        <li><b>Discounts on Online Certificate Programs</b><br />Members will receive discounts on three online certificate programs delivered by professors at accredited universities to supplement members’ educational experience in: “Global Health,” “Economic Development” and “Nonprofit & Social Enterprise Leadership.”</li>
+                        <li><b>Access to GB Local</b><br />Global Brigades is developing resources and templates to empower chapters to conduct meaningful volunteer programs that engage members of their local community. Examples include (1) facilitate health and safety fairs at under resourced elementary schools, (2) provide local high school students with financial planning workshops, or (3) work with high school sophomore and juniors to demystify the college application process and share perspectives in studying a specific major.</li>
+                        <li><b>Access to the Empower Partners Incubation Initiative</b><br />For members with new or innovative ideas to solve social challenges or improve upon Global Brigades’ programming.  Qualifying members can leverage Global Brigades’ 501c3 tax status, become eligible for grants, and provide tax receipts to donors.  Additionally, plans are eligible for seed funding and given consultative support from GB founders and marketing team to develop their idea and bring it to reality.</li>
+                    </ul>
+                    <form action="" method="post" id="formMembership">
+                    <div class="clear"></div>
+                    <input type="checkbox" name="news" checked/> Would like to receive communication around volunteer deadlines and updates
+                    <div class="clear"></div><br />
+                    <h3>Please, select payment type:</h3>
+                    <? foreach($this->group->membershipDonationAmounts as $memAmounts) { ?>
+                    <p style="font-size: 13px;"><input type="radio" name="freqId" value="<?=$memAmounts->id?>" onclick="$('#payForm').show();selectAmount(<?=$memAmounts->id?>, '<?=$memAmounts->frequency?>', '<?=$this->group->currency?><?=$memAmounts->amount?>')" /><b><?=$memAmounts->frequency?></b> membership donation <b><?=$this->group->currency?><?=$memAmounts->amount?></b></p>
+                    <? } ?>
+
+
+                    <div id="payForm" class="hide">
+                      <hr />
+                      <div id="errorInfo" class="errorBox hide"></div>
+
+                      <h2>Credit Card Information</h2>
+
+                      <?=$this->placeholder('bluepayform_cc') ?>
+                      <div class="clear"></div><br />
+                      <div class="volunteerBtn02_1" id="btnSub">
+                        <a onclick="javascript:showMessage();" href="javascript:;">Make Membership Donation</a>
+                      </div>
+
+                      <div id="loading" class="hide"><center>Please wait. Validating information ...</center></div>
+
+                    <img src="/public/images/bluepay.gif" class="right" width="200px"/>
+                    <div class="clear"></div><br />
+                    </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <div class="clr"></div>
+    <div class="clr"></div>
+</div>

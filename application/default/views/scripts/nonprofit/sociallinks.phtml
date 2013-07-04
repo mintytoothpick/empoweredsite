@@ -1,0 +1,36 @@
+<script>
+/*
+ * TO DELETE. ADDTHIS CODE UPDATED
+ *
+$(function() {
+    
+    $("#fb_share_link").click(function() {
+        $("#share-fb").click();
+    });
+    
+    $("#email_link").click(function() {
+        setTimeout('$("#at_msg").val( "<?= isset($this->shareEmail) ? $this->shareEmail : '' ; ?>").val()', 200);
+    });
+});
+*
+*/
+</script>
+
+<div class="socailNetCon">
+    <div class="socailNets">
+        <div class="fb-like" style="float:left;margin-top:-2px;" data-href="http://<?= $this->shareUrl ?>" data-send="false" data-layout="button_count" data-width="90" data-show-faces="true"></div>
+                
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_compact"></a>
+
+        <!-- TO DELETE. ADDTHIS CODE UPDATED
+	    <a id="share-fb" name="fb_share" type="icon" share_url="<?= $this->shareUrl ?>"></a>
+	    <a id="fb_share_link" title="Send to Facebook" href="#"><span class="at16nc at300bs at15nc at15t_facebook at16t_facebook"><span	class="at_a11y">Share on facebook</span></span></a>
+	    <a class="addthis_button_twitter"></a>
+	    <a id="email_link"class="addthis_button_email"></a>
+         -->
+    </div>
+    <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4e319b9362855da9"></script>
+</div>

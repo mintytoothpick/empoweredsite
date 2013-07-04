@@ -1,0 +1,478 @@
+<script type='text/javascript'>
+    function createProgram() {
+        $('#ProgramId').hide();
+        $('#ProgramId').rules("remove");
+        $('label[for=ProgramId]').remove();
+        $('#ProgramId').remove();
+        $('#ProgramName').show();
+        $('#ProgramName').rules("add",{
+            required: true,
+            notEqualTo: 'New Program Name',
+            messages: {
+                required: "The new program's name cannot be blank.",
+                notEqualTo: "The new program's name cannot be blank."
+            }
+        });
+        $('#CreateProgramLink').hide();
+        groupNameValid();
+    }
+
+    function createChapter() {
+        alert('saraza');
+        groupNameValid();
+    }
+
+    function groupNameValid() {
+        $('#GroupId').rules("remove");
+        $('label[for=GroupId]').remove();
+        $('#GroupId').remove();
+        $('#GroupName').show();
+        $('#GroupName').rules("add",{
+            required: true,
+            notEqualTo: 'New Chapter Name',
+            messages: {
+                required: "The new chapter's name cannot be blank.",
+                notEqualTo: "The new chapter's name cannot be blank."
+            }
+        });
+        $('#CreateGroupLink').hide();
+    }
+
+    // enable end time inputs
+    function addEndDate() {
+        $('.enddate').show();
+        $('#EndDate').val($('#StartDate').val());
+        $('#EndTime').val($('#StartTime').val());
+        $('#with-end-date').val('1')
+
+        $('#EndDate').rules("add", {
+            required: true,
+            dateTimeGT: $('#StartDate'),
+            dateFormat: true,
+            messages: {
+                required: 'Please specify end date of the volunteer activity.',
+                dateGT: 'End date must be greater than start date.'
+            }
+        });
+        $('#EndTime').rules("add", {
+            required: true,
+            date: false,
+            messages: {
+                required: 'Please specify end time of the volunteer activity.'
+            }
+        });
+
+        $("#EndTime, #StartTime, #StartDate").each(function(){
+            $(this).focusout(function(){
+                   $("#EndDate").valid();
+            });
+         });
+    }
+
+    $(function() {
+<? if (!isset($this->edit) || ($this->project->type == 0)) { ?>
+        $('#StartDate').datepicker({ changeMonth: true, changeYear: true })
+                       .change(function(){
+                           $(this).focus();
+                       });
+        $('#StartTime').calendricalTime();
+<? } ?>
+        $('#EndDate').datepicker({ changeMonth: true, changeYear: true })
+                       .change(function(){
+                           $(this).focus();
+                       });
+        $('#EndTime').calendricalTime();
+
+        $('#isfundraising01').click(function() {
+            if (document.getElementById("isfundraising01").checked == true) {
+                $('li.donationgoals').show();
+                document.getElementById("isfundraising02").checked = false;
+                $('#DonationGoal').rules("add", {
+                    min: 0,
+                    number: true,
+                    messages: {
+                        number: 'Please specify a valid number for donation goal.',
+                        min: 'Chapter donation goal must be greater than or equal to 0.'
+                    }
+                });
+                $('#VolunteerMinimumGoal').rules("add", {
+                    min: 0,
+                    number: true,
+                    messages: {
+                        number: 'Please specify a valid number for needed volunteers.',
+                        min: 'Volunteer donation goal must be greater than or equal to 0.'
+                    }
+                });
+            }
+        });
+
+        $('#isfundraising02').click(function() {
+            if (document.getElementById("isfundraising02").checked == true) {
+                $('li.donationgoals').hide();
+                document.getElementById("isfundraising01").checked = false;
+                $('#VolunteerMinimumGoal').rules("remove").val('0');
+                $('#DonationGoal').rules("remove").val('0');
+            }
+        });
+
+        //form contact validate
+        $("#CreateBrigade").validate({
+            onfocusout: function(element) { this.element(element); },
+            errorPlacement: function(error, element) {
+                if (element.attr("name") == "ProjectLogo") {
+                    error.insertAfter("#add-photo-pop");
+                } else if (element.attr("name") == "StartDate") {
+                    $('#liStartDate').append(error);
+                } else if (element.attr("name") == "EndDate") {
+                    $('#liEndTime').append(error);
+                } else if (element.attr("name") == "isFundraising") {
+                    $('#liFundraising').append(error);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            rules: {
+                ProjectLogo: {
+                    accept: "jpeg|jpg|png|gif"
+                },
+<?php if($this->level == "organization"){ ?>
+  <?php if ($this->network['hasPrograms'] == 1) { ?>
+                ProgramId: {
+                    required: true,
+                },
+  <?php } ?>
+  <?php if ($this->network['hasGroups'] == 1) { ?>
+                GroupId: {
+                    required: true,
+                },
+   <?php } ?>
+<?php } ?>
+                Name: 'required',
+                Description: 'required',
+                isFundraising: 'required',
+<?php if ($this->NetworkId == 'DAF7E701-4143-4636-B3A9-CB9469D44178' || $this->NetworkId == '547086E0-5456-4631-AB2A-BA781E7DB9A7' || $this->NetworkId == 'DB04F20F-59FE-468F-8E55-AD75F60FB0CB' || $this->NetworkId == '7D428431-A7C7-4DF6-A667-F9207E14674E' || $this->NetworkId == '47866989-6380-445C-95C0-827E55ACA9CB') { ?>
+                StartDate: {
+                    required: true,
+                    dateFormat: true,
+                    dateGT: '<?=date('m/d/Y', time()) ?>'
+                },
+<? if (!isset($this->edit) || ($this->project->type == 0)) { ?>
+                StartTime: 'required',
+<? } ?>
+                CountryId: 'required',
+<? } ?>
+                VolunteerGoal: {
+                    required: true,
+                    number: true,
+                    max: 100000,
+                    min: 0
+                }
+            },
+            messages: {
+                ProjectLogo: {
+                    accept: 'Please upload pictures in jpeg, png and gif format only.'
+                },
+<?php if($this->level == "organization"){ ?>
+  <?php if ($this->network['hasPrograms'] == 1) { ?>
+                ProgramId: {
+                    required: "You must associate this activity with an existing program or create a one to associate with it.",
+                },
+  <?php } ?>
+  <?php if ($this->network['hasGroups'] == 1) { ?>
+                GroupId: {
+                    required: 'You must associate this activity with an existing group or create a one to associate with it.'
+                },
+  <?php } ?>
+<?php } ?>
+                Name: 'Please specify the title of the volunteer activity.',
+                Description: "Please specify the volunteer activity's description.",
+                isFundraising: 'Please choose to enable or disable fundraising.',
+<?php if ($this->NetworkId == 'DAF7E701-4143-4636-B3A9-CB9469D44178' || $this->NetworkId == '547086E0-5456-4631-AB2A-BA781E7DB9A7' || $this->NetworkId == 'DB04F20F-59FE-468F-8E55-AD75F60FB0CB' || $this->NetworkId == '7D428431-A7C7-4DF6-A667-F9207E14674E' || $this->NetworkId == '47866989-6380-445C-95C0-827E55ACA9CB') { ?>
+                StartDate: {
+                    required: 'Please specify the start date of the volunteer activity.',
+                    dateFormat: 'Please specify a valid start date.',
+                    dateGT: 'Start date must be greater than the current date.'
+                },
+<? if (!isset($this->edit) || ($this->project->type == 0)) { ?>
+                StartTime: 'Please specify the start time of the volunteer activity.',
+<? } ?>
+                CountryId: 'Please specify the country location of volunteer activity.',
+<? } ?>
+                VolunteerGoal: {
+                    required: 'Please specify the needed volunteers.',
+                    number: 'Please specify a valid number for needed volunteers.',
+                    max: 'Volunteer goal must be less than 100,000.',
+                    min: 'Volunteer goal must be greater than or equal to 0.'
+                }
+            }
+        });
+<?php if (isset($this->project->organizationId) && $this->organization->hasGroups && count($this->groups) == 0) { ?>
+        $('#GroupName').rules("add",{
+            required: true,
+            notEqualTo: 'New Chapter Name',
+            messages: {
+                required: "The new chapter's name cannot be blank.",
+                notEqualTo: "The new chapter's name cannot be blank."
+            }
+        });
+<? } ?>
+    });
+
+    function loadGroup(PID) {
+        $('#groups-list').load('/fundraisingcampaign/loadgroups', {ProgramId: PID, create: 1});
+        $('#GroupName').rules('remove');
+    }
+</script>
+<style>
+    label.error { color:red; margin-top: 5px; display:block;}
+    .success { color:green; }
+    .date-inp {width: 95px;}
+    .field-label { float:left; font-weight:bold; color:#000; width:200px; margin-bottom:15px;}
+    .field-input { float:left; width:355px; margin-bottom:15px; }
+    .field-input .input { width:300px; }
+    /*.field-input input { padding:1px; }*/
+    .field-input .date { width:95px; }
+    .hidden { display:none }
+    .popup-box { width: 370px; left: 40%; right: 40%; top:25%; position: absolute; z-index: 999999!important; background-color:#ffffff; border:5px solid #e5e5e5; padding:10px 0 20px 0; -moz-border-radius:7px }
+    .calendricalTimePopup { width:98px }
+    #ui-datepicker-div { font-size:11px }
+</style>
+<div class="wrapper">
+   <!-- org header -->
+  <?=$this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+
+    <?php if (isset($this->project->userId)) { ?>
+        <?=$this->placeholder('breadcrumb') ?>
+    <?php }?>
+
+    <?php if (isset($this->organization)) { ?>
+
+      <!-- breadcrumb -->
+      <?=$this->placeholder('breadcrumb') ?>
+      <!-- // breadcrumb -->
+      <div class="clr"></div>
+
+      <!-- tabs -->
+      <?=$this->placeholder('tabs') ?>
+      <!-- // tabs -->
+
+    <?php } else {
+      include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/profileheader.php';
+    } ?>
+
+    <div class="mainC">
+      <div class="box05">
+        <div class="headingStyle02">
+            <?= (isset($this->edit)) ? 'Edit' : 'Create a' ?>
+            <? if (isset($this->edit)) { ?>
+            <?=($this->project->type == 0) ? 'Volunteer Activity' : 'Fundraising Campaign'?>
+            <? } else { ?>
+            Volunteer Activity
+            <? } ?>
+        </div>
+        <a id="top" href="#top" style="text-decoration:none">&nbsp;</a>
+        <form name="CreateBrigade" method="post" <?php if (!isset($this->edit)) { ?>enctype="multipart/form-data"<? } ?> id="CreateBrigade">
+
+            <?php if (!isset($this->edit)) { ?>
+                <?php if ($this->level == "group") { ?>
+                    <input type="hidden" id="GroupId" name="GroupId" value="<?=$this->group->id?>" />
+                <?php } else if ($this->level == "organization") { ?>
+                    <input type="hidden" id="NetworkId" name="NetworkId" value="<?=$this->organization->id?>" />
+                <?php } ?>
+            <?php } else { ?>
+                <?php if ($this->project->organizationId) { ?>
+                    <input type="hidden" id="NetworkId" name="NetworkId" value="<?=$this->project->organization->id?>" />
+                <?php } ?>
+                <?php if ($this->project->groupId) { ?>
+                    <input type="hidden" id="GroupId" name="GroupId" value="<?=$this->project->group->id?>" />
+                <?php } ?>
+                <input type="hidden" id="ProjectId" name="ProjectId" value="<?=$this->project->id?>" />
+                <? if ($this->project->contact) { ?><input type="hidden" id="ContactId" name="ContactId" value="<?=$this->project->contact->id?>" /><? } ?>
+            <?php } ?>
+            <input type="hidden" id="with-end-date" name="with_end_date" value="0" />
+            <input type="hidden" id="with-street-address" name="with_street_address" value="0" />
+            <ul style="list-style:none; padding-bottom:0px">
+                <?php if (!isset($this->edit)) { ?>
+                <li style="width:180px; float:left; margin-right:20px; margin-left:5px">
+                    <div style=" background-color:#BDD1DE; width:105px; height:80px; padding:20px 35px; margin:0px;">
+                        <div style="border:2px solid rgb(255, 255, 255); width: 100px; height: 75px; margin:0px;">
+                            <img src="<?=$this->contentLocation ?>public/images/addphoto.jpeg" style="width:100px; height:75px;" />
+                        </div>
+                    </div>
+                    <div style="width:180px; float:left; margin:0px; padding:10px">
+                        <input type="file" size="12" name="ProjectLogo" id="ProjectLogo" class="textfield" /><br>
+                    </div>
+                </li>
+                <? } ?>
+                <li <?php if (!isset($this->edit)) { ?>style="border-left:1px solid #e5e5e5; width:625px; float:left; padding-left:20px"<? } ?>>
+                    <div id="message" class="error" style="width:400px; border:2px solid #e3e3e3; margin-bottom:15px; padding:5px; <?php if(!$this->message) { echo "display:none;"; } ?>"><?php if(isset($this->message)) { echo $this->message; } ?></div>
+                    <?php if (!isset($this->edit)) { ?>
+                    <ul style="list-style:none; padding-bottom:0px; margin-bottom:0px">
+                        <?php if ($this->level == "organization") { ?>
+                            <?php if($this->organization->hasPrograms || $this->organization->hasGroups) { ?>
+                            <div id="CreateProgramExplanation" style="border:1px solid #dcbd00; background-color:#fff7c8; padding:10px; margin-bottom:10px;">You must create <?= count($this->programs) || count($this->groups) ? "or select" : "" ?> a <?=($this->organization->hasPrograms && !isset($_REQUEST['pid']) ? 'program' : '').($this->organization->hasGroups && !isset($_REQUEST['pid']) ? ' and chapter ' : ' chapter ') ?> to associate this volunteer activity with.</div>
+                            <?php } ?>
+                            <?php if ($this->organization->hasPrograms) { ?>
+                                <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Affiliated Program:</li>
+                                <li class="field-input">
+                                    <?php if (count($this->programs)) { ?>
+                                    <select id="ProgramId" name="ProgramId" onchange="loadGroup(this.value);">
+                                        <option value="">Select a Program</option>
+                                        <?php foreach($this->programs as $program) { ?>
+                                        <option value="<?=$program->id?>" <?php if(isset($_REQUEST['pid']) && $_REQUEST['pid'] == $program->id) { echo 'selected'; } ?>><?=stripslashes($program->name) ?></option>
+                                        <?php } ?>
+                                    </select>
+                                    <a id="CreateProgramLink" href="javascript:;" onclick="createProgram();" style="margin-left:10px;"> or Create a New Program</a>
+                                    <?php } ?>
+                                    <input type="text" id="ProgramName" name="ProgramName" value="New Program Name" class="input" onfocus="this.value=''; $('#ProgramName').css('color', '#000');" style="color:#AAA; <?=count($this->programs) == 0 ? '' : 'display:none;'?>" />
+                                </li>
+                                <div class="clear"></div>
+                            <?php } ?>
+                            <?php if ($this->organization->hasGroups) { ?>
+                                <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Affiliated Chapter:</li>
+                                <li class="field-input" id="groups-list">
+                                    <?php if (count($this->groups) > 0) { ?>
+                                    <select name="GroupId" id="GroupId" <?php if(!isset($_REQUEST['pid']) && $this->organization->hasPrograms) { echo 'disabled'; } ?>>
+                                        <option value="">Select a Chapter</option>
+                                        <?php if(isset($this->groups)) { foreach($this->groups as $group) { ?>
+                                        <option value="<?=$group['GroupId'] ?>"><?=stripslashes($group['GroupName']) ?></option>
+                                        <?php } } ?>
+                                    </select>
+                                    <a id="CreateGroupLink" href="javascript:createChapter();" style="margin-left:10px;"> or Create a New Chapter</a><?php } ?>
+
+                                    <input type="text" id="GroupName" name="GroupName" value="New Chapter Name" class="input" onfocus="this.value=''; $('#GroupName').css('color', '#000');" style="color:#AAA; <?=count($this->groups) == 0 ? '' : 'display:none;'?>" />
+                                </li>
+                                <div class="clear"></div>
+                            <?php } ?>
+                                <?php if($this->organization->hasPrograms || $this->organization->hasGroups) { ?>
+                                    <br /><span style="font-weight:bold;text-decoration:underline;margin-bottom:12px;">Volunteer Activity Details</span><br /><br />
+                                    <div class="clear"></div>
+                                <?php } ?>
+                        <?php } ?>
+                        <? } ?>
+                        <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Title:</li>
+                        <li class="field-input">
+                            <input name="Name" type="text" maxlength="50" id="Name" class="input" value="<?=isset($this->project) ? $this->project->name : "" ?>" />
+                        </li>
+                        <div class="clear"></div>
+                        <? if (!isset($this->edit) || ($this->project->type == 0)) { ?>
+                        <li class="field-label">When?</li>
+                        <li class="field-input" id="liStartDate">
+                            <input style="cursor: pointer" class="text smaller" name="StartDate" type="text" maxlength="10" id="StartDate" value="<?=($this->project) ? date_format(date_create($this->project->startDate), 'm/d/Y') : ''?>" />
+                            <input style="margin-left:10px" class="date-inp" name="StartTime" type="text" maxlength="10" id="StartTime" value="<?=($this->project) ? date_format(date_create($this->project->startDate), 'H:i') : ''?>" onkeypress="return false" />
+                            <a style="margin-left:10px" href="javascript:;" onclick="this.setAttribute('style', 'display:none'); addEndDate();">Add End Time</a>
+                        </li>
+                        <div class="clear"></div>
+                        <? } ?>
+                        <li class="field-label <?=(!isset($this->edit) ||  ($this->project && $this->project->endDate == '0000-00-00 00:00:00')) ? 'hidden' : ''?> enddate"><?=(isset($this->edit) && ($this->project->type == 1)) ? '<span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Fundraising Campaign Active Until':'End Time'?>:</li>
+                        <li class="field-input <?=(!isset($this->edit) ||  ($this->project && $this->project->endDate == '0000-00-00 00:00:00')) ? 'hidden' : ''?> enddate" id="liEndTime">
+                            <input style="cursor: pointer" class="text smaller" name="EndDate" type="text" maxlength="10" id="EndDate" value="<?=($this->project && $this->project->endDate != '0000-00-00 00:00:00') ? date_format(date_create($this->project->endDate), 'm/d/Y') : ''?>" />
+                            <input class="date-inp" style="margin-left:10px" name="EndTime" type="text" maxlength="10" id="EndTime" value="<?=($this->project && $this->project->endDate != '0000-00-00 00:00:00') ? date_format(date_create($this->project->endDate), 'H:i') : ''?>" onkeypress="return false" />
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span><?=(isset($this->edit) && ($this->project->type == 1)) ? 'What are you fundraising for?' : 'Description'?>: </li>
+                        <li class="field-input">
+                            <textarea class="input" name="Description" rows="3" cols="20" id="Description" onblur="return fnKeepWordLenTrack(this,3000);" onkeyup="return fnKeepWordLenTrack(this,3000);"><?=isset($this->project) ? $this->project->description : "" ?></textarea>
+                        </li>
+                        <div class="clear"></div>
+                        <? if (!isset($this->edit) || (isset($this->edit) && $this->project->type == 0)) { ?>
+                        <li class="field-label adrress<? if (isset($this->edit)) { ?> hidden<? } ?>" style="margin-top:-10px"><?php if (isset($this->organization) && $this->organization->id == 'DAF7E701-4143-4636-B3A9-CB9469D44178' || $this->organization->id == '547086E0-5456-4631-AB2A-BA781E7DB9A7' || $this->organization->id == 'DB04F20F-59FE-468F-8E55-AD75F60FB0CB' || $this->organization->id == '7D428431-A7C7-4DF6-A667-F9207E14674E' || $this->NetworkId == '47866989-6380-445C-95C0-827E55ACA9CB') { ?><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span><?php } ?>&nbsp;</li>
+                        <li class="field-input adrress<? if (isset($this->edit)) { ?> hidden<? } ?>" style="margin-top:-10px">
+                            <a href="javascript:;" onclick="$('.adrress').hide(); $('.locationbox').show();">Add Location</a>
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label locationbox" <? if (!isset($this->edit)) { ?> style="display:none;"<? } ?>>Street Address:</li>
+                        <li class="field-input locationbox" <? if (!isset($this->edit)) { ?> style="display:none;"<? } ?>>
+                            <input name="Location" type="text" maxlength="100" id="Location" class="input" value="<?=(isset($this->edit) && $this->project->contact) ? $this->project->contact->street : ''?>" />
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label locationbox"<? if (!isset($this->edit)) { ?> style="display:none;"<? } ?>><?php if ($this->project->organizationId == 'DAF7E701-4143-4636-B3A9-CB9469D44178' || $this->project->organizationId == '547086E0-5456-4631-AB2A-BA781E7DB9A7' || $this->project->organizationId == 'DB04F20F-59FE-468F-8E55-AD75F60FB0CB' || $this->project->organizationId == '7D428431-A7C7-4DF6-A667-F9207E14674E' || $this->project->organizationId == '47866989-6380-445C-95C0-827E55ACA9CB') { ?><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span><?php } ?>Country:</li>
+                        <li class="field-input locationbox"<? if (!isset($this->edit)) { ?> style="display:none;"<? } ?>>
+                            <select type="text" name="CountryId" id="CountryId" style="width:300px" onchange="populateLocation('state', this.value); $('#Country').val(this.options[this.selectedIndex].text); populateLocation('city', 0);">
+                                <option value="0">All</option>
+                                <?php foreach($this->country_list as $country) { ?>
+                                <option value="<?=$country['CountryId'] ?>" <?=(isset($this->edit) && $this->project->contact && ($this->project->contact->countryId == $country['CountryId'])) ? 'selected' : ''?>><?=$country['Country'] ?></option>
+                                <?php } ?>
+                            </select>
+                            <input type="text" id="Country" name="Country" value="<?php $this->contact['Country'] ?>" style="display:none;"/>
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label locationbox"<? if (!isset($this->edit)) { ?> style="display:none;"<? } ?>>Region:</li>
+                        <li class="field-input locationbox"<? if (!isset($this->edit)) { ?> style="display:none;"<? } ?> id="state-list">
+                            <select type="text" name="RegionId" id="RegionId" style="width:300px" onchange="populateLocation('city', this.value); $('#Region').val(this.options[this.selectedIndex].text);">
+                                <option value="0" selected>All</option>
+                            </select>
+                            <input type="text" id="Region" name="Region" value="<?php $this->contact['Region'] ?>" style="display:none;"/>
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label locationbox"<? if (!isset($this->edit)) { ?> style="display:none;"<? } ?>>City:</li>
+                        <li class="field-input locationbox"<? if (!isset($this->edit)) { ?> style="display:none;"<? } ?> id="city-list">
+                            <select type="text" name="CityId" id="CityId" style="width:300px" onchange="$('#City').val(this.options[this.selectedIndex].text);">
+                                <option value="0" selected>All</option>
+                            </select>
+                            <input type="text" id="City" name="City" value="<?php $this->contact['City'] ?>" style="display:none;"/>
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Enable Fundraising?</li>
+                        <li class="field-input" id="liFundraising">
+                            <span><input type="radio" id="isfundraising01" name="isFundraising" value="Yes" <?= !$this->googleId && !$this->paypalId && !$this->bluePayId ? "disabled" : "" ?> <?=($this->edit && $this->project->isFundraising == 'Yes') ? 'checked' : ''?>>&nbsp;Yes</span>
+                            <span style="margin-left:10px"><input type="radio" id="isfundraising02" name="isFundraising" value="No" <?= ((!$this->googleId && !$this->paypalId && !$this->bluePayId) || ($this->edit && $this->project->isFundraising == 'No'))  ? "checked" : "" ?>>&nbsp;No</span>
+                            <?php if (!$this->googleId && !$this->paypalId && !$this->bluePayId) {
+                                $url = '/';
+                                if (isset($this->organization)) {
+                                    $url .= $this->organization->urlName . '/activate-fundraising';
+                                } else {
+                                    $url .= $this->userNew->urlName . '/activate-fundraising?UserId=' . $this->project->userId;
+                                }
+                            ?>
+                              <span style="margin-left:10px">You haven't activated fundraising yet. To do so click <a href="<?=$url?>">here</a></span>
+                            <?php } ?>
+                        </li>
+                        <? } ?>
+                        <div class="clear"></div>
+                        <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span><?=(isset($this->project)) ? (($this->project->type == 0) ? 'Volunteers' : 'Fundraisers') : 'Volunteers' ?> Needed:</li>
+                        <li class="field-input">
+                            <input class="input" name="VolunteerGoal" maxlength="4" type="text" id="VolunteerGoal" onblur="CheckValueLimit(this,'1000');" value="<?=isset($this->project) ? $this->project->volunteerGoal : "0" ?>" /><a href="javascript:;" class="tooltip" title="Select the number of <?=($this->project->type == 0) ? 'volunteers' : 'fundraisers'?> that you are hoping will participate in this <?=($this->project->type == 0) ? 'activity' : 'campaign'?>"> ?</a>
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label <?=(!isset($this->edit) || $this->project->isFundraising == 'No') ? 'hidden':''?> donationgoals"><?=(isset($this->edit) && ($this->project->type == 1)) ? '<span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>':'Chapter '?>Donation Goal:</li>
+                        <li class="field-input <?=(!isset($this->edit) || $this->project->isFundraising == 'No') ? 'hidden':''?> donationgoals">
+                            <input class="input" name="DonationGoal" type="text" maxlength="6" id="DonationGoal" onblur="CheckValueLimit(this,'999999');" value="<?=isset($this->project->donationGoal) ? $this->project->donationGoal : "0" ?>" />
+                        </li>
+                        <? if (!isset($this->edit) || (isset($this->edit) && $this->project->type == 0)) { ?>
+                        <div class="clear"></div>
+                        <li class="field-label <?=(!isset($this->edit) || $this->project->isFundraising == 'No') ? 'hidden':''?> donationgoals">Default Volunteer Donation Goal:</li>
+                        <li class="field-input <?=(!isset($this->edit) || $this->project->isFundraising == 'No') ? 'hidden':''?> donationgoals">
+                            <input class="input" name="VolunteerMinimumGoal" maxlength="5" type="text" id="VolunteerMinimumGoal" onblur="CheckValueLimit(this,'99999');" value="<?=isset($this->project->volunteerMinGoal) ? $this->project->volunteerMinGoal : "0" ?>" />
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label" style="margin-bottom:15px">&nbsp;</li>
+                        <li class="field-input" style="margin-bottom:15px">
+                            <span><input type="checkbox" id="Status" name="Status" value="Open" <?=((isset($this->edit) && $this->project->status == 'Open') || (!isset($this->edit))) ? 'checked' : ''?>>&nbsp;Volunteers can join without being accepted by an admin</span><a href="javascript:;" class="tooltip" title="If you uncheck this box, volunteers must be approved before they are admitted into the activity."> ?</a>
+                        </li>
+                        <? } ?>
+                    </ul>
+                </li>
+            </ul>
+            <div style="margin-left:250px; margin-top:15px; float:left; width:100%; margin-bottom:20px">
+                <a class="btn btngreen" title="Back" href="/<?= isset($this->group) ? $this->group->urlName : $this->organization->urlName ?>" >Back</a>
+                <input type="submit" class="btn btngreen" name="btnCreateNew" value="<?=(!isset($this->edit) ? 'Create New' : 'Save Changes')?>" id="btnCreateNew" />
+            </div>
+        </form>
+        <div class="clear"></div>
+            </div>
+        </div>
+    <div class="clr"></div>
+    <div class="clr"></div>
+</div>
+<? if (isset($this->edit) && $this->project->contact && $this->project->type == 0) { ?>
+<script>
+populateLocation('state', <?=$this->project->contact->countryId?>, <?=$this->project->contact->stateId?>);
+populateLocation('city', <?=$this->project->contact->stateId?>, <?=$this->project->contact->cityId?>);
+</script>
+<? } ?>

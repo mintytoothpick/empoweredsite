@@ -1,0 +1,92 @@
+<?php
+if ($this->level == "group") {
+    $this->placeholder('currenttab')->set('active-campaigns');
+} else if ($this->level == "organization") {
+    $this->placeholder('currenttab')->set('campaigns');
+}
+?>
+<script type="text/javascript">
+    function generateReports() {
+        $.post('/donation/generatereport', {ProjectId: $('#ProjectId').val()});
+        return false;
+    }
+    function isFloat(value) {
+        if(value == ""){
+            return false;
+        }
+        value = value.replace(/,/, '.');
+        if(parseFloat(value) != (value*1)) {
+            return false;
+        }
+        return true;
+    }
+</script>
+
+<div>
+    <div id="mainco2">
+		<div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+		<div class="block001">
+			<div class="blst001">
+				<div class="blst002">
+					<div class="MainBody">
+                            <?php 
+                            if ($this->level == "group") {
+                                include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/groupheader.php';
+                            } else if ($this->level == "organization") {
+                                include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/nonprofitheader.php';
+                            } else {
+                                include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/profileheader.php'; 
+                            } ?>
+							<div class="TabbedPanelsContentGroup">
+								<div class="TabbedPanelsContent">
+									<div id='whiteBox' class="whiteBox">
+            <h2 style="color:#693;padding-bottom:8px;">Donations Details<?php echo isset($this->level) && $this->level != 'user' ? " - ".stripslashes($this->ProjectName) : '' ?></h2>
+            <div>
+                <table id="donations" cellspacing="0" cellpadding="3" border="0" style="width:100%; border-collapse:collapse;">
+                    <tr style="color:#F7F7F7;background-color:#000;font-weight:bold;height:25px;">
+                        <th style="text-align:center;" scope="col">Recipient</th>
+                        <th style="text-align:center;" scope="col">Amount</th>
+                        <th style="text-align:center;" scope="col">Comment</th>
+                        <th style="text-align:center;" scope="col">Donor Name</th>
+                        <th style="text-align:center;" scope="col">Donor Email</th>
+                        <th style="text-align:center;" scope="col">Donation Date</th>
+                        <th style="text-align:center;" scope="col">Donation Source</th>
+                    </tr>
+                    <?php
+                    if (count($this->donations) > 0) {
+                        $ctr = 0;
+                        foreach ($this->donations as $donation) { ?>
+                    <tr style="background-color:<?php echo $ctr%2 == 1 ? "#e7e7e9" : "white" ?>;border-bottom:1px solid #E7E7FF;<?php if($donation['IsDeleted']) { echo "color:#F00;"; $delMSG = 1; } ?>">
+                        <td style="border-right:1px solid silver;border-left:1px solid silver;width:200px"><a href="/<?php echo empty($donation['VolunteerId']) ? $this->URLName : $this->usersClass->getURLNameById($donation['VolunteerId']) ?>"><?php echo empty($donation['VolunteerId']) ? "Project" : stripslashes($this->usersClass->getFullNameById($donation['VolunteerId'])) ?></a></td>
+                        <td style="text-align:right; width:110px; border-right:1px solid silver;"><?php echo number_format($donation['DonationAmount']) ?>&nbsp;&nbsp;</td>
+                        <td style="text-align:right; width:110px; border-right:1px solid silver;"><?php echo stripslashes($donation['DonationComments']) ?>&nbsp;&nbsp;</td>
+                        <td style="text-align:right; width:110px; border-right:1px solid silver;"><?php echo $donation['isAnonymous'] ? "Anonymous" : stripslashes($donation['SupporterName']) ?>&nbsp;&nbsp;</td>
+                        <td style="text-align:right; width:110px; border-right:1px solid silver;"><?php echo $donation['isAnonymous'] ? "Anonymous" : stripslashes($donation['SupporterEmail']) ?>&nbsp;&nbsp;</td>
+                        <td style="text-align:right; width:110px; border-right:1px solid silver;"><?php echo $donation['CreatedOn'] ?>&nbsp;&nbsp;</td>
+                        <td style="text-align:center; width:120px;border-right:1px solid silver;"><?php echo $donation['TransactionSource'] ?></td>
+                    </tr>
+                            <?php $ctr++;?>
+                        <?php } ?>
+                        <?php if(isset($delMSG) && $delMSG) { echo "<span style='color:#F00;'>* Donations in red signifiy a volunteer who has been deleted from the activity</span>"; } ?>
+                    <?php } else {
+                        ?>
+                    <tr><td colspan="4"><b>&nbsp;No records found.</b></td></tr>
+                    <?php } ?>
+                </table>
+                <br /><br />
+                <div id="divUpdateDesc">
+                    <a class="btn btngreen" title="Back" href="/<?php echo $this->URLName ?>/manage-donations" >Back</a>
+                </div>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+							</div>
+						</div>
+					</div>
+				<div class="clear"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+<div class="block001f01"><div class="blst001"><div class="blst002"></div></div>

@@ -1,0 +1,42 @@
+<script>
+var pending = <?=count($this->members);?>;
+function acceptMember(id) {
+    $.post('pending-members-requests', {
+        'accept': true,
+        'UserId': id
+    });
+    hideMember(id);
+}
+
+function denyMember(id) {
+    $.post('pending-members-requests', {
+        'deny': true,
+        'UserId': id
+    });
+    hideMember(id);
+}
+
+function hideMember(id) {
+    pending-=1;
+    $("#userPending_"+id).hide();
+    $("#pendingNum").html(pending);
+    if (pending == 0) {
+        $("#btnPendReq").hide();
+        $.fancybox.close();
+    }
+}
+</script>
+
+<h1>Pending Requests</h1>
+<div class="clear"></div><br /><br />
+<? foreach($this->members as $member) { ?>
+<div class="programBox02" id="userPending_<?=$member->id?>"><a href="/<?=$member->urlName?>" target="_blank"><img src="/profile/loadimage/?UserId=<?=$member->id?>" alt=" " width="55" height="52" class="memberImgStyle<?= $member->isAdmin ? '' : '2'; ?>" /></a>
+<span class="TextStyle06"><a href="/<?=$member->urlName?>"><?=stripslashes($member->fullName)?></a>
+    <span style="float:right;">
+    <input type="button" class="button" value="Accept" onclick="acceptMember('<?=$member->id?>')"/>
+    <input type="button" class="button" value="Deny" onclick="denyMember('<?=$member->id?>')"/>
+    </span>
+</span>
+<?= stripslashes($member->aboutMe) ?><br />
+</div>
+<?php } ?>

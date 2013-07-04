@@ -1,0 +1,160 @@
+<?php 
+$this->headTitle("Empowered.org:  Empowering groups of volunteers to create social change");
+$url = (!empty($_SERVER['HTTPS'])) ? "https://".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'] : "http://".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
+?>
+
+<style> label.error {color:red; padding-bottom:7px;font-weight:normal;} </style>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("ul.tabs").tabs("div.panes > div");
+    })
+
+    $(function() {
+        $(".scrollable").scrollable();
+
+        $(".item").click(function() {
+            // activate item
+            $(".item").removeClass("active");
+            $(this).addClass("active");
+
+            // when page loads simulate a "click" on the first image
+        }).filter(":first").click();
+
+        $(".itemphoto").click(function() {
+            // activate item
+            $(".itemphoto").removeClass("active");
+            $(this).addClass("active");
+
+            // when page loads simulate a "click" on the first image
+        }).filter(":first").click();
+        
+        //form contact validate
+        $("#formContact").validate({
+            errorClass: 'error',
+            rules: {
+                Name: 'required',
+                Organization: 'required',
+                Phone: 'required',
+                Email: {
+                    required: true,
+                    email: true
+                }
+            },
+            messages: {
+                Name: 'Please specify your name.',
+                Organization: 'Please specify your organization name.',
+                Phone: 'Please specify your phone number.',
+                Email: {
+                    required: 'Please specify your contact email.',
+                    email: 'Please specify a valid email address.'
+                },
+            },
+            submitHandler: function(form) {
+                $.post('/nonprofit', {Name: name, Organization: organization, Phone: phone, Email: email, Comments: comments});
+                $('#message').css('color', 'green');
+                $('#message').html('Your sign up request for non profit has been sent.').show();
+                // clear form data
+                $('#Name').val('');
+                $('#Organization').val('');
+                $('#Phone').val('');
+                $('#Email').val('');
+                $('#Comments').val('');
+            }
+        });
+    });
+</script>
+
+<div>
+    <div id="mainco2">
+        <div class="roundedbox">
+            <div class="MainBody">
+                <div id="TabbedPanels1" class="TabbedPanels">
+                    <ul class="tabs TabbedPanelsTabGroup">
+                        <li class="TabbedPanelsTab" ><a href="#" class="wht">Organizations</a></li>
+                    </ul>
+                    <div class="panes TabbedPanelsContentGroup">
+                        <!-- FIRST TAB -->
+                        <div class="TabbedPanelsContent">
+                            <div class="whiteBox">
+                                <div class="mainrightOrg" style="margin-top:40px;">
+                                    <h2>Are you looking to grow your organization?
+                                    <br />Contact an Empowered Advocate....</h2>
+                                    <p>Empowered.org is currently seeking like-minded organizations that would benefit from the mobilization platform. Our Advocates help structure your organization on the site, help customize it around your needs, and share best practices around the social media/networking features.  We would love to hear from you. Simply fill out the form below to contact us or call us at +001 (951) 237-8973.</p>
+                                    <!-- next steps form -->
+                                    <div id="message" style="border:2px solid silver; padding:7px; color:red; display:none; margin:10px 0px; width:100%;"></div>
+                                    <div class="form04">
+                                      <form action="#" name="form04" id="formContact">
+                                        <label for="f3inp001">Name</label> <input name="Name" type="text" id="Name" />
+                                        <div class="clear"></div>
+                                        <label for="f3inp002">Organization</label> <input name="Organization" type="text" id="Organization" />
+                                        <div class="clear"></div>
+                                        <label for="f3inp003">Phone</label> <input name="Phone" type="text" id="Phone" />
+                                        <div class="clear"></div>
+                                        <label for="f3inp004">Email</label> <input name="Email" type="text" id="Email" />
+                                        <div class="clear"></div>
+                                        <label for="f3inp005">Comments</label> <textarea name="Comments" rows="3" cols="12" id="Comments"></textarea>
+                                        <div class="clear"></div>
+                                    </div>
+                                    <input type="submit" value="Submit" class="btn btngreen" style="float:right" />
+                                  </form>
+                                </div>
+                                <!-- e o main col - right col -->
+
+                                <!-- main col - left col -->
+                                <div class="mainleft">
+                                    <h1>Participating Organizations</h1>
+                                    <div class="searchres02">
+                                        <div class="sr2st02"><?php echo $this->end.' of '.$this->total // $this->start.' to '.$this->end.' of '.$this->total ?> Organizations</div>
+                                        <div class="clear"></div>
+                                        <?php foreach ($this->paginator as $list) : ?>
+                                        <div class="sr2st05">
+                                            <?php if(isset($list->logo->systemMediaName) && file_exists("/home/$this->envUsername/public_html/public/Media/full/".$list->logo->systemMediaName)) { ?><center><img src="<?=$this->contentLocation?>/public/Media/full/<?= $list->logo->systemMediaName ?>" alt="" style="border: 0px none #FFFFFF; max-height:70px; max-width:90px;" /></center><?php } ?>
+                                        </div>
+                                        <div class="sr2st04">
+                                            <h4><a href="/<?php echo $list->urlName ?>"><?php echo stripslashes($list->name) ?></a></h4>
+                                            <?php if($list->contact->address != "") { ?> <strong class="txt01">Headquarters: </strong><?php echo $list->contact->address ?><br/><?php } ?>
+                                            <strong class="txt01">About Us: </strong>
+                                            <div id="divLessContent<?php echo $list->id?>" style="display:inline;">
+                                                <span id="ctl00_ContentPHMain_NetList1_repeatNetworks_ctl00_lblDescriptionLessContent">
+                                                        <?php echo strlen($list->description) > 100 ? stripslashes(substr(strip_tags($list->description), 0, 100))." ..." : stripslashes(strip_tags($list->description)) ?>
+                                                </span>
+                                                    <?php if(strlen($list->description) > 100) { ?>
+                                                <a id="ReadMore" href='javascript:ShowHide("divLessContent<?php echo $list->id ?>","divMoreContent<?php echo $list->id ?>");'><span id="ctl00_ContentPHMain_NetList1_repeatNetworks_ctl00_lblReadMore"> Read More</span></a>
+                                                    <?php } ?>
+                                            </div>
+                                                <?php if(strlen($list->description) > 100) { ?>
+                                            <div id="divMoreContent<?php echo $list->id ?>" style="display:none;">
+                                                <span id="ctl00_ContentPHMain_NetList1_repeatNetworks_ctl00_lblDescriptionMoreContent">
+                                                            <?php echo stripslashes(strip_tags($list->description)) ?>
+                                                </span>
+                                                <a id="ReadFewer" href='javascript:ShowHide("divMoreContent<?php echo $list->id ?>","divLessContent<?php echo $list->id ?>")'> Read Less</a>
+                                            </div>
+                                                <?php } ?>
+                                        </div>
+										<div class="clear"></div>
+                                        <?php endforeach; ?>
+                                        <div class="clear"></div>
+                                        <?= $this->paginationControl($this->paginator, 'Sliding', '/index/page_selector.phtml'); ?>
+                                    </div>
+                                </div>
+
+
+
+                            </div>
+                        </div>
+                        <!-- e o FIRST TAB -->
+
+                        <!-- SECOND TAB -->
+                        <div class="TabbedPanelsContent">
+                            <div class="whiteBox">
+                            </div>
+                        </div>
+                        <!-- e o SECOND TAB -->
+                    </div>
+                </div>
+            </div>
+            <div class="clear"></div>
+        </div>
+
+    </div>
+</div>

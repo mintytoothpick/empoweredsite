@@ -1,0 +1,14 @@
+<?php $this->headTitle("Empowered.org - Page not found"); ?>
+<div>
+    <div id="mainco2">
+        <div class="roundedbox" style="min-height:200px;">
+            <div class="clear"></div><br><br>
+            <?php if (!isset($_SESSION['UserId'])) { ?>
+            <h1 style="color:#aaa; font-size:30px; text-align:center">You're must be logged in and have an administrator access to view the page.</h1>
+            <?php } else { ?>
+            <h1 style="color:#aaa; font-size:30px; text-align:center">You must have an administrator access to view the page.</h1>
+            <?php } ?>
+        </div>
+        <div class="clear" style="margin-bottom: 5px"></div>
+    </div>
+</div>

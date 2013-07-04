@@ -1,0 +1,172 @@
+<script>
+$(function() {
+    /*$("#hasMembershipFee").change(function() {
+        if ($(this).attr('checked')) {
+            $('.freqAmnts').show();
+        } else {
+            showPromotionalText();
+        }
+    });*/
+
+    $("#formMembership")
+    .submit(function(){
+        return validateFrequencies();
+    });
+});
+
+var inputsValid = true;
+var show = true;
+function validateFrequencies() {
+    //if ($('#hasMembershipFee').attr('checked')) {
+        if ($('.feeFreq:checked').length == 0) {
+            $("#freqError").show();
+            return false;
+        } else {
+            $("#freqError").hide();
+            inputsValid = true;
+            $('.feeFreqAmnts:not(:disabled)').each(function(element){
+                if (!isNumber($(this).val()) || $(this).val() < 1) {
+                    inputsValid = false;
+                }
+            });
+            if (inputsValid)
+                $("#freqErrorAmnts").hide();
+            else
+                $("#freqErrorAmnts").show();
+            return inputsValid;
+        }
+    //} else {
+    //    $("#freqError").hide();
+    //    $("#freqErrorAmnts").hide();
+    //    return true;
+    //}
+}
+/*
+function showPromotionalText() {
+    if (show) {
+        $.fancybox($("#membershipFcyBx").html());
+        show = false;
+    } else {
+        $('.freqAmnts').toggle()
+    }
+}
+
+function gotoStep2() {
+    $("#fancybox-content div.step1").hide();
+    $("#fancybox-content div.step2").show();
+    $('.freqAmnts').hide();
+}
+
+function cancelStop2() {
+    $.fancybox.close();
+    $("#hasMembershipFee").attr('checked', true);
+}
+
+function sendComment() {
+    $("#fancybox-content div.send").hide();
+    $("#fancybox-content div.errorMsgImprove").show();
+    var elems = $('.msgBoxContact');
+    $.ajax({
+        url: "/<?=$this->group->urlName?>/membershipturnoff",
+        type: 'POST',
+        data: 'message=' + elems[1].value,
+        dataType: 'json',
+        success: function(data){
+            $("#fancybox-content div.step2").hide();
+            $("#fancybox-content div.step3").show();
+        },
+        error: function(request, status, err) {
+            $("#fancybox-content div.errorMsgImprove").hide();
+            $("#fancybox-content div.send").show();
+        }
+    });
+}*/
+function isNumber(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+function toggleInp(id) {
+    $("#feeAmnt_"+id).attr('disabled', !$("#feeAmnt_"+id).attr('disabled'));
+}
+
+
+</script>
+
+<!-- popup - cancel membership -->
+<div id="membershipFcyBx" style="display:none">
+<div class="fcybxMembership">
+  <div class="step1">
+    <h2 class="loginTitle">Are you sure you want to turn <b>OFF</b> the Membership functionality?</h2>
+    <p>By turning off the Membership, you will make it impossible for any of your Brigaders or anyone affiliatedwith your GB Chapter to become a Member of Global Brigades EVEN IF THEY WANT TO. <br />Instead,please consider leaving the Membership function enabled, but unchecking the “Membership Required” option. This will allow individuals to become Members of your Chapter and receive national benefits, but only if they choose to. You can set the Membership donation at an option you feel is reasonable, which will in turn raise funds for your Chapter and Global Brigades' in-countrydevelopment projects. <br />For more information, please watch the short video below. Thank you!</p>
+    <iframe width="560" height="315" src="http://www.youtube.com/embed/dThOffL5NSc" frameborder="0"></iframe>
+    <br />
+    <div class="volunteerBtn03"><a onclick="gotoStep2()" href="javascript:;">Turn Off</a></div>
+    <div class="volunteerBtn03"><a onclick="cancelStop2()" href="javascript:;">Never Mind</a></div>
+  </div>
+  <div class="step2 hide">
+    <h2 class="loginTitle">Can you let us know why you are turning off the Membership?</h2>
+    <p>Global Brigades prides itself on being a student-led organization, and we would really appreciate your feedback on the GB Membership Program.  Please provide a brief explanation of why you are choosing to disable this function on your chapter's Empowered page.<br /><br />
+    We greatly appreciate your feedback.  This opportunity has been created to support your Chapter, and we would like to make changes that you feel would improve the Membership Program. You can also email membership@globalbrigades.org with any questions or comments. Thank you for your feedback.</p>
+    <textarea class="textField msgBoxContact" rows="3" cols="60"></textarea>
+    <div class="errorMsgImprove hide" style="color:red"><br /><br />Sending comment ... please wait.</div>
+    <div class="clear"></div><br />
+    <div class="volunteerBtn03 send"><a onclick="sendComment()" href="javascript:;">Send</a></div>
+  </div>
+  <div class="step3 hide">
+    <p><strong>Your message has been sent. Thank you!</strong>.</p>
+    <div class="volunteerBtn02"><a href="javascript:;" onclick="$.fancybox.close()">Close</a></div>
+  </div>
+</div>
+</div>
+<!-- popup - cancel membership -->
+
+<div class="wrapper">
+    <!-- org header -->
+    <?php echo $this->placeholder('header') ?>
+    <!-- // org header -->
+
+    <div class="clr"></div>
+    <div class="BodyCon">
+
+    <!-- breadcrumb -->
+    <?php echo $this->placeholder('breadcrumb') ?>
+    <!-- // breadcrumb -->
+
+    <div class="clr"></div>
+
+    <!-- tabs -->
+    <?=$this->placeholder('tabs') ?>
+    <!-- // tabs -->
+
+    <div class="mainC02">
+        <div class="box05 BG01">
+            <div class="headingStyle02">Membership Settings</div>
+            <div style="padding:0 10px;">
+<? if (isset($this->updated)) { ?>
+                <div class="successBox success">Membership settings updated successfully.</div>
+<? } ?>
+                <p>As a member of Global Brigades, your contribution will perpetuate year-round health and sustainable development work in the communities in which we serve. Your contribution will also support and sustain the Global Brigades chapter on your campus for future growth. 100% of your recurring membership donations will go towards your local chapter to support future Brigades and on-campus activities. Additionally, you will receive a variety of benefits including:</p>
+
+                <ul>
+                    <li><b>Priority Consideration for Internships, Fellowships and Full-Time Jobs</b><br />The member portal will consist of professional opportunities both within Global Brigades and other partner organizations, including positions that have been specifically created for students and alumni of Global Brigades.</li>
+                    <li><b>Free Registration at GB Exchanges and Special Offers at Other Industry Conferences</b><br />Join other Global Brigades members in your region for fun and enriching interactive weekend exchanges to discuss health and develop topics.  Additionally, receive Global Brigades negotiated discounts at other international conferences with other leading organizations.</li>
+                    <li><b>Discounts on Online Certificate Programs</b><br />Members will receive discounts on three online certificate programs delivered by professors at accredited universities to supplement members’ educational experience in: “Global Health,” “Economic Development” and “Nonprofit & Social Enterprise Leadership.”</li>
+                    <li><b>Access to GB Local</b><br />Global Brigades is developing resources and templates to empower chapters to conduct meaningful volunteer programs that engage members of their local community. Examples include (1) facilitate health and safety fairs at under resourced elementary schools, (2) provide local high school students with financial planning workshops, or (3) work with high school sophomore and juniors to demystify the college application process and share perspectives in studying a specific major.</li>
+                    <li><b>Access to the Empower Partners Incubation Initiative</b><br />For members with new or innovative ideas to solve social challenges or improve upon Global Brigades’ programming.  Qualifying members can leverage Global Brigades’ 501c3 tax status, become eligible for grants, and provide tax receipts to donors.  Additionally, plans are eligible for seed funding and given consultative support from GB founders and marketing team to develop their idea and bring it to reality.</li>
+                </ul>
+                <div class="clear"></div><br />
+                <form action="" method="post" id="formMembership">
+                    <ul style="list-style: none;">
+                    <li>
+                        <input name="isOpen" type="checkbox" id="isOpen" value="1" <?=($this->group->isOpen) ? 'checked' : ''?>/>
+                        &nbsp;Individuals can become members of this chapter without being accepted by an admin<br /><br />
+                    </li>
+                    <?=$this->membershipPaymentsHelper($this->group, $this->group->organization);?>
+                    </ul>
+                    <center><input type="submit" class="btn btngreen" name="btnCreateNew" value="Save Changes" id="btnCreateNew" /></center>
+                    <div class="clr"></div><br />
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="clr"></div>
+</div>

@@ -1,0 +1,242 @@
+<?php $this->headTitle("Empowered.org - Manage Events");
+$group_media = $this->sitemedia->getSiteMediaBySiteId($this->data['GroupId']);
+$contactinfo = $this->contactinfo->getContactInfo($this->data['GroupId'], 'All');
+if (!empty($this->data['BannerMediaId'])) {
+	$group_banner = $this->sitemedia->getSiteMediaById($this->data['BannerMediaId']);
+}
+$this->placeholder('title')->set('');
+$this->placeholder('currenttab')->set('');
+?>
+<link href="<?php echo $this->contentLocation ?>public/css/calendrical.css" rel="stylesheet" type="text/css" />
+<script src="<?php echo $this->contentLocation ?>public/js/jquery.calendrical.js" type="text/javascript" language="javascript"></script>
+<link rel="stylesheet" type="text/css" href="<?php echo $this->contentLocation ?>public/js/datepicker/themes/smoothness/jquery-ui-1.7.3.custom.css" media="screen"/>
+<script type="text/javascript" src="<?php echo $this->contentLocation ?>public/js/datepicker/ui.core.js"></script>
+<script type="text/javascript" src="<?php echo $this->contentLocation ?>public/js/datepicker/ui.datepicker.js"></script>
+<script type="text/javascript" language="javascript">
+    function getForm(form, id) {
+        if (form == 'add') {
+            $('#form').load('/event/addevent', {form:'add'});
+        } else {
+            $('#form').load('/event/updateevent', {form:'edit', EventId: id});
+        }
+    }
+
+    function addEvent() {
+        var error = "";
+        var title = jQuery.trim($('#Title').val());
+        var details = jQuery.trim($('#EventText').val());
+        var location = jQuery.trim($('#Location').val());
+        var start = jQuery.trim($('#StartDate').val()).split('/');
+        var end = jQuery.trim($('#EndDate').val()).split('/');
+        var startdate = new Date(start[2], Number(start[0])-1, Number(start[1]));
+        var enddate = new Date(end[2], Number(end[0])-1, Number(end[1]));
+        var currdate = new Date('<?php echo date('F d, Y 00:00:00', time()) ?>');
+        if (title == '') {
+            error += "Please specify the event title.<br>";
+        }
+        if (details == '') {
+            error += "Please specify the event details.<br>"
+        }
+        if (location == '') {
+            error += "Please specify the event location.<br>"
+        }
+        if (jQuery.trim($('#StartDate').val()) == '') {
+            error += "Please specify the event start date.<br>"
+        }
+        if (jQuery.trim($('#EndDate').val()) == '') {
+            error += "Please specify the event end date.<br>"
+        }
+        if(jQuery.trim($('#StartDate').val()) != '' && startdate < currdate) {
+            error += "Start date must be greater than the current date.<br>";
+        } else if(jQuery.trim($('#EndDate').val()) != '' && enddate < currdate) {
+            error += "End date must be greater than the current date.<br>";
+        } else if (startdate > enddate) {
+            error += "Start date must be less than or equal to end date.<br>";
+        }
+        if (error == '') {
+            $.post('/event/addevent', {Title: title, EventText: details, Location: location, StartDate: jQuery.trim($('#StartDate').val()), EndDate: jQuery.trim($('#EndDate').val()), StartTime: jQuery.trim($('#StartTime').val()), EndTime: jQuery.trim($('#EndTime').val()), SiteId: $('#SiteId').val(), UserId: $('#UserId').val(), Type: $('#Type').val()}, function(data) {
+                alert(data);
+                window.location.reload(true);
+            });
+        } else {
+            $('#message').html(error).show();
+        }
+        return false;
+    }
+
+    function updateEvent() {
+        var error = "";
+        var title = jQuery.trim($('#Title').val());
+        var details = jQuery.trim($('#EventText').val());
+        var location = jQuery.trim($('#Location').val());
+        var start = jQuery.trim($('#StartDate').val()).split('/');
+        var end = jQuery.trim($('#EndDate').val()).split('/');
+        var startdate = new Date(start[2], Number(start[0])-1, Number(start[1]));
+        var enddate = new Date(end[2], Number(end[0])-1, Number(end[1]));
+        var currdate = new Date('<?php echo date('F d, Y 00:00:00', time()) ?>');
+        if (title == '') {
+            error += "Please specify the event title.<br>";
+        }
+        if (details == '') {
+            error += "Please specify the event details.<br>"
+        }
+        if (location == '') {
+            error += "Please specify the event location.<br>"
+        }
+        if (jQuery.trim($('#StartDate').val()) == '') {
+            error += "Please specify the event start date.<br>"
+        }
+        if (jQuery.trim($('#EndDate').val()) == '') {
+            error += "Please specify the event end date.<br>"
+        }
+        if(jQuery.trim($('#StartDate').val()) != '' && startdate < currdate) {
+            error += "Start date must be greater than the current date.<br>";
+        } else if(jQuery.trim($('#EndDate').val()) != '' && enddate < currdate) {
+            error += "End date must be greater than the current date.<br>";
+        } else if (startdate > enddate) {
+            error += "Start date must be less than or equal to end date.<br>";
+        }
+        if (error == '') {
+            $.post('/event/updateevent', {Title: title, EventText: details, Location: location, StartDate: jQuery.trim($('#StartDate').val()), EndDate: jQuery.trim($('#EndDate').val()), StartTime: jQuery.trim($('#StartTime').val()), EndTime: jQuery.trim($('#EndTime').val()), SiteId: $('#SiteId').val(), UserId: $('#UserId').val(), EventId: $('#EventId').val(), Type: $('#Type').val()}, function(data) {
+                alert(data);
+                window.location.reload(true);
+            });
+        } else {
+            $('#message').html(error).show();
+        }
+        return false;
+    }
+
+    function deleteEvent() {
+        var deleted = 0;
+        $('#Event-list tr td input[type=checkbox]').each(function(){
+            var chkbox = $(this).attr('name');
+            var event_id = chkbox.split('_');
+            if (document.getElementById(chkbox).checked == true) {
+                $.post('/event/deleteevent', {EventId: event_id[1], SiteId: $('#SiteId').val(), Type: $('#Type').val()});
+                deleted++;
+            }
+        })
+        if (deleted > 0) {
+            alert("Event(s) has been successfully deleted.")
+            window.location.reload(true);
+            return false;
+        } else {
+            alert("Please select a record(s) to be deleted.")
+            return false;
+        }
+    }
+</script>
+<style type="text/css">
+    #ui-datepicker-div { font-size:11px }
+    .tblHeader {
+        color:#F7F7F7;
+        background-color:#000;
+        font-weight:bold;
+    }
+    .tblHeader th {
+        text-align:center;
+    }
+    #Event-list tr td {
+        padding:2px;
+    }
+    #Event-list {
+        width:100%;
+        border:1px solid #E7E7FF;
+        border-collapse:collapse;
+    }
+</style>
+
+<div>
+    <div id="mainco2">
+		<div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+		<div class="block001">
+			<div class="blst001">
+				<div class="blst002">
+					<div class="MainBody">
+						<?php $is_image_exists = file_exists("/home/$this->envUsername/public_html/public/Media/full/".$group_media['SystemMediaName']); ?>
+						<?php if($is_image_exists && trim($group_media['SystemMediaName']) != '' && !isset($group_banner)) { ?>
+							<div class="logo2"><img src="<?php echo $this->contentLocation ?>public/Media/full/<?php echo $group_media['SystemMediaName'] ?>" style="width:141px;height:70px; border-width:0px;" /></div>
+						<?php } else if (isset($group_banner)) { ?>
+							<center><img src="/public/Photos/banner/<?php echo $group_banner['SystemMediaName'] ?>" style="max-height:100px; max-width:1045px;" /></center>
+							<div class="clear"></div>
+						<?php } ?>
+						<div style="float:left; <?php echo $is_image_exists ? 'width:870px' : 'width:100%' ?>">
+							<?php if (empty($this->data['BannerMediaId'])) { ?>
+								<h1 style="font-size:27px; line-height:27px; float:left"><?php echo stripslashes($this->data['GroupName']) ?></h1>
+							<?php } ?>
+							<div class="clear"></div>
+						</div>
+						<div id="TabbedPanels1" class="TabbedPanels">
+							<?php include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/groupheader.php'; ?>
+							<div class="TabbedPanelsContentGroup">
+								<div class="TabbedPanelsContent">
+									<div id='whiteBox' class="whiteBox">
+            <h2>Event List</h2>
+            <div>
+                <table id="Event-list" cellspacing="0" cellpadding="3" border="0">
+                    <tr class="tblHeader" style="background-color:#333">
+                        <th scope="col" style="width:20px;"></th>
+                        <th scope="col" >Title</th>
+                        <th scope="col" >Details</th>
+                        <th scope="col" >Location</th>
+                        <th scope="col" >Event Date</th>
+                        <th scope="col" >Who</th>
+                        <th scope="col" >Action</th>
+                    </tr>
+                    <?php if (count($this->events)) :?>
+                        <?php $ctr = 0; foreach($this->events as $event) { ?>
+                    <tr style="background-color:<?php echo $ctr%2 == 1 ? "#e7e7e9" : "white" ?>;">
+                        <td>
+                            <input id="delete_<?php echo $event['EventId'] ?>" type="checkbox" name="delete_<?php echo $event['EventId'] ?>" />
+                        </td>
+                        <td style="text-align:center;">
+                            <a id="ctl00_ContentHolderMain_GridViewEvent_ctl02_lnkbtnEventTitle" title="<?php echo $event['Title'] ?>" href="/<?php echo $this->URLName ?>/events"><?php echo strlen($event['Title']) > 50 ? stripslashes(substr($event['Title'], 0, 50))."..." : stripslashes($event['Title']) ?></a>
+                        </td>
+                        <td style="text-align:center;">
+                            <span id="ctl00_ContentHolderMain_GridViewEvent_ctl02_lblEventText"><?php echo strlen($event['EventText']) > 60 ? stripslashes(substr($event['EventText'], 0, 60))."..." : stripslashes($event['EventText']) ?></span>
+                        </td>
+                        <td style="text-align:center;">
+                                    <?php echo stripslashes($event['Link']) ?>
+                        </td>
+                        <td style="text-align:center;">
+                                    <?php echo date('m/d/Y g:i A', strtotime($event['StartDate']))." - ".date('m/d/Y g:i A', strtotime($event['EndDate'])) ?>
+                        </td>
+                        <td style="text-align:center;">
+                            <a href='/<?php echo $event['URLName'] ?>' target="_blank"><?php echo stripslashes($event['FirstName'])." ".stripslashes($event['LastName']) ?></a>
+                        </td>
+                        <td style="text-align:center;"><a href="javascript:;" onclick="getForm('edit', '<?php echo $event['EventId'] ?>')">Edit</a></td>
+                    </tr>
+                        <?php } ?>
+                    <?php else:?>
+                    <tr>
+                        <td colspan="7" style="font-style:italic">No record found</td>
+                    </tr>
+                    <?php endif;?>
+                </table>
+                <br/>
+                <div>
+                    <a class="btn btngreen" title="Back" href="/<?php echo $this->URLName ?>/events" >Back</a>
+                    <?php if (count($this->events)) :?>
+                    <input type="button" class="btn btngreen" name="delete" value="Delete" onclick="return deleteEvent()" />
+                    <?php endif;?>
+                    <input type="button" class="btn btngreen" name="add" value="Add New" onclick="getForm('add', 0)" />
+                </div>
+                <input type="hidden" id="UserId" name="UserId" value="<?php echo $this->UserId ?>" />
+                <input type="hidden" id="SiteId" name="SiteId" value="<?php echo $this->SiteId ?>" />
+                <input type="hidden" id="Type" name="Type" value="<?php echo $this->Type ?>" />
+            </div>
+            <br/><br/><br/>
+            <div id="form"></div>
+            <div class="clear"></div>
+        </div>
+    </div>
+							</div>
+						</div>
+					</div>
+				<div class="clear"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+<div class="block001f01"><div class="blst001"><div class="blst002"></div></div>

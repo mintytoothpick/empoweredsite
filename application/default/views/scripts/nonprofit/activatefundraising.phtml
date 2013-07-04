@@ -1,0 +1,288 @@
+<?php
+$this->headTitle("Empowered.org:  Empowering groups of volunteers to create social change");
+?>
+
+<style type="text/css">
+    .success { color:green }
+    .error { color:red }
+    .hidden { display:none }
+    .info-boxes { margin: 10px 0px; margin-left: 15px; background: #fff7c8; border:1px solid #dcbd00; padding: 10px 5px; -moz-border-radius:5px; float: left }
+    .indicator { margin:auto; font-size:20px; text-align:center; font-weight:bold; border-bottom:1px solid #e5e5e5; width:640px; padding-bottom:5px;  }
+    .indicator span { color:#999898; margin-right:10px }
+    .indicator span.active { color:#669933; }
+    .indicator span.last { margin-right:5px }
+    .details { margin:5px 0px; margin-left:20px; }
+    .options { font-weight:bold; font-size:17px; }
+    .icons { width:150px; float:left }
+    .desc, .desc ul { width:435px; margin-left:15px; float:left }
+    #paypal-info { width:100%; float:left; margin-left:15px; margin-top:-10px; margin-bottom:15px; }
+    #paypal-info div { margin-bottom:3px }
+    #paypal-info div span { font-weight:bold; }
+    #paypal-info div input { padding:1px; width:220px }
+    #googlecheckout-info { width:100%; float:left; margin-left:15px; margin-top:-10px; margin-bottom:15px; }
+    #googlecheckout-info div { margin-bottom:3px }
+    #googlecheckout-info div span { font-weight:bold; }
+    #googlecheckout-info div input { padding:1px; width:220px }
+    #googlecheckout-info div select { padding:1px; width:70px; }
+    .popup-box { width: 650px; left: 30%; right: 30%; top:25%; position: absolute; z-index: 999999!important; background-color:#ffffff; border:5px solid #e5e5e5; padding:10px 0 20px 0; -moz-border-radius:5px }
+    #popup-overlay {
+        background: url(<?=$this->contentLocation ?>public/images/bg-overlay.png);
+        height:100%;
+        position:fixed;
+        display:block;
+        left:0;
+        top:0;
+        width:100%!important;
+        z-index:998;
+        display:none;
+    }
+    .right {
+        float:right;
+    }
+</style>
+<script>
+    $(function() {
+        $('ul li.desc input[type=radio]').bind('click', function() {
+            var id = $(this).attr('class');
+            $('.info-forms').each(function() {
+                $(this).hide();
+            })
+            $('#'+id).show();
+        })
+    })
+
+    function ValidateForm() {
+        var error = '';
+        if (!$('#activate_fundraising1').attr('checked') && !$('#activate_fundraising2').attr('checked')) {
+            error += "Please specify if you want to activate fundraising for this group or not.<br>";
+        }
+        if ($('#activate_fundraising1').attr('checked')) {
+            if ($('#Paypal').attr('checked')) {
+                if (jQuery.trim($('#paypalEmail').val()) == '') {
+                    error += "Please specify your Paypal API Username.<br>";
+                }
+            } else if ($('#Google-Checkout').attr('checked')) {
+                /* Removed because Google Checkout now requires custom setup / agreement
+                if (jQuery.trim($('#MerchantID').val()) == '') {
+                    error += "Please specify your Google Checkout Merchant ID.<br>";
+                }
+                if (jQuery.trim($('#MerchantKey').val()) == '') {
+                    error += "Please specify your Google Checkout Merchant Key.<br>";
+                } */
+            } else {
+                //error += "Please select either Paypal or Google Checkout.<br >";
+                error += "Please select Paypal.<br >";
+            }
+            if($('#pass_donations_0').attr('checked')) {
+                ;
+            } else if($('#pass_donations_1').attr('checked') || $('#pass_donations_2').attr('checked')) {
+                if(!jQuery.trim($('#PercentageFee').val()).match(/^\d*(\.\d{1, 2})?$/)) {
+                    error += "Please choose a valid percentage to charge on donations.<br />";
+                } else if($('#PercentageFee').val() < 0 || $('#PercentageFee').val() == '') {
+                    error += "Please choose a percentage greater than or equal to 0.<br />";
+                }
+            } else {
+                error += "Please decide how you would like to handle transaction fees.<br >";
+            }
+        }
+        if (error != '') {
+            $('#message').html(error).show();
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    function updateTotalBill() {
+        if(jQuery.trim($('#PercentageFee').val()).match(/^\d*(\.\d{1, 2})?$/) && $('#PercentageFee').val() >= 0 && $('#PercentageFee').val() != '') {
+
+            var percent = Number($('#PercentageFee').val());
+            if ($('#PercentageFee').length > 0) {
+                $('#transfee').html(Number($('#PercentageFee').val()));
+            } else {
+                $('#transfee').html(Number(0));
+            }
+            $('#FeeExplanation').show();
+        }
+    }
+
+</script>
+
+<div class="learnmore-find-out-more popup-box hidden" style="margin-bottom:15px; margin-left:15px; padding:10px; font-size:14px">
+    <ul>
+        <li><strong>Paypal</strong><br />When the donor elects to do so, Empowered.org adds a 1.5% contribution to the donation and takes it automatically as the donation is processed so there is no billing involved. This is the only fee and it is added to the donor's total rather than being taken from your donation, only when the donor opts to contribute of course.</li><br />
+        <li><strong>Google Checkout</strong><br />Currently all transactions made through Google Checkout are not charged any fees by Empowered.org. Soon the same system described for Paypal will apply to Google Checkout</li>
+    </ul>
+    <br><button class="btn btngreen right" onclick="$('.learnmore-find-out-more').hide(); $('#popup-overlay').hide()">Close</button>
+</div>
+<div class="paypal-find-out-more popup-box hidden" style="margin-bottom:15px; margin-left:15px; padding:10px; font-size:14px">
+    <div>
+        <a hre="https://www.paypal.com/" target="_blank">PayPal</a> is a secure online payment method, which allows you to pay or get paid quickly and easily without sharing any of your financial information.<br><br>
+        Pricing: This depends on the country. Current fees:<br><br>
+    </div>
+    <ul style="list-style:square; margin-left:35px;">
+        <li>up to 2.9% of the transaction value + $0.30 in the US or</li>
+        <li>up to 3.4% of the transaction value + £0.20 in the UK</li>
+    </ul>
+    <div>
+        To receive payments you can use any e-mail address. In order to access collected funds you will need to <a href="https://www.paypal.com/" target="_blank">create a PayPal account</a> with the same e-mail address.
+        PayPal accepts: all major credit and debit cards as well as bank transfers and direct debit. Your members can also pay using their PayPal account balance.
+    </div>
+    <br><button class="btn btngreen right" onclick="$('.paypal-find-out-more').hide(); $('#popup-overlay').hide()">Close</button>
+</div>
+<div class="google-find-out-more popup-box hidden" style="margin-bottom:15px; margin-left:15px; padding:10px; font-size:14px">
+    <div>
+    <a href="http://www.googlecheckout.com" target="_blank">Google Checkout</a> is an option if you have a US or UK bank account or already use Google Checkout.<br><br>
+    In order to use Google Checkout you will first need to <a href="https://checkout.google.com/sell/" target="_blank">register for a merchant account</a>. This must be linked to a bank account before you can start receiving payments. You will also need to set up payments to your account by logging in to your <a href="https://checkout.google.com/sell/settings?section=Integration" target="_blank">Google Checkout integration settings page</a> and following the instructions in the payments set-up page within your group.<br><br>
+    Pricing: Depends on country:<br><br>
+    </div>
+    <ul style="list-style:square; margin-left:35px;">
+        <li>up to 1.4 - 3.4% + £0.20 per transaction (UK)</li>
+        <li>up to 1.9% - 2.9% + $0.30 per transaction (US)</li>
+        (same as PayPal)
+    </ul>
+    <div>
+    Accepts: Most credit or debit cards are accepted (except Maestro) are accepted. Google Checkout does not accept bank transfer payments.
+    </div>
+    <br><button class="btn btngreen right" onclick="$('.google-find-out-more').hide(); $('#popup-overlay').hide()">Close</button>
+</div>
+<div id="popup-overlay"></div>
+<div class="wrapper">
+    <!-- org header -->
+    <?=$this->placeholder('header') ?>
+    <!-- // org header -->
+
+    <div class="BodyCon">
+
+        <?php if(isset($this->getstarted)) { ?>
+            <h2 style="font-size:14px; margin-left:35px;">
+                <div style="color:#A9A9A9; width:21%; float:left">Step 1. Structure & Details</div>
+                <div style="color:#A9A9A9; width:18%; float:left">Step 2. Add Admins</div>
+                <div style="color:#A9A9A9; width:19%; float:left">Step 3. Add Members</div>
+                <div style="color:#669933; width:23%; float:left">Step 4. Activate Fundraising</div>
+                <div style="color:#A9A9A9; width:19%; float:left">Step 5. Spread the Word</div>
+                <div class="clear"></div>
+            </h2>
+        <?php } else { ?>
+            <!-- breadcrumb -->
+            <?=$this->placeholder('breadcrumb') ?>
+            <!-- // breadcrumb -->
+            <div class="clr"></div>
+
+            <!-- tabs -->
+            <?=$this->placeholder('tabs') ?>
+            <!-- // tabs -->
+        <?php } ?>
+
+        <div class="mainC">
+            <div class="box05">
+                <div class="headingStyle02">
+                    Activate Fundraising for <?=stripslashes($this->organization->name) ?>
+                </div>
+                <a id="top" href="#top" style="text-decoration:none">&nbsp;</a>
+                <div style="margin-left:20px">
+                    <form name="CreateGroup" method="post" action="" id="ActivateFundraising" onsubmit="return ValidateForm()">
+                        <div style="margin-bottom:15px; padding-bottom:25px; border-bottom:1px solid #e5e5e5; width:600px; display:none;" id="fundraising-opt">
+                            <strong style="margin-left:20px">Would you like to activate fundraising?</strong><span style="margin:0 20px"><input type="radio" name="activate_fundraising" id="activate_fundraising1" value="Yes" checked />&nbsp;Yes</span><span><input type="radio" name="activate_fundraising" id="activate_fundraising2" value="No" />&nbsp;No</span>
+                        </div>
+                        <div id="Fundraising-Details" >
+                            <input type="hidden" id="NetworkId" name="NetworkId" value="<?=$this->organization->id?>" />
+                            <strong style="font-size:18px; color:#669933">Online Fundraising Just Became Free!</strong><br /><br />
+                            <span style="line-height:18px; font-size:15px;">
+                                Empowered.org makes it possible for you to pass your online, merchant and credit card fees off to <br /> donors during checkout. To keep Empowered alive, this includes a 1.5% contribution to help maintain <br /> the site. This process ensures that Empowered will never have any set up costs or monthly fees... EVER!
+                            </span><br /><br />
+                            <div class="info-boxes" style="margin-left:0; width:680px; line-height:16px;">
+                                <strong style="font-size:14px;">How it works:</strong><br />
+                                <div class="details">
+                                    &bull; All money fundraised on Empowered goes <strong>directly</strong> to your Paypal or Google Checkout account which ensures a safe and secure transaction. *Both Google Checkout and Paypal charge between 1.9-2.9% for credit card donations.
+                                </div>
+                                <div class="details">
+                                    &bull; You decide whether it is mandatory or optional to have your donors cover these online transaction costs. You can set the exact percentage you want.
+                                </div>
+                                <div class="details">
+                                    &bull; If the donor pays for your transaction costs, Empowered.org will charge your merchant processor an additional 1.5% to keep the site alive.  If the donor does not, the 1.5% is waived.
+                                </div>
+                                <div class="details">
+                                    &bull; The donor is made aware of the total contribution they are making in both the checkout process and email receipt.
+                                </div>
+                            </div>
+                            <div class="clear"></div>
+                            <div id="message" class="error" style="width:600px; border:2px solid #e3e3e3; margin-bottom:5px; padding:5px; <?php if(!$this->message) { echo "display:none;"; } ?>"><?php if(isset($this->message)) { echo $this->message; } ?></div><br />
+                            <div class="options" style="margin-bottom:5px; color:#669933">1. Choose Your Merchant Processor</div>
+                            <ul style="list-style:none; width:600px">
+                                <li class="icons"><img src="<?=$this->contentLocation ?>public/images/paypal.png" width="150" height="75" alt=""></li>
+                                <li class="desc">
+                                    <input class="paypal-info" style="margin-left:-2px" type="radio" name="payment_method" value="Paypal" id="Paypal"> <strong>Collect payments using Paypal</strong>
+                                    <ul style="list-style:disc">
+                                        <li>Accept payment via credit/debit cards and Paypal accounts</li>
+                                        <li>Paypal charges up to 1.9 - 2.9% + $0.30 per transaction</li>
+                                        <li>
+                                            Start collecting payments immediately!<br>
+                                            <a href="javascript:;" onclick="$('#popup-overlay').show(); $('.paypal-find-out-more').show()" style="text-decoration:underline">Find out more about Paypal</a> or <a href="https://www.paypal.com" target="_blank" style="text-decoration:underline">learn more at Paypal.com</a>
+                                        </li>
+                                    </ul>
+                                    <div class="spacer"></div>
+                                    <div class="info-forms hidden" id="paypal-info">
+                                        <div><span style="margin-right:5px; margin-bottom:5px">Paypal Email:</span><input type="text" id="paypalEmail" name="paypalEmail" value=""></div>
+                                        <div>
+                                            <span style="margin-right:29px">Currency:</span>
+                                            <select id="paypalCurrency" name="paypalCurrency">
+                                                <option value="USD">USD</option>
+                                                <option value="GBP">GBP</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </li>
+                                <div class="clear"></div>
+                                <!--<li class="icons"><img src="<?=$this->contentLocation ?>public/images/googlecheckout.jpg" width="150" height="105" alt=""></li>
+                                <li class="desc">
+                                    <input class="googlecheckout-info" style="margin-left:-2px" type="radio" name="payment_method" value="Google Checkout" id="Google-Checkout"> <strong>Collect payments using Google Checkout</strong>
+                                    <ul style="list-style:disc">
+                                        <li>Accept payment via credit/debit cards and Google accounts</li>
+                                        <li>Google Checkout charges up to 2.9% + $0.30 per transaction</li>
+                                        <li>Temporarily, Empowered.org does not charge a fee for these transactions. <a href="javascript:;" onclick="$('#popup-overlay').show(); $('.learnmore-find-out-more').show()" style="text-decoration:underline">Learn more</a></li>
+                                        <li>
+                                            Requires registration for a Google Checkout merchant account<br>
+                                            <a href="javascript:;" onclick="$('#popup-overlay').show(); $('.google-find-out-more').show()" style="text-decoration:underline">Find out more about Google Checkout</a> or <a href="http://checkout.google.com/sell/" target="_blank" style="text-decoration:underline">learn more at checkout.google.com</a>
+                                        </li>
+                                    </ul>
+                                    <div class="spacer"></div>
+
+                                    <div class="info-forms hidden" id="googlecheckout-info">
+                                        <span style="color:#F00; font-weight:bold;">For Google Checkout, we need to contact you first.<br />We will get back to you within 24 hours.</span>
+                                    </div>
+                                </li>
+                                <div class="clear"></div>-->
+                            </ul>
+                            <div class="options" style="margin-bottom:5px; color:#669933">2. Pass your transaction fees to donors</div>
+                            <div style="margin-bottom:25px;" id="nonprofit-option">
+                                <strong style="margin-left:20px">Would you like to allow donor's to cover your transaction fees?</strong>
+                                <span style="margin:0 20px"><input type="radio" name="allowPercentageFee" value="mandatory" id="pass_donations_2" onclick="$('#PassFeesDiv').show();" />&nbsp;Mandatory</span>
+                                <span style="margin:0 20px 0 0"><input type="radio" name="allowPercentageFee" value="optional" id="pass_donations_1" onclick="$('#PassFeesDiv').show();" />&nbsp;Optional</span>
+                                <div class="info-boxes" style="width: auto">
+                                If you select mandatory the percentage you elect below will automatically be added to all donations you collect in <br />
+                                addition to a 1.5% Empowered contribution.  If you select optional and the donor opts out during checkout, you will <br />
+                                have to pay the Google Checkout or Paypal fee, and Empowered will not receive its 1.5% contribution.
+                                </div>
+                                <div class="clear"></div>
+                                <div id="PassFeesDiv" style="display:none;">
+                                    <span style="margin-left:20px">What percentage would you like added: </span>
+                                    <input type="text" name="PercentageFee" id="PercentageFee" value="" onblur="updateTotalBill();" />%
+                                </div>
+                                <div class="info-boxes" id="FeeExplanation" style="display:none;">
+                                    If your donor chooses not to opt out, then their total total donation will be:<br />The original donation amount <strong>+ <span id="transfee"></span>%</strong> (to cover your merchant costs) <strong>+ 1.5%</strong> (for Empowered.org)
+                                </div>
+                                <div class="clear"></div>
+                            </div>
+                        </div>
+                        <div style="float:left; width:600px; margin-bottom:20px; margin-right:-90px">
+                            <a href="javascript:;" class="btn btngreen" onclick="$('#activate_fundraising2').click(); $('#ActivateFundraising').submit();">Skip</a>
+                            <input type="submit" value="Submit" class="btn btngreen" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    <div class="clr"></div>
+    <div class="clr"></div>
+</div>

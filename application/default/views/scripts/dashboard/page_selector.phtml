@@ -1,0 +1,39 @@
+<?php if ($this->pageCount > 1) { ?>
+
+<?php
+$limit = '';
+if (isset($_REQUEST['limit'])) {
+    $limit = "&limit=".$_REQUEST['limit'];
+}
+if (isset($_REQUEST['show_list'])) {
+    $limit .= "&show_list=".$_REQUEST['show_list'];
+}
+?>
+<center>
+    <div class="paginationControl" style="font-weight:normal">
+
+    <!-- Previous page link -->
+    <?php if (isset($this->previous)) { ?>
+        <a href="/<?=$_REQUEST['pageURL']?>/<?=$_REQUEST['subPage']?>?page=<?= $this->previous; ?><?=$limit?>" class="paginator"><span class="paginationBox">&laquo; Previous</span></a>
+    <?php } else { ?>
+        <span class="paginationBoxDisabled">&laquo; Previous <?= $this->network['URLName'] ?></span>
+    <?php } ?>
+
+    <!-- Numbered page links -->
+    <?php foreach ($this->pagesInRange as $page) { ?>
+        <?php if ($page != $this->current) { ?>
+            <a href="/<?= $_REQUEST['pageUrl'] ?>/<?= $_REQUEST['subPage'] ?>?page=<?= $page; ?><?=$limit?>" class="paginator"><span class="paginationBox"><?= $page; ?></span></a>
+        <?php } else { ?>
+            <span class="paginationBoxDisabled"><?= $page ?></span>
+        <?php } ?>
+    <?php } ?>
+
+    <!-- Next page link -->
+    <?php if (isset($this->next)) { ?>
+        <a href="/<?= $_REQUEST['pageUrl'] ?>/<?= $_REQUEST['subPage'] ?>?page=<?= $this->next; ?><?=$limit?>" class="paginator"><span class="paginationBox">Next &raquo;</span></a>
+    <?php } else { ?>
+        <span class="paginationBoxDisabled">Next &raquo;</span>
+    <?php } ?>
+    </div>
+</center>
+<?php } ?>

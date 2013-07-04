@@ -1,0 +1,70 @@
+<?php $this->placeholder('become_supporter')->captureStart() ?>
+<? if ($this->project->program && $this->project->program->hasSupporters && $this->enableSupporter) { ?>
+<style>
+ul.supporterList {list-style:none;margin-left:0;padding-left:0;}
+ul.supporterList li {margin-bottom: 10px;max-width:750px;}
+ul.supporterList li span {font-weight:bold;}
+img.right {margin: 0 10px 0 10px;}
+</style>
+<script>
+<!--
+var opened = false;
+function selectSupporterOption() {
+    var id = $('#fancybox-content input.supporterFreqId:checked').val();
+    if (typeof(id) != 'undefined' && id != '' && id != 'undefined') {
+        $('#fancybox-content label.error').hide();
+        $("#supportersFreqId").val(id);
+        $(".supporterSelected").html($('#fancybox-content span.'+id+'_supporter').html());
+        $("#supporterResult").show();
+        $.fancybox.close();
+    } else {
+        $('#fancybox-content label.error').show();
+    }
+}
+
+function openSupportersPopup() {
+    if (!opened) {
+        $.fancybox(
+            $("#supportersPopup").html(),
+            {
+                showCloseButton:    false,
+                enableEscapeButton: false,
+                hideOnOverlayClick: false
+            }
+        );
+    }
+    opened = true;
+}
+
+function changeSupportersSelection() {
+    opened = false;
+    openSupportersPopup();
+}
+
+function removeSupportersSelection() {
+    if (confirm('Are you sure?')) {
+        $("#supportersFreqId").val("");
+        $("#supporterResult").hide();
+    }
+}
+-->
+</script>
+
+<input type="hidden" id="supportersFreqId" name="supportersFreqId" value=""/>
+<div id="supportersPopup" class="hide">
+<h1>Support Life Saving Surgeries</h1>
+<p class="big" style="max-width:800px;"><?=$this->project->program->supporterText?></p>
+<? if ($this->supportersImg) { ?><img src="<?=$this->contentLocation ?>public/Media/full/<?=$this->supportersImg?>" class="right"/><? } ?>
+<ul class="supporterList">
+<? foreach($this->project->program->getSupportersFrequencies() as $sf) { ?>
+  <li class="big"><input type="radio" class="supporterFreqId" value="<?=$sf->id?>" /><span class="<?=$sf->id?>_supporter"><?=$this->project->organization->currency?><?=$sf->amount?> <?=$sf->frequency?></span> <?=($sf->description != '') ? ' - ' . $sf->description : ''?></li>
+<? } ?>
+</ul>
+<label class="error hide">To become a supporter, please select an option to continue.<br /><br /></label>
+<div class="clr"></div><br />
+<div class="volunteerBtn03"><a onclick="selectSupporterOption()" href="javascript:;">Add</a></div>
+<a href="javascript:;" onclick="$.fancybox.close();" class="Text14">No, not interested</a>
+<div class="clr"></div><br />
+</div>
+<? } ?>
+<?php $this->placeholder('become_supporter')->captureEnd() ?>

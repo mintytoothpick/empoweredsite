@@ -1,0 +1,42 @@
+<?php $this->placeholder('tool_box')->captureStart() ?>
+<div class="adminPanelCon">
+  <div class="adminPanel">
+    <h1><span></span>Tools</h1>
+    <div class="tool-box-content">
+      <ul>
+        <!--<li><a class="editDetails" href="javascript:;" onclick="$('.display-fields').toggle(); $('.box03HiddenInput').toggle(); $('.tool-box-content').hide();"><span style="vertical-align:top;">Edit Details</span></a></li>-->
+        <li><a class="editDetails" href="/project/edit/<?=$this->project->id?>" ><span style="vertical-align:top;">Edit Details</span></a></li>
+        <li><a class="logoIcon uploadLogo" href="javascript:;"><span style="vertical-align:top; margin-right:15px;">Change Logo</span></a></li>
+      </ul>
+      <div class="adminPanelSeprator"></div>
+      <ul>
+        <?php if($this->project->type == 1) { ?>
+        <li><a class="volunteerIcon" href="/<?=$this->project->urlName?>/fundraisers"><span style="vertical-align:top;margin-right:15px;">View People Fundraising</span></a></li>
+        <li><a class="volunteerIcon" href="/<?=$this->project->urlName?>/add-fundraisers"><span style="vertical-align:top;margin-right:15px;">Add New People Fundraising</span></a></li>
+        <?php } else { ?>
+        <li><a class="volunteerIcon" href="/<?=$this->project->urlName?>/volunteers"><span style="vertical-align:top;">View Volunteers</span></a></li>
+        <li><a href="/<?=$this->project->urlName?>/add-volunteers"><span style="vertical-align:top;margin-right:15px;">Add New Volunteers</span></a></li>
+        <li><a href="/<?=$this->project->urlName?>/manage-volunteers"><span style="vertical-align:top;margin-right:15px;">Accept or Deny Volunteers</span></a></li>
+        <?php } ?>
+        <li><a href="/<?= !empty($this->project->groupId) ? $this->project->group->urlName : (!empty($this->project->organizationId) ? $this->project->organization->urlName : $this->project->urlName) ?>/email-<?=$this->project->type == 1 ? 'fundraisers?Prev=campaign' : 'volunteers?Prev=activity'; ?><?= empty($this->project->userId) ? "&ProjectId=".$this->project->id : "" ?>"><span style="vertical-align:top;">Email <?=$this->project->type == 1 ? 'People Fundraising' : 'Volunteers'; ?></span></a></li>
+      </ul>
+      <div class="adminPanelSeprator"></div>
+      <ul>
+        <li><a href="/<?=$this->project->urlName?>/manage-donations"><span style="vertical-align:top; margin-right:15px;"><?=$this->project->type == 1 ? 'View Fundraiser\'s Donation Summary' : 'View Volunteer Donations vs. Goals'; ?></span></a></li>
+        <?php if (($this->project->isFundraising == 'Yes' || $this->project->isFundraising == 1) && $this->project->raised) { ?>
+        <li><a class="donationIcon" href="/<?=$this->project->urlName?>/donations"><span style="vertical-align:top;">View Donation History</span></a></li>
+        <li><a class="donorsIcon" href="/<?=$this->project->urlName?>/donors"><span style="vertical-align:top;">View Donors</span></a></li><?php } ?>
+        <li><a class="reportsIcon" href="/<?=$this->project->urlName?>/reports"><span style="vertical-align:top;">View Summary Reports</span></a></li>
+      </ul>
+      <div class="adminPanelSeprator"></div>
+      <ul>
+        <?php if(!empty($this->project->organizationId) && ($this->project->organization->hasSurvey())) { ?><li><a href="/signup/surveyreport?ProjectId=<?=$this->project->id?>"><span style="vertical-align:top;">Entry Survey Results</span></a></li><?php } ?>
+        <li><a class="files" href="/<?=$this->project->urlName?>/manage-files"><span style="vertical-align:top;">Share Files</span></a></li>
+        <li><a href="javascript:;" onclick="deleteProject('<?= $this->project->id ?>')"><span style="vertical-align:top;">Delete <?=$this->project->type == 1 ? 'Campaign' : 'Activity'; ?></span></a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<?php echo $this->placeholder('popup_upload_logo') ?>
+<?php $this->placeholder('tool_box')->captureEnd() ?>

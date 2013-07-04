@@ -1,0 +1,201 @@
+<? $hasMemberTitles = (count($this->group->organization->memberTitles)>0); ?>
+<script>
+function searchMembers() {
+    var srch_txt = $('#search_text').val().toString();
+    srch_txt = srch_txt.replace(/'/g, '');
+    srch_txt = srch_txt.replace(/"/g, "");
+    if(srch_txt != '') {
+        window.location.href = "/<?=$this->group->urlName?>/members?&search_text="+srch_txt;
+    } else {
+        alert('please enter your search criteria.');
+    }
+}
+
+//become a group member
+function joinGroup(GID, UID) {
+<?php
+$config = Zend_Registry::get('configuration');
+if(
+  $config->chapter->membership->enable &&
+  !in_array($this->group->organizationId, $config->chapter->membership->settings->toArray()) &&
+  in_array($this->group->organizationId, $config->chapter->membership->active->toArray())) {
+  if ($this->group->hasMembershipFee) { ?>
+    window.location.href = '/<?=$this->group->urlName?>/membership';
+<?php } else { ?>
+    alert("Your Chapter does not currently offer a membership. To become a Member, please tell your Chapter president to turn on the Membership program. If you have any questions, please email membership@globalbrigades.org. Thanks!");
+<?php } }else { ?>
+        $.post('/group/joinrequest', {GroupId: GID, UserId: UID}, function(data) {
+          if(data == 'participate') {
+            alert("Congratulations! You have joined <?=$this->group->name?>");
+            window.location.href = '/<?=$this->group->urlName?>/participate';
+          } else {
+            alert(data);
+            window.location.reload(true);
+          }
+        })
+<?php } ?>
+}
+
+<?php if($this->isAdmin) { ?>
+function activateGroup(GID) {
+    $.post('/group/activategroup', {GroupId: GID}, function(data) {
+        alert(data);
+        window.location.reload(true);
+    })
+}
+
+function makeAdmin(MID, UID) {
+    $.post('/group/updatemembers', {MemberId: MID, action: 'setAdminStatus', value: 1}, function(data) {
+        alert(data);
+        $('#status_'+UID).hide();
+    });
+}
+
+function removeAdmin(GID, UID) {
+    $.post('/administrator/delete', {SiteId: GID, UserId: UID}, function(data) {
+        alert(data);
+        <?php if($this->list != 'members') { ?>
+            $('#box_'+UID).hide();
+        <?php } else { ?>
+            $('#status_'+UID).hide();
+        <?php } ?>
+    });
+}
+
+function removeMember(MID, UID) {
+    $.post('/group/updatemembers', {MemberId: MID, action: 'deleteMember', value: 1}, function(data) {
+        alert(data);
+        $('#box_'+UID).hide();
+    })
+}
+
+<? if ($hasMemberTitles) { ?>
+function changeTitle(titleId, memberId) {
+    $.fancybox($("#editTitleFcy").html());
+    $("#fancybox-content .titlesOrg").attr('selectedIndex', titleId);
+    $("#fancybox-content .memberId").val(memberId);
+}
+
+function saveTitle() {
+    $.fancybox.showActivity();
+    $.post('/group/changemembertitle', {
+       MemberId: $("#fancybox-content .memberId").val(),
+       TitleId: $("#fancybox-content .titlesOrg").val(),
+    },
+    function(data) {
+        $('#title_'+$("#fancybox-content .memberId").val()).html(
+            $('#fancybox-content select.titlesOrg option:selected').text()
+        );
+        $.fancybox.hideActivity();
+        $.fancybox.close();
+    });
+}
+<?php }
+} ?>
+
+</script>
+
+<div class="wrapper">
+  <!-- org header -->
+  <?php echo $this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+  <div class="BodyCon">
+
+  <!-- breadcrumb -->
+  <?php echo $this->placeholder('breadcrumb') ?>
+  <!-- // breadcrumb -->
+
+  <div class="clr"></div>
+
+  <!-- tabs -->
+  <?php echo $this->placeholder('tabs') ?>
+  <!-- // tabs -->
+    <div class="mainC02 BG01">
+        <div class="spacer"></div>
+<?php if(!$this->group->isActive) { ?>
+        <div class="errorBox">
+            This chapter has not been activated yet and may not actually be associated with this organization.<?php if($this->isAdmin && $this->group->createdBy != $this->userNew->id) { ?><a href="javascript:;" onclick="activateGroup('<?=$this->group->id?>')">Click here to activate it now</a><?php } ?>
+        </div>
+<?php } ?>
+
+<?php
+if(($this->isAdminGroup || $this->isAdmin) &&
+(($config->chapter->membership->enable &&
+  (in_array($this->group->organization->id, $config->chapter->membership->settings->toArray()) ||
+  in_array($this->group->organization->id, $config->chapter->membership->active->toArray())))
+  || $this->pendingRequests > 0)
+) { ?>
+      <div class="leftC">
+        <?=$this->placeholder('memberstoolbox')?>
+      </div>
+      <div class="rightC">
+<? } ?>
+      <div class="programBox02">
+        <p><strong><span class="Text14">Find <?= $this->list == 'leadership' ? 'an Administrator' : 'a Member'; ?></span></strong></p>
+        <form id="searchMembers" action="/<?=$this->group->urlName?>/<?=$this->list?>" method="post" onsubmit="searchMembers(); return false;">
+        <input name="search_text" id="search_text" type="text" class="textField01" value="<?=$this->searchtxt?>" />
+        </form>
+        <?php
+        $waitingAppr = false;
+        $cssBtn      = '';
+        if (isset($this->userNew)) {
+            if ($this->is_member || $this->group->hasMembershipPendingReq($this->userNew)) {
+                $cssBtn = 'disabled-button';
+                if ($this->group->hasMembershipPendingReq($this->userNew)) {
+                    $waitingAppr = true;
+                }
+            }
+        }
+        ?>
+        <?php if($this->list == 'members') { ?><div class="<?=$cssBtn?> downloadBtn NoMarginTop startCBtn2"><a <?=$this->joinlink?>> <?php echo ($waitingAppr) ? "Waiting&nbsp;Admin&nbsp;Approval" : "Become&nbsp;a&nbsp;Member" ?></a></div><?php } ?>
+      </div>
+      <?php if(count($this->paginator)) {
+          foreach($this->paginator as $member) { ?>
+          <div class="programBox02" id="box_<?=$member->userId?>"><a href="/member/<?=$member->id?>"><img src="/profile/loadimage/?UserId=<?=$member->userId?>" alt=" " width="55" height="52" class="memberImgStyle<?= $member->isAdmin ? '' : '2'; ?>" /></a>
+            <span class="TextStyle06"><!-- <?=$member->id?> --><a href="/member/<?=$member->id?>"><?=stripslashes($member->fullName)?></a><?= $member->isAdmin ? ' (Administrator)' : ''; ?><span class="eventStyleText02 Text14">Joined on <?= date('M d, Y', strtotime($member->joinedOn)) ?></span>
+                <?php if($this->isAdminGroup || $this->isAdmin) { ?>
+                <span style="float:right;">
+                    <? if ($hasMemberTitles) { ?><a href="javascript:void(0);" onclick="changeTitle('<?=$member->memberTitleId?>', '<?=$member->id?>')" style="font-size:11px;margin-right:15px;">Member Title <img src="/public/images/changelogo.png" width="13px" style="margin-left:5px;" /></a><? } ?>
+                    <?php if($this->list == 'members') { ?>
+                        <?php if($member->isAdmin) { ?>
+                            <a id="status_<?=$member->userId?>" href="javascript:;" onclick="removeAdmin('<?=$this->group->id?>', '<?=$member->userId?>')" style="font-size:11px; margin-right:8px;">Remove Admin</a>
+                        <?php } else { ?>
+                            <a id="status_<?=$member->userId?>" href="javascript:;" onclick="makeAdmin('<?=$member->id?>', '<?=$member->userId?>')" style="font-size:11px; margin-right:8px;">Make Admin</a>
+                        <?php } ?>
+                        <a href="javascript:;" onclick="removeMember('<?=$member->id?>', '<?=$member->userId?>')">
+                    <?php } else { ?>
+                        <a href="javascript:;" onclick="removeAdmin('<?=$this->group->id?>', '<?=$member->userId?>')">
+                    <?php } ?>
+                    <img src="/public/images/cancel.png" /></a>
+                </span>
+                <?php } ?>
+            </span>
+            <span id="title_<?=$member->id?>" class="memberTitle"><? if ($member->memberTitle) { ?><?=$member->memberTitle->title?><? } ?></span><br />
+            <?= stripslashes($member->user->aboutMe) ?><br />
+          </div>
+          <?php } ?>
+          <?= $this->paginationControl($this->paginator, 'Sliding', 'nonprofit/new_page_selector.phtml', array('param' => 'page')); ?>
+      <?php } else { ?>
+          <div class="programBox02">
+          <span class="TextStyle06">There are currently no <?= $this->list == 'leadership' ? 'administrators' : 'members'; ?> for this <?= !empty($_POST['search_text']) ? 'search query' : 'group'; ?>.</span>
+          </div>
+      <?php } ?>
+    </div>
+  </div>
+  <div class="clr"></div>
+</div>
+<?php if ($hasMemberTitles && ($this->isAdminGroup || $this->isAdmin)) { ?>
+<div id="editTitleFcy" class="hide">
+    <input type="hidden" value="" class="memberId" />
+    <h3>Change Member Title</h3>
+    <select class="titlesOrg">
+        <option value="">Select Title ...</option>
+        <? foreach($this->group->organization->memberTitles as $title) { ?>
+        <option value="<?=$title->id?>"><?=$title->title?></option>
+        <?php } ?>
+    </select>
+    <a href="javascript:void(0);" class="btn btngreen newbtn" onclick="saveTitle();">Save</a> <a href="javascript:void(0);" class="btn btngreen" onclick="$.fancybox.close();">Cancel</a>
+</div>
+<?php } ?>

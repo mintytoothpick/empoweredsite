@@ -1,0 +1,38 @@
+<?php $this->headTitle("Empowered - Edit Personal Fundraising Message"); ?>
+<body onunload="window.opener.location.reload(true)">
+<script type='text/javascript' src='<?php echo $this->contentLocation ?>public/js/admin_scripts.js'></script>
+<script type='text/javascript' src='<?php echo $this->contentLocation ?>public/js/jquery-1.3.2.min.js'></script>
+<link href="<?php echo $this->contentLocation ?>public/css/styles.css" rel="stylesheet" type="text/css" />
+<script>
+    function updateMessage() {
+        if (jQuery.trim($('#Message').val()) == '') {
+            $('#message').hide();
+            $('#error').html('Please specify your fund raising message.').show();
+            return false;
+        } else {
+            return true;
+        }
+    }
+</script>
+<div>
+    <div id="mainco2">
+        <div class="roundedbox">
+            <form method="post" action="/profile/editfundraising/<?php echo $this->data['FundraisingMessageId'] ?>" onsubmit="return updateMessage();">
+                <input type="hidden" id="FundraisingMessageId" name="FundraisingMessageId" value="<?php echo $this->data['FundraisingMessageId'] ?>" />
+                <div style="width:500px;">
+                    <h2>Edit Fund Raising Message</h2>
+                    <div id="message" style="border:2px solid silver; padding:5px; color:green; width:486px; <?php echo isset($this->message) ? "" : "display:none" ?>"><?php echo $this->message ?></div>
+                    <div id="error" style="border:2px solid silver; padding:5px; color:red; width:486px; display:none;"></div>
+                    <div class="txt01">
+                        Fund Raising Message:
+                    </div>
+                    <textarea name="Message" rows="2" cols="50" id="Message" style="height:182px;width:500px;"><?php echo stripslashes($this->data['FundraisingMessage']) ?></textarea>
+                    <br><br>
+                    <input style="float:right;" type="submit" name="Submit" value="Submit">
+                </div>
+            </form>
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>
+</body>

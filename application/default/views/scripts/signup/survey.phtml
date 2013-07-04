@@ -1,0 +1,477 @@
+<?php $this->headTitle("Empowered.org: Volunteer Signup Survey"); ?>
+<style>
+    fieldset {
+        margin:25px 0;
+        border:1px solid #ccc;
+        width:90%;
+    }
+    fieldset legend{
+        font-weight:bold;
+    }
+    fieldset span {
+        color:red;
+        font-weight:bold;
+    }
+    fieldset p {
+        font-weight:bold;
+        margin-top:10px;
+        margin-bottom:-10px;
+    }
+    fieldset input, fieldset textarea {
+        width:90%;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+        CheckSelected();
+
+        $("#quest1yes").click(function(e) {
+            $("#reply1").show();
+        });
+        $("#quest1no").click(function(e) {
+            $("#reply1").hide();
+        });
+
+        $("#quest4yes").click(function(e) {
+            $("#reply4").show();
+        });
+        $("#quest4no").click(function(e) {
+            $("#reply4").hide();
+        });
+        $("#quest6yes").click(function(e) {
+            $("#reply6").show();
+        });
+        $("#quest6no").click(function(e) {
+            $("#reply6").hide();
+        });
+        $("#quest8no").click(function(e) {
+            $("#reply8").hide();
+        });
+        $("#quest8yes").click(function(e) {
+            $("#reply8").show();
+        });
+    });
+
+    function toogle(id) {
+        $("#"+id).toogle();
+    }
+
+    function CheckSelected() {
+        var idArray = $('.chk:checked').map(function () {
+            return $(this).val();
+        });
+        $("#degree").val($.makeArray(idArray).join(', '));
+    }
+    function validateSurveyForm(){
+        $('#error_div').hide();
+        var error = "";
+        if ($('#firstname').val() == ""){
+            error  += "First name is required. <br/>";
+        }
+        if ($('#lastname').val() == ""){
+            error  += "Last name is required. <br/>";
+        }
+        if ($('#gender').val() == ""){
+            error  += "Select gender. <br/>";
+        }
+        if (! $('#birthdate').val().match(/\d\d\/\d\d\/\d\d\d\d/)){
+            error  += "Enter valid birthdate. <br/>";
+        }
+        if (!validateEmail($('#email').val())) {
+            error += "Please specify a valid email address.<br>";
+        }
+        if ($('#phone').val() == ""){
+            error  += "Phone number is required. <br/>";
+        }
+        if (jQuery.trim($('#citizenship').val()) == ""){
+            error  += "Citizenship is required. <br/>";
+        }
+        if(jQuery.trim($('#diet_restriction').val()) == '') {
+            error += "Please enter your dietary restrictions or type \"N/A\". <br />";
+        }
+        if($('#degree').val() == '') {
+            $('#degree').val($('#OtherProfessions').val());
+        } else {
+            $('#degree').val($('#degree').val()+', '+$('#OtherProfessions').val());
+        }
+        if(jQuery.trim($('#degree').val()) == '') {
+            error += "Please select your degrees/profesions. <br />";
+        }
+        if($('#spanish_level').val() == '') {
+            error += "Please select your spanish level.<br/>";
+        }
+        if($('#discipline').val() == '') {
+            error += "Please select your brigade's discipline/major.<br/>";
+        }
+        if($('#position').val() == '') {
+            error += "Please select your leadership team position.<br/>";
+        }
+
+        if(jQuery.trim($('#allergies').val()) == '') {
+            error += "Please enter your allergies or type \"N/A\". <br />";
+        }
+        if (!document.getElementById('GBAccept').checked) {
+            error += "You must agree to the Global Brigades Student Information Packet.<br>";
+
+        }
+        if (!document.getElementById('PassportRequeirements').checked) {
+            error += "You must agree to the passport requirements.<br>";
+
+        }
+
+        if (jQuery.trim($('#passport_number').val()) != ""){
+            if (!$('#passport_expiration').val().match(/\d\d\/\d\d\/\d\d\d\d/)){
+                error  += "Enter valid passport expiration date. <br/>";
+            }
+            if ($('#passport_type').val() == ""){
+                error  += "Please specify your passport type. <br/>";
+            }
+        }
+
+        if ($('#emergency_name').val() == ""){
+            error  += "Emergency contact name is required. <br/>";
+        }
+        if ($('#emergency_number').val() == ""){
+            error  += "Emergency contact number is required. <br/>";
+        }
+        if ($('#emergency_relationship').val() == ""){
+            error  += "Emergency Contact Relationship is required. <br/>";
+        }
+        if ($('#emergency_email').val() == ""){
+            error  += "Emergency Email address is required. <br/>";
+        } else if (!validateEmail($('#emergency_email').val())) {
+            error += "Please specify a valid email address for emergency email.<br>";
+        }
+        if($("input[name='quest1']:checked").length == 0) {
+            error += "Please specify medical condition <br/>";
+        }
+        if($("input[name='quest1']:checked").val() == 'Yes' && jQuery.trim($('#quest2').val()) == '') {
+            error += "Please describe the nature of your condition or injury, any factors which may aggravate the condition, and the treatment you are receiving for the condition or injury. <br />";
+        }
+        if($("input[name='quest1']:checked").val() == 'Yes' && jQuery.trim($('#quest3').val()) == '') {
+            error += "Please provide the name, phone number, and address of the doctor(s) that are providing you with treatment for the condition or injury you described above.<br />";
+        }
+        if($("input[name='quest4']:checked").length == 0) {
+            error += "Please specify if any doctor ever restricted your physical activities <br/>";
+        }
+        if($("input[name='quest4']:checked").val() == 'Yes' && jQuery.trim($('#quest5').val()) == '') {
+            error += "Please describe the type of restriction, whether it was permanent or temporary and whether you presently have any limitations on your physical activities<br />";
+        }
+        if($("input[name='quest6']:checked").length == 0) {
+            error += "Please specify if you are presently taking any medication <br/>";
+        }
+        if($("input[name='quest6']:checked").val() == 'Yes' && jQuery.trim($('#quest7').val()) == '') {
+            error += "Please list the name or type of medication, the condition being treated, and the contact information for the prescribing physician.<br />";
+        }
+        if($("input[name='quest8']:checked").length == 0) {
+            error += "Please specify if any doctor ever restricted you from traveling <br/>";
+        }
+        if($("input[name='quest8']:checked").val() == 'Yes' && jQuery.trim($('#quest9').val()) == '') {
+            error += "Please explain the reason for the restriction and whether the restriction was temporary of permanent.<br />";
+        }
+        if(jQuery.trim($('#quest10').val()) == '') {
+            error += "Is there any other information about yourself that you think Global Brigades should be aware of in order to create a safe and comfortable environment for you during your trip? If so, please feel free to share below.<br />";
+        }
+
+        //show errors
+        if (error == ""){
+            if (jQuery.trim($('#passport_number').val()) == "") {
+                alert("you are responsible for submitting your passport information to your group leader, no later than two weeks prior to your brigade.");
+            }
+            $('#survey_form').submit();
+        } else{
+            $('#error_div').show();
+            $('#error_div').html(error);
+        }
+    }
+</script>
+<link href="<?php echo $this->contentLocation ?>public/css/CalendarControl.css" rel="stylesheet" type="text/css"/>
+<script src="<?php echo $this->contentLocation ?>public/js/CalendarControl.js" type="text/javascript" language="javascript"></script>
+<div class="wrapper">
+    <!-- org header -->
+    <?php echo $this->placeholder('header') ?>
+    <!-- // org header -->
+
+    <div class="BodyCon">
+
+        <!-- breadcrumb -->
+        <?php echo $this->placeholder('breadcrumb') ?>
+        <!-- // breadcrumb -->
+        <div class="clr"></div>
+
+        <!-- tabs -->
+        <?php echo $this->placeholder('tabs') ?>
+        <!-- // tabs -->
+
+        <div class="mainC">
+            <div class="box05">
+                <div class="headingStyle02">Global Brigades Volunteer Registration Survey</div>
+                <br /><span style="color:#F00;font-size:12px;">* This information is required by Global Brigades for participation in their service trips</span>
+                <div id = "error_div" class="box box-error" style="display:none"></div>
+                <? if (isset($this->updated)) { ?>
+                <center><p><strong>The survey was successfully updated.</strong></p></center>
+                <? } ?>
+                <?php if (count($this->errors) ) : ?>
+                <div class="box box-error">
+                        <?php
+                        foreach($this->errors as $msg) {
+                            echo $msg."<br>";
+                        }
+                        ?>
+                </div>
+                <? endif; ?>
+                <form name="survey_form" id="survey_form" method="post">
+                    <input type="hidden" name="ProjectId" id="ProjectId" value="<?php echo $this->project->id?>">
+
+                    <fieldset>
+                        <legend>Personal Information</legend>
+                        <table class="no-style">
+                            <tr>
+                                <td style="width:180px"><label for="firstname">First Name:</label><span>*</span></td>
+                                <td><input name="firstname" type="text"  id="firstname" value="<?php echo (!isset($this->survey) || is_null($this->survey)) ? stripslashes($this->userNew->firstName) : $this->survey->firstName ?>" /><br /><span style="color:#F00;font-weight:normal;">Exactly as it appears on your passport</span></td>
+                            </tr>
+                            <tr>
+                                <td><label for="middlename">Middle Name:</label></td>
+                                <td><input name="middlename" type="text" id="middlename" value="<?php echo (isset($this->survey) && !is_null($this->survey)) ? $this->survey->middleName : '' ?>" /><br /><span style="color:#F00;font-weight:normal;">If applicable, exactly as it appears on your passport</span></td>
+                            </tr>
+                            <tr>
+                                <td><label for="lastname">Last Name:</label><span>*</span></td>
+                                <td><input name="lastname" type="text" id="lastname" value="<?php echo (!isset($this->survey) || is_null($this->survey)) ? stripslashes($this->userNew->lastName) : $this->survey->lastName ?>" /><br /><span style="color:#F00;font-weight:normal;">Exactly as it appears on your passport</span></td>
+                            </tr>
+                            <tr>
+                                <td><label for="nickname">Preferred Name / Nickname:</label></td>
+                                <td><input name="nickname" type="text" id="nickname" value="<?php echo (isset($this->survey) && !is_null($this->survey)) ? $this->survey->nickName : '' ?>" /></td>
+                            </tr>
+                            <tr>
+                                <td><label for="gender">Gender:</label><span>*</span></td>
+                                <td>
+                                    <select name="gender" id="gender">
+                                        <? if (isset($this->survey)) {
+                                            $gender = $this->survey->gender;
+                                        } else {
+                                            $gender = $this->userNew->gender;
+                                        } ?>
+                                        <option value="">Select Gender</option>
+                                        <option <?php if($gender == 1) { echo 'selected="selected"'; } ?> value="1">Male</option>
+                                        <option <?php if($gender == 2) { echo 'selected="selected"'; } ?> value="2">Female</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label for="birthdate">Date of Birth (MM/DD/YYYY):</label><span>*</span></td>
+                                <td><input type="text" class="text" id="birthdate" name="birthdate" value="<? echo (isset($this->survey)) ? date("m/d/Y",strtotime($this->survey->birthday)) : '' ?>"/></td>
+                            </tr>
+                            <tr>
+                                <td><label for="email">Email Address:</label><span>*</span></td>
+                                <td><input name="email" type="text" id="email" value="<? echo isset($this->survey) ? $this->survey->email : !empty($this->userNew->email) ? $this->userNew->email : '' ?>" /></td>
+                            </tr>
+                            <tr>
+                                <td><label for="phone">Phone Number:</label><span>*</span></td>
+                                <td><input name="phone" type="text" id="phone" value="<? echo (isset($this->survey)) ? $this->survey->phone : '' ?>" /></td>
+                            </tr>
+                            <tr>
+                                <td><label for="citizenship">Citizenship:</label><span>*</span></td>
+                                <td><input name="citizenship" type="text" id="citizenship" value="<? echo (isset($this->survey)) ? $this->survey->citizenship : '' ?>" /></td>
+                            </tr>
+                        </table>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>Passport Information</legend>
+                        <table class="no-style">
+                            <tr>
+                                <i>If you do not have this information accessible at this time, you are responsible for submitting it to your group leader, no later than two weeks prior to your brigade.</i>
+                                <ul style="margin-left:30px;"><li>U.S. citizens <span style="text-decoration: underline;">do not</span> require a visa to enter Honduras or Panama.</li>
+                                    <li>Non – US citizens must check with their respective consulates to determine their visa requirements. Check <a href="http://www.visahq.com" target="_blank">http://www.visahq.com</a> for Visa guidelines for Panama and Honduras and/or contact your advisor for help with the visa procurement process.</li>
+                                    <li>Your passport must be <strong> valid for at least 6 months </strong> after the date of arrival in these countries. If
+                                    your passport is set to expire within 6 months on your date of arrival, please begin the renewal
+                                    process well in advance of the Brigade. The renewal process takes up to 2 months by mail. Please
+                                    visit <a href="http://travel.state.gov/passport/renew/renew_833.html" target="_blank">http://travel.state.gov/passport/renew/renew_833.html</a> for instructions on renewal</li>
+                                </ul>
+                            </tr>
+                            <tr>
+                                <td style="width:180px"><label for="passport_type">Passport Type:</label></td>
+                                <td><input name="passport_type" type="text" id="passport_type" value="<? echo (isset($this->survey)) ? $this->survey->passportType : '' ?>" /></td>
+                            </tr>
+                            <tr>
+                                <td><label for="passport_number">Passport Number:</label></td>
+                                <td><input name="passport_number" type="text" id="passport_number" value="<? echo (isset($this->survey)) ? $this->survey->passportNumber : '' ?>" /></td>
+                            </tr>
+                            <tr>
+                                <td><label for="passport_expiration">Passport Expiration Date:</label></td>
+                                <td>
+                                    <input name="passport_expiration" type="text" id="passport_expiration" class="textfield" value="<? echo (!empty($this->survey->passportExpirationDate)) ? $this->survey->passportExpirationDate : '' ?>" style="background-color:#fff; border:1px solid #aaaaaa;" readonly />
+                                    <a style="margin-left:3px;" href ="javascript:showCalendarControl(document.getElementById('passport_expiration'), '');"><img id="imgCalenderSD" src="<?php echo $this->contentLocation ?>public/images/Pictures/003.gif" alt=""/></a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <div class="clear"></div>
+                                <td colspan="2"><input type="checkbox" name="PassportRequirements" id="PassportRequeirements" style="width:auto;"> I have reviewed and understand all passport requirements<span>*</span></td>
+                            </tr>
+                        </table>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>In case of Emergency, please contact</legend>
+                        <table class="no-style">
+                            <tr>
+                                <td style="width:180px"><label for="emergency_name">Complete Name:</label><span>*</span></td>
+                                <td><input name="emergency_name" type="text" id="emergency_name" value="<? echo (isset($this->survey)) ? $this->survey->emergencyContactName : '' ?>" /></td>
+                            </tr>
+                            <tr>
+                                <td><label for="emergency_number">Phone Number:</label><span>*</span></td>
+                                <td><input name="emergency_number" type="text" id="emergency_number" value="<? echo (isset($this->survey)) ? $this->survey->emergencyContactNumber : '' ?>" /></td>
+                            </tr>
+                            <tr>
+                                <td><label for="emergency_relationship">Relationship:</label><span>*</span></td>
+                                <td><input name="emergency_relationship" type="text" id="emergency_relationship" value="<? echo (isset($this->survey)) ? $this->survey->emergencyContactRelationship : '' ?>" /></td>
+                            </tr>
+                            <tr>
+                                <td><label for="emergency_email">Email Address:</label><span>*</span></td>
+                                <td><input name="emergency_email" type="text" id="emergency_email" value="<? echo (isset($this->survey)) ? $this->survey->emergencyContactEmail : '' ?>" /></td>
+                            </tr>
+                        </table>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>Other Information</legend>
+                        <table class="no-style">
+                            <tr>
+                                <td style="width:300px"><label for="contact_america">Provide the email of person to contact upon arrival:</label></td>
+                                <td><input name="contact_america" type="text" id="contact_america" class="textfield" value="" /></td>
+                            </tr>
+                            <tr><td colspan="2">This contact will be emailed when your group has arrived safely to the airport. If you’d
+                            like to list multiple people, please separate the email addresses with commas. If this
+                            contact is also your emergency contact, please reenter their information there.</td></tr>
+                            <tr>
+                                <td><label for="spanish_level">Spanish Level:</label><span>*</span></td>
+                                <td><select name="spanish_level" id="spanish_level">
+                                    <option value="" <? echo (isset($this->survey) && $this->survey->spanishLevel == '') ? 'selected' : '' ?>>Select One</option>
+                                    <option value="None" <? echo (isset($this->survey) && $this->survey->spanishLevel == 'None') ? 'selected' : '' ?>>None</option>
+                                    <option value="Very Little" <? echo (isset($this->survey) && $this->survey->spanishLevel == 'Very Little') ? 'selected' : '' ?>>Very Little</option>
+                                    <option value="Some" <? echo (isset($this->survey) && $this->survey->spanishLevel == 'Some') ? 'selected' : '' ?>>Some</option>
+                                    <option value="Conversational" <? echo (isset($this->survey) && $this->survey->spanishLevel == 'Conversational') ? 'selected' : '' ?>>Conversational</option>
+                                    <option value="Fluent" <? echo (isset($this->survey) && $this->survey->spanishLevel == 'Fluent') ? 'selected' : '' ?>>Fluent</option>
+                                    <option value="Native Speaker" <? echo (isset($this->survey) && $this->survey->spanishLevel == 'Native Speaker') ? 'selected' : '' ?>>Native Speaker</option>
+                                </select></td>
+                            </tr>
+                            <tr>
+                                <td><label for="discipline">Discipline/Major:</label><span>*</span></td>
+                                <td><select name="discipline" id="discipline">
+                                    <option value="" <? echo (isset($this->survey) && $this->survey->discipline == '') ? 'selected' : '' ?>>Select One</option>
+                                    <option value="Architecture" <? echo (isset($this->survey) && $this->survey->discipline == 'Architecture') ? 'selected' : '' ?>>Architecture</option>
+                                    <option value="Business" <? echo (isset($this->survey) && $this->survey->discipline == 'Business') ? 'selected' : '' ?>>Business</option>
+                                    <option value="Dental" <? echo (isset($this->survey) && $this->survey->discipline == 'Dental') ? 'selected' : '' ?>>Dental</option>
+                                    <option value="Environmental" <? echo (isset($this->survey) && $this->survey->discipline == 'Environmental') ? 'selected' : '' ?>>Environmental</option>
+                                    <option value="Law" <? echo (isset($this->survey) && $this->survey->discipline == 'Law') ? 'selected' : '' ?>>Law</option>
+                                    <option value="Medical" <? echo (isset($this->survey) && $this->survey->discipline == 'Medical') ? 'selected' : '' ?>>Medical</option>
+                                    <option value="Microfinance" <? echo (isset($this->survey) && $this->survey->discipline == 'Microfinance') ? 'selected' : '' ?>>Microfinance</option>
+                                    <option value="Public Health" <? echo (isset($this->survey) && $this->survey->discipline == 'Public Health') ? 'selected' : '' ?>>Public Health</option>
+                                    <option value="Water" <? echo (isset($this->survey) && $this->survey->discipline == 'Water') ? 'selected' : '' ?>>Water</option>
+                                </select></td>
+                            </tr>
+                            <tr>
+                                <td><label for="position">Leadership Team Position:</label><span>*</span></td>
+                                <td><select name="position" id="position">
+                                    <option value="" <? echo (isset($this->survey) && $this->survey->leadershipPosition == '') ? 'selected' : '' ?>>Select One</option>
+                                    <option value="President" <? echo (isset($this->survey) && $this->survey->leadershipPosition == 'President') ? 'selected' : '' ?>>President</option>
+                                    <option value="Vice President" <? echo (isset($this->survey) && $this->survey->leadershipPosition == 'Vice President') ? 'selected' : '' ?>>Vice President</option>
+                                    <option value="Brigader" <? echo (isset($this->survey) && $this->survey->leadershipPosition == 'Brigader') ? 'selected' : '' ?>>Brigader</option>
+                                    <option value="Health Care Professional" <? echo (isset($this->survey) && $this->survey->leadershipPosition == 'Health Care Professional') ? 'selected' : '' ?>>Health Care Professional</option>
+                                </select></td>
+                            </tr>
+                        </table>
+                    </fieldset>
+
+                    <fieldset>
+                        <p style="margin-bottom:10px;">Special Training/Knowledge/Certifications</p>
+                        <textarea style="height:50px" id="skills" name="skills" ><?php echo (isset($this->survey)) ? stripslashes($this->survey->skills) : '' ?></textarea>
+                        <p style="margin-bottom:10px;">Student / Profession / Degree<span>*</span></p>
+                        <div style="width:150px; float:left;"><input type="checkbox" style="width:auto;" class="chk" value="High School Student" onclick="CheckSelected();" <?=(isset($this->survey) && $this->survey->isDegree('High School Student')) ? 'checked' : ''?> />High School Student</div>
+                        <div style="width:150px; float:left;"><input type="checkbox" style="width:auto;" class="chk" value="Undergraduate Student" onclick="CheckSelected();" <?=(isset($this->survey) && $this->survey->isDegree('Undergraduate Student')) ? 'checked' : ''?>/>Undergraduate Student</div>
+                        <div style="width:150px; float:left;"><input type="checkbox" style="width:auto;" class="chk" value="Graduate Student" onclick="CheckSelected();" <?=(isset($this->survey) && $this->survey->isDegree('Graduate Student')) ? 'checked' : ''?>/>Graduate Student</div>
+                        <div style="width:150px; float:left;"><input type="checkbox" style="width:auto;" class="chk" value="Campus Administrator" onclick="CheckSelected();" <?=(isset($this->survey) && $this->survey->isDegree('Campus Administrator')) ? 'checked' : ''?>/>Campus Administrator</div>
+                        <div style="width:150px; float:left;"><input type="checkbox" style="width:auto;" class="chk" value="MD" onclick="CheckSelected();" <?=(isset($this->survey) && $this->survey->isDegree('MD')) ? 'checked' : ''?>/>MD</div>
+                        <div style="width:150px; float:left;"><input type="checkbox" style="width:auto;" class="chk" value="DO" onclick="CheckSelected();" <?=(isset($this->survey) && $this->survey->isDegree('DO')) ? 'checked' : ''?>/>DO</div>
+                        <div style="width:150px; float:left;"><input type="checkbox" style="width:auto;" class="chk" value="PA" onclick="CheckSelected();" <?=(isset($this->survey) && $this->survey->isDegree('PA')) ? 'checked' : ''?> />PA</div>
+                        <div style="width:150px; float:left;"><input type="checkbox" style="width:auto;" class="chk" value="NP" onclick="CheckSelected();" <?=(isset($this->survey) && $this->survey->isDegree('NP')) ? 'checked' : ''?> />NP</div>
+                        <div style="width:150px; float:left;"><input type="checkbox" style="width:auto;" class="chk" value="RN" onclick="CheckSelected();" <?=(isset($this->survey) && $this->survey->isDegree('RN')) ? 'checked' : ''?> />RN</div>
+                        <div style="width:150px; float:left;"><input type="checkbox" style="width:auto;" class="chk" value="DDS" onclick="CheckSelected();" <?=(isset($this->survey) && $this->survey->isDegree('DDS')) ? 'checked' : ''?> />DDS</div>
+                        <div style="width:150px; float:left;"><input type="checkbox" style="width:auto;" class="chk" value="DMD" onclick="CheckSelected();" <?=(isset($this->survey) && $this->survey->isDegree('DMD')) ? 'checked' : ''?> />DMD</div>
+                        <div style="width:150px; float:left;"><input type="checkbox" style="width:auto;" class="chk" value="EMT" onclick="CheckSelected();" <?=(isset($this->survey) && $this->survey->isDegree('EMT')) ? 'checked' : ''?> />EMT</div>
+                        <div style="width:150px; float:left;"><input type="checkbox" style="width:auto;" class="chk" value="PharmD" onclick="CheckSelected();" <?=(isset($this->survey) && $this->survey->isDegree('PharmD')) ? 'checked' : ''?> />PharmD</div>
+                        <div style="width:150px; float:left;"><input type="checkbox" style="width:auto;" class="chk" value="R.Ph" onclick="CheckSelected();" <?=(isset($this->survey) && $this->survey->isDegree('R.Ph')) ? 'checked' : ''?> />R.Ph</div>
+                        <div style="width:150px; float:left;"><input type="checkbox" style="width:auto;" class="chk" value="CNA" onclick="CheckSelected();" <?=(isset($this->survey) && $this->survey->isDegree('CNA')) ? 'checked' : ''?> />CNA</div>
+                        <div style="width:150px; float:left;"><input type="checkbox" style="width:auto;" class="chk" value="MA" onclick="CheckSelected();" <?=(isset($this->survey) && $this->survey->isDegree('MA')) ? 'checked' : ''?> />MA</div>
+                        <div style="width:150px; float:left;"><input type="checkbox" style="width:auto;" class="chk" value="MPH" onclick="CheckSelected();" <?=(isset($this->survey) && $this->survey->isDegree('MPH')) ? 'checked' : ''?> />MPH</div>
+                        <div style="width:530px; float:left;">Other: <input type="text" id="OtherProfessions" /></div>
+                        <input type="hidden" name="degree" id="degree" />
+                        <div class="clear"></div><br />
+
+                        <p style="margin-bottom:10px;">Dietary Restrictions or Preferences<span>*</span> <span style="color:#AAA;"><i>If none, please write "N/A"</i></span></p>
+                        <textarea style="height:40px" id="diet_restriction" name="diet_restriction"><?php echo (isset($this->survey)) ? stripslashes($this->survey->dietaryRestrictions) : '' ?></textarea>
+                        <p style="margin-bottom:10px;">Allergies or Medical Conditions<span>*</span> <span style="color:#AAA;"><i>If none, please write "N/A"</i></span></p>
+                        <textarea style="height:40px" id="allergies" name="allergies" ><?php echo (isset($this->survey)) ? stripslashes($this->survey->medicalConditions) : '' ?></textarea>
+                        <p style="margin-bottom:10px;">Other Information (optional)</p>
+                        <textarea style="height:40px" id="other_information" name="other_information" ><?php echo (isset($this->survey)) ? stripslashes($this->survey->otherInformation) : '' ?></textarea>
+                    </fieldset>
+
+                    <fieldset>
+                        <p style="margin-bottom:10px;"><span>*</span> Do you currently have any medical condition (either physical or mental) for which you receive treatment?</p>
+                        <input type="radio" id="quest1yes" name="quest1" value="Yes" class="radioOpt" <?=(isset($this->survey)) ? (($this->survey->question1 == 'No') ? '' : 'checked') : ''?>>
+                        <label for="quest1" class="radioOpt" >Yes</label>
+                        <input type="radio" id="quest1no" name="quest1" value="No" class="radioOpt" <?=(isset($this->survey) && $this->survey->question1 == 'No') ? 'checked' : ''?>>
+                        <label for="quest1" class="radioOpt">No</label><br />
+                        <div id="reply1" class="<?=(isset($this->survey)) ? (($this->survey->question1 == 'No') ? 'hide' : '') : 'hide'?>">
+                          <p style="margin-bottom:10px;"><span>*</span> Please describe the nature of your condition or injury, any factors which may aggravate the condition, and the treatment you are receiving for the condition or injury.</p>
+                          <textarea style="height:40px" name="quest2" id="quest2"><?php echo (isset($this->survey)) ? stripslashes((substr($this->survey->question1, 0, 3) == 'Yes') ? substr($this->survey->question1, 6) : $this->survey->question3) : '' ?></textarea>
+                          <p style="margin-bottom:10px;"><span>*</span> Please provide the name, phone number, and address of the doctor(s) that are providing you with treatment for the condition or injury you described above.</p>
+                          <textarea style="height:40px" id="quest3" name="quest3" ><?php echo (isset($this->survey)) ? stripslashes($this->survey->question2) : '' ?></textarea>
+                        </div>
+
+                        <p style="margin-bottom:10px;"><span>*</span> Has any doctor ever restricted your physical activities due to injury, disability, or medical condition?</p>
+                        <input type="radio" id="quest4yes" name="quest4" value="Yes" class="radioOpt" <?=(isset($this->survey)) ? (($this->survey->question3 == 'No') ? '' : 'checked') : ''?>>
+                        <label for="quest4yes" class="radioOpt">Yes</label>
+                        <input type="radio" id="quest4no" name="quest4" value="No" class="radioOpt"  <?=(isset($this->survey) && $this->survey->question3 == 'No') ? 'checked' : ''?>>
+                        <label for="quest4no" class="radioOpt">No</label><br />
+                        <div id="reply4" class="<?=(isset($this->survey)) ? (($this->survey->question3 == 'No') ? 'hide' : '') : 'hide'?>">
+                          <p style="margin-bottom:10px;"><span>*</span>Please describe the type of restriction, whether it was permanent or temporary and whether you presently have any limitations on your physical activities</p>
+                          <textarea style="height:40px" id="quest5" name="quest5" ><?php echo (isset($this->survey)) ? stripslashes((substr($this->survey->question3, 0, 3) == 'Yes') ? substr($this->survey->question3, 6) : $this->survey->question3) : '' ?></textarea>
+                        </div>
+
+                        <p style="margin-bottom:10px;"><span>*</span> Are you presently taking any medication for any serious injury, disability or medical condition?</p>
+                        <input type="radio" id="quest6yes" name="quest6" value="Yes" class="radioOpt" <?=(isset($this->survey)) ? (($this->survey->question4 == 'No') ? '' : 'checked') : ''?>>
+                        <label for="quest6yes" class="radioOpt">Yes</label>
+                        <input type="radio" id="quest6no" name="quest6" value="No" class="radioOpt" <?=(isset($this->survey) && $this->survey->question4 == 'No') ? 'checked' : ''?>>
+                        <label for="quest6no" class="radioOpt">No</label><br />
+                        <div id="reply6" class="<?=(isset($this->survey)) ? (($this->survey->question4 == 'No') ? 'hide' : '') : 'hide'?>">
+                          <p style="margin-bottom:10px;"><span>*</span> Please list the name or type of medication, the condition being treated, and the contact information for the prescribing physician.</p>
+                          <textarea style="height:40px" id="quest7" name="quest7" ><?php echo (isset($this->survey)) ? stripslashes((substr($this->survey->question4, 0, 3) == 'Yes') ? substr($this->survey->question4, 6) : $this->survey->question4) : '' ?></textarea>
+                        </div>
+
+                        <p style="margin-bottom:10px;"><span>*</span> Has any doctor ever restricted you from traveling due to any medical condition, injury, or disability?</p>
+                        <input type="radio" id="quest8yes" name="quest8" value="Yes" class="radioOpt" <?=(isset($this->survey)) ? (($this->survey->question5 == 'No') ? '' : 'checked') : ''?>>
+                        <label for="quest8yes" class="radioOpt">Yes</label>
+                        <input type="radio" id="quest8no" name="quest8" value="No" class="radioOpt" <?=(isset($this->survey) && $this->survey->question5 == 'No') ? 'checked' : ''?>>
+                        <label for="quest8no" class="radioOpt">No</label><br />
+                        <div id="reply8" class="<?=(isset($this->survey)) ? (($this->survey->question5 == 'No') ? 'hide' : '') : 'hide'?>">
+                          <p style="margin-bottom:10px;"><span>*</span> Please explain the reason for the restriction and whether the restriction was temporary of permanent.</p>
+                          <textarea style="height:40px" id="quest9" name="quest9" ><?php echo (isset($this->survey)) ? stripslashes((substr($this->survey->question5, 0, 3) == 'Yes') ? substr($this->survey->question5, 6) : $this->survey->question5) : '' ?></textarea>
+                        </div>
+                        <p style="margin-bottom:10px;"><span>*</span> Is there any other information about yourself that you think Global Brigades should be aware of in order to create a safe and comfortable environment for you during your trip? If so, please feel free to share below.</p>
+                        <textarea style="height:40px" id="quest10" name="quest10" ><?php echo (isset($this->survey)) ? stripslashes($this->survey->question6) : '' ?></textarea>
+                    </fieldset>
+                    <input type="checkbox" id="GBAccept" name="GBAccept" /> <span style="color:#F00;">*</span> I have read the information in the <a href="http://globalbrigades.wikidot.com/student-introduction-packet" target="_blank">Student Introduction Packet</a>. I also agree that Global Brigades can contact me with information and add me to the Global Brigades Newsletter.<br /><br />
+                    <div>
+                        <input type="reset" class="btn btngreen" />
+                        <input type="button" class="btn btngreen" onclick="validateSurveyForm(); return false" value="Submit"/>
+                    </div>
+                </form>
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+    <div class="clr"></div>
+    <div class="clr"></div>
+</div>

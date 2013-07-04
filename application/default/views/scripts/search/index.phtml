@@ -1,0 +1,282 @@
+<?php
+$this->headTitle("Empowered.org:  Empowering groups of volunteers to create social change");
+$categories = array('all' => 'All Results', 'people' => 'People', 'group' => 'Groups', 'activity' => 'Volunteer Activities', 'campaign' => 'Fundraising Campaigns', 'event' => 'Events', 'nonprofit' => 'Organizations', 'program' => 'Programs');
+$search_icons = array('all' => 'search.png', 'people' => 'people.jpg', 'group' => 'groups.jpg', 'activity' => 'activities.jpg', 'campaign' => 'campaigns.png', 'event' => 'events.png', 'nonprofit' => 'nonprofits.png', 'program' => 'programs.png');
+?>
+<script type="text/javascript">
+    $(function() {
+        $('.read-more-or-less').each(function() {
+            $(this).bind('click', function() {
+                if ($(this).attr('name').search('divLessContent') != -1) {
+                    var id = $(this).attr('name').replace('divLessContent', '');
+                    $('#divLessContent'+id).show();
+                    $('#divMoreContent'+id).hide();
+                } else {
+                    var id = $(this).attr('name').replace('divMoreContent', '');
+                    $('#divMoreContent'+id).show();
+                    $('#divLessContent'+id).hide();
+                }
+            })
+        })
+    })
+    function validate() {
+        if (jQuery.trim($('#search_text').val()) == '') {
+            alert('Please specify a keyword to search for record(s)');
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    function moreResults(category, limit) {
+        var rows = 0;
+        $('.'+category+'-row').each(function() {
+            rows++;
+        })
+        $.post('/search/moreresults', {search_text: '<?php echo isset($this->search_text) ? $this->search_text : "" ?>', category: category, offset: rows, limit: limit}, function(data) {
+            if (data != '') {
+                $('#'+category+'-list').append(data);
+                var total_rows = 0;
+                $('.'+category+'-row').each(function() {
+                    total_rows++;
+                })
+            } else {
+                $('#'+category+'-see-more').hide();
+            }
+        })
+    }
+
+    function showMore() {
+        var ctr = 0;
+        $('.hidden').each(function() {
+            if (ctr < 10) {
+                $(this).removeClass('hidden');
+            }
+            ctr++;
+        })
+
+        var ctr = 0;
+        $('.hidden').each(function() {
+            ctr++;
+        })
+        if (ctr == 0) {
+            $('#see-more').addClass('hidden');
+        }
+    }
+</script>
+<style type="text/css">
+    .left-column {
+        float:left;
+        width:210px;
+        padding:10px 20px 10px 10px;
+    }
+    .right-column {
+        float:left;
+        width:648px;
+        padding:10px 115px 10px 55px;
+        margin-top:10px;
+        border-left:3px solid #e5e5e5;
+        min-height:220px!important;
+    }
+    .left-column div {
+        float:left;
+        width:194px;
+        padding:2px 3px;
+        cursor:pointer;
+    }
+    .left-column div:hover {
+        background-color:#ECEFF5;
+    }
+    .left-column div span {
+        float:left;
+        width:155px;
+        padding:5px 0px;
+    }
+    .left-column div.active {
+        background-color:#D8DFEA;
+        height:25px;
+    }
+    .left-column div img {
+        float:left;
+        margin-right:10px;
+        height:24px;
+        width:24px;
+    }
+    .right-column .results-header {
+        width:100%;
+        padding-bottom:5px;
+        border-bottom:1px solid #e5e5e5;
+        float:left;
+    }
+    .right-column .spellchecker {
+        width:100%;
+        padding:10px 0px;
+        float:left;
+        font-size:14px;
+    }
+    .right-column .spellchecker a {
+        font-weight:bold;
+    }
+    .right-column .search-results {
+        width:100%;
+        float:left;
+    }
+    .right-column .search-results .item .logo {
+        width:110px;
+        float:left;
+        margin-right:10px;
+        min-height:60px!important;
+    }
+    .right-column .search-results .item .logo img.user {
+        height:60px;
+        width:60px;
+        float:left;
+    }
+    .right-column .search-results .item .logo img {
+        height:60px;
+        width:90px;
+        float:left;
+    }
+    .right-column .search-results .item .info {
+        width:508px;
+    }
+    .right-column .search-results .item {
+        padding-bottom:8px;
+        margin-bottom:10px;
+        border-bottom:1px solid #e5e5e5;
+    }
+    .right-column .search-results .item .info a.name {
+        color:#669933;
+        font-size:13px;
+    }
+    .right-column .search-results .item .info {
+        float:right;
+        width:508px;
+    }
+    .right-column .search-results .item .info .site-desc {
+        float:right;
+        width:508px;
+    }
+    .hidden {
+        display:none;
+    }
+</style>
+
+<div>
+    <div id="mainco2">
+        <!-- block001 -->
+        <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+        <div class="block001">
+            <div class="blst001">
+                <div class="blst002" style="float:left">
+                    <div class="left-column">
+                        <div <?php echo $this->category == 'all' ? 'class="active"' : '' ?> onclick="window.location.href = '/search?search_text=<?php echo isset($this->search_text) ? $this->search_text : "" ?>&category=all'"><img src="<?php echo $this->contentLocation ?>public/images/ico/search.png" alt="" /><span>All Results</span></div>
+                        <div <?php echo $this->category == 'people' ? 'class="active"' : '' ?> onclick="window.location.href = '/search?search_text=<?php echo isset($this->search_text) ? $this->search_text : "" ?>&category=people'"><img src="<?php echo $this->contentLocation ?>public/images/ico/people.jpg" alt="" /><span>People</span></div>
+                        <div <?php echo $this->category == 'group' ? 'class="active"' : '' ?> onclick="window.location.href = '/search?search_text=<?php echo isset($this->search_text) ? $this->search_text : "" ?>&category=group'"><img src="<?php echo $this->contentLocation ?>public/images/ico/groups.jpg" alt="" /><span>Groups</span></div>
+                        <div <?php echo $this->category == 'activity' ? 'class="active"' : '' ?> onclick="window.location.href = '/search?search_text=<?php echo isset($this->search_text) ? $this->search_text : "" ?>&category=activity'"><img src="<?php echo $this->contentLocation ?>public/images/ico/activities.jpg" alt="" /><span>Volunteer Activities</span></div>
+                        <div <?php echo $this->category == 'campaign' ? 'class="active"' : '' ?> onclick="window.location.href = '/search?search_text=<?php echo isset($this->search_text) ? $this->search_text : "" ?>&category=campaign'"><img src="<?php echo $this->contentLocation ?>public/images/ico/campaigns.png" alt="" /><span>Fundraising Campaigns</span></div>
+                        <div <?php echo $this->category == 'event' ? 'class="active"' : '' ?> onclick="window.location.href = '/search?search_text=<?php echo isset($this->search_text) ? $this->search_text : "" ?>&category=event'"><img src="<?php echo $this->contentLocation ?>public/images/ico/events.png" alt="" /><span>Events</span></div>
+                        <div <?php echo $this->category == 'nonprofit' ? 'class="active"' : '' ?> onclick="window.location.href = '/search?search_text=<?php echo isset($this->search_text) ? $this->search_text : "" ?>&category=nonprofit'"><img src="<?php echo $this->contentLocation ?>public/images/ico/nonprofits.png" alt="" /><span>Organizations</span></div>
+                        <div <?php echo $this->category == 'program' ? 'class="active"' : '' ?> onclick="window.location.href = '/search?search_text=<?php echo isset($this->search_text) ? $this->search_text : "" ?>&category=program'"><img src="<?php echo $this->contentLocation ?>public/images/ico/programs.png" alt="" /><span>Programs</span></div>
+                    </div>
+                    <div class="right-column">
+                        <div class="results-header">
+                            <img src="<?php echo $this->contentLocation ?>public/images/ico/<?php echo $search_icons[$this->category] ?>" style="width:32px;height:32px;margin-right:10px;float:left" alt="" />
+                            <span style="font-size:18px; display:inline;padding:8px 0px;float:left"><?php echo $categories[$this->category] ?></span>
+                            <script>
+                                function beginSearch() {
+                                    var srch_txt = $('#searchfield').val().toString();
+                                    srch_txt = srch_txt.replace(/'/g, '');
+                                    srch_txt = srch_txt.replace(/"/g, "");
+                                    window.location.href = '/search?&search_text='+srch_txt;
+                                }
+                            </script>
+                            <form action="/search" method="post" onsubmit="beginSearch(); return false">
+                                <div class="topbar_search" style="float:right; display:block">
+                                    <input name="search_text" type="text" class="searchbox" id="searchfield" value="<?php echo isset($this->search_text) ? $this->search_text : "" ?>"/>
+                                    <input type="submit" value="" class="go"  />
+                                </div>
+                            </form>
+                            <!--     <form action="/search" method="post" style="margin-top:4px" onsubmit="return validate()">
+                                    <input type="submit" value="" class="globalsearchbutton" style="height:100%;padding:1px;" />
+                                    <input id="search_text" name="search_text" type="text" class="globalsearch" value="<?php echo isset($this->search_text) ? $this->search_text : "" ?>" />
+                                </form>
+                             -->
+                        </div>
+                        <!--
+                        <div class="spellchecker">
+                            <?php if (count($this->correct_spelling) > 0 && trim($this->correct_spelling[0]) != '') { ?>
+                            Did you mean:
+                            <?php
+                                $correct_spellings = array();
+                                foreach($this->correct_spelling as $spelling) {
+                                    $correct_spellings[] = '<a href="/search?search_text='.$spelling.'">'.$spelling.'</a>';
+                                }
+                                echo implode(', ', $correct_spellings);
+                            ?>
+                            <?php } ?>
+                        </div>
+                        -->
+                        <div class="search-results">
+                        <?php if ($this->category == 'all') { ?>
+                            <?php if (count($this->search_results)) { ?>
+                            <?php foreach($this->search_results as $category => $search_result) { ?>
+                            <div id="<?php echo $category ?>-list" style="width:100%">
+                                <div style="margin:10px 0px; padding-bottom:5px; border-bottom:1px solid #e5e5e5; width:100%; float:left">
+                                    <img src="<?php echo $this->contentLocation ?>public/images/ico/<?php echo $search_icons[$category] ?>" style="width:32px;height:32px;margin-right:10px;float:left" alt="" />
+                                    <span style="font-size:18px; display:inline;padding:8px 0px;float:left"><?php echo $categories[$category] ?></span>
+                                </div>
+                                <?php if (count($search_result)) { ?>
+                                    <?php foreach($search_result as $item) { ?>
+                                        <?php echo $item ?>
+                                    <?php } ?>
+                                <?php } ?>
+                            </div>
+                            <?php if (count($search_result) == 3) { ?>
+                            <div id="<?php echo $category ?>-see-more" style="width:100%; padding:10px 0px; text-align:center; border:1px solid #D8DFEA; background-color:#ECEFF5; margin-top:10px;">
+                                <a href="javascript:;" onclick="moreResults('<?php echo $category ?>', 5);">See More Results <img src="<?php echo $this->contentLocation ?>public/images/ico/more_results.png" alt=""></a>
+                            </div>
+                            <?php } ?>
+                        <?php } ?>
+                        <?php } ?>
+                    <?php } else { ?>
+                            <div id="<?php echo $this->category ?>-list" style="width:100%;">
+                        <?php
+                            if (count($this->search_results) && $this->search_text != '') {
+                                $ctr = 0;
+                                foreach($this->search_results as $search_result) {
+                                    $ctr++;
+                                    echo $search_result;
+                                    if ($ctr == 10) break;
+                                }
+                        ?>
+                            </div>
+                            <?php if ($this->total_results > 10) { ?>
+                            <div id="<?php echo $this->category ?>-see-more" style="width:100%; padding:10px 0px; text-align:center; border:1px solid #D8DFEA; background-color:#ECEFF5; margin-top:10px;">
+                                <a href="javascript:;" onclick="moreResults('<?php echo $this->category ?>', 10);">See More Results <img src="<?php echo $this->contentLocation ?>public/images/ico/more_results.png" alt=""></a>
+                            </div>
+                            <?php } ?>
+                        <?php
+                            } else { ?>
+                            <!-- <img src="<?php echo $this->contentLocation ?>public/images/ico/no_results.png" alt="" /> -->
+                            <div style="border:1px solid #dcbd00; background-color:#fff7c8; padding:10px; margin-left:7px; width:470px">
+                <?php if($this->search_text == '') { ?>
+                    <b>Please enter a term that you would like to search for</b>
+                <?php } else { ?>
+                                    <b>No result found for your query.</b><br/>
+                                    <span style="font-size:11px">Check your spelling or try another term.</span>
+                <?php } ?>
+                            </div>
+                        <?php }
+                    } ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="block001f01" style="float:left; width:100%"><div class="blst001"><div class="blst002"></div></div></div>
+        <!-- e o block001 -->
+    </div>
+    <!-- e o main col -->
+    <div class="clear"></div>
+</div>

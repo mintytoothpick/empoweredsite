@@ -1,0 +1,376 @@
+<script>
+    function togglePopup(form, id, val, note) {
+        $('#popup-overlay').toggle();
+        $('.'+form).toggle()
+        $(id).val(val);
+        if (form == 'add-note') {
+            $('#'+form+' .Notes').val(note)
+        } else {
+            $('#'+form+' .Notes').val($('#hidden-note-'+val).val());
+        }
+    }
+
+    function manageNote(form, action) {
+        if (jQuery.trim($(form+' .Notes').val()) == '') {
+            alert("Please enter the volunteer's notes")
+        } else {
+            $.post('/dashboard/'+action, $(form).serialize(), function(data) {
+                alert(data);
+                window.location.reload(true);
+            })
+        }
+        return false;
+    }
+
+    function deleteNote(id) {
+        if (confirm("Are you sure you want to delete this donation note?") == true) {
+            $.post('/dashboard/deletenote', {DonationNoteId: id}, function(data) {
+                alert(data);
+                window.location.reload(true);
+            })
+        } else {
+            return false;
+        }
+    }
+
+    function resendReceipt(PDI) {
+        $.post('/dashboard/reemailreceipt', {ProjectDonationId: PDI}, function(data) {
+            alert(data);
+            $('#resend-'+PDI).toggle();
+            $('#sent-'+PDI).toggle();
+        })
+    }
+
+    function loadVolunteers(PID, selectId) {
+        $('select#'+ selectId).load('/dashboard/loadvolunteers', {ProjectId: PID});
+    }
+
+    $(function() {
+        $('#FromDate').datepicker({ changeMonth: true, changeYear: true });
+        $('#ToDate').datepicker({ changeMonth: true, changeYear: true });
+
+        $('.manualEntry').click(function() {
+            $.fancybox($('#manualEntryFcyBx').html());
+
+            var formBox = $("#fancybox-content form#manual-entry");
+            formBox.validate({
+                onfocusout: function(element) { this.element(element); },
+                submitHandler: function(form) {
+                    $.fancybox.showActivity();
+                    $('input.btnSubmit').hide();
+                    $.ajax({
+                        url: '/dashboard/manualentry',
+                        type: 'POST',
+                        data: {
+                            ProjectId:      $('#fancybox-content select#ManualProjectId').val(),
+                            VolunteerId:    $('#fancybox-content select#ManualVolunteerId').val(),
+                            DonationAmount: $('#fancybox-content #ManualDonationAmount').val(),
+                            Notes:          $('#fancybox-content #Notes').val(),
+                            IsPrivate:      $('#fancybox-content #isPrivate:checked').val(),
+                            PaidFees:       $('#fancybox-content #paidFees:checked').val()
+                        },
+                        success: function(data) {
+                            if (data == 'success') {
+                                alert('Manual donation has been successfully processed');
+                                window.location.reload(true);
+                            } else {
+                                $.fancybox.hideActivity();
+                                $('input.btnSubmit').show();
+                            }
+                        }
+                    });
+                }
+            });
+
+            $('#fancybox-content select#ManualProjectId').rules('add', {required:true, notEqualTo: 'null'});
+/*$('#fancybox-content select#ManualVolunteerId').rules('add', {required:true, notEqualTo: 'stop'});*/
+        });
+    })
+
+    function loadGroup(PID, selectId) {
+        $('#'+ selectId).load('/nonprofit/loadgroups', {ProgramId: PID});
+    }
+
+    function loadProjects(GID, selectId) {
+        $('#'+ selectId).load('/nonprofit/loadprojects', {GroupId: GID});
+    }
+
+    function filterByDate() {
+        if ($('#FromDate').val() != '' && $('#ToDate').val() != '') {
+            filter_records.submit();
+        }
+    }
+</script>
+<style>
+    .popup-box { width: 600px; left: 30%; right: 30%; top:25%; position: fixed; z-index: 999999!important; background-color:#ffffff; border:5px solid #e5e5e5; padding:10px 0 20px 0; -moz-border-radius:5px; margin:auto }
+    #popup-overlay {
+        background: url(<?php echo $this->contentLocation ?>public/images/bg-overlay.png);
+        height:100%;
+        position:fixed;
+        display:block;
+        left:0;
+        top:0;
+        width:100%!important;
+        z-index:998;
+        display:none;
+    }
+    .right {
+        float:right;
+    }
+    .error {display:block;color:red;}
+    .hidden { display:none }
+    #ui-datepicker-div { font-size:11px }
+</style>
+<div class="add-note popup-box hidden" style="margin-bottom:15px; margin-left:15px; padding:10px; font-size:14px">
+    <h2>Add Donation Note</h2>
+    <form id="add-note" onsubmit="manageNote('#add-note', 'addnote'); return false;">
+        <input id="ProjectDonationId" type="hidden" name="ProjectDonationId" value="" />
+        <textarea cols="60" rows="3" name="Notes" class="Notes"></textarea><br>
+        <input type="hidden" name="isPrivate" value="0">
+        <div class="clear"></div><br>
+        <a href="javascript:;" class="btn btngreen" onclick="togglePopup('add-note', '#ProjectDonationId', '', '')">Cancel</a>
+        <input type="submit" class="btn btngreen" value="Submit" />&nbsp;
+    </form>
+</div>
+<div class="edit-note popup-box hidden" style="margin-bottom:15px; margin-left:15px; padding:10px; font-size:14px">
+    <h2>Edit Donation Note</h2>
+    <form id="edit-note" onsubmit="manageNote('#edit-note', 'editnote'); return false;">
+        <input id="DonationNoteId" type="hidden" name="DonationNoteId" value="" />
+        <textarea cols="60" rows="3" name="Notes" class="Notes"></textarea><br>
+        <input type="hidden" name="isPrivate" value="0">
+        <div class="clear"></div><br>
+        <a href="javascript:;" class="btn btngreen" onclick="togglePopup('edit-note', '#DonationNoteId', '', '')">Cancel</a>
+        <input type="submit" class="btn btngreen" value="Submit" />&nbsp;
+    </form>
+</div>
+<div id="manualEntryFcyBx" style="display:none;">
+    <h2>Manual Entry Tool</h2>
+    <form id="manual-entry" method="post">
+        <strong>Volunteer Activity/Fundraising Campaign:</strong><br>
+        <select id="ManualProjectId" name="ManualProjectId" onchange="loadVolunteers(this.value, 'ManualVolunteerId')" class="required">
+            <option value="null">Select One</option>
+            <?php foreach($this->fundraisingProjects as $project) { ?>
+            <option value="<?php echo $project->id ?>"><?php echo stripslashes($project->name) ?></option>
+            <?php } ?>
+        </select>
+        <div class="clear" style="margin-bottom:5px"></div>
+        <strong>Volunteer/Fundraiser:</strong><br>
+        <select id="ManualVolunteerId" name="ManualVolunteerId" class="required">
+            <option value="stop">Select One</option>
+        </select>
+        <div class="clear" style="margin-bottom:5px"></div>
+        <strong>Amount:</strong><br>
+        <input type="text" id="ManualDonationAmount" name="ManualDonationAmount" class="required" />
+        <div class="clear" style="margin-bottom:5px"></div>
+        <strong>Comment:</strong><br>
+        <textarea cols="60" rows="3" id="Notes" name="Notes" class="Notes"></textarea><br>
+        <input type="checkbox" name="isPrivate" value="1" id="isPrivate">&nbsp;Make Comment Private?<br />
+        <input type="checkbox" name="paidFees" value="1" id="paidFees">&nbsp;Paid Fees?
+        <div class="clear"></div><br>
+        <a href="javascript:;" class="btn btngreen" onclick="$.fancybox.close();">Cancel</a>
+        <input type="submit" class="btn btngreen btnSubmit" value="Submit" />&nbsp;
+    </form>
+</div>
+
+<div id="popup-overlay"></div>
+<div class="wrapper">
+   <!-- org header -->
+  <?php echo $this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+    <!-- breadcrumb -->
+    <?php echo $this->placeholder('breadcrumb') ?>
+    <!-- // breadcrumb -->
+    <div class="clr"></div>
+
+    <!-- tabs -->
+    <?php echo $this->placeholder('tabs') ?>
+    <!-- // tabs -->
+
+    <div class="mainC">
+      <div class="box05">
+        <div class="headingStyle02">
+            Donations
+            <? if (!empty($_REQUEST['FromDate']) && !empty($_REQUEST['ToDate'])) { ?>
+            (from <?=date('m/d/Y', strtotime($_REQUEST['FromDate']))?> to <?=date('m/d/Y', strtotime($_REQUEST['ToDate']))?>)
+            <? } else { ?>
+            (<?=number_format(count($this->donations))?> totaling <?=$this->organization->currency.(isset($this->program) ? number_format($this->program->raised) : number_format($this->organization->raised)) ?>)
+            <? } ?>
+        </div>
+        <div id="mainnotleft"     style="width:100%;">
+            <div class="clear"></div>
+            <div class="tab-container" style="width:100%;padding-top:0;">
+                <div id="donationFilters" class="article01" style="padding-bottom:15px;display:none;">
+                    <form id="filter_records" name="filter_records" method="post">
+                        <div style="float:left; margin-bottom: 8px; width: 100%">
+                            <span style="color:#693; font-weight:bold; font-size:13px;" >Filter By: </span>
+                            <?php if ($this->organization->hasPrograms) { ?>
+                            <select name="ProgramId" id="ProgramId" onchange="loadGroup(this.value, 'GroupId'); $('#GroupId').removeAttr('disabled')" style="width:180px;">
+                                <option value="">Program: All</option>
+                                <?php foreach($this->organization->programs as $program) { ?>
+                                <option value="<?=$program->id?>" <?= isset($this->program) && $this->program->id == $program->id ? "selected" : "" ?>>Program: <?=stripslashes($program->name)?></option>
+                                <?php } ?>
+                            </select>
+                            <img src="/public/images/filter_arrow.jpg" style="margin-top:3px;"/>
+                            <?php } ?>
+                            <?php if ($this->organization->hasGroups) { ?>
+                            <select name="GroupId" id="GroupId" style="width:180px;" onchange="loadProjects(this.value, 'ProjectId'); $('#ProjectId').removeAttr('disabled')" <?php if(!isset($_REQUEST['ProgramId']) && $this->organization->hasPrograms) { echo 'disabled="disabled"'; } ?>>
+                                <option value="">Chapter: All</option>
+                                <? if ($this->groups) { ?>
+                                <?php foreach($this->groups as $group) { ?>
+                                <option value="<?php echo $group['GroupId'] ?>" <?php echo isset($_REQUEST['GroupId']) && $_REQUEST['GroupId'] == $group['GroupId'] ? "selected" : "" ?>>Chapter: <?php echo stripslashes($group['GroupName']) ?></option>
+                                <?php } } ?>
+                            </select>
+                            <img src="/public/images/filter_arrow.jpg" style="margin-top:3px;" />
+                            <?php } ?>
+                            <select name="ProjectId" id="ProjectId" style="width:180px;" <?php if(!isset($_REQUEST['GroupId']) && $this->organization->hasGroups) { echo 'disabled="disabled"'; } ?>>
+                                <option value="">Activity or Campaign: All</option>
+                                <?php if ($this->activities) { ?>
+                                <?php foreach($this->activities as $activity) { ?>
+                                <option value="<?php echo $activity['ProjectId'] ?>" <?php echo isset($_REQUEST['ProjectId']) && $_REQUEST['ProjectId'] == $activity['ProjectId'] ? "selected" : "" ?>><?php echo $activity['Type'] == 1 ? 'Campaign: ' : 'Activity: '; ?> <?php echo stripslashes($activity['Name']) ?></option>
+                                <?php } } ?>
+                            </select>
+                            <input type="submit" value="Update" class="btn btngreen" />
+                        </div>
+                        <div class="clear" style="margin-bottom:20px;"></div>
+                        <div class="search" style="float:left;margin:0px; width:auto;">
+                            <input type="text" name="search_text" value="<?php echo isset($_REQUEST['search_text']) ? $_REQUEST['search_text'] : "" ?>" style="width:250px; border:2px solid #528D19; padding:3px; float: left; color: gray; background: url(/public/images/search.gif) no-repeat 98% center" />
+                            <input type="submit" value="" style="display: none">
+                        </div>
+                        <span style="float:left; margin:0 0 0 5px;">
+                            Show:
+                            <select name="show_list" id="limit" onchange="$('#filter_records').submit();">
+                                <option value="10" <?php echo isset($_REQUEST['limit']) && $_REQUEST['limit'] == 10 ? "selected" : "" ?>>10</option>
+                                <option value="25" <?php echo (isset($_REQUEST['limit']) && $_REQUEST['limit'] == 25  || !isset($_REQUEST['limit'])) ? "selected" : "" ?>>25</option>
+                                <option value="50" <?php echo isset($_REQUEST['limit']) && $_REQUEST['limit'] == 50 ? "selected" : "" ?>>50</option>
+                                <option value="100" <?php echo isset($_REQUEST['limit']) && $_REQUEST['limit'] == 100 ? "selected" : "" ?>>100</option>
+                                <option value="" <?php echo isset($_REQUEST['limit']) && $_REQUEST['limit'] == 'All' ? "selected" : "" ?>>All</option>
+                            </select>
+                        </span>
+                        <div style="float:right; margin:3px 0 0 5px">
+                            <div style="float:left; margin-top:5px; font-weight:bold; color:#693; font-size:13px;">Filter By Donation Date:&nbsp;</div>
+                            <input class="text smaller" id="FromDate" name="FromDate" value="<?php echo isset($_REQUEST['FromDate'])&& !empty($_REQUEST['FromDate']) ? date('m/d/Y', strtotime($_REQUEST['FromDate'])) : "" ?>" style="float:left; width:100px;" onchange="filterByDate()">
+                            <div style="float:left; width:20px; margin-top:3px; font-weight:bold; text-align:center;color:#693; font-size:13px;">&nbsp;to&nbsp;</div>
+                            <input class="text smaller" id="ToDate" name="ToDate" value="<?php echo isset($_REQUEST['ToDate'])&& !empty($_REQUEST['ToDate']) ? date('m/d/Y', strtotime($_REQUEST['ToDate'])) : "" ?>" style="float:left; width:100px;" onchange="filterByDate()">
+                        </span>
+                    </form>
+                </div>
+                </div>
+                <div class="article01" style="padding:10px 0;">
+                    <ul id="tools-links">
+                        <li><a href="javascript:;"><img src="/public/images/wrench.jpeg" style="border:1px solid #AAA;"></a>
+                            <ul style="font-size:12px; font-weight:normal;">
+                                <li><a href="javascript:;" class="manualEntry"><img src="/public/images/dollarsign.png" style="margin:3px 5px;"><span style="vertical-align:top;margin-right:15px;">Manual Donation Tool</span></a></li><br />
+                                <li><a href="/reporting/export2?SiteId=<?=$this->organization->id.(isset($this->program) ? "&ProgramId=".$this->program->id : "").(isset($_REQUEST['GroupId']) && !empty($_REQUEST['GroupId']) ? "&GroupId=".$_REQUEST['GroupId'] : "").(isset($_REQUEST['search_text']) && !empty($_REQUEST['search_text']) ? "&search_text=".$_REQUEST['search_text'] : "").(isset($_REQUEST['FromDate']) && !empty($_REQUEST['FromDate']) ? "&StartDate=".$_REQUEST['FromDate'] : "").(isset($_REQUEST['ToDate']) && !empty($_REQUEST['ToDate']) ? "&EndDate=".$_REQUEST['ToDate'] : "").(isset($_REQUEST['ProjectId']) && !empty($_REQUEST['ProjectId']) ? "&ProjectId=".$_REQUEST['ProjectId'] : "") ?>&Type=Organization"><img src="/public/images/reports.png" style="margin:3px 5px;"><span style="vertical-align:top;">Pull Donations Report</span></a></li><br />
+                            </ul>
+                        </li>
+                    </ul>
+                    <div id="showFilterLink" style="float:right;margin-right:20px;margin-top:10px;"><a href="javascript:;" onclick="$('#showFilterLink').hide(); $('#donationFilters').show(); $('#hideFilterLink').show(); $('')" >Show Filters</a></div>
+                    <div id="hideFilterLink" style="float:right;margin-right:20px;margin-top:10px;display:none;"><a href="javascript:;" onclick="$('#showFilterLink').show(); $('#donationFilters').hide(); $('#hideFilterLink').hide();" >Hide Filters</a></div>
+                </div>
+
+                <table cellpadding="5" cellspacing="0" width="100%">
+                    <tr>
+                        <td colspan="10" class="donation_tablehead">
+                            <div class="donation_navpage">
+
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="do_col1" style="color: #000">Transaction ID</td>
+                        <td class="do_col2">Source</td>
+                        <td class="do_col2">Donor</td>
+                        <td class="do_col2">Destination</td>
+                        <td class="do_col2" align="center">Amount</td>
+                        <td class="do_col2" align="center">Charged</td>
+                        <td class="do_col2" align="center">Notes</td>
+                        <td class="do_col2" align="center">Comment</td>
+                        <td class="do_col2" align="center">Date</td>
+                        <td class="do_col3" align="center">Re-Email <br />Receipt</td>
+                    </tr>
+                    <?php foreach ($this->paginator as $donation) { ?>
+                    <tr>
+                        <td class="xdo_col1">
+                            <?php echo $donation->transactionId ?>
+                        </td>
+                        <td class="xdo_col2">
+                            <?= $donation->transactionSource ?>
+                        </td>
+                        <td class="xdo_col2">
+                            <?php if($donation->donor) {
+                                echo $donation->donor->fullName;
+                            } else if(!empty($donation->supporterName)) {
+                                echo $donation->supporterName;
+                            } else {
+                                echo 'Guest';
+                            }?>
+                        </td>
+                        <td class="xdo_col2">
+                            <?php echo $donation->destination; ?>
+                        </td>
+                        <td  class="xdo_col2" align="center"><?= (isset($donation->project->currency) ? $donation->project->currency : $donation->project->group->currency).number_format($donation->amount) ?></td>
+                        <td  class="xdo_col2" align="center">
+                            <?php if ($donation->orderStatusId == 2) { ?>
+                            <img src="/public/images/dashboard/note.png" />
+                            <?php } else if ($donation->orderStatusId == 3) { ?>
+                            <img src="/public/images/dashboard/x.png" alt="Cancelled" title="Cancelled"/>
+                            <?php } ?>
+                        </td>
+                        <td class="xdo_col2" align="center">
+                            <?php if (count($donation->notes)) { ?>
+                            <a href="javascript:;" onclick="$('#notes-<?php echo $donation->id ?>').toggle()">View</a>
+                            <?php } else { ?>
+                            <a href="javascript:;" onclick="togglePopup('add-note', '#ProjectDonationId', '<?php echo $donation->id ?>', '')">+</a>
+                            <?php } ?>
+                        </td>
+                        <td class="xdo_col2">
+                            <?= substr($donation->comments,0,50) ?>
+                            <? if (strlen($donation->comments) > 50 ) {
+                                echo "<div id='comment{$donation->id}' class='hidden'>" . $donation->comments . "</div>
+                                ... <a href='javascript:;' onclick='showComment(\"comment{$donation->id}\")'>Show Comment</a>";
+                            } ?>
+                        </td>
+                        <td class="xdo_col2" align="center">
+                            <?php echo date('M d, Y h:i:s A', strtotime($donation->createdOn)) ?>
+                        </td>
+                        <td class="xdo_col3" align="center">
+                            <a id="resend-<?php echo $donation->id ?>" href="javascript:;" onclick="resendReceipt('<?php echo $donation->id ?>')"><img src="/public/images/dashboard/e.png" /></a>
+                            <img id="sent-<?php echo $donation->id ?>" src="/public/images/dashboard/check_icon.png" style="display:none" />
+                        </td>
+                    </tr>
+                        <?php if (count($donation->notes)) { ?>
+                        <tr id="notes-<?php echo $donation->id ?>" style="display:none; background-color:#e7e7e9; border-left:1px solid #BBCFF9!important; border-bottom:1px solid #BBCFF9!important; padding:3px 5px!important">
+                            <td colspan="7">
+                                <div style="padding:5px 0;">
+                                    <?php foreach($donation->notes as $note) { ?>
+                                        &nbsp;&nbsp;<?php echo ($note->isPrivate == 1 ? "Private Note - " : "Public Note - ").stripslashes($note->note) ?>
+                                        <input type="hidden" id="hidden-note-<?php echo $note->id ?>" value="<?php echo stripslashes($note->note) ?>" />
+                                        <a href="javascript:;" onclick="togglePopup('edit-note', '#DonationNoteId', '<?php echo $note->id ?>', '')">Edit</a>
+                                        &nbsp;/&nbsp;
+                                        <a href="javascript:;" onclick="deleteNote('<?php echo $note->id ?>')">Delete</a>
+                                        <br>
+                                    <?php } ?>
+                                    <a style="margin-left:10px" href="javascript:;" onclick="togglePopup('add-note', '#ProjectDonationId', '<?php echo $donation->id ?>')">Add New</a>
+                                    <br>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php } ?>
+                    <?php } ?>
+                </table>
+
+                <div class="spacer"></div>
+                <a class="btn btngreen" href="/<?=isset($this->program) ? $this->program->urlName : $this->organization->urlName ?>">Back</a>
+                <?= $this->paginationControl($this->paginator, 'Sliding', '/nonprofit/new_page_selector.phtml'); ?>
+
+            </div>
+        </div><!--End Main Content-->
+            </div>
+        </div>
+        <div class="clr"></div>
+        <div class="clr"></div>
+    </div>

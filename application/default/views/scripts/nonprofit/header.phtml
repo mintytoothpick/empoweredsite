@@ -1,0 +1,26 @@
+<?php $this->placeholder('header')->captureStart(); ?>
+<div class="banner">
+<!-- login link -->
+<?php echo $this->placeholder('login_link') ?>
+<!-- //login link -->
+
+<?if ($this->siteBanner) {?>
+<style>
+div.banner {
+  background: url(<?=$this->siteBanner['path']?>) no-repeat;
+  -moz-border-radius:10px 10px 0 0;
+  -webkit-border-radius:10px 10px 0 0;
+  border-radius:10px 10px 0 0;
+}
+</style>
+<? } else if (!empty($this->organization->logo->systemMediaName)) { ?>
+  <div id="bannerLogo"><img src="<?=$this->contentLocation ?>public/Media/full/<?=$this->organization->logo->systemMediaName?>" /></div> <h1><?=stripslashes($this->organization->name) ?></h1>
+<? } else { ?>
+  <div id="bannerLogo"></div><h1><?=$this->organization->name?></h1>
+<? } ?>
+<style>
+<?=$this->organization->cssStyles;?>
+</style>
+</div>
+<div class="clr"></div>
+<?php $this->placeholder('header')->captureEnd() ?>

@@ -1,0 +1,436 @@
+<script type="text/javascript">
+function searchGroup() {
+    var srch_txt = $('#search_text').val().toString();
+    srch_txt = srch_txt.replace(/'/g, '');
+    srch_txt = srch_txt.replace(/"/g, "");
+    if(srch_txt != '') {
+        window.location.href = "/<?=$this->group->urlName?>/search?&search_text="+srch_txt;
+    } else {
+        alert('please enter your search criteria.');
+    }
+}
+
+<?php if($this->isAdmin) { ?>
+function updateInformation() {
+    if($('#editDescription').val() == '') {
+        alert("Please enter your <?=strtolower($this->group->organization->groupNamingSingular)?>'s description");
+        return false;
+    } else if ($('#editEmail').val() == '' || !validateEmail($('#editEmail').val())) {
+        alert("Please enter your <?=strtolower($this->group->organization->groupNamingSingular)?>'s contact email address");
+        return false;
+    } else {
+        if ($('#editStreet').val() == 'Street Address') {
+            $('#editStreet').val('');
+        }
+        if ($('#editWebsite').val() == 'Email Address') {
+            $('#editWebsite').val('');
+        }
+        if ($('#editWebsite').val() == 'Website') {
+            $('#editWebsite').val('');
+        }
+        if ($('#editPhone').val() == 'Phone #') {
+            $('#editPhone').val('');
+        }
+
+        $('#hiddenGroupName').val($('#editName').val());
+
+        $.post('/group/editinfo', $('#editDetails').serialize(), function() {});
+    }
+}
+
+function deleteBanner(GID) {
+    if (confirm("Are you sure you want to remove the banner for this <?=strtolower($this->group->organization->groupNamingSingular)?>?") == true) {
+        $.post('/group/removebanner', {GroupId: GID}, function(data) {
+            alert(data);
+            window.location.reload(true);
+        })
+    }
+}
+
+function deleteGroup(GID) {
+    if (confirm("Are you sure you want to delete this <?=strtolower($this->group->organization->groupNamingSingular)?>?") == true) {
+        $.post('/group/delete', {GroupId: GID, redirect: 0}, function(){
+            alert('The <?=strtolower($this->group->organization->groupNamingSingular)?> has been successfully deleted');
+            window.location.href = '/<?php echo !empty($this->group->programId) ? $this->group->program->urlName : $this->group->organization->urlName; ?>';
+        });
+    }
+}
+
+function activateGroup(GID) {
+    $.post('/chapters/activategroup', {GroupId: GID}, function(data) {
+        window.location.reload(true);
+    })
+}
+
+function editInfo() {
+    $('.box02Editable').toggle(); $('.box02HiddenInput').toggle(); $('.tool-box-content').hide();
+    var title = $('h1:first').html();
+    $('h1:first').html('<form id="editFrmTitle" onsubmit="return updateInformation()"><input type="text" value="'+title+'" id="editName" class="editTitle" /><input type="submit" value="Update" /></form>');
+}
+<?php } ?>
+var wall         = false;
+var isFancyWall  = false;
+var wallCmntStat = false;
+var wallConf     = {
+    scrolling: 'yes',
+    width: 630,
+    height:500,
+    autoDimensions: false,
+    autoScale: false,
+    centerOnScroll: true,
+    showNavArrows: false,
+    onClosed: function () {
+        isFancyWall = false;
+    }
+};
+$(function() {
+    $("#fancyWall").click(function(){
+        isFancyWall = true;
+        if (!wall) {
+            $.ajax({
+                url: "/group/wall",
+                data: 'groupId=<?=$this->group->id?>',
+                success: function(data) {
+                    wall = '<h1>Group Wall</h1><div class="cr"></div><br />' + data;
+                    $.fancybox(wall, wallConf);
+                }
+            });
+        } else {
+            $.fancybox(wall, wallConf);
+        }
+    });
+    <? if ($this->isLoggedIn) { ?>
+    $("#txtAreaComment").click(function() {
+        if (!wallCmntStat) {
+            $(this).val('').removeClass('grey').animate({height: '80px'}, 200);
+            wallCmntStat = true;
+        }
+    });
+
+    $("#txtAreaComment").focusout( function() {
+        focusOutComment();
+    });
+
+    //post wall action
+    $("#btnPostWallComment a").click(function() {
+        $("#btnPostWallComment").hide();
+        $("#btnPostWallLoading").show();
+        $.ajax({
+            url: "/<?=$this->group->urlName?>/post-wall",
+            data: 'message=' + $("#txtAreaComment").val(),
+            type: 'POST',
+            success: function(data){
+                $("#btnPostWallComment").show();
+                $("#btnPostWallLoading").hide();
+                $("#wallAct").html(data);
+                $("#txtAreaComment").val('');
+                focusOutComment();
+            }
+        });
+    });
+
+    <?php if ($this->contactAdminActive) { ?>
+    //message group admin
+    $("#btnMsgGrpAdmin").click(function() {
+        $(".msgFormGroupAdmin").show();
+        $(".msgAlertGroupAdmin").hide();
+        $(".msgResGroupAdmin").hide();
+        $.fancybox($("#msgGroupAdmin").html());
+    });
+    <? } ?>
+    <? } ?>
+});
+
+<? if ($this->isLoggedIn) { ?>
+
+function showCommentBox(id) {
+    var prefix = '';
+    if (isFancyWall) {
+        prefix = '#fancybox-content ';
+    }
+    $(prefix+'div.comment-'+id).show();
+}
+
+function postActivityComment(id) {
+    var prefix = '';
+    if (isFancyWall) {
+        prefix = '#fancybox-content ';
+    }
+
+    $.ajax({
+        url: "/<?=$this->group->urlName?>/post-wall",
+        data: 'message=' + $(prefix+'div.comment-'+id+' textarea').val() + '&activityId='+id +'&filter='+(!isFancyWall),
+        type: 'POST',
+        success: function(data){
+            if (!isFancyWall) {
+                $("#wallAct").html(data);
+            } else {
+                wall = '<h1>Group Wall</h1><div class="cr"></div><br />' + data;
+                $.fancybox(wall, wallConf);
+            }
+            $(prefix+'div.comment-'+id+' textarea').val('');
+        }
+    });
+}
+<?php if ($this->contactAdminActive) { ?>
+function sendMsg() {
+    var elems = $('.msgBoxGroupAdmin');
+    $.ajax({
+        url: "/<?=$this->group->urlName?>/contact-admin",
+        type: 'POST',
+        data: 'message=' + elems[1].value,
+        dataType: 'json',
+        success: function(data){
+            if (data.ok) {
+                $(".msgFormGroupAdmin").hide();
+                $(".msgResGroupAdmin").show();
+            } else if(data.alert) {
+                $(".msgFormGroupAdmin").hide();
+                $(".msgAlertGroupAdmin").show();
+            }
+        }
+    });
+}
+<?php } ?>
+function focusOutComment() {
+    if ($("#txtAreaComment").val() == '') {
+        $("#txtAreaComment").val('Type your comment here ...').addClass('grey').animate({height: '21px'}, 200);
+        wallCmntStat = false;
+    }
+}
+
+//become a group member
+function joinGroup(GID, UID) {
+<?php
+$config = Zend_Registry::get('configuration');
+if(
+  $config->chapter->membership->enable &&
+  !in_array($this->group->organizationId, $config->chapter->membership->settings->toArray()) &&
+  in_array($this->group->organizationId, $config->chapter->membership->active->toArray())) {
+
+  if ($this->group->hasMembershipFee) { ?>
+    window.location.href = '/<?=$this->group->urlName?>/membership';
+<?php } else { ?>
+    alert("Your Chapter does not currently offer a membership. To become a Member, please tell your Chapter president to turn on the Membership program. If you have any questions, please email membership@globalbrigades.org. Thanks!");
+<?php } }else { ?>
+    $("#becomeBtn").html('Loading ...');
+    $.post('/group/joinrequest', {GroupId: GID, UserId: UID}, function(data) {
+      if(data == 'participate') {
+        alert("Congratulations! You have joined <?=$this->group->name?>");
+        window.location.href = '/<?=$this->group->urlName?>/participate';
+      } else {
+        alert(data);
+        window.location.reload(true);
+      }
+    })
+<?php } ?>
+}
+<? } ?>
+
+</script>
+<div class="wrapper">
+  <!-- group header -->
+  <?php echo $this->placeholder('header') ?>
+  <!-- // group header -->
+
+  <div class="clr"></div>
+  <div class="BodyCon">
+
+  <!-- breadcrumb -->
+  <?php echo $this->placeholder('breadcrumb') ?>
+  <!-- // breadcrumb -->
+
+  <div class="clr"></div>
+
+  <!-- tabs -->
+  <?php echo $this->placeholder('tabs') ?>
+  <!-- // tabs -->
+
+  <div class="mainC02">
+    <div class="spacer"></div>
+    <?php if(!$this->group->isActive) { ?><div class="errorBox">This <?=strtolower($this->group->organization->groupNamingSingular)?> will be activated when the organization admin approves. <?php if($this->isAdmin) { ?><a href="javascript:;" onclick="activateGroup('<?=$this->group->id?>')">Click here to activate it now</a><?php } ?></div><?php } ?>
+      <div class="leftC">
+        <?php if($this->isAdmin && ($this->group->createdBy != $this->userNew->id || $this->group->isActive)) echo $this->placeholder('toolbox').'<div class="spacer"></div>'; ?>
+        <div class="leftMainBox BG01">
+          <form id="editDetails" method="post" enctype="multipart/form-data" onsubmit="return updateInformation();">
+          <div class="box002">
+            <div class="headingStyle01 BG02">About</div>
+            <div class="box002Content box02Editable"><span id="groupDescription"><?= stripslashes(nl2br($this->group->description)) ?></span></div>
+            <div class="box02HiddenInput">
+            <textarea class="box02Textarea" id="editDescription" name="Description"><?= stripslashes($this->group->description) ?></textarea>
+            <input type="submit" value="Update" />
+          </div>
+          </div>
+          <div class="box002">
+            <? if (!is_null($this->group->contact)) { ?>
+            <div class="headingStyle01 BG02">Contact</div>
+            <div class="box002Content  box02Editable">
+              <?php if (!empty($this->group->contact->address)) { ?><p><strong>Location</strong> <span id="groupLocation"><?=stripslashes($this->group->contact->address)?></span></p><? } ?>
+              <?php if (!empty($this->group->contact->website)) { ?><p><strong>Website</strong> <span id="groupWebsite"><a class="anchorHiddenOverflow" href="<?= $this->group->contact->website?>"><?= $this->group->contact->website?></a></span></p><?php } ?>
+              <?php if (!empty($this->group->contact->phone)) { ?><p><strong>Phone</strong> <span id="groupPhone"><?= $this->group->contact->phone?></span></p><?php } ?>
+              <?php if ($this->contactAdminActive) { ?>
+              <?php if ($this->isLoggedIn) { ?>
+                  <div class="messageAdminGroup"><a href="javascript:;" id="btnMsgGrpAdmin">Message Group Administrator</a></div>
+              <? } else { ?>
+                  <center>Log in to message the<br />group administrator</center>
+              <?php } ?>
+              <?php } ?>
+            </div>
+            <?php } ?>
+          </div>
+          </form>
+          <?php if($this->staff_count) { ?>
+          <div class="box002">
+            <div class="headingStyle01 BG02">
+              <?php if($this->staff_count > 3) { ?><span class="TextStyle04"><a href="/<?= $this->group->urlName ?>/leadership">See More</a></span><?php } ?>
+              Staff (<?= $this->staff_count ?>)
+            </div>
+            <div class="box002Content">
+              <ul class="ulStyel01">
+                <?php $ctr = 1; foreach($this->administrators as $staff) { ?>
+                <li <?= $ctr%3==0 ? 'class="noMR"' : '' ?>><a href="/<?php echo $staff['URLName'] ?>" class="tooltip" title="<?= $staff['FullName'] ?>"><img src="/profile/loadimage/?UserId=<?= $staff['UserId'] ?>" alt="" width="53px" height="53px" class="BorderStyle" /></a></li>
+                <?php $ctr++; if($ctr > 3) break; } ?>
+              </ul>
+              <div class="clr"></div>
+            </div>
+          </div>
+          <?php } ?>
+          <?php if($this->member_count && $this->group->organization->hasMembership) { ?>
+          <div class="box002">
+            <div class="headingStyle01 BG02">
+              <?php if($this->member_count > 9) { ?><span class="TextStyle04"><a href="/<?= $this->group->urlName ?>/members">See More</a></span><?php } ?>
+              Members (<?= number_format($this->member_count) ?>)
+            </div>
+            <div class="box002Content">
+              <ul class="ulStyel01">
+                <?php $ctr = 1; foreach($this->group->members as $member) { ?>
+                <li <?= $ctr%3==0 ? 'class="noMR"' : '' ?>><a href="/<?php echo $member->urlName ?>" class="tooltip" title="<?= $member->fullName ?>"><img src="/profile/loadimage/?UserId=<?= $member->userId ?>" alt="" width="53px" height="53px" class="BorderStyle" /></a></li>
+                <?php $ctr++; if($ctr > 9) break; } ?>
+              </ul>
+              <div class="clr"></div>
+            </div>
+          </div>
+          <?php } ?>
+          <!-- Files -->
+          <?php echo $this->render('nonprofit/files_list.phtml'); ?>
+          <?php echo $this->placeholder('files_list') ?>
+          <!-- //Files -->
+        </div>
+      </div>
+      <div class="rightC">
+        <?php $this->shareUrl = $_SERVER['HTTP_HOST'] . '/' . $this->group->urlName ?>
+        <?php $this->shareEmail = $this->group->name ?>
+        <?php echo $this->render('nonprofit/sociallinks.phtml'); ?>
+
+        <div class="mediaplayerCon">
+          <div class="TopBox3">
+            <div class="socailNets"><a href="#F"></a><a href="#T"></a><a href="#M"></a></div>
+            <div class="box001">
+              <div class="textSTyle01"><?=$this->member_count?><br />
+                <?=$this->group->currency.number_format($this->group->raised)?></div>
+              <div class="textSTyle02">Members<br />
+                Raised</div>
+            </div>
+          </div>
+          <div class="chapterMemberGroup">
+            <form id="SearchOrganization" style="float:left;" action="/<?= $this->group->urlName ?>/search" method="post" onsubmit="searchGroup(); return false">
+              <p>Search this <?=$this->group->organization->groupNamingSingular?></p>
+              <input id="search_text" name="search_text" type="text" class="textField01Group" value="" />
+            </form>
+            <?php if ($this->group->organization->hasMembership) { ?>
+            <div class="<?= $this->is_member || $this->waiting_approval ? 'disabled-button' : ''; ?> startCBtn2" id="becomeBtn"><a <?=$this->joinlink?>> <?php echo ($this->waiting_approval) ? "Waiting&nbsp;Admin&nbsp;Approval" : "Become&nbsp;a&nbsp;Member" ?></a></div>
+            <? } ?>
+          </div>
+        </div>
+        <div class="clr"></div>
+
+        <div class="rightMainBox BG01">
+          <?php if(count($this->group->events_upcoming)) { ?>
+          <div class="box004">
+            <div class="headingStyle02">Events</div>
+            <div class="box004Content">
+              <?php foreach($this->group->events as $event) { ?>
+              <div class="dateCon" style="height:auto;">
+                <div class="month"><strong><span class="color01"><?= date('M', strtotime($event->startDate)); ?></span></strong><br /><?= date('d', strtotime($event->startDate)); ?></div>
+                <div class="dateConText"><span class="headignStyle03"><a href="/<?=$this->group->urlName?>/events?EventId=<?=$event->id?>"><?=$event->title?></a></span><br />
+                  Location: <?=$event->location?><br />
+                  <?=$event->text?>
+                </div>
+                <a href="/<?=$this->group->urlName?>/events?EventId=<?=$event->id?>"><div class="RSVP noMR"><strong><span class="text19">RSVP</span></strong></div></a>
+                <div class="donation"><strong><span class="text19"><?=number_format(count($event->attendees))?></span></strong><br />Attending</div>
+              </div>
+              <?php break;} ?>
+              <br />
+            </div>
+          </div>
+          <?php } ?>
+          <?php if(isset($this->project)) { ?>
+          <div class="box004">
+            <div class="headingStyle02">
+            <?=$this->project_status?> Initiative</div>
+            <div class="box004Content"><span class="TextStyle05"><a href="/<?= $this->project->urlName ?>"><?= $this->project->name ?></a></span>
+            <div class="clr"></div>
+
+            <!-- right_bar -->
+            <?= $this->placeholder('right_bar'); ?>
+            <!-- //right_bar -->
+
+            <?php if(!empty($this->project->logo->systemMediaName)) { ?><p><img src="<?=$this->contentLocation?>public/Media/full/<?=$this->project->logo->systemMediaName?>" alt="<?=$this->project->name?>'s Logo" class="imgstyle3" style="max-width:370px;" /></p><?php } ?>
+            <p><?php if(!empty($this->project->contact->address)) { ?><strong>Location:</strong> <?=$this->project->contact->address?><br /><?php } ?>
+              <strong>When:</strong> <?php if(isset($this->project->startDate)) echo date('M d Y h:i A', strtotime($this->project->startDate)); ?> to <?= date('M d Y h:i A', strtotime($this->project->endDate)); ?>
+            </p>
+            <?php if(!empty($this->project->description)) { ?><p><strong><span class="Text14"><?= $this->project->type == 1 ? 'Fundraising Campaign' : 'Volunteer Activity'; ?> Description:</span></strong><br />
+              <?= stripslashes(nl2br($this->project->description)) ?>
+            </p><?php } ?>
+            <div class="clr"></div>
+            </div>
+          </div>
+          <?php } ?>
+
+          <!-- group wall -->
+          <div class="box004">
+            <div class="headingStyle02"><?=$this->group->organization->groupNamingSingular?> Wall<span><a href="javascript:;" id="fancyWall" style="float:right; font-size:18px;">View All</a></span></div>
+            <div class="box004Content">
+            <? if ($this->isLoggedIn && $this->group->isActive) { ?>
+            <div class="postComment">
+                <label id="errorMsgWall" class="error"></label>
+                <textarea id="txtAreaComment" class="grey textField">Type your comment here ... </textarea>
+                <div id="btnPostWallComment" class="float-right startCBtn2"><a href="javascript:;" title="Post Wall Comment">Post Wall Comment</a></div>
+                <div id="btnPostWallLoading" class="float-right hide"><img src="/public/images/ui/ajax-loader.gif" />Posting comment ...</div>
+            </div>
+            <? } ?>
+            <div class="clr"></div>
+            <div id="wallAct">
+              <? echo $this->render('group/wall.phtml'); ?>
+            </div>
+            </div>
+          </div>
+          <!-- // group wall -->
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="clr"></div>
+  <div class="clr"></div>
+</div>
+
+<? if ($this->isLoggedIn /* && !$this->isAdmin*/) { ?>
+<!-- Message Group Administrator -->
+<div id="msgGroupAdmin" style="display:none;">
+  <div class="msgFormGroupAdmin">
+    <p><strong>Send a message to the group administrator</strong></p>
+    <textarea rows="5" cols="50" class="msgBoxGroupAdmin"></textarea>
+    <div class="volunteerBtn02"><a href="javascript:;" onclick="sendMsg()" id="btnSend">Send</a></div>
+  </div>
+  <div class="msgResGroupAdmin" style="display:none;">
+    <p><strong>Your message has been sent</strong>.</p>
+    <div class="volunteerBtn02"><a href="javascript:;" onclick="$.fancybox.close()">Close</a></div>
+  </div>
+  <div class="msgAlertGroupAdmin" style="display:none;">
+    <p><strong>You have reached your limit of messages</strong>.</p>
+    <div class="volunteerBtn02"><a href="javascript:;" onclick="$.fancybox.close()">Close</a></div>
+  </div>
+</div>
+<!-- //Message Group Administrator -->
+<? } ?>

@@ -1,0 +1,23 @@
+<?php $this->placeholder('popup_project_donate')->captureStart(); ?>
+
+<div id="projectDonateFcyBx" style="display:none">
+<div class="fcybxLogin">
+    <p><strong>This initiative was completed on 
+    	<span style="display:inline;" id="donationEndDate">
+		<?php if(isset($this->project)) { ?>
+    		<?=date('M d, Y h:i A', strtotime($this->project->endDate)) ?>
+    	<?php } ?>
+    	</span>
+    </strong></p>
+    <p><strong>Would you still like to make a donation?</strong></p>
+
+    <div class="clr"></div>
+    <div class="btnCenter">
+		<input id="donateButton" type="button" value="Yes Donate" class="btnSubmitLarge box confirm">
+    	<input type="button" value="Never mind" class="btnSubmitLarge box">    
+    </div>
+</div>
+</div>
+
+
+<?php $this->placeholder('popup_project_donate')->captureEnd() ?>

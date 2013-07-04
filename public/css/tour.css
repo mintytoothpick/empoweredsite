@@ -1,0 +1,272 @@
+/*------------------------- NEW 30/08/2011 ------------------------------*/
+
+.MainBody02{
+    background:#fff;
+    width:1067px;
+    float:left;
+    padding:20px;
+    margin:0 0 5px 0;
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    border-radius:10px
+    }
+
+.leftCon{
+    width:236px;
+    float:left;
+    }
+
+.JoinBtn{
+    line-height:50px;
+    width:145px;
+    float:left;
+    margin:10px 0;
+    }
+
+.JoinBtnL{
+    width:200px;
+}
+
+.JoinBtn a{
+    background:#ffa200;
+    width:145px;
+    height:50px;
+    color:#fff;
+    display:block;
+    font-size:22px;
+    text-align:center;
+    text-decoration:none;
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    border-radius:10px
+}
+.JoinBtnL a{
+    width:200px;
+}
+
+.JoinBtn a:hover{
+    background:#ffb83c;
+    text-decoration:none;
+    }
+
+.leftSiderBar{
+    background:#f5f5f5;
+    float:left;
+    width:206px;
+    padding:10px 15px;
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    border-radius:10px
+    }
+
+.leftSiderBarHeading{
+    color:#666;
+    font-size:16px;
+    font-weight:bold;
+    display:block;
+    padding-bottom:10px
+    }
+
+.leftSiderBarStyle01{
+    margin:0;
+    padding:0;
+    }
+
+.leftSiderBarStyle01 li{
+    color:#333;
+    list-style:none;
+    font-size:14px;
+    font-weight:bold;
+    line-height:34px;
+    padding-left:10px;
+    }
+
+.leftSiderBarStyle01 li a{
+    color:#333;
+    margin-left:20px;
+    padding:5px;
+    }
+
+.leftSiderBarStyle01 li a:hover{
+    background:#939393;
+    color:#fff;
+    text-decoration:none;
+    }
+
+.leftSiderBarStyle01 li a.active{
+    background:#939393;
+    color:#fff;
+    text-decoration:none;
+    }
+
+.solutions02{ background:url(../images/tour/solutions.png) no-repeat 0px 3px;}
+.fundraising02{ background:url(../images/tour/fundraising.png) no-repeat 6px 7px;}
+.volunteer02{ background:url(../images/tour/volunteer.png) no-repeat 4px 8px;}
+.events{ background:url(../images/tour/events.png) no-repeat 2px 3px;}
+.management{ background:url(../images/tour/management.png) no-repeat 2px 4px;}
+.chapter{ background:url(../images/tour/chapter.png) no-repeat 0 3px;}
+
+.seprator{
+    background:url(../images/tour/sperator.png) no-repeat;
+    width:206px;
+    height:12px;
+    float:left;
+    margin:10px 0;
+    }
+
+.dateBox{
+    background:url(../images/tour/dateBoxBg.png) repeat-x;
+    height:23px;
+    width:48px;
+    float:left;
+    font-size:8px;
+    font-weight:bold;
+    text-align:center;
+    padding:4px 0;
+    margin:4px 4px 4px 0;
+    border:1px solid #c9c9c9;
+    -moz-border-radius:6px;
+    -webkit-border-radius:6px;
+    border-radius:6px
+    }
+
+.Text10{ font-size:10px;}
+
+.textfield001{
+    width:100px;
+    float:right;
+    height:16px;
+    }
+
+.registerBtn{
+    line-height:38px;
+    width:100px;
+    margin:10px 0;
+    }
+
+.registerBtn a{
+    background:#ffa200;
+    color:#fff;
+    font-size:16px;
+    font-weight:bold;
+    text-align:center;
+    width:100px;
+    height:38px;
+    display:block;
+    text-decoration:none;
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    border-radius:10px
+    }
+
+.registerBtn a:hover{
+    background:#ffb83c;
+    text-decoration:none;
+    }
+
+.rightCon{
+    width:740px;
+    float:right;
+    }
+
+.Heading01{
+    color:#96c930;
+    font-size:36px;
+    font-weight:bold;
+    padding-bottom:10px;
+    display:block;
+    }
+
+.Heading02{
+    color:#333;
+    font-size:20px;
+    font-weight:bold;
+    padding-bottom:10px;
+    display:block;
+    }
+
+.con01{
+    width:660px;
+    float:left;
+    margin:15px 0;
+    }
+
+.con01 .Con01Text01{
+    width:180px;
+    float:left;
+    padding:40px 10px 0 0;
+    }
+
+.con01 .Con01Text02{
+    width:180px;
+    float:right;
+    padding:40px 10px 0 0;
+    }
+
+.heading03{
+    color:#333;
+    line-height:22px;
+    width:180px;
+    font-size:18px;
+    font-weight:bold;
+    padding-right:20px;
+    margin:0 0 10px 0;
+    }
+
+.imgstyle3{
+    float:right;
+    margin:0 0 30px 20px;
+    }
+
+.imgstyle4{
+    float:left;
+    margin:0 20px 30px 0;
+    }
+ul.servicies {
+    margin: 0 0 0 25px;
+    padding: 0;
+    list-style-image:url('/public/images/ui/ok.gif');
+}
+ul.servicies li{
+    margin-top:5px;
+}
+
+form.contact label {
+    text-align:right;
+    display: block;
+    float:left;
+    width: 200px;
+    margin-top: 16px;
+    font-size: 12px;
+}
+
+form.contact input {
+    margin: 12px 0 0 15px;
+    width: 250px;
+    margin-right: 100px;
+    border: 1px solid #CCC;
+    padding: 2px;
+    font-size: 12px;
+    height:22px;
+}
+
+form.contact div.btnSubmit {
+    margin-left: 15px;
+    line-height: 40px;
+    width: 100px;
+}
+
+form.contact div.btnSubmit a {
+    height:40px;
+    font-size:18px;
+    width: 100px;
+    width: 100px;
+}
+
+.marginSide {margin:0 40px 0 40px;}
+
+.TextBox { border: none; width: 740px }
+#footermenu a, #copyrights { font-size: 11px }
+#copyrights span { margin-top: -5px }
+
+#footer {background-color: #f5f5f5}

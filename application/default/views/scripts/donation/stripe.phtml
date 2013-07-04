@@ -1,0 +1,248 @@
+<?php $this->placeholder('paymentform')->captureStart(); ?>
+<script src="https://checkout.stripe.com/v2/checkout.js"></script>
+<script>
+<!--
+$(function() {
+
+    $('#volunteers, #rdoName, #fundraisers').change(function() {
+        if ($('#VolunteerId').val() != 'none') {
+            $('#VolunteerId').rules("remove");
+        }
+    });
+
+    $("#formDonate").validate({
+        onfocusout: function(element) { this.element(element); },
+        submitHandler: function(form) {
+            if (validDestination(false)) {
+                var description = 'Donation ';
+
+                if ($("#rdoVolunteer:checked").length == 1 && $("#volunteers").val() != 'none') {
+                    description += 'on behalf of ' + $('#volunteers option:selected').html();
+                }
+                description += ' to ' +'<?=$this->project->name?>.';
+
+                var amountNoFee = 0;
+                if ($(".suggested_donations:checked").length > 0) {
+                    amountNoFee = Number($(".suggested_donations:checked").val());
+                } else {
+                    amountNoFee = Number($("#donationAmount").val());
+                }
+
+                var part1 = amountNoFee*Number(<?=$this->project->percentageFee?>);
+                var result = (part1/100) + amountNoFee;
+
+                StripeCheckout.open({
+                    key:         '<?=$this->project->stripe->publishableKey?>',
+                    address:     true,
+                    amount:      (result*100).toFixed(2),
+                    currency:    'usd',
+                    description: description,
+                    panelLabel:  'Donate',
+                    token:       function(res) {
+                        var $input = $('#stripeToken').val(res.id);
+                        $('form').append($input);
+
+                        $.ajax({
+                            type: "POST",
+                            url: "/donation/bluepay",
+                            data: $("#formDonate").serialize(),
+                            dataType: "json",
+                            timeout: 60000,
+                            success: function(data) {
+                                if (data['status'] == 'ok') {
+                                    location.href = '/donation/stripe?ProjectId=<?=$this->project->id?>&dId='+data['donationId']+'&pA='+data['payAmount'];
+                                } else {
+                                    $("#errorInfo").html(data['msg']).show();
+                                    if (data['donationId']) {
+                                        $("#DonationId").val(data['donationId']);
+                                    }
+                                    $("#btnSub").show();
+                                    $("#loading").hide();
+                                }
+                            },
+                            error: function(request, status, err) {
+                                if(status == "timeout") {
+                                    alert('Error timeout, please try again later.');
+                                    $("#btnSub").show();
+                                    $("#loading").hide();
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        }
+    });
+
+
+<? if (!isset($this->suggested_donations)) { ?>
+    $('#donationAmount').rules("add",{
+        required: true,
+        min: 1
+    });
+    $('#donationAmount').change(function() {
+        updateAmounts();
+    });
+    $('#donationAmount').focusout(function() {
+        updateAmounts();
+    });
+<? } else { ?>
+    $('#donationAmount').rules("add",{
+        required: function() {
+            return ($('.suggested_donations:checked').length == 0)
+        },
+        min: 1,
+        messages: {
+            required: "Please select a valid donation amount"
+        }
+    });
+    $('#donationAmount').change(function() {
+        $('.suggested_donations:checked').attr('checked', false);
+        $('#amntSelected').val(0);
+        updateAmounts();
+    });
+    $('#donationAmount').focusout(function() {
+        updateAmounts();
+    });
+    $('.suggested_donations').change(function() {
+        $('#donationAmount').val('');
+        $('#amntSelected').val($('.suggested_donations:checked').val());
+        $('label[for="donationAmount"]').hide();
+        updateAmounts()
+    });
+<? } ?>
+    $("#volunteers").change(function(){
+        $("#errorDest").html("");
+    });
+    $("#rdoName").click(function(){
+        $("#errorDest").html("");
+    });
+
+});
+
+<?php
+$manual = false;
+if ($this->isLoggedIn) {
+$manual = in_array(
+                $this->userNew->id,
+                Zend_Registry::get('configuration')->user->manualDonation->toArray()
+          );
+$manual = ($manual && ($this->isAdmin && ($this->isNetworkAdmin || $this->isGlobAdmin)));
+}
+if ($manual) { ?>
+function manualEntry() {
+    $('#donationAmount').rules("remove");
+<? if (!isset($this->suggested_donations)) { ?>
+    $('#donationAmount').rules("add",{
+        required: true,
+        number: true
+    });
+<? } else { ?>
+    $('#donationAmount').rules("add",{
+        required: function() {
+            return ($('.suggested_donations:checked').length == 0)
+        },
+        number: true,
+        messages: {
+            required: "Please select a valid donation amount"
+        }
+    });
+<? } ?>
+    validDestination(true);
+    if ($("#formDonate").valid() && validDestination(true)) {
+        if (confirm('You are going to perform a manual donation, do you want to continue?')) {
+            updateAmounts();
+            $("#btnsSelect").hide();
+            $(".echeckInfo").hide();
+            $(".cardInfo").hide();
+            $("#buttonsFinish").hide();
+            $.post('/donation/manualentry', {
+                    ProjectId: $('#ProjectId').val(),
+                    VolunteerId: $('#VolunteerId').val(),
+                    DonationAmount: Number($('.totalAmntNoFee').html()),
+                    DonationComments: $('#DonationComments').val()
+                },
+                function(data) {
+                    alert(data);
+                    location.href = 'http://' + document.location.hostname + '/<?=$this->project->urlName?>';
+                }
+            );
+        }
+    }
+}
+<? } ?>
+
+function updateAmounts() {
+    var part1;
+    var amountNoFee = 0;
+    if ($(".suggested_donations:checked").length > 0) {
+        amountNoFee = Number($(".suggested_donations:checked").val());
+    } else {
+        amountNoFee = Number($("#donationAmount").val());
+    }
+
+    part1 = amountNoFee*Number(<?=$this->project->percentageFee?>);
+    var result = (part1/100) + amountNoFee;
+    $(".totalAmnt").html(result.toFixed(2));
+    //$(".totalAmntNoFee").html(amountNoFee);
+}
+
+function validDestination(manual) {
+    var valid = true;
+    if ((($("#rdoVolunteer:checked").length == 1 && $("#volunteers").val() != 'none') ||
+        ($("#rdoFundraiser:checked").length == 1 && $("#fundraisers").val() != 'none')
+        ) || $("#rdoName:checked").length == 1) {
+        $("#errorDest").html("");
+    } else {
+        $("#errorDest").html("<label class='error'>Please select your donation's destination.</label>");
+        valid = false;
+    }
+<? if (isset($this->suggested_donations)) { ?>
+    if (Number($('#amntSelected').val()) < 1 && Number($('#donationAmount').val()) < 1 && !manual) {
+        valid = false;
+        $("#errorDonationAmnt").html('<label class="error">Please select a valid donation amount</label>');
+    } else {
+        $("#errorDonationAmnt").html('');
+    }
+<? } ?>
+    return valid;
+}
+-->
+</script>
+
+<form action="/donation/stripe" method="post" id="formDonate" autocomplete="off">
+    <input type="hidden" name="stripeToken" id="stripeToken" />
+    <input type="hidden" id="ProjectId" name="ProjectId" value="<?=$this->project->id?>" />
+    <input type="hidden" id="VolunteerId" name="VolunteerId" value="none" />
+    <input type="hidden" value="null" name="typePayment" id="typePayment" />
+    <? if (!isset($this->suggested_donations)) { ?>
+    <input type="hidden" id="amntSelected" name="amntSelected" />
+    <p style="padding-bottom:0px">Please enter any amount you wish to donate:</p>
+    <? } else { ?>
+    <div id="suggested-donations">
+    <?php foreach($this->suggested_donations as $suggested_amount) { ?>
+    <input style="margin-bottom:5px;" type="radio" class="suggested_donations" name="donationAmountRadio" value="<?php echo number_format($suggested_amount['Amount']) ?>">&nbsp;<span style="margin-right:10px;">$<?php echo number_format($suggested_amount['Amount']) ?></span><?php echo $suggested_amount['Description'] ?><br>
+    <?php } ?>
+    </div>
+    <? } ?>
+    <p>
+        <strong><?=$this->project->currency ?></strong>
+        <input id="donationAmount" name="donationAmount" <? if (!isset($this->suggested_donations)) { ?>onfocus="changeVal(this)" style="color:grey;"<? } ?> size="11" type="text" <? if (!isset($this->suggested_donations)) { ?>value="Enter Amount"<? } ?> />
+    </p>
+    <div id="errorDonationAmnt"></div>
+
+    <h2>Comment</h2>
+    <p>Leave a comment?<br />Your message will be displayed on the group's (& volunteer's) pages</p>
+    <textarea name="DonationComments" rows="3" cols="70" id="DonationComments"></textarea><br />
+
+    <input type="checkbox" value="1" name="isAnonymous" />Make my donation anonymous<br /><br />
+
+    <p><span class="big color"><b>Total Amount:</b> <?=$this->project->currency ?><span class="totalAmnt">0</span> </span></p>
+
+    <div class="clear"></div><br />
+    <div class="donateBtn2" id="btnSub">
+        <a href="javascript:$('#formDonate').submit();">Continue</a>
+    </div>
+    <div class="clear"></div><br />
+</form>
+<?php $this->placeholder('paymentform')->captureEnd() ?>

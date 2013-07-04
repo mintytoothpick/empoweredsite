@@ -1,0 +1,23 @@
+<?php $this->headTitle("Empowered.org - Activation"); ?>
+<div id="centredpp">
+    <!-- block001 -->
+    <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+    <div class="block001">
+        <div class="blst001">
+            <div class="blst002">
+                <div class="test">
+                    <?php if ($this->valid) : ?>
+                        Congratulations! Your Empowered.org account has been verified and is ready to use. <a href="/profile/login">Click here</a> to login.
+                    <div class="clear"></div>
+                    <?php else : ?>
+                        Sorry, your activation code is invalid. Check your activation link again or resend your account activation email. If you continue to experience problems, please contact us at admin@empowered.org.</a>
+                    <div class="clear"></div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+        <div class="block001f01"><div class="blst001"><div class="blst002"></div></div></div>
+        <!-- e o block001 -->
+        <div class="clear"></div>
+    </div>
+</div>

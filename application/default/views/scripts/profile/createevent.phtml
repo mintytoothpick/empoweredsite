@@ -1,0 +1,433 @@
+<?php
+$this->headTitle("Empowered.org - Create Event");
+?>
+
+<link href="<?php echo $this->contentLocation ?>public/css/calendrical.css" rel="stylesheet" type="text/css" />
+<script src="<?php echo $this->contentLocation ?>public/js/custom.validate.js" type="text/javascript" language="javascript"></script>
+<script src="<?php echo $this->contentLocation ?>public/js/jquery.calendrical.js" type="text/javascript" language="javascript"></script>
+<link href="<?php echo $this->contentLocation ?>public/css/ui.css" rel="stylesheet" type="text/css"/>
+<script src="<?php echo $this->contentLocation ?>public/js/datepicker/ui.datepicker.js" type="text/javascript" language="javascript"></script>
+
+<script type='text/javascript'>
+    var total_tickets = 1;
+    $(function() {
+        //form contact validate
+        $("#CreateEvent").validate({
+            onfocusout: function(element) { this.element(element); },
+            errorPlacement: function(error, element) {
+                if (element.attr("name") == "StartDate") {
+                    $('#liStartDate').append(error);
+                } else if (element.attr("name") == "EndDate") {
+                    $('#liEndTime').append(error);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            rules: {
+                Title: {
+                    required: true,
+                    notEqualTo: 'My Event'
+                },
+                Description: {
+                    required: true,
+                    notEqualTo: "This is my event. Let's change the world!"
+                },
+                Location: {
+                    required: true,
+                    notEqualTo: "UCLA Auditorium 757 Hilgard, Los Angeles, CA 90405"
+                },
+                StartDate: {
+                    required: true,
+                    dateFormat: true,
+                    dateGT: '<?=date('m/d/Y', time()) ?>'
+                },
+                EndDate: {
+                    required: true,
+                    dateFormat: true,
+                    dateTimeGT: $('#StartDate')
+                },
+                numTickets: {
+                    required: "#isSellTickets03:checked",
+                    number: true,
+                }
+
+            },
+            messages: {
+                Title: {
+                    required: 'Please specify the event title.',
+                    notEqualTo: 'Please specify the event title.'
+                },
+                Description: {
+                    required: 'Please specify the event details.',
+                    notEqualTo: 'Please specify the event details.'
+                },
+                Location: {
+                    required: 'Please specify the event location.',
+                    notEqualTo: 'Please specify the event location.'
+                },
+                StartDate: {
+                    required: 'Please specify the event start date.',
+                    dateFormat: 'Please specify a valid start date.',
+                    dateGT: 'Start date must be greater than the current date.'
+                },
+                EndDate: {
+                    required: 'Please specify the event end date.',
+                    dateFormat: 'Please specify a valid end date.',
+                    dateGT: 'End date must be greater than start date.'
+                },
+                numTickets: {
+                    required: 'Please specify the number of tickets.',
+                    number: 'The limit of tickets must be a number.'
+                }
+            }
+        });
+        $('.adv-opts').hide();
+
+        $('#StartDate').datepicker({ changeMonth: true, changeYear: true })
+                       .change(function(){
+                           $(this).focus();
+                       });
+        $('#StartTime').calendricalTime();
+        $('#EndDate').datepicker({ changeMonth: true, changeYear: true })
+                     .change(function(){
+                         $(this).focus();
+                     });
+        $('#EndTime').calendricalTime();
+        $('.date-inp').datepicker({ changeMonth: true, changeYear: true })
+                      .change(function(){
+                          $(this).focus();
+                      });
+        $('input.grey, textarea.grey').focus(function () {
+            $(this).val('');
+            $(this).removeClass('grey');
+        });
+
+        $("#EndTime, #StartTime, #StartDate").each(function() {
+            $(this).focusout(function(){
+                   $("#EndDate").valid();
+            });
+        });
+    });
+
+    function addTickets() {
+        $('.tickets').show();
+        validateTickets(total_tickets);
+    }
+
+    function addTicket() {
+        total_tickets++;
+        $('#total_tickets').val(total_tickets);
+        $.post('/event/addticket', {ctr: total_tickets}, function(data) {
+            $('#more-tickets').append(data).ready(function(){
+                validateTickets(total_tickets);
+            });
+        });
+    }
+
+    function validateTickets(id) {
+        $("#TicketName-"+id).rules("add",{
+            required: "#isSellTickets01:checked",
+            messages: {
+                required: 'Please specify the ticket name.'
+            }
+        });
+        $("#TicketPrice-"+id).rules("add", {
+            number: "#isSellTickets01:checked",
+            messages: {
+                number: "Please specify a valid ticket price, or you may leave it blank if you sell it for FREE"
+            }
+        });
+    }
+
+    function removeTicket(id) {
+        $("#TicketName-"+id).rules("remove");
+        $("#TicketPrice-"+id).rules("remove");
+        $('.new-ticket-'+id).remove();
+        //total_tickets--;
+    }
+
+    function removeTickets() {
+        $('.tickets').hide();
+        $('.adv-opts').hide();
+    }
+
+    $(function() {
+        $('ul li.desc input[type=radio]').bind('click', function() {
+            var id = $(this).attr('class');
+            $('.info-forms').each(function() {
+                $(this).hide();
+            })
+            $('#'+id).show();
+        })
+        $('#fundraising-opt span input[type=radio]').bind('click', function() {
+            if ($(this).val() == 'Yes') {
+                $('#Fundraising-Details').show();
+            } else {
+                $('#Fundraising-Details').hide();
+            }
+        })
+    })
+</script>
+<style>
+label.error { color:red; display: block; margin-top: 5px;}
+.hide {display: none;}
+.error { color:red; }
+.success { color:green; }
+.details { margin:5px 0px; margin-left:20px; }
+.options { font-weight:bold; font-size:17px; }
+.icons { width:190px; float:left }
+.desc, .desc ul { width:435px; margin-left:15px; float:left }
+#paypal-info { width:100%; float:left; margin-left:15px; margin-top:-10px; margin-bottom:15px; }
+#paypal-info div { margin-bottom:3px }
+#paypal-info div span { font-weight:bold; }
+#paypal-info div input { padding:1px; width:220px }
+#googlecheckout-info { width:100%; float:left; margin-left:15px; margin-top:-10px; margin-bottom:15px; }
+#googlecheckout-info div { margin-bottom:3px }
+#googlecheckout-info div span { font-weight:bold; }
+#googlecheckout-info div input { padding:1px; width:220px }
+#googlecheckout-info div select { padding:1px; width:70px; }
+.popup-box { width: 650px; left: 30%; right: 30%; top:25%; position: fixed; z-index: 999999!important; background-color:#ffffff; border:5px solid #e5e5e5; padding:10px 0 20px 0; -moz-border-radius:5px; margin:auto }
+#popup-overlay {
+    background: url(<?php echo $this->contentLocation ?>public/images/bg-overlay.png);
+    height:100%;
+    position:fixed;
+    display:block;
+    left:0;
+    top:0;
+    width:100%!important;
+    z-index:998;
+    display:none;
+}
+.right {
+    float:right;
+}
+</style>
+<div class="paypal-find-out-more popup-box hidden" style="margin-bottom:15px; margin-left:15px; padding:10px; font-size:14px">
+    <div>
+        <a href="https://www.paypal.com/" target="_blank">Paypal</a> is a secure online payment method, which allows you to pay or get paid quickly and easily without sharing any of your financial information.<br><br>
+        Pricing: This depends on the country. Current fees:<br><br>
+    </div>
+    <ul style="list-style:square; margin-left:35px;">
+        <li>Between 1.9 - 2.9% of the transaction value + $0.30 in the US or</li>
+        <li>up to 3.4% of the transaction value + £0.20 in the UK</li>
+    </ul>
+    <div>
+        To receive payments you can use any e-mail address. In order to access collected funds you will need to <a href="https://www.paypal.com/" target="_blank">create a PayPal account</a> with the same e-mail address.
+        PayPal accepts: all major credit and debit cards as well as bank transfers and direct debit. Your members can also pay using their PayPal account balance.<br><br>
+        You can often use your PayPal account balance to purchase from other websites.
+    </div>
+    <br><button class="btn btngreen right" onclick="$('.paypal-find-out-more').hide(); $('#popup-overlay').hide()">Close</button>
+</div>
+<div class="google-find-out-more popup-box hidden" style="margin-bottom:15px; margin-left:15px; padding:10px; font-size:14px">
+    <div>
+    <a href="http://www.googlecheckout.com" target="_blank">Google Checkout</a> is an option if you have a US or UK bank account or already use Google Checkout.<br><br>
+    In order to use Google Checkout you will first need to <a href="https://checkout.google.com/sell/" target="_blank">register for a merchant account</a>. This must be linked to a bank account before you can start receiving payments. You will also need to set up payments to your account by logging in to your <a href="https://checkout.google.com/sell/settings?section=Integration" target="_blank">Google Checkout integration settings page</a> and following the instructions in the payments set-up page within your group.<br><br>
+    Pricing: Depends on country:<br><br>
+    </div>
+    <ul style="list-style:square; margin-left:35px;">
+        <li>Between 1.4 - 3.4% + £0.20 per transaction (UK)</li>
+        <li>Between 1.9% - 2.9% + $0.30 per transaction (US)</li>
+        (same as PayPal)
+    </ul>
+    <div>
+    Accepts: Most credit or debit cards are accepted (except Maestro) are accepted. Google Checkout does not accept bank transfer payments.
+    </div>
+    <br><button class="btn btngreen right" onclick="$('.google-find-out-more').hide(); $('#popup-overlay').hide()">Close</button>
+</div>
+<div id="popup-overlay"></div>
+<div>
+    <div id="mainco2">
+        <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+        <div class="block001">
+            <div class="blst001">
+                <div class="blst002">
+                    <div class="MainBody">
+                            <h2 style="font-size:14px">
+                                <div style="color:#669933; width:19%; float:left">Step 1. Event Details</div>
+                                <div style="color:#A9A9A9; width:19%; float:left">Step 2. Spread the Word</div>
+                                <div class="clear"></div>
+                            </h2>
+                        <div id="TabbedPanels1" class="TabbedPanels">
+                            <div class="TabbedPanelsContentGroup">
+                                <div class="TabbedPanelsContent">
+                                    <div id='whiteBox' class="whiteBox">
+                                        <a id="top" href="#top" style="text-decoration:none">&nbsp;</a>
+                                        <input type="hidden" id="GoogleCheckoutAccountId" name="GoogleCheckoutAccountId" value="<?php echo $this->GoogleCheckoutAccountId ?>">
+        <form name="CreateEvent" method="post" id="CreateEvent" action="">
+            <input type="hidden" id="SiteId" name="SiteId" value="<?php echo $this->SiteId ?>" />
+            <input type="hidden" id="with-end-date" name="with_end_date" value="1" />
+            <style>
+                .field-label { float:left; font-weight:bold; color:#000; width:200px; margin-bottom:15px;}
+                .field-input { float:left; width:455px; margin-bottom:15px; }
+                .field-input .input { width:300px; }
+                .field-input input { padding:1px; }
+                .field-input .date { width:95px; }
+                .hidden { display:none }
+                .popup-box { width: 370px; left: 40%; right: 40%; top:25%; position: absolute; z-index: 999999!important; background-color:#ffffff; border:5px solid #e5e5e5; padding:10px 0 20px 0; -moz-border-radius:7px }
+                .calendricalTimePopup { width:98px }
+                #ui-datepicker-div { font-size:11px }
+            </style>
+            <ul style="list-style:none; padding-bottom:0px">
+                <li style="width:725px; float:left; padding-left:20px">
+                    <h1 style="color:#693;">Create Event</h1>
+                    <div id="message" class="error" style="width:500px; border:2px solid #e3e3e3; margin-bottom:15px; padding:5px; <?php if(!$this->message) { echo "display:none;"; } ?>"><?php if(isset($this->message)) { echo $this->message; } ?></div><br />
+                    <ul style="list-style:none; padding-bottom:0px; margin-bottom:0px">
+                        <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Title:</li>
+                        <li class="field-input">
+                            <input name="Title" type="text" maxlength="50" id="Title" class="input" value="My Event" />
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Starts:</li>
+                        <li class="field-input">
+                            <input style="padding: 4px; color: gray" class="text smaller" name="StartDate" type="text" maxlength="10" id="StartDate" value="<?php echo date('m/d/Y') ?>" onchange="$('#EndDate').val($('#StartDate').val()); if ($('#StartDate').css('color') == 'gray') { $('#StartDate').css('color', 'black') }" />
+                            <input style="margin-left:10px; color: gray" class="time" name="StartTime" type="text" maxlength="10" id="StartTime" value="12:00am" onkeypress="return false" onclick="if ($('#StartTime').css('color') == 'gray') { $('#StartTime').css('color', 'black') }" />
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label enddate"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Ends:</li>
+                        <li class="field-input enddate">
+                            <input style="padding: 4px;" class="text smaller" name="EndDate" type="text" maxlength="10" id="EndDate" value="" />
+                            <input class="time" style="margin-left:10px" name="EndTime" type="text" maxlength="10" id="EndTime" value="" onkeypress="return false" />
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Description: </li>
+                        <li class="field-input">
+                            <textarea class="input" name="Description" rows="3" cols="20" id="Description" onblur="return fnKeepWordLenTrack(this,3000);" onkeyup="return fnKeepWordLenTrack(this,3000);"><?php echo isset($this->Description) ? $this->Description : "This is my event. Let's change the world!" ?></textarea>
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Location: </li>
+                        <li class="field-input">
+                            <textarea class="input" name="Location" rows="2" cols="20" id="Location" onblur="return fnKeepWordLenTrack(this,3000);" onkeyup="return fnKeepWordLenTrack(this,3000);"><?php echo isset($this->Location) ? $this->Location : "UCLA Auditorium 757 Hilgard, Los Angeles, CA 90405" ?></textarea>
+                        </li>
+                        <div class="clear"></div>
+                        <span>
+                        <li class="field-label">&nbsp;&nbsp;Do you want to Sell Tickets?</li>
+                        <li class="field-input">
+                            <!--<span><input type="radio" id="isSellTickets01" name="isSellTickets" value="1" onclick="addTickets();$('.rsvp').hide();">&nbsp;Yes</span>-->
+                            <span style="margin-left:10px"><input type="radio" id="isSellTickets02" name="isSellTickets" value="0" checked onclick="removeTickets();$('.rsvp').hide();">&nbsp;No</span>
+                            <span style="margin-left:10px"><input type="radio" id="isSellTickets03" name="isSellTickets" value="2" onclick="removeTickets();$('.rsvp').show();">&nbsp;Yes (Free Only)</span>
+                        </li>
+                        </span>
+                        <div class="clear"></div>
+                        <li class="hide field-label rsvp">&nbsp;&nbsp;Limit # of Attendees:</li>
+                        <li class="hide field-input rsvp">
+                            <input type="text" value="1" name="numTickets" id="numTickets" />
+                        </li>
+                        <li id="enable-fundraising" style="float: left; width: 100%; display: none">
+                            <?php if ($this->data['GoogleCheckoutAccountId'] == 0 && $this->data['PaypalAccountId'] == 0) { ?>
+                            <br><span style="font-weight:bold;text-decoration:underline;margin-bottom:12px;">Select your Fundraising Processor</span>
+                            <ul style="list-style:none; width:700px; margin-top: 5px">
+                                <li class="icons"><img src="<?php echo $this->contentLocation ?>public/images/paypal.png" width="150" height="75" alt=""></li>
+                                <li class="desc">
+                                    <input class="paypal-info" style="margin-left:-2px" type="radio" name="payment_method" value="Paypal" id="Paypal"> <strong>Collect payments using Paypal</strong>
+                                    <ul style="list-style:disc">
+                                        <li>Accept payment via credit/debit cards and Paypal accounts</li>
+                                        <li>Paypal charges up to 2.9% + $0.30 per transaction</li>
+                                        <li>
+                                            Start collecting payments immediately!<br>
+                                            <a href="javascript:;" onclick="$('#popup-overlay').show(); $('.paypal-find-out-more').show()" style="text-decoration:underline">Find out more abour Paypal</a> or <a href="https://www.paypal.com/" target="_blank" style="text-decoration:underline">learn more at Paypal.com</a>
+                                        </li>
+                                    </ul>
+                                    <div class="info-forms hidden" id="paypal-info">
+                                        <div><span style="margin-right:5px; margin-bottom:5px">Paypal Email:</span><input type="text" id="paypalEmail" name="paypalEmail" value=""></div>
+                                        <span style="margin-right:29px">Currency:</span>
+                                        <select id="paypalCurrency" name="paypalCurrency">
+                                            <option value="USD">USD</option>
+                                            <option value="GBP">GBP</option>
+                                        </select>
+                                    </div>
+                                </li>
+                                <div class="clear"></div>
+                                <li class="icons"><img src="<?php echo $this->contentLocation ?>public/images/googlecheckout.jpg" width="150" height="105" alt=""></li>
+                                <li class="desc">
+                                    <input class="googlecheckout-info" style="margin-left:-2px" type="radio" name="payment_method" value="Google Checkout" id="Google-Checkout"> <strong>Collect payments using Google Checkout</strong>
+                                    <ul style="list-style:disc">
+                                        <li>Accept payment via credit/debit cards and Google accounts</li>
+                                        <li>Google Checkout charges up to 2.9% + $0.30 per transaction</li>
+                                        <li>
+                                            Requires registration for a Google Checkout merchant account<br>
+                                            <a href="javascript:;" onclick="$('#popup-overlay').show(); $('.google-find-out-more').show()" style="text-decoration:underline">Find out more abour Google Checkout</a> or <a href="http://checkout.google.com/sell/" target="_blank" style="text-decoration:underline">learn more at checkout.google.com</a>
+                                        </li>
+                                    </ul>
+                                    <div class="info-forms hidden" id="googlecheckout-info">
+                                        <div style="font-weight:bold"><span style="margin-right:10px; margin-bottom:5px">Callback URL:</span>https://empowered.org/responsehandler<?php echo $this->responsehandler ?></div>
+                                        <div><span style="margin-right:16px; margin-bottom:5px">Merchant ID:</span><input type="text" id="MerchantID" name="MerchantID" value=""></div>
+                                        <div><span style="margin-right:6px">Merchant Key:</span><input type="text" id="MerchantKey" name="MerchantKey" value=""></div>
+                                        <div>
+                                            <span style="margin-right:29px">Currency:</span>
+                                            <select id="Currency" name="Currency">
+                                                <option value="USD">USD</option>
+                                                <option value="GBP">GBP</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </li>
+                                <div class="clear"></div>
+                            </ul>
+                            <div class="clear"></div>
+                            <?php } ?>
+                        </li>
+                        <li class="field-label hidden tickets">&nbsp;</li>
+                        <li class="field-input hidden tickets">
+                            <strong style="color: #669933">Ticket #1</strong>
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label hidden tickets"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Ticket Name?</li>
+                        <li class="field-input hidden tickets">
+                            <input class="input ticket-name" type="text"  id="TicketName-1" name="TicketName[1]" value="General Admission Ticket" />
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label hidden tickets">Ticket Description?</li>
+                        <li class="field-input hidden tickets">
+                            <textarea class="input ticket-desc" type="text" id="TicketDescription-1" name="TicketDescription[1]" cols="20" rows="3">You may describe the ticket here. Feel free to leave this blank.</textarea>
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label hidden tickets"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Ticket Price?</li>
+                        <li class="field-input hidden tickets">
+                            <input class="input ticket-price" type="text" id="TicketPrice-1" name="TicketPrice[1]" value="100" style="color: gray" />
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label hidden tickets">&nbsp;</li>
+                        <li class="field-input hidden tickets">
+                            <a href="javascript:;" onclick="$('.adv-opts-1').toggle()">Advanced Options</a>
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label adv-opts adv-opts-1" style="display: none">&nbsp;&nbsp;Limit ticket quantity:</li>
+                        <li class="field-input adv-opts adv-opts-1" style="display: none">
+                            <input class="input ticket-qty grey" type="text" name="TicketQuantity[1]" id="TicketQuantity-1" value="1,000" />
+                        </li>
+                        <div class="clear"></div>
+                        <li class="field-label adv-opts adv-opts-1" style="display: none">&nbsp;&nbsp;Limit ticket availability:</li>
+                        <li class="field-input adv-opts adv-opts-1" style="display: none" id="liTicketDate-1">
+                            <input style="padding: 4px;" class="text smaller date-inp ticket-dates grey" id="TicketStartDate-1" name="TicketStartDate[1]" type="text" value="Today" onchange="if ($('#TicketStartDate-1').css('color') == 'gray') { $('#TicketStartDate-1').css('color', 'black'); }" />
+                            &nbsp;thru&nbsp;
+                            <input style="padding: 4px;" class="text smaller date-inp ticket-dates grey" id="TicketEndDate-1" name="TicketEndDate[1]" type="text" value="x date in future" onchange="if ($('#TicketEndDate-1').css('color') == 'gray') { $('#TicketEndDate-1').css('color', 'black'); }" />
+                        </li>
+                        <div class="clear"></div>
+                        <div id="more-tickets">
+
+                        </div>
+                        <li class="field-label hidden tickets" style="margin-bottom:15px">&nbsp;</li>
+                        <li class="field-input hidden tickets" style="margin-bottom:15px">
+                            <a href="javascript:;" onclick="addTicket()">Add Another Ticket</a>
+                            <input type="hidden" id="total_tickets" name="total_tickets" value="0" />
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <div style="margin-left:220px; margin-top:15px; float:left; width:100%; margin-bottom:20px">
+                <a class="btn btngreen" title="Back" href="/getstarted" >Back</a>
+                <input type="submit" class="btn btngreen" name="btnCreateNew" value="Create New" id="btnCreateNew" />
+            </div>
+        </form>
+                                        <div class="clear"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="block001f01"><div class="blst001"><div class="blst002"></div></div>

@@ -1,0 +1,86 @@
+<?php $this->headTitle("Empowered.org : world's largest student-led global health and sustainable development organization"); ?>
+<script type="text/javascript">
+    function validateForm() {
+        var invalid_email = 0;
+        if ($('#contact_list').val() != '') {
+            var emails = $('#contact_list').val().split(",");
+            if (emails.length > 0 && jQuery.trim($('#contact_list').val()) != '') {
+                return true;
+            } else {
+                alert('Please enter an email address to continue');
+                return false;
+            }
+        }
+		if($('#message').val == '') {
+			alert('You cannot send the email without a message');
+			return false;
+		}
+        return true;
+    }
+</script>
+<script type="text/javascript" src="https://api.cloudsponge.com/address_books.js"></script>
+<script type="text/javascript" charset="utf-8">
+    var csPageOptions = {
+        domain_key:"KHKXHF2HRGM5ZSYAGSUC", 
+        textarea_id:"contact_list"
+    };
+</script>
+<style type="text/css">
+    table tr th {
+        text-align:center;
+    }
+</style>
+
+<div id="mainco2">
+    <!-- block001 -->
+    <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+    <div class="block001">
+        <div class="blst001">
+            <div class="blst002 hsp">
+				<h2 style="font-size:14px">
+	                <div style="color:#A9A9A9; width:19%; float:left">Step 1. Agreements</div>
+	                <div style="color:#669933; width:19%; float:left">Step 2. Email Friends</div>
+	                <div style="color:#A9A9A9; width:19%; float:left">Step 3. Next Steps</div>
+	                <div class="clear"></div>
+	            </h2>
+				<div class="clear" style="margin-bottom:15px;"></div>
+                <span style="color:#693; font-size:16px; font-weight:bold;">Tell Friends</span>
+                <div class="clear" style="margin-bottom:15px;"></div>
+                <?php if ($this->sent) { ?>
+                    <div style="margin:5px 0px; padding:5px; border:1px solid #93C47D; background: #D9EAD3">Your message has been sent to the following email addresses: <?php echo implode(', ', $this->emails) ?></div><br />
+                <?php } ?>
+                <form method="post" action="" onsubmit="return validateForm()">
+                    <input type="hidden" id="ProjectId" name="ProjectId" value="<?php echo $this->data['ProjectId'] ?>" />
+                    <br />
+                    <div style="float: left; width: 100%">
+                        Please type the email addresses you wish to add into the box below<br><br> You can also <a class="cs_import">import your contacts</a> from gmail, msn, yahoo, etc.
+                        <div class="clear" style="margin-bottom:8px;"></div>
+                        <textarea id="contact_list" name="emails" rows="8" cols="90"></textarea><br><br>
+                    </div>
+                    <div style="float: left; width: 100%; margin-bottom: 10px">
+						The message that you enter into this box will be included in the email sent to each email address:<br /><br />
+                        <textarea name="message" rows="5" cols="90" style="color:#AAA;" onchange="$(this).css('color', '#000');" >I just volunteered for <?php echo $this->data['Name'] ?> on Empowered.org! Please help my cause visiting my personal fundraising page: http://<?php echo $_SERVER['HTTP_HOST'] ?>/<?php echo $this->userInfo['URLName'] ?>/initiatives/<?php echo $this->data['URLName'] ?></textarea>
+                        <div class="clear"></div>
+                    </div>
+                    <div style="float: left; width: 100%; margin-bottom: 20px">
+                        <?php if ($this->sent && $this->data['Type'] == 0) { ?>
+                            <a class="btn btngreen" href="/signup/next?ProjectId=<?php echo $this->data['ProjectId'] ?>">Continue</a>
+                        <?php } else if ($this->sent && $this->data['Type'] == 1) { ?>
+                            <a class="btn btngreen" href="/<?php echo $this->userInfo['URLName'] ?>/initiatives/<?php echo $this->data['URLName'] ?>" >Continue</a>
+                        <?php } else { ?>
+                            <?php if ($this->data['Type'] == 0) { ?>
+                                <a class="btn btngreen" href="/signup/next?ProjectId=<?php echo $this->data['ProjectId'] ?>">Skip</a>
+                            <?php } else { ?>
+                                <a class="btn btngreen" href="/<?php echo $this->userInfo['URLName'] ?>/initiatives/<?php echo $this->data['URLName'] ?>">Skip</a>
+                            <?php } ?>
+                            <input type="submit" value="Tell Friends" class="btn btngreen" />
+                        <?php } ?>
+                    </div>
+                </form>
+                <div class="clear"></div>
+            </div>
+        </div>
+    </div>
+    <div class="block001f01"><div class="blst001"><div class="blst002"></div></div></div>
+    <!-- e o block001 -->
+</div>

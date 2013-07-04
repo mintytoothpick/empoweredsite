@@ -1,0 +1,62 @@
+<input id="rowsCount" type="hidden" value="<?= $this->countRes ?>">
+
+<?php if (count($this->paginator) > 0) {
+$this->render('profile/popup_project_donate.phtml');
+$this->render('profile/popup_project_volunteer.phtml');
+
+foreach ($this->paginator as $activity) { ?>
+<div class="programBox02">
+    <div class="month"><strong><span class="color01"><?= !empty($activity->startDate) ? date('M', strtotime($activity->startDate)) : ''; ?></span></strong><br /><?= !empty($activity->startDate) ? date('d', strtotime($activity->startDate)) : ''; ?></div>
+    <div class="programText02"><span class="headignStyle03"><a href="/<?=$activity->urlName?>" title="<?=stripslashes($activity->name)?>"><strong><?=stripslashes($activity->name)?></strong></a></span><br />
+    <?php if($this->organization->hasGroups) { ?>Led by<strong> <?=$activity->group->name?></strong><?php } ?></div>
+    
+    <?php if($activity->isFundraising == 1 || $activity->isFundraising == "Yes") { ?>
+      
+    <div class="donation noMR"><strong><span class="text19"><?=$activity->currency?><?=number_format($activity->raised)?></span></strong><br />
+    Donations</div>
+    
+    <?php }?>
+    
+    <div class="donation noMR"><strong><span class="text19"><?=number_format(count($activity->volunteers))?></span></strong><br />
+    Volunteers</div>
+    
+    <div class="volunteerBtn">
+    	<?php if($this->isLoggedIn){?>
+    		
+    		<?php if($activity->getVolunteerByUser($this->userNew)) { ?>
+    			<a href="/<?=$activity->urlName?>/stopvolunteering" class="stopVolunteerAction">
+			      Stop Volunteering
+				</a>
+    		<?php } else {?>
+	    		<a onclick="$(document).trigger('showProjectVolunteerModal', ['/<?=$activity->urlName?>/signup', <?= $activity->isFinished() ? "true":"false" ?>, '<?=date('M d, Y h:i A', strtotime($activity->endDate)) ?>' ]);" href="#">
+					Volunteer With Us
+				</a>
+			<?php }?>
+			
+    	<?php }else{?>
+			<a href="javascript:;" class="join">
+            	Volunteer With Us
+			</a>
+    	<?php }?>
+    </div>
+    
+    <?php if($activity->isFundraising == 1 || $activity->isFundraising == "Yes") { ?>
+    
+    <div class="donateBtn">
+        <a onclick="$(document).trigger('showProjectDonateModal', ['/<?=$activity->urlName?>/donate', <?= $activity->isFinished() ? "true":"false" ?>, '<?=date('M d, Y h:i A', strtotime($activity->endDate)) ?>' ]);" href="#">
+    		Donate
+    	</a>
+	</div>
+	
+    <?php }?>
+</div>
+<div class="clr" style="margin-bottom:20px;"></div>
+
+<? } ?>
+<?= $this->paginationControl($this->paginator, 'Sliding', 'nonprofit/new_page_selector.phtml', array('param' => 'page')); ?>
+<?php echo $this->placeholder('popup_project_donate') ?>
+<?php echo $this->placeholder('popup_project_volunteer') ?>
+<? } else { ?>
+<p>No results found.</p>
+<? } ?>
+

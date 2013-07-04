@@ -1,0 +1,157 @@
+<?php if(count($this->organization->programs)) { ?>
+<script>
+$(function() {
+
+    $(".timeFilter").each(function() {
+        
+        $(this).click(function() {
+            $(".timeFilter").each(function() {
+                $(this).removeClass("selected");
+            });
+            var rel = $(this).attr("rel");
+            $("#timeFilter").val(rel);
+            filter(false);
+            $(this).addClass("selected");
+        });
+    });
+	
+    //Program Filter
+    $("#program").change(function(){
+        if ($('#program').val() != 'all') {
+            <? if ($this->organization->hasGroups) { ?>
+            $("#loading").show();
+            $("#group").hide();
+            $("#group").children().remove().end().append($('<option>', { value : 'null' }).text('Select group ...'));
+            <? } ?>
+            $.ajax({
+                url: "<?=($this->organization->hasGroups)?'get-groups':strtolower($this->list).'-campaigns'?>",
+                <? if($this->organization->hasGroups) { ?>dataType: 'json',<? } ?>
+                data: 'ProgramId=' + $('#program').val() + '&filter=true',
+                success: function(data) {
+                    <? if ($this->organization->hasGroups) { ?>
+                    $("#group").show();
+                    for (i=0;i<data.length;i++) {
+                        $("#group").append($('<option value="'+data[i].GroupId+'">').text(data[i].GroupName));
+                    }
+                    $("#loading").hide();
+                    <? }?>
+                }
+            });
+            filter(false);
+        } else {
+            <? if ($this->organization->hasGroups) { ?>
+            $("#group").hide();
+            $("#group").children().remove();
+            <? } ?>
+            filter(false);
+        }
+    });
+
+    //Group Filter
+    <? if ($this->organization->hasGroups) { ?>
+    $("#group").change(function(){
+        filter(false);
+    });
+    <? } ?>
+
+    <? if (isset($this->filter)) { ?>
+        capturePaginators();
+    <? } ?>
+});
+
+function capturePaginators() {
+    $('.paginator').click(function(event) {
+        event.preventDefault();
+        filter($(this).attr('href'));
+    });
+}
+
+function filter(url) {
+    var urlParam = url;
+    if (!url) {
+        var urlParam = 'active-campaigns';
+    }
+    var data = 'filter=true';
+
+    if ( !($('#program').val() === undefined) && $('#program').val() != 'all') {
+        data += '&ProgramId=' + $('#program').val();
+        <? if ($this->organization->hasGroups) { ?>
+        if (!($('#group').val() === undefined) && $('#group').val() != 'null') {
+            data += '&GroupId=' + $('#group').val();
+        }
+        <? } ?>
+    }
+    data += '&Status='+ $("#timeFilter").val();
+    if (!($('#searchFilter').val() === undefined) && $('#searchFilter').val() != '') {
+        data += '&searchFilter=' + $('#searchFilter').val();
+    }
+    $("#contentData").html('Loading content ...');
+    $.ajax({
+        url: urlParam,
+        data:  data,
+        success: function(data) {
+            $("#contentData").html(data);
+            capturePaginators();
+            $("#activitiesTitleCount").text( $("#contentData #rowsCount").val() );
+            if ($("#timeFilter").val()=="active"){
+                $("#title").html("Active");
+            } else {
+                $("#title").html("Inactive");
+            }
+        }
+    });
+
+    return false;
+}
+</script>
+<? } ?>
+
+<div class="wrapper">
+   <!-- org header -->
+  <?php echo $this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+    <!-- breadcrumb -->
+    <?php echo $this->placeholder('breadcrumb') ?>
+    <!-- // breadcrumb -->
+    <div class="clr"></div>
+    <!-- tabs -->
+    <?php echo $this->placeholder('tabs') ?>
+    <!-- // tabs -->
+
+    <div class="mainC">
+      <div class="searchInternalBox">
+        <form id="searchMembers" action="" method="post" onsubmit="return filter();">
+          <input name="searchFilter" id="searchFilter" type="text" class="textField01" value="<?=$this->searchtext?>" />
+          <input id="timeFilter" type="hidden" value="<?= $this->status?>">
+        </form>
+      </div>
+      <div class="internalFilter">
+        <strong>Filter By</strong>
+        <select name="program" class="textfield" id="program">
+          <option value="all">Program: All</option>
+          <? foreach($this->organization->programs as $program) { ?>
+          <option value="<?=$program->id?>" <?=isset($this->program) && $this->program->id == $program->id ? 'selected' : ''; ?>>Program: <?=$program->name?></option>
+          <? } ?>
+        </select>
+        <? if ($this->organization->hasGroups) { ?><select id="group" class="hide"></select><span id="loading" class="hide">Loading groups ...</span><? } ?>
+      </div>
+
+      <div class="box05">
+        <div class="headingStyle02 rounded">
+            <label id="title"><?= $this->list ?></label> Fundraising Campaigns (<label id="activitiesTitleCount"><?=$this->countRes?></label>)
+            <span class="titleTab noMR"><a class="<?php echo ($this->status=="inactive") ?"selected": "" ?> timeFilter" rel="inactive" href="#">Inactive</a></span>
+            <span class="titleTab noMR"><a class="<?php echo ($this->status=="active") ?"selected": "" ?> timeFilter" rel="active" href="#">Active</a></span>
+        </div>
+        <div id="contentData">
+            <!-- content by default or by ajax -->
+            <?php echo $this->render('nonprofit/tabscontent/campaigns.phtml'); ?>
+        </div>
+      </div>
+    </div>
+  <div class="clr"></div>
+  <div class="clr"></div>
+</div>

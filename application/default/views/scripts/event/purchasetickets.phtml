@@ -1,0 +1,336 @@
+<?php
+$tickets_info = array();
+foreach($this->tickets as $tickets) {
+    $tickets_info[$tickets['EventTicketId']] = $tickets;
+}
+?>
+<script>
+    function validatePayment() {
+        var error = "";
+        // check if ticket(s) is selected
+        var ticket_selected = false;
+        $('.ticket-quantity').each(function() {
+            if ($(this).val() > 0 && !ticket_selected) {
+                ticket_selected = true;
+            }
+        })
+        if (!ticket_selected) {
+            error += "Please select a ticket to purchase.<br>";
+        }
+        // check if all tickets are assigned to a person
+        var not_assigned_ticket = 0;
+        var invalid_email = 0;
+        <?php if (isset($_SESSION['UserId'])) { ?>
+        $('.ids').each(function() {
+            var id = $(this).val();
+            var user = $('.user-'+id);
+            var other = $('.other-'+id);
+            if (!user.attr('checked') && !other.attr('checked')) {
+                not_assigned_ticket++;
+            } else if (other.attr('checked')) {
+                $('.others-'+id).each(function() {
+                    if ($(this).attr('name').search('ticketHolderName') > -1 && (jQuery.trim($(this).val()) == '' || $(this).val() == 'First & Last Name')) {
+                        not_assigned_ticket++;
+                    } else if ($(this).attr('name').search('ticketHolderEmail') > -1 && (jQuery.trim($(this).val()) == '' || $(this).val() == 'Email')) {
+                        not_assigned_ticket++;
+                    } else if ($(this).attr('name').search('ticketHolderEmail') > -1 && !validateEmail(jQuery.trim($(this).val()))) {
+                        invalid_email ++;
+                    }
+                })
+            }
+        })
+        <?php } else { ?>
+        $('.assign-tickets > div > div > input[type=text]').each(function() {
+            if ($(this).attr('name').search('ticketHolderName') > -1 && (jQuery.trim($(this).val()) == '' || $(this).val() == 'First & Last Name')) {
+                not_assigned_ticket++;
+            } else if ($(this).attr('name').search('ticketHolderEmail') > -1 && (jQuery.trim($(this).val()) == '' || $(this).val() == 'Email')) {
+                not_assigned_ticket++;
+            } else if ($(this).attr('name').search('ticketHolderEmail') > -1 && !validateEmail(jQuery.trim($(this).val()))) {
+                invalid_email ++;
+            }
+        })
+        <?php } ?>
+        if (not_assigned_ticket > 0) {
+            error += "Please assign all the tickets to their corresponding holder/owner.<br>";
+        }
+        if (invalid_email > 0) {
+            error += "Please specify a valid email address.<br>";
+        }
+        if (error == '') {
+            return true;
+        } else {
+            $('#error').html(error).show().focus();
+            return false;
+        }
+    }
+        
+    function isFloat(value) {
+        if(value == ""){
+            return false;
+        }
+        value = value.replace(/,/, '.');
+        if(parseFloat(value) != (value*1)) {
+            return false;
+        }
+        return true;
+    }
+        
+    function assignTickets(TID, Qty) {
+        $('#assign-tickets-'+TID).load('/event/assigntickets', {TicketId: TID, Quantity: Qty, level: '<?php echo $this->level ?>', SiteId: '<?php echo $this->level == 'group' ? $this->data['GroupId'] : $this->level == 'organization' ? $this->data['NetworkId'] : $this->data['UserId'] ?>'}, function() {
+            // update total cost
+            var total_cost = 0;
+            $('.ticket-prices').each(function() {
+                total_cost += parseFloat($(this).val());
+            })
+            $("#total-cost").html(total_cost);
+        });
+    }
+
+    function updateTotalBill() {
+        var percent = Number($('#PercentageFee').val());
+        var total_amount = 0;
+        $('.ticket-prices').each(function() {
+            var id = $(this).attr('id').replace('item_price_', '');
+            if ($('#item_quantity_'+id).val() != undefined) {
+                total_amount += Number($(this).val()) * Number($('#item_quantity_'+id).val());
+            }
+        })
+        $('#trans-fee').html(Number(total_amount * (percent/100)).toFixed(2));
+    }
+
+    function updateEmpoweredBill() {
+        var total_amount = 0;
+        $('.ticket-prices').each(function() {
+            var id = $(this).attr('id').replace('item_price_', '');
+            if ($('#item_quantity_'+id).val() != undefined) {
+                total_amount += Number($(this).val()) * Number($('#item_quantity_'+id).val());
+            }
+        })
+        $('#empower-fee').html(Number(total_amount * (0.015)));
+    }
+</script>
+<link href="<?php echo $this->contentLocation ?>public/css/ui.css" rel="stylesheet" type="text/css"/>
+<style>
+    .hidden { display: none }
+</style>
+<div id="mainco2">
+    <!-- block001 -->
+    <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+    <div class="block001">
+        <div class="blst001">
+            <div class="blst002 hsp">
+                <h2 style="font-size:25px">
+                    <div style="color:#669933; width:30%; float:left">Step 1. Ticket Details</div>
+                    <div style="color:#A9A9A9; width:35%; float:left">Step 2. Payment Information</div>
+                    <div style="color:#A9A9A9; width:30%; float:left">Step 3. Your Receipt</div>
+                    <div class="clear"></div>
+                </h2>
+                <div id="error" style="color:red; padding:5px; margin:5px 0px 10px 0px; border:solid 1px #e5e5e5; <?php echo !$this->error ? "display:none" : "font-size:15px; padding:8px" ?>"><?php echo $this->error ? "This group is not set up for fundraising yet." : "" ?></div>
+                <form method="post" action="/event/<?php echo $this->data['PaypalAccountId'] == 0 ? 'newticket' : 'chainedpayment' ?>" onSubmit="return validatePayment()">
+                    <?php if ($this->level == 'organization') { ?>
+                    <input type="hidden" id="NetworkId" name="NetworkId" value="<?php echo $this->data['NetworkId'] ?>" />
+                    <?php } else if ($this->level == 'group') { ?>
+                    <input type="hidden" id="GroupId" name="GroupId" value="<?php echo $this->data['GroupId'] ?>" />
+                    <?php } else if ($this->level == 'user') { ?>
+                    <input type="hidden" id="UserId" name="UserId" value="<?php echo $this->data['UserId'] ?>" />
+                    <?php } ?>
+                    <input type="hidden" id="EventId" name="EventId" value="<?php echo $this->eventInfo['EventId'] ?>" />
+                    <input type="hidden" id="editCartURI" name="editCartURI" value="<?php echo $_SERVER['REQUEST_URI'] ?>" />
+                    <?php if($this->data['allowPercentageFee'] != 'no') { ?>
+                    <input type="hidden" id="PercentageFee" name="PercentageFee" value="<?php echo $this->data['PercentageFee'] ?>" />
+                    <?php } ?>
+                <?php if ($this->data['PaypalAccountId'] > 0 && $this->data['GoogleCheckoutAccountId'] == 0 && !$this->error) { ?>
+                    <input type="hidden" id="expType" name="expType" value="light" />
+                    <input type="hidden" id="PaypalEmail" name="PaypalEmail" value="<?php echo $this->paypal['email'] ?>" />
+                    <input type="hidden" id="CurrencyCode" name="CurrencyCode" value="<?php echo $this->paypal['currencyCode'] ?>" />
+                    <script type="text/javascript" src="https://www.paypalobjects.com/js/external/dg.js"></script>
+                    <script type="text/javascript" charset="utf-8">
+                        var embeddedPPFlow = new PAYPAL.apps.DGFlow({trigger: 'embeddedPaypal'});
+                        function get_full_url(url_path)
+                        {
+                            var loc = window.location;
+                            var url = '' + loc.protocol + '//' + loc.host + url_path;
+                            return url;
+                        }
+                        function MyEmbeddedFlow(embeddedFlow) {
+                            this.embeddedPPObj = embeddedFlow;
+                            this.paymentSuccess = function () {
+                                this.embeddedPPObj.closeFlow();
+                                window.location.href = get_full_url('/event/thankyou');
+                            };
+                            this.paymentCanceled = function () {
+                                this.embeddedPPObj.closeFlow();
+                                window.location.href = get_full_url('/event/unsuccessful?EventId=' + <?php echo $this->eventInfo['EventId'] ?>);
+                            };
+                        }
+                        var myEmbeddedPaymentFlow = new MyEmbeddedFlow(embeddedPPFlow);
+                    </script>
+                <?php } ?>
+                    <input type="hidden" id="total_tickets" name="total_tickets" value="<?php echo count($this->tickets) ?>" />
+                    <div style="padding-bottom: 25px; font-weight: bold; width: 100%; color: #669933; font-size: 20px; border-bottom: 1px solid #E5E5E5; margin: 30px 0 20px">
+                        Seller: <span style="color: #000; font-size: 16px; font-weight: bold">
+                            <?php echo stripslashes($this->level == 'user' ? $this->data['FullName'] : ($this->level == 'group' ? $this->data['GroupName'] : $this->data['NetworkName'])) ?>
+                        </span>
+                        <div class="clear" style="margin-bottom: 5px"></div>
+                        Buyer: 
+                        <span style="color: #000; font-size: 16px; font-weight: bold">
+                        <?php if (isset($_SESSION['UserId'])) { ?>
+                            <?php echo stripslashes($this->SessionFullName) ?>
+                        <?php } else { ?>
+                            Have an Account? <a href="javascript:;" onclick="login()">Login</a>
+                        <?php } ?>
+                        </span>
+                    </div>
+                    <div style="padding-bottom: 25px; font-weight: normal; width: 100%; color: #669933; font-size: 20px; border-bottom: 1px solid #E5E5E5; margin-bottom: 20px">
+                        <ul style="list-style: none">
+                            <li style="float: left; margin-right: 5px; font-weight: bold">Event: </li>
+                            <li style="color: #000; font-size: 16px; font-weight: normal; float: left; line-height: 20px">
+                                <div style="color: #000; font-size: 16px; font-weight: bold"><?php echo $this->eventInfo['Title'] ?></div>
+                                <div style="color: #000; font-weight: normal; font-size: 11px; line-height: 14px">&bull; <?php echo $this->eventInfo['Link'] ?></div>
+                                <div style="color: #000; font-weight: normal; font-size: 11px; line-height: 12px">
+                                    &bull; <?php echo date('F jS', strtotime($this->eventInfo['StartDate']))." - ".date('F jS, Y', strtotime($this->eventInfo['EndDate'])) ?>
+                                </div>
+                            </li>
+                        </ul>
+                        <div class="clear"></div>
+                    </div>
+                    <div style="padding-bottom: 25px; font-weight: normal; width: 100%; border-bottom: 1px solid #E5E5E5; margin-bottom: 20px">
+                        <div style="color: #669933; font-size: 20px; margin-bottom: 10px; font-weight: bold">
+                            Ticket Info:
+                        </div>
+                        <div style="margin-left: 60px">
+                            <?php
+                            $total_cost = 0;
+                            $counter = 1;
+                            foreach($this->tickets as $ticket) {
+                                if ($ticket['Quantity'] > 0 || empty($ticket['Quantity'])) {
+                                    $total_cost += $ticket['Price'] * (isset($this->other_tickets[$ticket['EventTicketId']]) && !empty($this->other_tickets[$ticket['EventTicketId']]) ? $this->other_tickets[$ticket['EventTicketId']] : $this->tickets_order[$ticket['EventTicketId']]);
+                            ?>
+                            <div style="margin-bottom: 5px; font-size: 14px; font-weight: bold;">
+                                <input name="TicketId_<?php echo $counter ?>" type="hidden" value="<?php echo $ticket['EventTicketId'] ?>"/>
+                                <input id="item_name_1" name="item_name_<?php echo $counter ?>" type="hidden" value="Your ticket purchase is being processed"/>
+                                <input name="item_description_<?php echo $counter ?>" type="hidden" value="A receipt will be emailed to you after processing your payment."/>
+                                <input name="item_currency_<?php echo $counter ?>" type="hidden" value="USD"/>
+                                <input name="item_is_modifiable_<?php echo $counter ?>" type="hidden" value="true"/>
+                                <input name="item_min_price_<?php echo $counter ?>" type="hidden" value="0.01"/>
+                                <input name="item_max_price_<?php echo $counter ?>" type="hidden" value="25000.0"/>
+                                <input class="ticket-prices" id="item_price_<?php echo $counter ?>" name="item_price_<?php echo $counter ?>" type="hidden" value="<?php echo $ticket['Price'] ?>"/></p>
+                                <span style="<?php echo $this->tickets_order[$ticket['EventTicketId']] == 0 ? " color: #aaaaaa" : "" ?>">
+                                <?php echo $this->data['Currency'].$ticket['Price'] ?>
+                                &nbsp;x&nbsp;
+                                </span>
+                                <select class="ticket-quantity" id="item_quantity_<?php echo $counter ?>" name="item_quantity_<?php echo $counter ?>" style="width: 90px; padding: 2px" onchange="assignTickets(<?php echo $ticket['EventTicketId'] ?>, this.value)">
+                                <?php
+                                $ticket['Quantity'] = (isset($this->other_tickets[$ticket['EventTicketId']]) && !empty($this->other_tickets[$ticket['EventTicketId']]) ? $this->other_tickets[$ticket['EventTicketId']] : $this->tickets_order[$ticket['EventTicketId']]);
+                                for ($ctr = 0; $ctr <= $ticket['Quantity']; $ctr++) { ?>
+                                    <option value="<?=$ctr?>" <?php echo $this->tickets_order[$ticket['EventTicketId']] == $ctr ? "selected" : "" ?>><?=$ctr.($ctr > 1 ? ' Tickets' : ' Ticket')?></option>
+                                <?php } ?>
+                                </select>
+                                &nbsp;
+                                <?php echo '('.$ticket['Description'].')' ?><br>
+                            </div>
+                            <?php $counter++; } 
+                            } ?>
+                            <div style="margin-bottom: 5px; font-size: 14px; font-weight: bold; margin-top: 5px; padding-top: 5px; border-top: 1px solid #e5e5e5; width: 400px">
+                                <?php echo $this->data['Currency'] ?><span id="total-cost" ><?php echo number_format($total_cost) ?></span> Total Cost
+                            </div>
+                        </div>
+                    </div>
+                    <?php if($this->data['allowPercentageFee'] == 'mandatory') { ?>
+                    <div style="padding-bottom: 25px; font-weight: normal; width: 100%; border-bottom: 1px solid #E5E5E5; margin-bottom: 20px">
+                        <div style="color: #669933; font-size: 20px; margin-bottom: 10px; font-weight: bold">Transaction Fees</div>
+                        <div style="margin-left: 20px">
+                            <input type="hidden" name="coverTransFee" value="1" />
+                            <input type="hidden" name="allowPercentageFee" value="mandatory" />
+                            <input type="hidden" name="PercentageFee" value="<?php echo $this->data['PercentageFee'] ?>" />
+                            <p style="padding-bottom:0px"><?php echo $this->data['PercentageFee'] ?>% of your donation will be added to your total bill for the donation in order to help cover transaction fees.</p>
+                            <span id="transfeemandatory" style="font-weight: bold; display: none">An additional amount of <?php echo $this->data['Currency'] ?><span id="trans-fee"></span> will be added to your total bill</span><br>
+                            <div class="clear"></div>
+                    </div>
+                    <?php } else if($this->data['allowPercentageFee'] == 'optional') {  ?>
+                    <div style="padding-bottom: 25px; font-weight: normal; width: 100%; border-bottom: 1px solid #E5E5E5; margin-bottom: 20px">
+                        <div style="color: #669933; font-size: 20px; margin-bottom: 10px; font-weight: bold">Transaction Fees</div>
+                        <div style="margin-left: 60px">
+                            <input type="hidden" name="allowPercentageFee" value="optional" />
+                            <input type="hidden" name="PercentageFee" value="<?php echo $this->data['PercentageFee'] ?>" />
+                            <p style="padding-bottom:0px">
+                                Would you like to cover the transaction fee of <?php echo $this->data['PercentageFee'] ?>% of your donation?
+                                <span><input type="radio" name="coverTransFee" value="1" onclick="$('#transfee').show()" /> Yes</span>
+                                <span style="margin-left: 15px"><input type="radio" name="coverTransFee" value="0" onclick="$('#transfee').hide()" /> No</span>
+                                <br><span id="transfee" style="font-weight: bold; display: none">An additional amount of <?php echo $this->data['Currency'] ?><span id="trans-fee"></span> will be added to your total bill</span>
+                                <div class="clear"></div>
+                            </p>
+                        </div>
+                    </div>
+                    <?php } ?>
+                    <?php if ($this->data['PaypalAccountId'] > 0) { ?>
+                    <div style="padding-bottom: 25px; font-weight: normal; width: 100%; border-bottom: 1px solid #E5E5E5; margin-bottom: 20px">
+                        <div style="color: #669933; font-size: 20px; margin-bottom: 10px; font-weight: bold">Support Empowered.org</div>
+                        <div style="margin-left: 20px">
+                            <p style="padding-bottom:0px">
+                                Would you like to contribute 1.5% to help support Empowered.org?
+                                <span><input type="radio" name="supportEmpowered" value="1" onclick="$('#empoweredfee').show(); updateEmpoweredBill();" /> Yes</span>
+                                <span style="margin-left: 15px"><input type="radio" name="supportEmpowered" value="0" onclick="$('#empoweredfee').hide()" /> No</span>
+                                <div class="clear"></div>
+                                <span id="empoweredfee" style="font-weight: bold; display: none">An additional amount of <?php echo $this->data['Currency']; ?><span id="empower-fee"></span> will be added to your total bill</span><br>
+                            </p>
+                        </div>
+                    </div>
+                    <?php } ?>
+                    <div style="padding-bottom: 25px; font-weight: normal; width: 100%;">
+                        
+                        <?php if (isset($this->tickets_order)) { ?>
+                        <div style="color: #669933; font-size: 20px; margin-bottom: 10px; font-weight: bold">
+                            Assign Tickets:
+                        </div>
+                        <div style="margin-left: 60px;">
+                                <?php
+                                    $counter = 0;
+                                    foreach($this->tickets_order as $TicketId => $Quantity) {
+	                            ?>
+	                            <span id="assign-tickets-<?php echo $TicketId ?>" class="assign-tickets">
+	                            <?php
+	                                for ($ctr = 1; $ctr <= $Quantity; $ctr++) {
+	                                    $info = $tickets_info[$TicketId];
+	                            ?>
+	                                <input type="hidden" name="TicketId_<?php echo $counter ?>" value="<?php echo $TicketId ?>" />
+	                                <input type="hidden" value="<?php echo $info['Price'] ?>" class="ticket-prices" />
+	                                <input type="hidden" value="<?php echo "$counter-$ctr" ?>" class="ids" />
+	                                <div style="margin-bottom: 5px; font-size: 13px">
+	                                    <?php echo $ctr.". ".$info['Description'] ?> (<?php echo $this->data['Currency'].$info['Price'] ?>)<br>
+	                                    <div style="margin-left: 15px">
+	                                        <?php if ($this->is_loggedin) { ?>
+	                                        <input class="user-<?php echo "$counter-$ctr" ?>" type="radio" name="ticketHolder_<?php echo $counter ?>[<?php echo $ctr ?>]" value="User" onclick="$('.others-<?php echo "$counter-$ctr" ?>').hide()" /> This is for me (<?php echo stripslashes($this->userInfo['FullName']) ?> <<?php echo stripslashes($this->userInfo['Email']) ?>>)<br>
+	                                        <input class="other-<?php echo "$counter-$ctr" ?>" type="radio" name="ticketHolder_<?php echo $counter ?>[<?php echo $ctr ?>]" value="Others" onclick="$('.others-<?php echo "$counter-$ctr" ?>').show()" /> This is for someone else<br>
+	                                        <?php } ?>
+	                                        <input class="others-<?php echo "$counter-$ctr" ?>" style="margin: 3px 0 3px 25px; <?php echo $this->is_loggedin ? 'display:none' : '' ?>" type="text" name="ticketHolderName[<?php echo $counter ?>]" value="First & Last Name" onfocus="if (this.value == 'First & Last Name') { this.value='' }" onblur="if (this.value == '') { this.value='First & Last Name' }" /><br>
+	                                        <input class="others-<?php echo "$counter-$ctr" ?>" style="margin: 3px 0 3px 25px; <?php echo $this->is_loggedin ? 'display:none' : '' ?>" type="text" name="ticketHolderEmail[<?php echo $counter ?>]" value="Email" onfocus="if (this.value == 'Email') { this.value='' }" onblur="if (this.value == '') { this.value='Email' }" />
+	                                    </div>
+	                                </div>
+	                            <?php } $counter++; ?>
+	                            </span>
+	                            <?php } ?>
+	                            
+                            <input type="hidden" id="ticket_holders" name="ticket_holders" value="<?php echo $counter-1 ?>" />
+                            </div>	
+                            <?php } ?>
+                        
+                    </div>
+                    <div style="padding-bottom: 15px; font-weight: normal; width: 100%; color: #669933; font-size: 20px;">
+                        <input name="_charset_" type="hidden" value="utf-8"/>
+                        <div class="box14">
+                            <?php if ($this->data['PaypalAccountId'] > 0 && $this->data['GoogleCheckoutAccountId'] == 0 && !$this->error) { ?>
+                            <input id="embeddedPaypal" name="embeddedPaypal" type="image" src="/public/images/paypaldonate.jpg" />
+                            <?php } else if ($this->data['GoogleCheckoutAccountId'] > 0 && $this->data['PaypalAccountId'] == 0 && !$this->error) { ?>
+                            <input alt="Donate" src="https://sandbox.google.com/checkout/buttons/donateNow.gif?merchant_id=<?php echo $this->merchant_id ?>&amp;w=115&amp;h=50&amp;style=white&amp;variant=text&amp;loc=en_US" type="image" />
+                            <?php } ?>
+                        </div>
+                    </div>
+                </form>
+                <div class="clear"></div>
+            </div>
+        </div>
+    </div>
+    <div class="block001f01"><div class="blst001"><div class="blst002"></div></div></div>
+    <!-- e o block001 -->
+</div>

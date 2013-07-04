@@ -1,0 +1,66 @@
+<? if (!isset($this->filter)) { ?>
+<script>
+var status = 'upcoming';
+function pagingInitiatives(page) {
+    filter(status, page)
+}
+
+function filter(stat, page) {
+    $("div.btnFilter."+status+" a").removeClass('selected');
+    status = stat;
+    $("div.btnFilter."+status+" a").addClass('selected');
+    $("#loading").show();
+    $("#contentInitiatives").html('');
+
+    $.ajax({
+        url: "/<?=$this->user->urlName?>/filterinitiatives",
+        data: 'view=index&type=all&status=' + status + '&page=' + page,
+        success: function(data) {
+            $("#contentInitiatives").html(data);
+            $("#loading").hide();
+        }
+    });
+}
+</script>
+
+<div class="box006">
+  <div class="rightMainBox BG01">
+    <div class="box004">
+        <div class="headingStyle02 box006Heading">
+          <div class="sortBy SBStyle01">
+            <span class="fL">Sort By</span>
+            <div class="pastBtn btnFilter completed"><a href="javascript:;" onclick="filter('completed')">Past</a></div>
+            <div class="upComingBtn btnFilter upcoming"><a href="javascript:;" class="selected" onclick="filter('upcoming')">Upcoming</a></div>
+          </div>
+          All Initiatives
+        </div>
+        <div id="loading" class="hide"><div class="box002Content">Loading initiatives ...</div></div>
+        <div id="contentInitiatives">
+<? } ?>
+        <?php if(count($this->initiatives)) { ?>
+        <?php foreach ($this->initiatives as $initiative) { ?>
+        <div class="box006Style02">
+        <div class="donation noMR"><strong><span class="text19"><?=$initiative->currency.number_format($initiative->getVolunteerByUser($this->user)->userDonationGoal)?></span></strong><br />
+        Goal</div>
+        <div class="donation noMR"><strong><span class="text19"><?=$initiative->currency.number_format($initiative->getVolunteerByUser($this->user)->raised)?></span></strong><br />
+        Donations</div>
+        <?php if($initiative->type == 0) { ?>
+        <div class="month02"><strong><span class="color01"><?= date('M', strtotime($initiative->startDate)); ?></span></strong><br /><?= date('d', strtotime($initiative->startDate)); ?></div>
+        <?php } ?>
+        <p class="box006Style01"><?php if($initiative->type == 1) { ?><img src="/public/images/dollar.png" width="35" height="35" alt=" " /><?php } ?><span class="text19"><strong><a href="/<?=$initiative->urlName?>"><?=$initiative->name?></a><br /></strong></span>
+        <?php if(!empty($initiative->group->organizationId)) { ?><strong><a href="/<?=$initiative->group->organization->urlName?>"><?=$initiative->group->organization->name?></a></strong><?php } ?></p>
+        </div>
+        <div class="spacer"></div>
+        <?php } ?>
+        
+        <div class="pager">
+        <?= $this->render('profile/page_selector_initiatives.phtml'); ?>
+        </div>
+        <? } else { ?>
+        <div class="leftBox"><p>No initiatives found.</p></div>
+        <? } ?>
+        <? if (!isset($this->filter)) { ?></div><? } ?>
+        
+    </div>
+  </div>
+</div>

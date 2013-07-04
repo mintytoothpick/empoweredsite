@@ -1,0 +1,144 @@
+<?php $this->headTitle("Empowered.org:  Empowering groups of volunteers to create social change"); ?>
+<script type="text/javascript" language="javascript">
+    function ValidateForm() {
+        var error = "";
+        if ($('#upload').val() != "") {
+            var image = $('#upload').val().split(".");
+            var accepted_files = new Array("jpeg", "jpg", "JPG", "JPEG", "png", "gif");
+            var extension = image[image.length-1].toLowerCase();
+            if (!accepted_files.inArray(extension)) {
+                error += "Please select jpeg files only.<br>";
+            }
+        }
+        if (jQuery.trim($('#FirstName').val()) == '') {
+            error += "Please specify First Name.<br>";
+        }
+        if (jQuery.trim($('#LastName').val()) == '') {
+            error += "Please specify Last Name.<br>";
+        }
+        if (jQuery.trim($('#URLName').val()) == '') {
+            error += "Please specify empowered web address.<br>";
+        }
+            <?php if (isset($_SESSION['first_fb_login'])) { ?>
+                if (jQuery.trim($('#password').val()) == "") {
+                    error += "Please enter your password.<br>";
+                }
+            <?php } ?>
+                if (error != '') {
+                    $('#message').removeClass('success').addClass('error').html(error).show();
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            function hidePopup() {
+                $('#popup-box').hide();
+            }
+</script>
+<style>
+    .success { color:green }
+    .error { color:red }
+    .field-label { float:left; font-weight:bold; color:#000; width:200px; margin-bottom:15px;}
+    .field-input { float:left; width:555px; margin-bottom:15px; }
+    .field-input .input { width:300px; }
+    .field-input input { padding:1px; }
+    .field-input .date { width:95px; }
+    .hidden { display:none }
+    .popup-box { width: 370px; left: 40%; right: 40%; top:25%; position: absolute; z-index: 999999!important; background-color:#ffffff; border:5px solid #e5e5e5; padding:10px 0 20px 0; -moz-border-radius:7px }
+</style>
+<div>
+    <div id="mainco2">
+        <div class="roundedbox">
+            <a id="top" href="#top" style="text-decoration:none">&nbsp;</a>
+            <form name="edit_profile_form" id="edit_profile_form" action="/profile/edit" method="post" enctype="multipart/form-data" onsubmit="return ValidateForm()">
+                <input type="hidden" id="uesrID" name="UserId" value="<?php echo $this->data['UserId']?>" />
+                <input type="hidden" name="MAX_FILE_SIZE" value="2097152" />
+                <div id="popup-box" class="popup-box" style="display:none;">
+                    <div style="padding:10px; padding-top:0px">
+                        <h3 style="margin:auto; padding:5px 0px; color:#3366FF; margin-bottom:20px; font-size:15px; border-bottom:2px solid #e5e5e5">Choose Profile Photo</h3>
+                        <span style="font-weight:bold">Select an image:&nbsp;</span>
+                        <input type="file" size="24" name="upload" id="upload" class="textfield" /><br>
+                        <div style="border:1px solid #dcbd00; background-color:#fff7c8; padding:10px; margin-top:8px;">You will be asked to crop your image after saving changes to your profile</div>
+                        <input class="button" type="button" value="Close" style="float:right; margin-top:10px; margin-right:5px" onclick="hidePopup()">
+                    </div>
+                </div>
+                <ul style="list-style:none; padding-bottom:0px">
+                    <li style="width:180px; float:left; margin-right:20px; margin-left:5px">
+                        <?php if(isset($this->data['UserId'])):?>
+                        <div align="center" style="width:100%;">
+                            <img id="imgLogo" src="/profile/loadimage/?UserId=<?php echo $this->data['UserId']?>" style="border-width:0px;" />
+                        </div>
+                        <?php else:?>
+                        <div style=" background-color:#BDD1DE; width:105px; height:80px; padding:20px 35px; margin:0px;">
+                            <div style="border:2px solid rgb(255, 255, 255); width: 100px; height: 75px; margin:0px;">
+                                <div style="border:3px solid #999898; border-bottom:7px solid #999898; border-top:23px solid #999898; width: 84px; height: 35px; background-color:#ffffff; margin:0px; text-align:center; font-size:30px; font-weight:bold; padding:5px; color:#999898">
+                                </div>
+                            </div>
+                        </div>
+                        <?php endif;?>
+                        <div class="clear"></div>
+                        <div style="width:100%; float:left; margin-top:10px;padding-bottom:30px;" align="center">
+                            <a id="add-photo" href="javascript:;" onclick="$('#popup-box').show()" class="btn btngreen" style="text-decoration:none;">Change Photo</a>
+                        </div>
+                        <?php if(empty($this->data['FaceBookId'])):?>
+                            <div class="fb-login-button fbLogin" onclick="facebookConnect();return false;" data-scope="email,publish_stream,publish_actions">
+                              Connect with Facebook
+                            </div>
+                        <?php endif;?>
+                    </li>
+                    <li style="border-left:1px solid #e5e5e5; width:825px; float:left; padding-left:20px">
+                        <h1 style="font-weight:bold; <?php echo (array_key_exists('FirstLogin', $this->data) && $this->data['FirstLogin']) ? 'font-size:24px;' : 'font-size:28px;' ?>"><?php echo isset($_SESSION['first_fb_login']) ? "Update Your Profile" : (array_key_exists('FirstLogin', $this->data) && ($this->data['FirstLogin']) ? "We are glad to see you using your account. Edit your details below." : "Edit Profile") ?></h1>
+                        <div id="message" class="error" style="width:600px; border:2px solid #e3e3e3; margin-bottom:15px; padding:5px; <?php if(!$this->message) { echo "display:none;"; } ?>"><?php if(isset($this->message)) { echo $this->message; } ?></div><br />
+                        <ul style="list-style:none; padding-bottom:0px; margin-bottom:0px">
+                            <li class="field-label">First Name:</li>
+                            <li class="field-input">
+                                <input name="FirstName" type="text" id="FirstName" class="input" value="<?php echo stripslashes($this->data['FirstName']) ?>" />
+                            </li>
+                            <li class="field-label">Last Name:</li>
+                            <li class="field-input">
+                                <input name="LastName" type="text" id="LastName" class="input" value="<?php echo stripslashes($this->data['LastName']) ?>" />
+                            </li>
+                            <li class="field-label">Passions:</li>
+                            <li class="field-input">
+                                <textarea name="passion" rows="3" cols="10" id="passion" class="input" onblur="return fnKeepWordLenTrack(this,800);" onkeyup="return fnKeepWordLenTrack(this,800);" style="font-size:14px"><?php echo stripslashes($this->data['AboutMe']) ?></textarea>
+                            </li>
+                            <li class="field-label">Email:</li>
+                            <li class="field-input">
+                                <input name="email" type="text" id="email" class="input" value="<?php echo $this->data['Email']?>" />
+                            </li>
+                            <li class="field-label">Location:</li>
+                            <li class="field-input">
+                                <input name="Location" type="text" id="Location" class="input" value="<?php echo stripslashes($this->data['Location']) ?>" />
+                            </li>
+                            <li class="field-label">Gender:</li>
+                            <li class="field-input">
+                                <span style="margin-left:20px"><input type="radio" id="gender01" name="Gender" value="1" <?php echo isset($this->data['Gender']) && $this->data['Gender'] == '1' ? 'checked' : '' ?>>&nbsp;Male</span>
+                                <span style="margin-left:20px"><input type="radio" id="gender02" name="Gender" value="2" <?php echo isset($this->data['Gender']) && $this->data['Gender'] == '2' ? 'checked' : '' ?>>&nbsp;Female</span>
+                            </li>
+                            <li class="field-label">Password:</li>
+                            <li class="field-input">
+                                <input name="password" type="password" id="password" class="input" value="" />
+                            </li>
+                            <?php if (!isset($_SESSION['first_fb_login'])) { ?>
+                            <li class="field-label" style="margin-bottom:15px">&nbsp;</li>
+                            <li class="field-input" style="margin-bottom:15px">
+                                <span>*Leaving the password field blank will maintain your current password</span>
+                            </li>
+                            <?php } ?>
+                            <li class="field-label">Empowered Web Address:<div class="clear" style="margin-top:5px;"></div><span style="font-weight:normal">http://www.empowered.org/</span></li>
+                            <li class="field-input"><br />
+                                <input name="URLName" type="text" id="URLName" class="input" value="<?php echo stripslashes($this->data['URLName']) ?>" />
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <div style="margin-left:220px; margin-top:15px; float:left; width:100%; margin-bottom:20px">
+                    <a class="btn btngreen" style="padding:3px 15px" href="/<?=$this->userNew->urlName?>">Back</a>
+                    <input class="btn btngreen" type="submit" name="submit" id="edit_profile_form_submit" value="Save Changes">
+                </div>
+            </form>
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>

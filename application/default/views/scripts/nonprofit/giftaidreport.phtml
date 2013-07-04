@@ -1,0 +1,203 @@
+<script>
+    function togglePopup(form, id, val, note) {
+        $('#popup-overlay').toggle();
+        $('.'+form).toggle()
+        $(id).val(val);
+        if (form == 'add-note') {
+            $('#'+form+' .Notes').val(note)
+        } else {
+            $('#'+form+' .Notes').val($('#hidden-note-'+val).val());
+        }
+    }
+
+
+    function loadVolunteers(PID, selectId) {
+        $('select#'+ selectId).load('/dashboard/loadvolunteers', {ProjectId: PID});
+    }
+
+    $(function() {
+        $('#FromDate').datepicker({ changeMonth: true, changeYear: true });
+        $('#ToDate').datepicker({ changeMonth: true, changeYear: true });
+    })
+
+    function loadGroup(PID, selectId) {
+        $('#'+ selectId).load('/nonprofit/loadgroups', {ProgramId: PID});
+    }
+
+    function loadProjects(GID, selectId) {
+        $('#'+ selectId).load('/nonprofit/loadprojects', {GroupId: GID});
+    }
+
+    function filterByDate() {
+        if ($('#FromDate').val() != '' && $('#ToDate').val() != '') {
+            filter_records.submit();
+        }
+    }
+</script>
+<style>
+    .right {
+        float:right;
+    }
+    .error {display:block;color:red;}
+    .hidden { display:none }
+    #ui-datepicker-div { font-size:11px }
+</style>
+
+<div class="wrapper">
+   <!-- org header -->
+  <?php echo $this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+    <!-- breadcrumb -->
+    <?php echo $this->placeholder('breadcrumb') ?>
+    <!-- // breadcrumb -->
+    <div class="clr"></div>
+
+    <!-- tabs -->
+    <?php echo $this->placeholder('tabs') ?>
+    <!-- // tabs -->
+
+    <div class="mainC">
+      <div class="box05">
+        <div class="headingStyle02">
+            Gift Aid
+            (from <?=date('m/d/Y', strtotime($_REQUEST['FromDate']))?> to <?=date('m/d/Y', strtotime($_REQUEST['ToDate']))?>)
+        </div>
+        <div id="mainnotleft" style="width:100%;">
+            <div class="clear"></div>
+            <div class="tab-container" style="width:100%;padding-top:0;">
+                <div id="donationFilters" class="article01" style="padding-bottom:15px;display:none;">
+                    <form id="filter_records" name="filter_records" method="post">
+                        <div style="float:left; margin-bottom: 8px; width: 100%">
+                            <span style="color:#693; font-weight:bold; font-size:13px;" >Filter By: </span>
+                            <?php if ($this->organization->hasPrograms) { ?>
+                            <select name="ProgramId" id="ProgramId" onchange="loadGroup(this.value, 'GroupId'); $('#GroupId').removeAttr('disabled')" style="width:180px;">
+                                <option value="">Program: All</option>
+                                <?php foreach($this->organization->programs as $program) { ?>
+                                <option value="<?=$program->id?>" <?= isset($this->program) && $this->program->id == $program->id ? "selected" : "" ?>>Program: <?=stripslashes($program->name)?></option>
+                                <?php } ?>
+                            </select>
+                            <img src="/public/images/filter_arrow.jpg" style="margin-top:3px;"/>
+                            <?php } ?>
+                            <?php if ($this->organization->hasGroups) { ?>
+                            <select name="GroupId" id="GroupId" style="width:180px;" onchange="loadProjects(this.value, 'ProjectId'); $('#ProjectId').removeAttr('disabled')" <?php if(!isset($this->program) && $this->organization->hasPrograms) { echo 'disabled="disabled"'; } ?>>
+                                <option value="">Chapter: All</option>
+                                <? if ($this->program) { ?>
+                                <?php foreach($this->program->groups as $group) { ?>
+                                <option value="<?php echo $group->id ?>" <?php echo isset($this->group) && $this->group->id == $group->id ? "selected" : "" ?>>Chapter: <?php echo stripslashes($group->name) ?></option>
+                                <?php } } ?>
+                            </select>
+                            <img src="/public/images/filter_arrow.jpg" style="margin-top:3px;" />
+                            <?php } ?>
+                            <select name="ProjectId" id="ProjectId" style="width:180px;" <?php if(!isset($_REQUEST['GroupId']) && $this->organization->hasGroups) { echo 'disabled="disabled"'; } ?>>
+                                <option value="">Activity or Campaign: All</option>
+                                <?php if ($this->group) { ?>
+                                <?php foreach($this->group->initiatives as $activity) { ?>
+                                <option value="<?php echo $activity->id ?>" <?php echo isset($this->project) && $this->project->id == $activity->id ? "selected" : "" ?>><?php echo $activity->type == 1 ? 'Campaign: ' : 'Activity: '; ?> <?php echo stripslashes($activity->name) ?></option>
+                                <?php } } ?>
+                            </select>
+                            <input type="submit" value="Update" class="btn btngreen" />
+                        </div>
+                        <div class="clear" style="margin-bottom:20px;"></div>
+                        <div class="search" style="float:left;margin:0px; width:auto;">
+                            <input type="text" name="search_text" value="<?php echo isset($_REQUEST['search_text']) ? $_REQUEST['search_text'] : "" ?>" style="width:250px; border:2px solid #528D19; padding:3px; float: left; color: gray; background: url(/public/images/search.gif) no-repeat 98% center" />
+                            <input type="submit" value="" style="display: none">
+                        </div>
+                        <span style="float:left; margin:0 0 0 5px;">
+                            Show:
+                            <select name="show_list" id="limit" onchange="$('#filter_records').submit();">
+                                <option value="10" <?php echo isset($_REQUEST['limit']) && $_REQUEST['limit'] == 10 ? "selected" : "" ?>>10</option>
+                                <option value="25" <?php echo (isset($_REQUEST['limit']) && $_REQUEST['limit'] == 25  || !isset($_REQUEST['limit'])) ? "selected" : "" ?>>25</option>
+                                <option value="50" <?php echo isset($_REQUEST['limit']) && $_REQUEST['limit'] == 50 ? "selected" : "" ?>>50</option>
+                                <option value="100" <?php echo isset($_REQUEST['limit']) && $_REQUEST['limit'] == 100 ? "selected" : "" ?>>100</option>
+                                <option value="" <?php echo isset($_REQUEST['limit']) && $_REQUEST['limit'] == 'All' ? "selected" : "" ?>>All</option>
+                            </select>
+                        </span>
+                        <div style="float:right; margin:3px 0 0 5px">
+                            <div style="float:left; margin-top:5px; font-weight:bold; color:#693; font-size:13px;">Filter By Donation Date:&nbsp;</div>
+                            <input class="text smaller" id="FromDate" name="FromDate" value="<?php echo isset($_REQUEST['FromDate'])&& !empty($_REQUEST['FromDate']) ? date('m/d/Y', strtotime($_REQUEST['FromDate'])) : "" ?>" style="float:left; width:100px;" onchange="filterByDate()">
+                            <div style="float:left; width:20px; margin-top:3px; font-weight:bold; text-align:center;color:#693; font-size:13px;">&nbsp;to&nbsp;</div>
+                            <input class="text smaller" id="ToDate" name="ToDate" value="<?php echo isset($_REQUEST['ToDate'])&& !empty($_REQUEST['ToDate']) ? date('m/d/Y', strtotime($_REQUEST['ToDate'])) : "" ?>" style="float:left; width:100px;" onchange="filterByDate()">
+                        </span>
+                    </form>
+                </div>
+                </div>
+                <div class="article01" style="padding:10px 0;">
+<!--                    <ul id="tools-links">
+                        <li><a href="javascript:;"><img src="/public/images/wrench.jpeg" style="border:1px solid #AAA;"></a>
+                            <ul style="font-size:12px; font-weight:normal;">
+                                <li><a href=""><img src="/public/images/reports.png" style="margin:3px 5px;"><span style="vertical-align:top;">Pull Gift Aid Report</span></a></li><br />
+                            </ul>
+                        </li>
+-->
+                    </ul>
+                    <div id="showFilterLink" style="float:right;margin-right:20px;margin-top:10px;"><a href="javascript:;" onclick="$('#showFilterLink').hide(); $('#donationFilters').show(); $('#hideFilterLink').show(); $('')" >Show Filters</a></div>
+                    <div id="hideFilterLink" style="float:right;margin-right:20px;margin-top:10px;display:none;"><a href="javascript:;" onclick="$('#showFilterLink').show(); $('#donationFilters').hide(); $('#hideFilterLink').hide();" >Hide Filters</a></div>
+                </div>
+
+                <table cellpadding="3" cellspacing="0" width="99%">
+                    <tr>
+                        <td colspan="9" class="donation_tablehead">
+                            <div class="donation_navpage">
+
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="do_col1">Transaction ID</td>
+                        <td class="do_col2" align="center">Initiative</td>
+                        <td class="do_col2">Salutation</td>
+                        <td class="do_col2">Name</td>
+                        <td class="do_col2" align="center">Email</td>
+                        <td class="do_col2" align="center">Phone</td>
+                        <td class="do_col2" align="center">Address</td>
+                        <td class="do_col2" align="center">Family Member</td>
+                        <td class="do_col3" align="center">Date</td>
+                    </tr>
+                    <?php foreach ($this->paginator as $giftaid) { ?>
+                    <tr>
+                        <td class="xdo_col1">
+                            <?php echo $giftaid->donation->transactionId ?>
+                        </td>
+                        <td class="xdo_col2">
+                            <?= $giftaid->project->name ?>
+                        </td>
+                        <td class="xdo_col2">
+                            <?= $giftaid->salutation ?>
+                        </td>
+                        <td class="xdo_col2">
+                            <?= $giftaid->lastName ?> <?= $giftaid->firstName ?>
+                        </td>
+                        <td  class="xdo_col2" align="center">
+                            <?= $giftaid->email ?>
+                        </td>
+                        <td class="xdo_col2" align="center">
+                            <?= $giftaid->phone ?>
+                        </td>
+                        <td class="xdo_col2">
+                            <?= $giftaid->address ?>
+                        </td>
+                        <td class="xdo_col2" align="center">
+                            <?=($giftaid->familyMember) ? 'Yes' : 'No' ?>
+                        </td>
+                        <td class="xdo_col3" align="center">
+                            <?php echo date('M d, Y h:i:s A', strtotime($giftaid->createdOn)) ?>
+                        </td>
+                    </tr>
+                    <?php } ?>
+                </table>
+
+                <div class="spacer"></div>
+                <a class="btn btngreen" href="/<?=isset($this->program) ? $this->program->urlName : $this->organization->urlName ?>">Back</a>
+                <?= $this->paginationControl($this->paginator, 'Sliding', '/nonprofit/new_page_selector.phtml'); ?>
+
+            </div>
+        </div><!--End Main Content-->
+            </div>
+        </div>
+        <div class="clr"></div>
+        <div class="clr"></div>
+    </div>

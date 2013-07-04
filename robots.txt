@@ -1,0 +1,17 @@
+User-agent: *
+Disallow: /*donors
+Disallow: /*donorlist*
+Disallow: /*donor-list*
+Disallow: /*donordonations*
+Disallow: /*donations
+Disallow: /*fundraisers
+Disallow: /*fundraiserdonations*
+Disallow: /*volunteers
+Disallow: /*volunteerdonations*
+Disallow: /*reports
+Disallow: /reporting*
+Disallow: /*manage-donations
+Disallow: /*donations-detail
+Disallow: /dashboard
+Disallow: /nonprofit/export*
+Disallow: /volunteers/volunteersreport*

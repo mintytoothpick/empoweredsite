@@ -1,0 +1,248 @@
+<script>
+    function togglePopup(form, id, val, note) {
+        $('#popup-overlay').toggle();
+        $('.'+form).toggle()
+        $(id).val(val);
+        if (form == 'add-note') {
+            $('#'+form+' .Notes').val(note)
+        } else {
+            $('#'+form+' .Notes').val($('#hidden-note-'+val).val());
+        }
+    }
+
+    function manageNote(form, action) {
+        if (jQuery.trim($(form+' .Notes').val()) == '') {
+            alert("Please enter the volunteer's notes")
+        } else {
+            $.post('/volunteer/'+action, $(form).serialize(), function(data) {
+                window.location.reload(true);
+            })
+        }
+        return false;
+    }
+
+    function deleteNote(id) {
+        if (confirm("Are you sure you want to delete this fundraiser note?") == true) {
+            $.post('/volunteer/deletenote', {VolunteerNoteId: id}, function(data) {
+                window.location.reload(true);
+            })
+        } else {
+            return false;
+        }
+    }
+
+    function newGoal(element, oldval, newgoal_elem){
+        $(newgoal_elem).val($(newgoal_elem).val().replace(',', ''));
+        $.post("/profile/editdonationgoal",element.serialize(),function(data){
+            alert("You have successfully updated the fundraising goal.");
+            window.location.reload(true);
+        });
+    }
+
+    function deleteFundraiser(FID) {
+        if (confirm("Are you sure you want to delete the selected fundraiser from this campaign?")) {
+            $.post('/volunteer/delete', {FundraiserId: FID}, function(data) {
+                alert(data);
+                window.location.reload(true);
+            });
+        }
+        return false;
+    }
+</script>
+<style>
+    .popup-box { width: 600px; left: 30%; right: 30%; top:25%; position: fixed; z-index: 999999!important; background-color:#ffffff; border:5px solid #e5e5e5; padding:10px 0 20px 0; -moz-border-radius:5px; margin:auto }
+    #popup-overlay {
+        background: url(<?php echo $this->contentLocation ?>public/images/bg-overlay.png);
+        height:100%;
+        position:fixed;
+        display:block;
+        left:0;
+        top:0;
+        width:100%!important;
+        z-index:998;
+        display:none;
+    }
+    .right {
+        float:right;
+    }
+    .hidden { display:none }
+</style>
+<div class="add-note popup-box hidden" style="margin-bottom:15px; margin-left:15px; padding:10px; font-size:14px">
+    <h2>Add Fundraiser Note</h2>
+    <form id="add-note" onsubmit="manageNote('#add-note', 'addnote'); return false;">
+        <input id="VolunteerId" type="hidden" name="VolunteerId" value="" />
+        <textarea cols="60" rows="3" name="Notes" class="Notes"></textarea>
+        <div class="clear"></div><br>
+        <a href="javascript:;" class="btn btngreen" onclick="togglePopup('add-note', '#VolunteerId', '', '')">Cancel</a>
+        <input type="submit" class="btn btngreen" value="Submit" />&nbsp;
+    </form>
+</div>
+<div class="edit-note popup-box hidden" style="margin-bottom:15px; margin-left:15px; padding:10px; font-size:14px">
+    <h2>Edit Fundraiser Note</h2>
+    <form id="edit-note" onsubmit="manageNote('#edit-note', 'editnote'); return false;">
+        <input id="VolunteerNoteId" type="hidden" name="VolunteerNoteId" value="" />
+        <textarea cols="60" rows="3" name="Notes" class="Notes"></textarea>
+        <div class="clear"></div><br>
+        <a href="javascript:;" class="btn btngreen" onclick="togglePopup('edit-note', '#VolunteerNoteId', '', '')">Cancel</a>
+        <input type="submit" class="btn btngreen" value="Submit" />&nbsp;
+    </form>
+</div>
+<div id="popup-overlay"></div>
+<div class="wrapper">
+   <!-- org header -->
+  <?php echo $this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+    <!-- breadcrumb -->
+    <?php echo $this->placeholder('breadcrumb') ?>
+    <!-- // breadcrumb -->
+    <div class="clr"></div>
+    <?php if ($this->project->organizationId) { ?>
+    <!-- tabs -->
+    <?php echo $this->placeholder('tabs') ?>
+    <!-- // tabs -->
+    <?php } ?>
+
+    <div class="mainC">
+      <div class="box05">
+        <div class="headingStyle02">
+            <?= isset($this->project) ? $this->project->name : $this->group->name ?>'s Fundraisers (<?php echo number_format(count($this->fundraisers)) ?>)
+        </div>
+        <div id="mainnotleft">
+            <div class="clear"></div>
+            <div class="tab-container" style="width:100%;padding-top:0;">
+                <div id="fundraiserFilters" class="article01" style="padding-bottom:15px;border:0;display:none;">
+                    <form method="post">
+                        <?php if (isset($this->group)) { ?>
+                        <span style="float:left;">
+                            <span style="color:#693; font-weight:bold; font-size:13px;" >Filter By: </span>
+                        <select name="ProjectId" style="padding: 2px 2px 2px 0" onchange="this.form.submit();">
+                                <option value="">All Activities & Campaigns</option>
+                                <?php foreach($this->group->initiatives as $activity) { ?>
+                                <option value="<?=$activity->id?>" <?php if(isset($this->project) && $this->project->id == $activity->id) { echo "selected"; } ?>><?php echo stripslashes($activity->name) ?></option>
+                                <?php } ?>
+                            </select>
+                        </span>
+                        <div class="clear" style="margin-bottom:25px;"></div>
+                        <?php } ?>
+                        <div class="search" style="float:left;margin:0;width:auto;">
+                            <input type="text" name="search_text" style="width:250px; border:2px solid #528D19; padding:3px; float: left; color: gray; background: url(/public/images/search.gif) no-repeat 98% center" <?php if(isset($_POST['search_text'])) { echo 'value="'.$_POST['search_text'].'"'; } ?>/>
+                            <input type="submit" value="" style="display: none"/>
+                        </div>
+                        <span style="float:left;margin:3px 0 0 5px;">
+                        <b>Show:</b>
+                        <select name="limit" id="limit" style="padding: 2px 2px 2px 0" onchange="this.form.submit();">
+                            <option value="10" <?php echo isset($_POST['limit']) && $_POST['limit'] == 10 ? "selected" : "" ?>>10</option>
+                            <option value="25" <?php echo isset($_POST['limit']) && $_POST['limit'] == 25 ? "selected" : "" ?>>25</option>
+                            <option value="50" <?php echo isset($_POST['limit']) && $_POST['limit'] == 50 ? "selected" : "" ?>>50</option>
+                            <option value="100" <?php echo isset($_POST['limit']) && $_POST['limit'] == 100 ? "selected" : "" ?>>100</option>
+                            <option value="" <?php echo isset($_POST['limit']) && $_POST['limit'] == 'All' ? "selected" : "" ?>>All</option>
+                        </select>
+                        </span>
+                    </form>
+                </div>
+                <div class="article01" style="margin:10px 0;padding-bottom:20px;">
+                    <ul id="tools-links">
+                        <h2 style="border:none;"><li><a href="javascript:;"><img src="/public/images/wrench.jpeg" style="border:1px solid #AAA;"></a>
+                                <ul style="font-size:12px; font-weight:normal;">
+                                    <li><a href="/<?= isset($this->project) ? $this->project->urlName : $this->group->urlName ?>/email-fundraisers"><img src="/public/images/envelope.png" style="margin:3px 5px;"><span style="vertical-align:top;margin-right:15px;">Email People Fundraising</span></a></li><br />
+                                    <li><a href="/dashboard/fundraisersreport?<?= isset($this->project) ? 'ProjectId='.$this->project->id : 'GroupId='.$this->group->id ?>"><img src="/public/images/reports.png" style="margin:3px 5px;"><span style="vertical-align:top;">Pull Fundraisers Report</span></a></li><br />
+                                </ul>
+                            </li>
+                    </ul></h2>
+                    <div id="showFilterLink" style="float:right; margin-top:10px;"><a href="javascript:;" onclick="$('#showFilterLink').hide(); $('#fundraiserFilters').show(); $('#hideFilterLink').show();" >Show Filters</a></div>
+                    <div id="hideFilterLink" style="float:right; margin-top:10px;display:none;"><a href="javascript:;" onclick="$('#showFilterLink').show(); $('#fundraiserFilters').hide(); $('#hideFilterLink').hide();" >Hide Filters</a></div>
+                </div>
+            <?php
+            if (count($this->paginator)) {
+                foreach($this->paginator as $fundraiser) {
+                    $total_donation = $this->project_donations->getUserProjectDonations($fundraiser['uUserId'], $fundraiser['ProjectId']);
+            ?>
+                <div class="article01">
+                    <div class="tab-left">
+                        <img src="/profile/loadimage/?UserId=<?php echo $fundraiser['uUserId'] ?>" width="52" height="50"/>
+                    </div>
+                    <div class="tab-right" style="width:780px!important">
+                        <table width="100%">
+                            <tr>
+                                <td valign="top" style="width:650px!important">
+                                    <b><a href="/<?php echo $fundraiser['uURLName'] ?>" style="color:#000;"><?php echo stripslashes($fundraiser['FullName']) ?></a></b><br />
+                                    <?php if (isset($this->group)) { ?>
+                                    <a href="javascript:;" onclick="$('#history-<?php echo $fundraiser['uUserId'] ?>').toggle()" style="margin-right:5px">&bull; Fundraising History</a>
+                                    <?php } ?>
+                                    <a href="javascript:;" onclick="$('#notes-<?php echo $fundraiser['uUserId'] ?>').toggle()" style="margin-right:5px">&bull; Notes</a>
+                                    <a href="/<?= isset($this->project) ? $this->project->urlName : $this->group->urlName ?>/fundraiser-donations/<?php echo $fundraiser['uUserId'] ?>" style="margin-right:5px">&bull; Donation Report</a>
+                                    <?php if($fundraiser['Type'] == 0) { ?><a href="javascript:;" onclick="$('#goals-<?php echo $fundraiser['uUserId'] ?>').toggle()">&bull; Fundraising Goals</a><?php } ?>
+                                </td>
+                                <td valign="top">
+                                    Fundraised:&nbsp;<?php echo (isset($this->project) ? $this->project->currency : $this->group->currency).number_format($total_donation) ?>
+                                </td>
+                                <td valign="top"><a href="javascript:;" onclick="deleteFundraiser('<?= $fundraiser['VolunteerId'] ?>')"><img src="/public/images/icon_delete_grey.gif" width="10" height="10" alt="Delete Fundraiser" title="Delete Fundraiser" /></a></td>
+                            </tr>
+                        </table>
+                    <?php if (isset($this->group)) { ?>
+                        <div id="history-<?php echo $fundraiser['uUserId'] ?>" style="display:none; margin-top:10px; margin-bottom:5px;">
+                            <strong>Fundraising Campaigns Participated</strong><br>
+                            <?php $campaigns_participated = $this->volunteer_class->getProjectsParticipatedByGroup($this->group->id, $fundraiser['uUserId'], isset($ProjectId) ? $ProjectId : null, true);
+                            foreach($campaigns_participated as $campaign) { ?>
+                            Fundraised for fundraising campaign <a href="/<?php echo $campaign['URLName'] ?>"><?php echo stripslashes($campaign['Name']) ?></a><?php echo $campaign['DateParticipated'] != '0000-00-00 00:00:00' ? " on ".date('F d, Y', strtotime($campaign['DateParticipated'])) : "" ?><br>
+                            <?php } ?>
+                        </div>
+                        <?php } ?>
+                        <div id="notes-<?php echo $fundraiser['uUserId'] ?>" style="display:none; margin-top:10px; margin-bottom:5px;">
+                            <strong>Volunteer Notes</strong><br>
+                            <?php $notes = $this->volunteer_notes->getVolunteerNotes($fundraiser['VolunteerId']);
+                            foreach($notes as $note) { ?>
+                            <span> - <?php echo stripslashes($note['Notes']) ?></span>
+                            <input type="hidden" id="hidden-note-<?php echo $note['VolunteerNoteId'] ?>" value="<?php echo stripslashes($note['Notes']) ?>" />
+                             &bull;<a href="javascript:;" onclick="togglePopup('edit-note', '#VolunteerNoteId', '<?php echo $note['VolunteerNoteId'] ?>', '')">Edit</a>
+                            &nbsp;&bull;&nbsp;
+                            <a href="javascript:;" onclick="deleteNote('<?php echo $note['VolunteerNoteId'] ?>')">Delete</a>
+                            <br>
+                            <?php } ?>
+                            &nbsp;<a href="javascript:;" onclick="togglePopup('add-note', '#VolunteerId', '<?php echo $fundraiser['VolunteerId'] ?>', '')">Add</a>
+                        </div>
+                        <div id="goals-<?php echo $fundraiser['uUserId'] ?>" style="display:none; margin-top:10px; margin-bottom:5px;">
+                            <strong>Fundraising Goals</strong><br>
+                            <?php
+                            if (isset($this->project)) {
+                                $fundraising_goals = $this->volunteer_class->getProjectsParticipated($this->project->id, $fundraiser['uUserId'], true);
+                            } else {
+                                $fundraising_goals = $this->volunteer_class->getProjectsParticipatedByGroup($this->group->id, $fundraiser['uUserId'], null, true);
+                            }
+                            foreach($fundraising_goals as $goal) {
+                            ?>
+                            <span style="float: left; margin-right: 5px"><?php echo stripslashes($goal['Name']) ?>:&nbsp;<span id="curr_goal_<?php echo $goal['VolunteerId'] ?>"><?php echo (isset($this->project) ? $this->project->currency : $this->group->currency).number_format($goal['UserDonationGoal'])?></span></span>
+                            <a id="edit-goal-<?php echo $goal['VolunteerId'] ?>" href="javascript:;" onclick="$('#curr_goal_<?php echo $goal['VolunteerId'] ?>').toggle(); $('#new_goal_form_<?php echo $goal['VolunteerId'] ?>').toggle(); $('#edit-goal-<?php echo $goal['VolunteerId'] ?>').toggle()" title="Edit Goal">
+                                <img src="/public/images/icon_edit.jpg" width="16" height="16" alt="Edit Goal">
+                            </a>
+                            <form id="new_goal_form_<?php echo $goal['VolunteerId'] ?>" method="post" style="display: none">
+                                <input type="hidden" id="VolunteerId" name="VolunteerId" value="<?php echo $goal['VolunteerId'] ?>" />
+                                <input type="text" id="DonationGoal_<?php echo $goal['VolunteerId'] ?>" name="DonationGoal" title="New Goal should be higher than the original donation goal" style="width:45px; float: left; margin-right: 5px" value="<?php echo $goal['UserDonationGoal'] ?>" />
+                                <a style="float: left;" href="javascript:;" class="btnok" onclick="newGoal($('#new_goal_form_<?php echo $goal['VolunteerId'] ?>'),<?php echo $goal['UserDonationGoal'] ?>,'#DonationGoal_<?php echo $goal['VolunteerId'] ?>');" title="Save">Save</a>
+                            </form>
+                            <?php } ?>
+                        </div>
+                    </div>
+                </div>
+                    <?php } ?>
+                <?php } ?>
+                <div class="clear" style="margin-bottom:15px;"></div>
+                <a class="btn btngreen" href="/<?= isset($this->project) ? $this->project->urlName : $this->group->urlName ?>">Back</a>
+
+                <div class="clear" style="margin-bottom:10px;"></div>
+                <div class="navpage">
+                    <div class='s2st03' style="margin-top:10px"><?= $this->paginationControl($this->paginator, 'Sliding', '/dashboard/page_selector.phtml'); ?></div>
+                </div>
+
+            </div>
+        </div><!--End Main Content-->
+        </div>
+            </div>
+        </div>
+        <div class="clr"></div>
+        <div class="clr"></div>
+    </div>

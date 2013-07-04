@@ -1,0 +1,73 @@
+<?php $this->headTitle("Empowered.org - Share Your Event"); ?>
+<script type="text/javascript">
+    function share() {
+        var checked = false;
+        if (document.getElementById('fb-share').checked == true) {
+            $('#share-fb').click();
+            checked = true;
+        }
+        if (document.getElementById('email-share').checked == true) {
+            $('.addthis_button_email').click();
+            $('#at_msg').val($('#share-content').val());
+            checked = true;
+        }
+        if (!checked) {
+            alert('Please select Facebook and or email to share your post.')
+        }
+        return false;
+    }
+</script>
+<div>
+    <div id="mainco2">
+        <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+        <div class="block001">
+            <div class="blst001">
+                <div class="blst002">
+					<?php if(isset($this->newevent)) { ?>
+						<h2 style="font-size:14px">
+			                <div style="color:#A9A9A9; width:19%; float:left">Step 1. Event Details</div>
+			                <div style="color:#669933; width:19%; float:left">Step 2. Spread the Word</div>
+			                <div class="clear"></div>
+			            </h2>
+					<?php } ?>
+                    <div id="TabbedPanels1" class="TabbedPanels">
+                        <div class="panes TabbedPanelsContentGroup">
+                            <!-- FIRST TAB -->
+                            <div class="TabbedPanelsContent">
+                                <div class="whiteBox" style="font-size:13px;">
+				<form method="post" action="/project/share/?ProjectId=<?php echo $this->eventInfo['EventId'] ?>">
+				    <input type="hidden" name="ProjectId" value="<?php echo $this->eventInfo['EventId'] ?>" />
+				    <h1 style="margin-bottom:10px; font-weight:bold;">Get the word out!</h1>
+				    <textarea id="share-content" cols="40" rows="4" style="width:495px">I am holding an event. Attend and help spread the word! http://<?php echo $_SERVER['HTTP_HOST']."/".$this->data['URLName']."/" ?>events?EventId=<?php echo $this->eventInfo['EventId'] ?>
+				    </textarea><br><br>
+				    <span style="font-weight:bold">Link to this page: </span><a href="/<?php echo $this->data['URLName'] ?>/events?EventId=<?php echo $this->eventInfo['EventId'] ?>">http://<?php echo $_SERVER['HTTP_HOST'] ?>/<?php echo $this->data['URLName'] ?>/events?EventId=<?php echo $this->eventInfo['EventId'] ?></a><br><br>
+				    <div class="addthis_toolbox addthis_default_style addthis_32x32_style">
+					<span style="float:left; margin-right:20px"><br />
+					    <input type="checkbox" id="fb-share" style="float:left; margin-top:10px; " checked="checked" />
+                                            <a style="float:left" class="addthis_button_facebook" addthis:url="<?php echo $_SERVER['HTTP_HOST']."/".$this->data['URLName'] ?>events?EventId=<?php echo $this->eventInfo['EventId'] ?>"></a>
+                                            <a id="share-fb" name="fb_share" type="icon" style="display:none" share_url="<?php echo $_SERVER['HTTP_HOST'] ?>/<?php echo $this->data['URLName'] ?>events?EventId=<?php echo $this->eventInfo['EventId'] ?>"></a>
+                                            <script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share"type="text/javascript"></script>
+					</span>
+					<span style="float:left"><br />
+					    <input type="checkbox" id="email-share" style="float:left; margin-top:10px;" checked="checked" />
+					    <a style="float:left" class="addthis_button_email" addthis:url="<?php echo $_SERVER['HTTP_HOST']."/".$this->data['URLName'] ?>events?EventId=<?php echo $this->eventInfo['EventId'] ?>" ></a>
+					</span>
+				    </div>
+				    <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4e319b9362855da9"></script>
+				    <div style="width:500px">
+					<input style="float:right;" type="submit" value="Share" class="btn btngreen" onclick="return share()" />
+					<a href="/<?php echo $this->data['URLName'] ?>/events?EventId=<?php echo $this->eventInfo['EventId'] ?>" style="float:right; font-weight:bold; font-size:15px; margin-top:5px; margin-right:10px">Skip</a>
+				    </div>
+				</form>
+			    	</div>
+                            </div>
+                            <!-- e o FIRST TAB -->
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </div>
+        <div class="block001f01"><div class="blst001"><div class="blst002"></div></div>
+    </div>
+</div>

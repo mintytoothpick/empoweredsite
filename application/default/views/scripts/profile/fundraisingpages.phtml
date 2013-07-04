@@ -1,0 +1,479 @@
+<?php
+$this->headTitle(stripslashes($this->data['FullName'])."'s Fundraising Page: ". $this->fundraisingInfo['Name']);
+?>
+<script type="text/javascript">
+    //var TabbedPanels1 = new Spry.Widget.TabbedPanels("TabbedPanels1");
+    $(document).ready(function(){
+        $("ul.tabs").tabs("div.panes > div");
+    })
+
+    $(document).ready(function(){
+        $(".toggle_container").hide();
+
+        $(".editgoal").toggle(function(){
+            $(this).addClass("active").html("Close Edit Goal");
+        }, function () {
+            $(this).removeClass("active").html("Edit Donation Goal >>");
+        });
+
+        $(".editgoal").click(function(){
+            $(this).next(".toggle_container").slideToggle("slow");
+        });
+
+    });
+
+    function newGoal(element, oldval){
+        var newval =  $("#DonationGoal").val();
+        if ($('#MinimumGoal').val() < newval) {
+            $.post("/profile/editdonationgoal",element.serialize(),function(data){
+                element.parents('.toggle_container').prev().click();
+                $("#newdongoal").html(newval);
+                alert('You have successfully updated your donation goal for this activity');
+                window.location.reload(true);
+            });
+        } else {
+            alert('You must enter a value greater than the minimum allowed goal');
+        }
+    }
+    function toggleCampaigns(show) {
+        if (show == 'active') {
+            $('#title').html('Active Fundraising');
+            $('#tab-link-2').removeClass('active');
+            $('#tab-link-1').addClass('active');
+            $('#tab1').show();
+            $('#tab2').hide();
+        } else {
+            $('#title').html('Inactive Fundraising');
+            $('#tab-link-2').addClass('active');
+            $('#tab-link-1').removeClass('active');
+            $('#tab1').hide();
+            $('#tab2').show();
+        }
+    }
+
+    function hidePopup() {
+        $('#popup-box').hide();
+    }
+
+    function editMessage() {
+        $.post('/profile/editfundraising', {ProjectId: $('#ProjectId').val(), FundraisingMessageId: $('#FundraisingMessageId').val(), FundraisingMessage: $('#fundraisingmessage').val(), VolunteerId: '<?=$this->volunteerInfo['VolunteerId']?>'}, function(data) {
+            if(data == 'success') {
+                alert('You have successfully updated your fundraising message.');
+                hidePopup();
+                window.location.reload(true);
+            }
+        });
+    }
+</script>
+<link rel="stylesheet" href="<?php echo $this->contentLocation ?>public/css/scrollable-horizontal.css" type="text/css" media="screen" />
+<div id="popup-box" class="popup-box" style="display:none;">
+    <div style="padding:10px; padding-top:0px">
+        <h3 style="margin:auto; padding:5px 0px; color:#3366FF; margin-bottom:20px; font-size:15px; border-bottom:2px solid #e5e5e5">Edit Fundraising Message</h3>
+        <input type="hidden" id="ProjectId" name="ProjectId" value="<? echo $this->fundraisingInfo['ProjectId'] ?>" />
+        <input type="hidden" id="FundraisingMessageId" name="FundraisingMessageId" value="<? echo isset($this->fundraisingmessage['FundraisingMessageId']) ? $this->fundraisingmessage['FundraisingMessageId'] : "" ?>" />
+        <textarea id="fundraisingmessage" name="fundraisingmessage" cols="60" rows="8" style="width:99%"><?php if (!empty($this->fundraisingmessage)) { echo stripslashes(str_replace("<br>", '\n', $this->fundraisingmessage['FundraisingMessage'])); } else { echo "Dear Friends,\n\nWelcome to my project page! Thank you for visiting!\n\nAll contributions are sincerely appreciated and necessary to make this project possible. Every step towards social change helps make a difference! If you are interested in making a donation to this project, simply click on the 'DONATE' button. It's the fastest and most efficient way to contribute and is 100% secure.\n\nThanks again for checking out my page! And feel free to forward this page to anyone you know who might be interesting in donating or volunteering. Let's change the world together!\n\n<span style='float:right'>".(" - ".stripslashes($this->data['FirstName']))."</span>"; } ?></textarea>
+        <input class="button" type="button" value="Cancel" style="float:right; margin-top:10px; margin-right:5px" onclick="hidePopup()">
+        <input class="button" type="button" value="Save" style="float:right; margin-top:10px; margin-right:5px" onclick="editMessage()">
+    </div>
+</div>
+<style>
+.hidden { display:none }
+.popup-box { width: 50%; left: 25%; right: 25%; top:25%; position: absolute; z-index: 999999!important; background-color:#ffffff; border:5px solid #e5e5e5; padding:10px 0 20px 0; -moz-border-radius:7px }
+#ui-datepicker-div { font-size:11px }
+</style>
+<div>
+    <div id="mainco2">
+        <!-- <div class="roundedbox">-->
+        <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+        <div class="block001">
+            <div class="blst001">
+                <div class="blst002">
+                    <div class="MainBody">
+                        <div style="float:left; margin-right:30px; margin-bottom:10px; width:100px;"><img src="/profile/loadimage/?UserId=<?php echo $this->data['UserId'] ?>" style="width:100px; height:100px;" class="BorderStyle"/></div>
+                        <?php if ($this->list) { ?>
+			    <table>
+                            <tr>
+                                <td><h1 style="padding:0; font-size:23px;line-height:24px"><?php echo stripslashes($this->data['FirstName'])." ".stripslashes($this->data['LastName']) ?></h1></td>
+                            </table>
+                            <table>
+                            <?php if (!empty($this->data['AboutMe'])):?>
+                            <tr>
+                                <td style="width:70px; color:#AAA;">passions</td>
+                                <td><?php echo stripslashes($this->data['AboutMe']) ?></td>
+                            </tr>
+                            <?php endif;?>
+                            <?php if (!empty($this->data['Location'])):?>
+                            <tr>
+                                <td style="color:#AAA;">lives in</td>
+                                <td><?php echo stripslashes($this->data['Location']) ?></td>
+                            </tr>
+                            <?php endif;?>
+                            </table>
+                        <?php } else { ?>
+							<?php if ($this->fundraisingInfo['Type'] == 1) {
+								//$this->DonationGoal['UserDonationGoal'] = $this->fundraisingInfo['DonationGoal'];
+							} else {
+								//$this->DonationGoal['UserDonationGoal'] = $this->volunteers_class->getUserDonationGoal($this->data['UserId'], $this->fundraisingInfo['ProjectId'], true);
+							} ?>
+			  				<table>
+                            <tr>
+                                <td>
+                                    <h1 style="padding:0; font-size:23px;line-height:24px; margin-right:10px; width:auto; float:left"><?php echo stripslashes($this->data['FirstName'])." ".stripslashes($this->data['LastName']) ?></h1>
+                                    <h3 style="color:#669933;line-height:32px; font-size:15px; width:auto; margin:0px; float:left; margin-right:3px;">Fundraising for</h3>
+                                    <a style="font-size:15px;line-height:32px; font-weight:bold; float:left" href="/<?php echo isset($this->fundraisingInfo['projectLink']) ? $this->fundraisingInfo['projectLink'] : $this->fundraisingInfo['campaignLink'] ?>"><?php echo stripslashes($this->fundraisingInfo['Name']) ?></a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <!--
+                                    <div class="progress_label"><?php echo $this->total_donations > $this->DonationGoal['UserDonationGoal'] ? "Donations" : "Goal" ?>: <?php if ($this->treeInfo['NetworkId'] == "DB04F20F-59FE-468F-8E55-AD75F60FB0CB") { echo "US$"; } elseif ($this->treeInfo['NetworkId'] == "547086E0-5456-4631-AB2A-BA781E7DB9A7") { echo "&#163;"; } else { echo "$"; } ?><?php echo number_format($this->total_donations) ?><?php if($this->DonationGoal['UserDonationGoal'] > $this->total_donations) { ?> of <?php if ($this->treeInfo['NetworkId'] == "DB04F20F-59FE-468F-8E55-AD75F60FB0CB") { echo "US$"; } elseif ($this->treeInfo['NetworkId'] == "547086E0-5456-4631-AB2A-BA781E7DB9A7") { echo "&#163;"; } else { echo "$"; } ?><?php echo number_format($this->DonationGoal['UserDonationGoal']) ?><?php } ?></div>
+                                    -->
+                                    <div style="width:240px; margin-right:20px; float:left; margin-top:3px; height:24px" id="progress1" class="progress full <?php echo $this->total_donations > 0 ? "progress-green" : "" ?>"><span style="height:24px"><b></b></span></div>
+                                    <?php $donate_link = $this->fundraisingInfo['Type'] == 0 ? "/".$this->fundraisingInfo['projectLink']."/".$this->data['URLName']."/donate" : "/".$this->fundraisingInfo['projectLink']."/".$this->data['URLName']."/donate" ?>
+                                    <?php if ((date('Y-m-d', strtotime($this->fundraisingInfo['EndDate'])) > date('Y-m-d') || $this->fundraisingInfo['EndDate'] == '0000-00-00 00:00:00') && (($this->volunteerInfo['DocumentsSigned'] == 1 && $this->volunteerInfo['IsDeleted'] == 0 && $this->volunteerInfo['IsDenied'] == 0) || $this->volunteerInfo['isActive'] == 1)) { ?>
+                                    	<a class="btnbig orange" style="float:left" href="<?php echo $donate_link ?>">DONATE</a>
+                                    <?php } else { ?>
+										<span style="color:#900; font-size:11px;">Donations are not currently being accepted.</span>
+									<?php } ?>
+                                    <script type="text/javascript">
+                                        Administry.progress("#progress1", <? echo !empty($this->total_donations) ? $this->total_donations : 0 ?>, <? echo $this->DonationGoal['UserDonationGoal'] ?>);
+                                    </script>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="color:#669933; font-size:15px;">
+                                    <?php if ($this->treeInfo['NetworkId'] == "DB04F20F-59FE-468F-8E55-AD75F60FB0CB") { $currency = "US$"; } elseif ($this->treeInfo['NetworkId'] == "547086E0-5456-4631-AB2A-BA781E7DB9A7") { $currency = "&#163;"; } else { $currency = "$"; } ?>
+                                    <div style="width:240px; margin-right:20px; float:left; text-align:center; font-weight:bold">
+                                        <span style="line-height:28px; border-right:2px solid #a5a5a5; padding-right:8px; margin-right:8px;">Goal <?php echo $this->fundraisingInfo['Currency'].number_format($this->DonationGoal['UserDonationGoal']) ?></span>
+                                        <?php //} ?>
+                                        <span style="line-height:28px;">Raised <?php echo $this->fundraisingInfo['Currency'].number_format($this->total_donations) ?></span>
+                                    </div>
+                                    <?php if ((date('Y-m-d', strtotime($this->fundraisingInfo['EndDate'])) > date('Y-m-d') || $this->fundraisingInfo['EndDate'] == '0000-00-00 00:00:00') && (($this->volunteerInfo['DocumentsSigned'] == 1 && $this->volunteerInfo['IsDeleted'] == 0 && $this->volunteerInfo['IsDenied'] == 0) || $this->volunteerInfo['isActive'] == 1)) { ?>
+                                    <div style="float:left">
+                                        <iframe src="http://www.facebook.com/widgets/like.php?href=http://<?php echo $_SERVER['HTTP_HOST'] ?>/<?php echo $this->data['URLName'] ?>/<?php echo $this->fundraisingInfo['projectLink'] ?>&amp;layout=button_count&amp;show_faces=true" scrolling="no" frameborder="0" style="border:none; height:30px; width:100px; margin-top: 5px; float:left"></iframe>
+                                        <!-- Share Button BEGIN -->
+                                        <div class="share" style="float:left">
+                                            <div class="addthis_toolbox addthis_default_style">
+                                                <div style="float:left;">
+                                                    <a class="addthis_button_email"></a>
+                                                    <a class="addthis_button_facebook"></a>
+                                                    <a class="addthis_button_twitter"></a>
+                                                </div>
+                                            </div>
+                                            <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4e319b9362855da9"></script>
+                                        </div>
+                                        <!-- Share Button END -->
+                                    </div>
+									<?php } ?>
+                                </td>
+                            </tr>
+                            <?php if ($this->owner && date('Y-m-d', strtotime($this->fundraisingInfo['EndDate'])) > date('Y-m-d')) { ?>
+                            <tr>
+                                <td>
+                                    <div style="margin-top:-10px; width: 240px; margin-right: 20px; float: left; text-align:center">
+                                        <a href="javascript:;" class="editgoal" > Edit Donation Goal >></a>
+                                        <div class="toggle_container" style="display:none;" >
+                                            <div style="margin-top:7px">
+                                                <span style="color:#F00;">Minimum Allowed: <?php echo $this->fundraisingInfo['Currency'].$this->fundraisingInfo['VolunteerMinimumGoal'] ?></span>
+                                                <form id="new_goal_form" method="post" onsubmit="newGoal($('#new_goal_form'),<?php echo $this->DonationGoal['UserDonationGoal'] ?>); return false;">
+                                                    <input type="hidden" id="VolunteerId" name="VolunteerId" value="<?php echo $this->DonationGoal['VolunteerId'] ?>" />
+                                                    <input type="hidden" id="MinimumGoal" value="<?php echo $this->fundraisingInfo['VolunteerMinimumGoal'] ?>" />
+                                                    <input type="text" id="DonationGoal" name="DonationGoal" title="New Goal should be higher than the original donation goal" style="width:45px" value="<?php echo $this->DonationGoal['UserDonationGoal'] ?>" />
+                                                    <a href="javascript:;" id="submit-form" class="btnok" onclick="newGoal($('#new_goal_form'),<?php echo $this->DonationGoal['UserDonationGoal'] ?>);" title="Save">Save</a>
+                                                    <input type="submit" style="display: none" />
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php } ?>
+
+			   </table>
+				<?php if(isset($_SESSION['UserId']) && $_SESSION['UserId'] == $this->data['UserId']) { ?>
+					<div style="border:1px solid #dcbd00; background-color:#fff7c8; padding:10px; margin-top:8px;">Hey <?php echo stripslashes($this->data['FirstName']) ?>. This is your personal fundraising page for <?php echo stripslashes($this->fundraisingInfo['Name']) ?>.<br /><br />Use this page to edit your personal message to possible donors, set a custom donation goal, and track your fundraising progress.</div><br />
+				<?php } ?>
+			
+                        <?php } ?>
+
+                        <div id="TabbedPanels1" class="TabbedPanels">
+                            <ul class="TabbedPanelsTabGroup">
+                                <li class="TabbedPanelsTab"><a id="t1" href="/<?php echo $this->data['URLName'] ?>" class="wht">About Me</a></li>
+                                <li class="TabbedPanelsTab NoMarginLT current" ><a id="t2" href="#activities_tab" class="wht">Fundraising Pages</a></li>
+                            </ul>
+
+                            <div class="TabbedPanelsContentGroup">
+                                <div class="TabbedPanelsContent">
+                                    <div class="whiteBox" style="padding:7px; width:1026px;">
+                                        <?php if ($this->list) { ?>
+                                        <h3 id="title" style="margin:0; font-weight:bold; color:#669933; font-size:20px; margin:10px 0px 20px 10px;">Active Fundraising</h3>
+                                        <div id="fundraising-lists" style="float:left">
+                                            <style>
+                                                ul.tabs-01 {
+                                                    margin: 0px 10px;
+                                                    padding: 0;
+                                                    float: left;
+                                                    list-style: none;
+                                                    height: 32px; /*--Set height of tabs--*/
+                                                    border-bottom: 1px solid #999;
+                                                    /* border-left: 1px solid #999; */
+                                                    width: 98%;
+                                                }
+                                                ul.tabs-01 li {
+                                                    float: left;
+                                                    margin: 0;
+                                                    padding: 0;
+                                                    height: 31px; /*--Subtract 1px from the height of the unordered list--*/
+                                                    line-height: 31px; /*--Vertically aligns the text within the tab--*/
+                                                    border: 1px solid #999;
+                                                    margin-bottom: -1px; /*--Pull the list item down 1px--*/
+                                                    overflow: hidden;
+                                                    position: relative;
+                                                    background: #e0e0e0;
+                                                    margin-right:3px
+                                                }
+                                                ul.tabs-01 li a {
+                                                    text-decoration: none;
+                                                    color: #000;
+                                                    display: block;
+                                                    font-size: 1.2em;
+                                                    padding: 0 20px;
+                                                    border: 1px solid #fff; /*--Gives the bevel look with a 1px white border inside the list item--*/
+                                                    outline: none;
+                                                }
+                                                ul.tabs-01 li a:hover {
+                                                    background: #ccc;
+                                                }
+                                                html ul.tabs-01 li.active, html ul.tabs-01 li.active a:hover  { /*--Makes sure that the active tab does not listen to the hover properties--*/
+                                                    background: #fff;
+                                                    border-bottom: 1px solid #fff; /*--Makes the active tab look like it's connected with its content--*/
+                                                }
+                                                .tab_container {
+                                                    /* border: 1px solid #999; */
+                                                    border-top: none;
+                                                    overflow: hidden;
+                                                    clear: both;
+                                                    float: left;
+                                                    width: 98%;
+                                                    background: #fff;
+                                                    margin: 0px 10px;
+                                                }
+                                                .tab_content {
+                                                    padding: 10px 0px;
+                                                }
+                                            </style>
+                                            <ul class="tabs-01">
+                                                <li id="tab-link-1" style="margin-left:5px;" class="active"><a href="#tab1" onclick="toggleCampaigns('active')">Active</a></li>
+                                                <li id="tab-link-2"><a href="#tab2" onclick="toggleCampaigns('inactive')">Inactive</a></li>
+                                            </ul>
+                                            <div class="tab_container">
+                                                <div id="tab1" class="tab_content">
+                                                <?php if (count($this->upcoming_brigades) > 0) { ?>
+                                                    <?php
+                                                        foreach ($this->upcoming_brigades as $brigade) {
+															if($brigade['isFundraising'] == 'Yes' || $brigade['isFundraising'] == 1) {
+                                                            $total_donation = $this->project_donations->getUserProjectDonations($this->data['UserId'], $brigade['ProjectId']);
+															$individual_goal = $this->volunteers_class->getUserDonationGoal($this->data['UserId'], $brigade['ProjectId'], true);
+                                                    ?>
+                                                    <div style="padding:8px 0px; margin:0px 10px; border-bottom:solid 1px #CCCCCC; height:40px">
+                                                        <div class="left_side" style="padding-left:10px; width:650px">
+                                                            <div style="float:left">
+                                                                <a style="font-weight:bold" href="/<?php echo $this->data['URLName'] ?>/<?php echo $brigade['pURLName'] ?>"><?php echo stripslashes($brigade['Name']) ?></a><br>
+                                                                <?php if($brigade['EndDate'] == '0000-00-00 00:00:00') { ?>
+																	No end date.
+																<?php } else { ?>
+																	Ends <?php echo date('M d, Y', strtotime($brigade['EndDate'])) ?><br>
+																<?php } ?>
+                                                            </div>
+                                                        </div>
+                                                        <div class="right_side">
+                                                            <span> Goal: <?php echo number_format($individual_goal)?></span><br>
+                                                            <span> Raised: <?php echo $brigade['Currency'].number_format($total_donation)?></span>
+                                                        </div>
+                                                    </div>
+                                                    <?php } } ?>
+                                                <?php } ?>
+                                                <?php if (count($this->active_campaigns) > 0) { ?>
+                                                    <?php
+                                                        foreach ($this->active_campaigns as $campaign) {
+                                                            $total_donation = $this->project_donations->getUserProjectDonations($this->data['UserId'], $campaign['ProjectId']);
+                                                    ?>
+                                                    <div style="padding:8px 0px; margin:0px 10px; border-bottom:solid 1px #CCCCCC; height:40px">
+                                                        <div class="left_side" style="padding-left:10px; width:650px">
+                                                            <div style="float:left">
+                                                                <a style="font-weight:bold" href="/<?php echo $this->data['URLName'] ?>/<?php echo $campaign['pURLName'] ?>"><?php echo stripslashes($campaign['Name']) ?></a><br>
+                                                                <?php if($campaign['EndDate'] == '0000-00-00 00:00:00') { ?>
+																	No end date.
+																<?php } else { ?>
+																	Ends <?php echo date('M d, Y', strtotime($campaign['EndDate'])) ?><br>
+																<?php } ?>
+                                                            </div>
+                                                        </div>
+                                                        <div class="right_side">
+                                                            <span> Goal: <?php echo number_format($campaign['DonationGoal'])?></span><br>
+                                                            <span> Raised: <?php echo $campaign['Currency'].number_format($total_donation)?></span>
+                                                        </div>
+                                                    </div>
+                                                    <?php } ?>
+                                                <?php } ?>
+                                                    <br><br>
+                                                </div>
+                                                <div id="tab2" class="tab_content" style="display:none">
+                                                <?php if (count($this->past_brigades) > 0) { ?>
+                                                    <?php
+                                                        foreach ($this->past_brigades as $brigade) {
+															if($brigade['isFundraising'] == 'Yes' || $brigade['isFundraising'] == 1) {
+                                                            $total_donation = $this->project_donations->getUserProjectDonations($this->data['UserId'], $brigade['ProjectId']);
+															$individual_goal = $this->volunteers_class->getUserDonationGoal($this->data['UserId'], $brigade['ProjectId'], true);
+                                                    ?>
+                                                    <div style="padding:8px 0px; margin:0px 10px; border-bottom:solid 1px #CCCCCC; height:40px">
+                                                        <div class="left_side" style="padding-left:10px; width:650px">
+                                                            <div style="float:left">
+                                                                <a style="font-weight:bold" href="/<?php echo $this->data['URLName'] ?>/<?php echo $brigade['pURLName'] ?>"><?php echo stripslashes($brigade['Name']) ?></a><br>
+                                                                <?php if($brigade['EndDate'] == '0000-00-00 00:00:00') { ?>
+																	No end date.
+																<?php } else { ?>
+																	Ended <?php echo date('M d, Y', strtotime($brigade['EndDate'])) ?><br>
+																<?php } ?>
+                                                            </div>
+                                                        </div>
+                                                        <div class="right_side">
+                                                            <?php if(number_format($individual_goal)) { ?><span> Goal: <?php echo number_format($individual_goal)?></span><br><?php } ?>
+                                                            <span> Raised: <?php echo $brigade['Currency'].number_format($total_donation)?></span>
+                                                        </div>
+                                                    </div>
+                                                    <?php } } ?>
+                                                <?php } ?>
+                                                <?php if (count($this->inactive_campaigns) > 0) { ?>
+                                                    <?php
+                                                        foreach ($this->inactive_campaigns as $campaign) {
+                                                            $total_donation = $this->project_donations->getUserProjectDonations($this->data['UserId'], $campaign['ProjectId']);
+                                                    ?>
+                                                    <div style="padding:8px 0px; margin:0px 10px; border-bottom:solid 1px #CCCCCC; height:40px">
+                                                        <div class="left_side" style="padding-left:10px; width:650px">
+                                                            <div style="float:left">
+                                                                <a style="font-weight:bold" href="/<?php echo $this->data['URLName'] ?>/<?php echo $campaign['pURLName'] ?>"><?php echo stripslashes($campaign['Name']) ?></a><br>
+                                                                <?php if($campaign['EndDate'] == '0000-00-00 00:00:00') { ?>
+																	No end date.
+																<?php } else { ?>
+																	Ended <?php echo date('M d, Y', strtotime($campaign['EndDate'])) ?><br>
+																<?php }?>
+                                                            </div>
+                                                        </div>
+                                                        <div class="right_side">
+                                                            <?php if(number_format($campaign['DonationGoal'])) { ?><span> Goal: <?php echo number_format($campaign['DonationGoal'])?></span><br><?php } ?>
+                                                            <span> Raised: <?php echo $campaign['Currency'].number_format($total_donation)?></span>
+                                                        </div>
+                                                    </div>
+                                                    <?php } ?>
+                                                <?php } ?>
+                                                    <br><br>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <?php } else { ?>
+                                        <div style="width:1050px; padding:10px; float:left">
+                                            <div style="width:535px; margin-right:70px; float:left;">
+                                                <h3 style="padding-bottom:5px; margin:0 0 10px; font-size:15px; color:#a5a5a5; border-bottom:1px solid #e5e5e5;"><?php if($this->owner){ echo "My"; } else { echo stripslashes($this->data['FirstName'])."'s"; } ?> Message<?php if($this->owner) { ?><span style="float:right; font-size:12px;"><a href="javascript:;" onclick="$('#popup-box').show()">Edit</a></span><?php } ?></h3>
+                    				<?php if (!empty($this->fundraisingmessage)) {
+                    					echo str_replace("\n", '<br>', stripslashes($this->fundraisingmessage['FundraisingMessage']));
+                    				} else {
+                    					echo "Dear Friends,<br><br>Welcome to my project page! Thank you for visiting!<br><br>All contributions are sincerely appreciated and necessary to make this project possible. Every step towards social change helps make a difference! If you are interested in making a donation to this project, simply click on the 'DONATE' button. It's the fastest and most efficient way to contribute and is 100% secure.\n\nThanks again for checking out my page! And feel free to forward this page to anyone you know who might be interesting in donating or volunteering. Let's change the world together!<br><br><span style='float:right'>".(" - ".stripslashes($this->data['FirstName']))."</span>";
+                    				}?>
+                                            </div>
+                                            <div style="width:400px;float:left;">
+                                                <?php
+                                                if ($this->owner) {
+                                                $tools_usage = 35;
+                                                if ($this->volunteerInfo['hasTellFriends']) $tools_usage += 25;
+                                                if ($this->volunteerInfo['hasEditMessage']) $tools_usage += 25;
+                                                if ($this->total_donations >= $this->DonationGoal['UserDonationGoal']) $tools_usage += 15;
+                                                if ($tools_usage < 100) { ?>
+                                                <div class="info-boxes" style="margin:0; width:auto;">
+                                                    <strong>Your personal fundraising campaign is almost complete!</strong>
+                                                    <div class="clear" style="margin-bottom:6px;"></div>
+                                                    <div class="progress_label"></div>
+                                                    <div id="progress4" class="progress full progress-green"><span><b></b></span></div>
+                                                    <script type="text/javascript">
+                                                        Administry.progress("#progress4", <?= intval($tools_usage) ?>, <?= intval(100) ?>);
+                                                    </script>	
+                                                    <div class="clear" style="margin-bottom:6px;"></div>
+                                                    Keep improving your personal fundraising page with<br /> one of the following:<br /><br>
+                                                    <?php if (!$this->volunteerInfo['hasTellFriends']) { ?>
+                                                            - <a href="/<?= $this->data['URLName'] ?>/<?= $this->fundraisingInfo['pURLName'] ?>/tell-firends">Tell Friends</a> (+25%)<br>
+                                                    <?php } ?>
+                                                    <?php if (!$this->volunteerInfo['hasEditMessage']) { ?>
+                                                            - <a onclick="$('#popup-box').show()" href="javascript:;">Personalize your message</a> (+25%)<br>
+                                                    <?php } ?>
+                                                    <?php if ($this->total_donations < $this->DonationGoal['UserDonationGoal']) { ?>
+                                                            - <a href="/<?= $this->fundraisingInfo['pURLName'] ?>/<?= $this->data['URLName'] ?>/donate">Donate</a> (+15%)
+                                                    <?php } ?>
+                                                            </div>
+                                                    <?php } ?>
+                                                    <div class="clear"></div><br /><br />
+                                                <?php } ?>
+                                                <h3 style="padding-bottom:5px; margin:0 0 10px; font-size:15px; color:#a5a5a5; width:100%; border-bottom:1px solid #e5e5e5;">Fundraising for:</h3>
+                                                <a style="font-size:13px; font-weight:bold" href="/<?php echo isset($this->fundraisingInfo['projectLink']) ? $this->fundraisingInfo['projectLink'] : $this->fundraisingInfo['campaignLink'] ?>"><?php echo stripslashes($this->fundraisingInfo['Name']) ?></a><br>
+                                                <div id="divLessContent_desc" style="display:block; margin-top:8px;">
+                                                <?php echo strlen($this->fundraisingInfo['Description']) > 150 ? substr($this->fundraisingInfo['Description'], 0, 150)."..." : $this->fundraisingInfo['Description'] ?>
+                                                <?php if (strlen($this->fundraisingInfo['Description']) > 150) { ?>
+                                                    <a id="ReadMore" href="javascript:;" onclick="$('#divMoreContent_desc').show(); $('#divLessContent_desc').hide();"> Read More</a>
+                                                <?php } ?>
+                                                </div>
+                                                <?php if (strlen($this->fundraisingInfo['Description']) > 150) { ?>
+                                                <div id="divMoreContent_desc" style="display:none; margin-top:8px;">
+                                                    <?php echo $this->fundraisingInfo['Description']?>
+                                                    <a id="ReadFewer" href="javascript:;" onclick="$('#divMoreContent_desc').hide(); $('#divLessContent_desc').show();"> Read Less</a>
+                                                </div>
+                                                <?php } ?>
+                                                <?php if (!empty($this->fundraisingInfo['GroupId'])) { ?>
+                                                <?php if ($this->treeInfo['NetworkId'] != '2A3801E4-203D-11E0-92E6-0025900034B2') { ?><br><div style="font-weight:bold; width:90px; float:left">Organization: </div><div style="float:left"><a href="/<?php echo $this->treeInfo['nURLName'] ?>"><?php echo stripslashes($this->treeInfo['NetworkName']) ?></a></div><?php } ?>
+                                                <br><div style="font-weight:bold; width:90px; float:left">Chapter: </div><div style="float:left"><a href="/<?php echo $this->fundraisingInfo['groupLink'] ?>"><?php echo stripslashes($this->fundraisingInfo['GroupName']) ?></a></div>
+                                                <?php } ?>
+                                            </div>
+                                            <div style="float:left; width:1010px">
+                                                <h3 style="font-size:15px; color:#a5a5a5">My Supporters</h3>
+                                                <div>
+                                                    <table class="table01" cellspacing="0" cellpadding="3" border="0" id="ctl00_ContentPHMain_grdDonationDetails" style="background-color:White;border-color:White;border-width:1px;border-style:None;width:100%;border-collapse:collapse;">
+                                                        <tr style="background-color:White;font-weight:bold;">
+                                                            <th scope="col">Name</th><th scope="col">Date</th><th scope="col">Amount</th><th scope="col">Comment</th>
+                                                        </tr>
+                                                        <?php $total_raised = 0; ?>
+                                                        <?php if (count($this->donationlist)) { ?>
+                                                        <?php foreach ($this->donationlist as $donation) : ?>
+                                                            <?php $total_raised = $total_raised + $donation['DonationAmount']; ?>
+                                                            <tr style="color:Black;background-color:#F7F7F7;border-width:0px;">
+                                                            <td style="width:120px;"><?php if ($donation['SupporterName'] == '' || $donation['isAnonymous']) { echo 'Anonymous'; } else { echo stripslashes($donation['SupporterName']); }?></td>
+                                                            <td style="width:70px;"><?php echo date('M d, Y', strtotime($donation['CreatedOn'])) ?></td>
+                                                            <td style="width:70px;">
+                                                                <span id="lblDonationAmount"><?php echo $donation['DonationAmount'] < 0 ? "-" : "" ?><?php if ($this->treeInfo['NetworkId'] == "DB04F20F-59FE-468F-8E55-AD75F60FB0CB") { echo "US$"; } elseif ($this->treeInfo['NetworkId'] == "547086E0-5456-4631-AB2A-BA781E7DB9A7") { echo "&#163;"; } else { echo "$"; } ?><?php echo number_format(abs($donation['DonationAmount'])) ?></span>
+                                                            </td>
+                                                            <td style="width:200px;">
+                                                                <?php if($donation['TransactionSource'] != "Manual") { ?><span id="lblDonationComments"><?php echo stripslashes($donation['DonationComments']) ?></span><?php } ?>
+                                                            </td>
+                                                        </tr>
+                                                        <?php endforeach; ?>
+                                                        <?php } ?>
+                                                    </table>
+                                                </div>
+                                                <table cellpadding="0" cellspacing="0" border="0" width="100%" class="table01">
+                                                    <tr class="t1st3">
+                                                        <td class="t1st4">Total Raised Online: <span><?php if ($this->treeInfo['NetworkId'] == "DB04F20F-59FE-468F-8E55-AD75F60FB0CB") { echo "US$"; } elseif ($this->treeInfo['NetworkId'] == "547086E0-5456-4631-AB2A-BA781E7DB9A7") { echo "&#163;"; } else { echo "$"; } ?></span> <?php echo $total_raised ?></td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <?php } ?>
+                                    </div>
+                                </div>
+                                <!-- e o SECOND TAB -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </div>
+        <div class="block001f01"><div class="blst001"><div class="blst002"></div></div>
+        </div>
+    </div>

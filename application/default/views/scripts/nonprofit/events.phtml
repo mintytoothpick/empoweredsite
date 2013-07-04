@@ -1,0 +1,151 @@
+<script>
+$(function() {
+    <?php if($this->organization->hasPrograms) { ?>
+    //Program Filter
+    $("#program").change(function(){
+        if ($('#program').val() != 'all') {
+            <? if ($this->organization->hasGroups) { ?>
+            $("#loading").show();
+            $("#group").hide();
+            $("#group").children().remove().end().append($('<option>', { value : 'null' }).text('Select group ...'));
+            <? } ?>
+            $.ajax({
+                url: "<?=($this->organization->hasGroups)?'get-groups':strtolower($this->list).'-events'?>",
+                <? if($this->organization->hasGroups) { ?>dataType: 'json',<? } ?>
+                data: 'ProgramId=' + $('#program').val() + '&filter=true',
+                success: function(data) {
+                    <? if ($this->organization->hasGroups) { ?>
+                    $("#group").show();
+                    for (i=0;i<data.length;i++) {
+                        $("#group").append($('<option value="'+data[i].GroupId+'">').text(data[i].GroupName));
+                    }
+                    $("#loading").hide();
+                    <? }?>
+                }
+            });
+        } else {
+            <? if ($this->organization->hasGroups) { ?>
+            $("#group").hide();
+            $("#group").children().remove();
+            <? } ?>
+            filter(false);
+        }
+    });
+    <? } ?>
+
+    //Group Filter
+    <? if ($this->organization->hasGroups) { ?>
+    $("#group").change(function(){
+        filter(false);
+    });
+    <? } ?>
+
+    <? if (isset($this->filter)) { ?>
+        capturePaginators();
+    <? } ?>
+});
+
+function capturePaginators() {
+    $('.paginator').click(function(event) {
+        event.preventDefault();
+        filter($(this).attr('href'));
+    });
+}
+
+function filter(url) {
+    var urlParam = url;
+    if (!url) {
+        var urlParam = '<?=strtolower($this->list)?>-events';
+    }
+    var data = 'filter=true';
+    <?php if($this->organization->hasPrograms) { ?>
+    if ($('#program').val() != 'all') {
+        data += '&ProgramId=' + $('#program').val();
+    <? } ?>
+        <? if ($this->organization->hasGroups) { ?>
+        if ($('#group').val() != 'null') {
+            data += '&GroupId=' + $('#group').val();
+        }
+        <? } ?>
+    <?php if($this->organization->hasPrograms) { ?>
+    }
+    <? } ?>
+
+    if ($('#searchFilter').val() != '') {
+        data += '&searchFilter=' + $('#searchFilter').val();
+    }
+    $("#contentData").html('Loading content ...');
+    $.ajax({
+        url: urlParam,
+        data:  data,
+        success: function(data) {
+            $("#contentData").html(data);
+            capturePaginators();
+        }
+    });
+
+    return false;
+}
+</script>
+
+<div class="wrapper">
+   <!-- org header -->
+  <?php echo $this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+  <div class="BodyCon">
+    <!-- breadcrumb -->
+    <?php echo $this->placeholder('breadcrumb') ?>
+    <!-- // breadcrumb -->
+    <div class="clr"></div>
+    <!-- tabs -->
+    <?php echo $this->placeholder('tabs') ?>
+    <!-- // tabs -->
+
+    <div class="mainC">
+      <div class="searchInternalBox">
+        <form id="searchMembers" action="" method="post" onsubmit="return filter();">
+          <input name="searchFilter" id="searchFilter" type="text" class="textField01" value="<?=$this->searchtext?>" />
+        </form>
+      </div>
+      <?php if (count($this->paginator)) { ?>
+      <? if ($this->organization->hasPrograms || $this->organization->hasGroups) { ?>
+      <div class="internalFilter">
+        <strong>Filter By</strong>
+        <? if ($this->organization->hasPrograms) { ?>
+        <select name="program" class="textfield" id="program">
+          <option value="all">Program: All</option>
+          <? foreach($this->organization->programs as $program) { ?>
+          <option value="<?=$program->id?>" <?= isset($this->program) && $this->program->id == $program->id ? 'selected' : ''; ?>>Program: <?=stripslashes($program->name)?></option>
+          <? } ?>
+        </select>
+        <? } ?>
+        <? if ($this->organization->hasGroups) { ?>
+        <select id="group" <? if ($this->organization->hasPrograms) { ?>class="hide"<? } ?>>
+        <? if (!$this->organization->hasPrograms) { ?>
+          <option value="all">Group: All</option>
+          <? foreach($this->organization->groups as $group) { ?>
+          <option value="<?=$group->id?>" <?= isset($this->group) && $this->group->id == $group->id ? 'selected' : ''; ?>>Group: <?=stripslashes($group->name)?></option>
+          <? } ?>
+        <? } ?>
+        </select><? if ($this->organization->hasPrograms) { ?><span id="loading" class="hide">Loading groups ...</span><? } ?>
+        <? } ?>
+      </div>
+      <? } ?>
+      <? } ?>
+      <div class="box05">
+        <div class="headingStyle02 rounded">
+            <?= $this->list ?> Events (<?=$this->countRes?>)
+            <span class="titleTab noMR"><a href="/<?= isset($this->program) ? $this->program->urlName : $this->organization->urlName ?>/past-events">Past</a></span>
+            <span class="titleTab noMR"><a href="/<?= isset($this->program) ? $this->program->urlName : $this->organization->urlName ?>/upcoming-events">Upcoming</a></span>
+        </div>
+        <div id="contentData">
+            <!-- content by default or by ajax -->
+            <?php echo $this->render('nonprofit/tabscontent/events.phtml'); ?>
+        </div>
+      </div>
+    </div>
+  <div class="clr"></div>
+  <div class="clr"></div>
+</div>

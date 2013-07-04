@@ -1,0 +1,105 @@
+body {padding:12px; margin:0; font-family:Arial, Helvetica, sans-serif; color:#000; background:#fff; font-size:13px}
+
+h1, h2, h3 , h5, h6 {margin:0; font-family:Georgia, Helvetica, sans-serif;}
+h1 { font-size:35px; line-height:37px; color:#669933; font-weight:normal; padding:0 0 20px 0}
+h2 { font-size:20px; line-height:22px; font-weight:normal; padding:20px 0 5px 0}
+h3 { font-size:13px; line-height:15px; font-weight:bold; padding:20px 0 5px 0; font-family:Arial, Helvetica, sans-serif;}
+h4 { font-size:14px; line-height:16px; font-weight:normal; padding:0; margin:0}
+h5 { font-size:14px; line-height:16px; padding:0; margin:12px 0 6px 12px}
+
+
+ul { margin:0; padding:0; list-style:none}
+ul li { margin:0; padding:0 0 0 12px; background:url(../Images/Bul/004.gif) 0 4px no-repeat }
+
+img {border:0}
+
+a:link, a:visited {color:#3366ff}
+a:hover {color:#f23a39}
+
+p {margin:0; padding:0 0 12px 0}
+
+.txt01 {font-size:12px; padding:7px 0 1px 0}
+.txt01 select {margin:0 5px}
+.txt02 {color:#999999}
+.txt03 {width:auto;float:left;padding-right:10px;font-size:12px;color:#999999}
+
+
+form {margin:0; padding:0}
+input, select, textarea {font-family:Arial, Helvetica, sans-serif}
+input.inp001 { width:700px} 
+textarea.inp001 { width:700px} 
+
+table tr th {color:#fff; font-weight:bold; background:#333; text-align:left; padding:5px; border-bottom:1px solid #fff}
+
+table tr.row001 td {background:#fff;}
+
+
+table.tab001 {border-right:1px solid #e5e5e5;}
+table.tab001 tr th {color:#fff; font-weight:bold; background:#333; text-align:left; padding:5px; border-right:1px solid #333; border-bottom:1px solid #333 }
+table.tab001 tr td {color:#000; padding:7px; background:#fff; border-left:1px solid #e5e5e5; border-bottom:1px solid #e5e5e5; }
+table.tab001 tr td input.inp002 { width:95%}
+
+
+.but001 { height:21px; margin:20px 0 30px 0 }
+.but001 .bst01 { float:left; background:url(../Images/button/001.gif) no-repeat; font-size:12px; text-transform:uppercase; line-height:14px;}
+.but001 .bst01  a { display:block; background:url(../Images/button/002.gif) 100% 0 no-repeat; color:#fff; padding:3px 21px }
+.but001 .bst01  a:link, .but001 .bst01  a:visited {color:#fff; text-decoration:none; font-weight:bold}
+.but001 .bst01  a:hover {text-decoration:underline}
+.but001 .bst01 input { display:block; background:url(../Images/button/002.gif) 100% 0 no-repeat; color:#fff; border:0; color:#fff; text-decoration:none; font-weight:bold; vertical-align:middle; min-height:20px; font-size:12px; text-transform:uppercase; line-height:14px; padding:2px 21px 4px; cursor:pointer  }
+.but001 .bst01 input:hover {text-decoration:underline}
+
+.but001 .bst02 { float:left; background:url(../Images/button/003.gif) no-repeat; font-size:12px; text-transform:uppercase; line-height:14px; }
+.but001 .bst02  a { display:block; background:url(../Images/button/004.gif) 100% 0 no-repeat; color:#fff; padding:3px 21px }
+.but001 .bst02  a:link, .but001 .bst02  a:visited {color:#fff; text-decoration:none; font-weight:bold}
+.but001 .bst02  a:hover {text-decoration:underline}
+.but001 .bst02 input { display:block; background:url(../Images/button/004.gif) 100% 0 no-repeat; color:#fff; border:0; color:#fff; text-decoration:none; font-weight:bold; vertical-align:middle; min-height:20px; font-size:12px; text-transform:uppercase; line-height:14px; padding:2px 21px 4px; cursor:pointer  }
+.but001 .bst02 input:hover {text-decoration:underline}
+
+/* */
+
+.but002 { height:21px; margin:4px 0 0 0; float:right }
+.but002 .bst01 {  background:url(../Images/button/001.gif) no-repeat; font-size:12px; text-transform:uppercase; line-height:14px}
+.but002 .bst01  a { display:block; background:url(../Images/button/002.gif) 100% 0 no-repeat; color:#fff; padding:3px 21px }
+.but002 .bst01  a:link, .but002 .bst01  a:visited {color:#fff; text-decoration:none; font-weight:bold}
+.but002 .bst01  a:hover {text-decoration:underline}
+.but002 .bst01 input { display:block; background:url(../Images/button/002.gif) 100% 0 no-repeat; color:#fff; border:0; color:#fff; text-decoration:none; font-weight:bold; vertical-align:middle; min-height:20px; font-size:12px; text-transform:uppercase; line-height:14px; padding:2px 21px 4px; cursor:pointer  }
+.but002 .bst01 input:hover {text-decoration:underline}
+
+.but002 .bst02 { float:left; background:url(../Images/button/003.gif) no-repeat; font-size:12px; text-transform:uppercase; line-height:14px; margin-right:12px  }
+.but002 .bst02  a { display:block; background:url(../Images/button/004.gif) 100% 0 no-repeat; color:#fff; padding:3px 21px }
+.but002 .bst02  a:link, .but002 .bst02  a:visited {color:#fff; text-decoration:none; font-weight:bold}
+.but002 .bst02  a:hover {text-decoration:underline}
+.but002 .bst02 input { display:block; background:url(../Images/button/004.gif) 100% 0 no-repeat; color:#fff; border:0; color:#fff; text-decoration:none; font-weight:bold; vertical-align:middle; min-height:20px; font-size:12px; text-transform:uppercase; line-height:14px; padding:2px 21px 4px; cursor:pointer  }
+.but002 .bst02 input:hover {text-decoration:underline}
+
+/* */
+
+.but003 { height:21px; margin:0 0 0 0; }
+.but003 .bst01 {  float:right; background:url(../Images/button/001.gif) no-repeat; font-size:12px; text-transform:uppercase; line-height:14px}
+.but003 .bst01  a { display:block; background:url(../Images/button/002.gif) 100% 0 no-repeat; color:#fff; padding:3px 21px }
+.but003 .bst01  a:link, .but003 .bst01  a:visited {color:#fff; text-decoration:none; font-weight:bold}
+.but003 .bst01  a:hover {text-decoration:underline}
+.but003 .bst01 input { display:block; background:url(../Images/button/002.gif) 100% 0 no-repeat; color:#fff; border:0; color:#fff; text-decoration:none; font-weight:bold; vertical-align:middle; min-height:20px; font-size:12px; text-transform:uppercase; line-height:14px; padding:2px 21px 4px; cursor:pointer  }
+.but003 .bst01 input:hover {text-decoration:underline}
+
+.but003 .bst02 { float:left; background:url(../Images/button/003.gif) no-repeat; font-size:12px; text-transform:uppercase; line-height:14px; margin-right:12px  }
+.but003 .bst02  a { display:block; background:url(../Images/button/004.gif) 100% 0 no-repeat; color:#fff; padding:3px 21px }
+.but003 .bst02  a:link, .but003 .bst02  a:visited {color:#fff; text-decoration:none; font-weight:bold}
+.but003 .bst02  a:hover {text-decoration:underline}
+.but003 .bst02 input { display:block; background:url(../Images/button/004.gif) 100% 0 no-repeat; color:#fff; border:0; color:#fff; text-decoration:none; font-weight:bold; vertical-align:middle; min-height:20px; font-size:12px; text-transform:uppercase; line-height:14px; padding:2px 21px 4px; cursor:pointer  }
+.but003 .bst02 input:hover {text-decoration:underline}
+
+
+.date { padding:7px 0 0 0}
+.date  input { width:68px; padding:2px 3px}
+.date  img { margin:1px 12px 0 0; vertical-align:top; cursor:pointer}
+
+.box001 { float:left; width:352px; padding:7px 0}
+
+.inv001 { position:relative}
+.inv001 img { position:absolute; top:-5px; left:12px; display:none}
+
+.clear { clear:both; height:1px; overflow:hidden; }
+.divError {  width:250px; height:auto; color:Red; background-color:Silver}
+
+.test01 {color:Red; vertical-align:top; font-size:x-large; font-weight:600;}

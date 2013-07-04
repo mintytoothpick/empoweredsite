@@ -1,0 +1,48 @@
+<?php
+$this->headTitle("Empowered.org:  Empowering groups of volunteers to create social change");
+?>
+<?php
+/**
+ * Remove https for other links.
+ */
+if (Zend_Registry::get('configuration')->bluepay->ssl) { ?>
+<script>
+<!--
+$(function() {
+    $("a").each(function (i,v) {
+        if ($(this).attr('href') && $(this).attr('href').indexOf('http:') == -1) {
+            $(this).attr('href', 'http://' + document.location.hostname + $(this).attr('href'));
+        }
+    });
+});
+-->
+</script>
+<?php } ?>
+<div id="mainco2">
+    <!-- block001 -->
+    <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+    <div class="block001">
+        <div class="blst001">
+            <div class="blst002 hsp">
+                <?php if (!$this->error) { ?>
+                <h2>Donation Confirmed</h2>
+                <p style="font-size:15px">
+                    <?php echo $this->message ?>
+                </p>
+                <div class="clear"></div>
+                <?php } else { ?>
+                <h2>GetExpressCheckoutDetails API call failed.</h2>
+                <p style="font-size:15px">
+                    <?php // echo $this->error_code ?>
+                    <?php // echo $this->short_msg ?>
+                    <?php echo $this->long_msg ?>
+                </p>
+                <?php } ?>
+                <br><br>
+                <a class="btn btngreen" href="/donation/<?php echo $this->ProjectId ?>">Back</a>
+            </div>
+        </div>
+    </div>
+    <div class="block001f01"><div class="blst001"><div class="blst002"></div></div></div>
+    <!-- e o block001 -->
+</div>

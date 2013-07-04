@@ -1,0 +1,80 @@
+<div class="wrapper">
+   <!-- org header -->
+  <?=$this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+
+    <!-- breadcrumb -->
+    <?=$this->placeholder('breadcrumb') ?>
+    <!-- // breadcrumb -->
+    <div class="clr"></div>
+
+    <!-- tabs -->
+    <?=$this->placeholder('tabs') ?>
+    <!-- // tabs -->
+
+    <div class="mainC">
+      <div class="box05">
+        <div class="headingStyle02">
+            <?=$this->organization->name?> - Membership Funds Transfers
+        </div>
+        <div class="tab-container">
+
+            <table cellpadding="5" cellspacing="0" width="100%">
+                <tr>
+                    <td colspan="10" class="donation_tablehead">
+                        <div class="donation_navpage"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="do_col1">Chapter</td>
+                    <td class="do_col2">Initiative Destination</td>
+                    <td class="do_col2" align="center" width="120">Amount Transfered</td>
+                    <td class="do_col3" align="center" width="60">&nbsp;</td>
+                </tr>
+                <?php
+                if (count($this->funds) > 0) { foreach ($this->funds as $fund) {?>
+                <tr>
+                    <td class="xdo_col1"><a href="/<?=$fund->group->urlName ?>" target="_blank"><?=stripslashes($fund->group->name) ?></a></td>
+                    <td class="xdo_col2"><a href="/<?=$fund->project->urlName ?>" target="_blank"><?=stripslashes($fund->project->name) ?></a></td>
+                    <td class="xdo_col2" align="right"><?=$fund->group->currency?><?= number_format($fund->amount,2) ?></td>
+                    <td class="xdo_col3"><a href="javascript:;" onclick="$('#details_<?=$fund->id?>').toggle();">[details]</a></td>
+                </tr>
+                <tr class="hide" id="details_<?=$fund->id?>" cellpadding="0" cellspacing="0" bgcolor="#FFF">
+                    <td class="xdo_col1 xdo_col3" colspan="4" cellpadding="0" cellspacing="0">
+                        <? if (count($fund->transfers) > 0) { ?>
+                        <table width="100%" style="margin:0;" border="0">
+                            <tr>
+                                <td width="160" align="center"><b>Transfer Date</b></td>
+                                <td align="center"><b>Transfer Amount</b></td>
+                                <td width="150" align="center"><b>Made By</b></td>
+                            </tr>
+                            <? foreach ($fund->transfers as $trans) { ?>
+                            <tr>
+                                <td  align="center"><?=$trans->createdOn?></td>
+                                <td align="center"><?=$fund->group->currency?><?=number_format($trans->amount,2)?></td>
+                                <td align="center"><?=$trans->createdBy->fullName?></td>
+                            </tr>
+                            <? } ?>
+                        </table>
+                        <? } else { ?>
+                        No transfers details found.
+                        <? } ?>
+                    </td>
+                </tr>
+                <?php } } else { ?>
+                <tr><td class="xdo_col1 xdo_col3" colspan="4" align="center"><b>&nbsp;No records found.</b></td></tr>
+                <?php } ?>
+            </table>
+            <?= $this->paginationControl($this->funds, 'Sliding', 'nonprofit/new_page_selector.phtml', array('param' => 'page')); ?>
+            <br /><br />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="clr"></div>
+  <div class="clr"></div>
+</div>

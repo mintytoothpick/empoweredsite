@@ -1,0 +1,147 @@
+<?php $this->placeholder('giftaid')->captureStart() ?>
+<?php if (isset($this->organization) && $this->organization->hasGiftAid()) { ?>
+<style>label.error { color:red; margin-top: 5px; display: block;}</style>
+<script>
+$(function() {
+
+});
+var validator;
+function giftAid() {
+    if (!validateForm(false)) return;
+
+    $.fancybox($("#giftAidFrm").html(),
+    {
+        width: 800,
+        height: 700,
+        autoDimensions: false,
+        centerOnScroll: false,
+        scrolling: 'yes',
+        onComplete: function() {
+            validator = $("#fancybox-content form").validate({
+                onfocusout: function(element) { this.element(element); },
+                submitHandler: function(form) {
+                    $.post(
+                        "/<?=$this->project->urlName?>/gift-aid",
+                        $("#fancybox-content form").serialize(),
+                        function(data) {
+                            if (data['status'] == 'ok') {
+                                $("#giftAidId").val(data['id']);
+                                $.fancybox.close();
+                                $("#BB_BuyButtonForm").submit();
+                            }
+                        },
+                        'json'
+                    );
+                }
+            });
+        }
+    });
+
+
+
+
+}
+
+function submitGiftAid() {
+    $("#fancybox-content form").submit();
+}
+
+function skipGiftAid() {
+    $.fancybox.close();
+    $("#BB_BuyButtonForm").submit();
+}
+
+</script>
+<div id="giftAidFrm" class="hide">
+
+<H2>Gift Aid Declaration</H2>
+Are you a UK taxpayer? If so, <strong>you can make your contribution worth more at no extra cost</strong> and
+have Gift Aid funds support the year-round health and sustainable development initiatives in our
+communities.<br /><br />
+
+If you would like to increase the value of your support to Global Brigades UK, simply electronically
+sign the box below indicating you agree to Gift Aid’s terms and will allow Global Brigades UK to
+claim the tax back on your donations for the purposes of sustainable development work. If all
+donors opt into this for 2012, Global Brigades UK will be able to budget more than £50,000 for
+community projects in Ghana, Hondruas and Panama. We appreciate your support!
+
+
+<div id = "error_div" class="box box-error" style="display:none"></div>
+
+<form name="survey_form" id="survey_form">
+    <fieldset>
+        <legend>Personal Declaration</legend>
+        <input type="checkbox" id="GBAccept" name="GBAccept" /> I wish Global Brigades UK to claim Gift Aid on my donations. I
+        confirm that I am a UK tax payer and have paid income and/
+        or capital gains tax at least equal to the tax to be reclaimed in
+        this tax year by Global Brigades UK. I agree that Gift Aid can be
+        claimed on all donations that I have made in the last four tax
+        years, and all donations that I will make from this date until
+        notified otherwise.
+        <table class="no-style">
+            <tr>
+                <td style="width:180px"><label for="salutation">Salutation:</label></td>
+                <td><input name="salutation" type="text" id="salutation" value="" class="required" /></td>
+            </tr>
+            <tr>
+                <td><label for="first_name">First Name:</label></td>
+                <td><input name="first_name" type="text" id="first_name" value="" class="required" /></td>
+            </tr>
+            <tr>
+                <td><label for="last_name">Last Name:</label></td>
+                <td><input name="last_name" type="text" id="last_name" value="" class="required" /></td>
+            </tr>
+            <tr>
+                <td><label for="address">Mailing Address:</label></td>
+                <td><input name="address" type="text" id="address" value="" class="required" /></td>
+            </tr>
+            <tr>
+                <td><label for="email">Email Address:</label></td>
+                <td><input name="email" type="text" id="email" value="" class="required email" /></td>
+            </tr>
+            <tr>
+                <td><label for="phone">Phone Number:</label></td>
+                <td><input name="phone" type="text" id="phone" value="" class="required" /></td>
+            </tr>
+            <tr>
+                <p><input type="checkbox" value="false" id="family" name="family"/>I am not an immediate family member of the brigader.</p><br />
+            </tr>
+        </table>
+
+    </fieldset>
+
+    <div>
+        <a class="btn btngreen" href="javascript:;" onclick="skipGiftAid();">Skip</a>
+        <input type="button" class="btn btngreen" onclick="submitGiftAid(); return false" value="Submit"/>
+    </div>
+</form>
+<div class="spacer"></div>
+
+N.B. You must pay an amount of income tax and/or capital gains tax in each tax year (6 April one
+year to 5 April the next) at least equal to the tax that Global Brigades UK will reclaim from the
+HMRC on your gift aid donations (currently 25p for every £1 you give).<br /><br />
+
+<strong>Notes:</strong><br />
+1. Gift Aid works by allowing charities to reclaim tax on a donation’s ‘gross’ equivalent (its value before tax was
+deducted) at the basic rate. Basic rate tax is currently 20%, which allows charities to reclaim 25 pence on the
+pound plus a transitional relief of 3 pence on the pound granted by HMRC until 2011.<br /><br />
+
+2. Higher rate tax payers can claim back the difference between basic rate and higher rate tax. If you pay tax at the
+higher rate, you can claim this further tax relief via your Self Assessment tax return. Donors who complete a Self
+Assessment tax return will have the option to gift back the higher rate element of the tax relief to MSF. Simply fill
+in our Charity Code: HAL18QG in box 19a of the Full SA tax return form or section 12 on the Short SA tax return.
+Donors who do not complete a Self Assessment tax return can call their tax office and have the higher rate relief
+reflected in their PAYE tax code.<br /><br />
+
+3. If you do not pay tax, you should not use Gift Aid.<br /><br />
+
+4. If your circumstances change and you no longer pay enough income or capital gains tax to cover the
+amount claimed by MSF, you can cancel your declaration by notifying the Global Brigades Fundraising team at
+(admin@globalbrigades.org). Your declaration will then not apply to donations you make on or after the date of
+cancellation or such later date as you specify.<br /><br />
+
+5. Gift Aid declarations must be made in a single name and require a full residential address.<br /><br />
+
+</div>
+<?php } ?>
+<?php $this->placeholder('giftaid')->captureEnd() ?>

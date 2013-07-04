@@ -1,0 +1,88 @@
+<?php if($this->organization->programs) { ?>
+<script>
+$(function() {
+    //Program Filter
+    $("#program").change(function(){
+        filter(false);
+    });
+
+    <? if (isset($this->filter)) { ?>
+        capturePaginators();
+    <? } ?>
+});
+
+function capturePaginators() {
+    $('.paginator').click(function(event) {
+        event.preventDefault();
+        filter($(this).attr('href'));
+    });
+}
+
+function filter(url) {
+    var urlParam = url;
+    if (!url) {
+        var urlParam = 'chapters';
+    }
+    var data = 'filter=true';
+    if ($('#program').val() != 'all') {
+        data += '&ProgramId=' + $('#program').val();
+    }
+    if ($('#searchFilter').val() != '') {
+        data += '&searchFilter=' + $('#searchFilter').val();
+    }
+    $("#contentData").html('Loading content ...');
+    $.ajax({
+        url: urlParam,
+        data:  data,
+        success: function(data) {
+            $("#contentData").html(data);
+            capturePaginators();
+        }
+    });
+    return false;
+}
+</script>
+<? } ?>
+
+<div class="wrapper">
+   <!-- org header -->
+  <?php echo $this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="BodyCon">
+
+    <!-- breadcrumb -->
+    <?php echo $this->placeholder('breadcrumb') ?>
+    <!-- // breadcrumb -->
+    <div class="clr"></div>
+
+    <!-- tabs -->
+    <?php echo $this->placeholder('tabs') ?>
+    <!-- // tabs -->
+
+    <div class="mainC">
+      <div class="searchInternalBox">
+        <form id="searchMembers" action="/<?=$this->organization->urlName?>/chapters" method="post" onsubmit="return filter();">
+          <input name="searchFilter" id="searchFilter" type="text" class="textField01" value="<?=$this->searchtext?>" />
+        </form>
+      </div>
+      <? if(count($this->organization->programs) && !isset($this->program->id) ) { ?>
+      <div class="internalFilter">
+        <strong>Filter By </strong>
+        <select name="program" class="textfield" id="program">
+          <option value="all">Program: All</option>
+          <? foreach($this->organization->programs as $program) { ?>
+          <option value="<?=$program->id?>" <?php echo isset($this->program->id) && $this->program->id == $program->id ? 'selected' : ''; ?>>Program: <?=stripslashes($program->name)?></option>
+          <? } ?>
+        </select>
+      </div>
+      <? } ?>
+
+      <div class="box05" id="contentData">
+        <!-- content by default or by ajax -->
+        <?php echo $this->render('nonprofit/tabscontent/groups.phtml'); ?>
+      </div>
+    </div>
+  <div class="clr"></div>
+  <div class="clr"></div>
+</div>

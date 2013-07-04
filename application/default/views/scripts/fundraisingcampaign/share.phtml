@@ -1,0 +1,84 @@
+<?php $this->headTitle("Empowered.org - ".$this->campaignInfo['Name']); ?>
+<script type="text/javascript">
+    function share() {
+        var checked = false;
+        $('#at_msg').val($('#share-content').val());
+        if (document.getElementById('fb-share').checked == true) {
+            $('#share-fb').click();
+            checked = true;
+        }
+        if (document.getElementById('email-share').checked == true) {
+            $('.addthis_button_email').click();
+            $('#at_msg').val($('#share-content').val());
+            checked = true;
+        }
+        if (!checked) {
+            alert('Please select Facebook and or email to share your post.')
+            return false;
+        } else {
+            $.post('/fundraisingcampaign/share', {ProjectId: '<?php echo $this->campaignInfo['ProjectId'] ?>'}, function() {
+                $('#current-links').hide();
+                $('#continue-links').show();
+            });
+        }
+        return false;
+    }
+    $(function(){
+        $('#at16ptx').click(function() {
+            if ($('#at_success').html().search('Message sent!') > 0) {
+                window.location.href = "/<?php echo $this->campaignInfo['pURLName'] ?>";
+            }
+        })
+        var addthis_share = { email_vars: { notes: $('#share-content').val() } }
+    })
+    
+</script>
+<div class="wrapper">
+   <!-- org header -->
+  <?=$this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+
+    <?php if (isset($this->group)) { ?>
+      
+      <!-- breadcrumb -->
+      <?=$this->placeholder('breadcrumb') ?>
+      <!-- // breadcrumb -->
+      <div class="clr"></div>
+
+      <!-- tabs -->
+      <?=$this->placeholder('tabs') ?>
+      <!-- // tabs -->
+
+    <?php } else {
+      include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/profileheader.php'; 
+    } ?>
+    <div class="mainC">
+      <div class="box05">
+        <div class="headingStyle02">Get the word out!</div>
+        <div class="programBox02">
+        <?php if(isset($this->newcampaign)) { ?>
+        <h2 style="font-size:14px">
+            <div style="color:#A9A9A9; width:19%; float:left">Step 1. Activity Details</div>
+            <div style="color:#A9A9A9; width:19%; float:left">Step 2. Add Volunteers</div>
+            <div style="color:#669933; width:19%; float:left">Step 3. Spread the Word</div>
+            <div class="clear"></div>
+        </h2>
+        <?php } ?>
+
+        <?php $this->shareUrl = 'http://'.$_SERVER['HTTP_HOST'] . "/" . $this->campaignInfo['pURLName'] ?>
+        <?php $this->type = "Campaing"?>
+        <?php $this->message = 'I just created a fundraising campaign. Donate and spread the word! ' . $this->shareUrl   ?>
+        <?php echo $this->render("common/share.phtml")?>
+        
+        </div>
+        <div class="clear"></div>
+        </div>
+    </div>
+</div>
+<div class="clr"></div>
+<div class="clr"></div>
+</div></div>

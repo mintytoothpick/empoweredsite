@@ -1,0 +1,43 @@
+<?php $this->headTitle("Empowered.org - Share Your Activity"); ?>
+<div class="wrapper">
+	<!-- org header -->
+	<?=$this->placeholder('header') ?>
+	<!-- // org header -->
+
+	<div class="BodyCon">
+
+		<?php if(isset($this->getstarted)) { ?>
+			<h2 style="font-size:14px; margin-left:35px;">
+                <div style="color:#A9A9A9; width:21%; float:left">Step 1. Structure & Details</div>
+                <div style="color:#A9A9A9; width:18%; float:left">Step 2. Add Admins</div>
+                <div style="color:#A9A9A9; width:19%; float:left">Step 3. Add Members</div>
+                <div style="color:#A9A9A9; width:23%; float:left">Step 4. Activate Fundraising</div>
+                <div style="color:#669933; width:19%; float:left">Step 5. Spread the Word</div>
+				<div class="clear"></div>
+			</h2>
+		<?php } else { ?>
+			<!-- breadcrumb -->
+			<?=$this->placeholder('breadcrumb') ?>
+			<!-- // breadcrumb -->
+			<div class="clr"></div>
+
+			<!-- tabs -->
+			<?=$this->placeholder('tabs') ?>
+			<!-- // tabs -->
+		<?php } ?>
+
+		<div class="mainC">
+			<div class="box05">
+				<div class="headingStyle02">Get the word out!</div>
+				<div class="programBox02">
+				<?php $this->shareUrl = 'http://'.$_SERVER['HTTP_HOST'] . "/" .$this->organization->urlName ?>
+				<?php $this->type = "organization" ?>
+				<?php $this->message = 'I just set up '. $this->organization->name. " on empowered.org. Let's get going and change the world! " . $this->shareUrl ?>
+				<?php echo $this->render("common/share.phtml")?>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="clr"></div>
+	<div class="clr"></div>
+</div>

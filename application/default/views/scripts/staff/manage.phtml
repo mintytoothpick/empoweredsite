@@ -1,0 +1,148 @@
+<?php $this->headTitle("Empowered.org : world's largest student-led global health and sustainable development organization"); ?>
+<script type='text/javascript' src='<?php echo $this->contentLocation ?>public/js/CalendarControl.js'></script>
+<link rel="stylesheet" href="<?php echo $this->contentLocation ?>public/css/CalendarControl.css" type="text/css" media="screen" />
+<script type="text/javascript" language="javascript">
+    function searchMembers() {
+        if(jQuery.trim($('#search_text').val()) != "") {
+            $('#search-results').load("/staff/searchmembers", {SiteId: $('#SiteId').val(), Level: $('#Level').val(), search_text: jQuery.trim($('#search_text').val())}).show();
+        } else {
+            alert("Please enter member's name or email.");
+        }
+        return false;
+    }
+
+    function toggle(id) {
+        $('.add_staff').each(function() {
+            $('.add_staff').children('div').hide();
+            $('.add_staff').children('a').show();
+        })
+        $('#div_'+id).show();
+        $('#a_'+id).hide();
+    }
+
+    function addTitle(id) {
+        if (jQuery.trim($('#title_'+id).val()) != '') {
+            $.post("/staff/add", {SiteId: $('#SiteId').val(), UserId: id, Title: jQuery.trim($('#title_'+id).val())});
+            alert("You have successfully added a <?php echo strtolower($this->Level) ?> leader.")
+            window.location = "/staff/manage/"+$('#SiteId').val()+"/"+$('#Level').val();
+        } else {
+            alert("Please specify a title for this group leader.");
+        }
+    }
+
+    function editTitle(id) {
+        var title = jQuery.trim($('#title_'+id).val());
+        if (title != "") {
+            $.post("/staff/edit", {ID: id, Title: title});
+            alert("You have successfully updated a group leader's title.")
+            window.location = "/staff/manage/"+$('#SiteId').val()+"/"+$('#Level').val();
+        } else {
+            alert("Please specify a title for this group leader.");
+        }
+    }
+
+    function deleteStaffs() {
+        var deleted = 0;
+        $('#site-staffs-list tr td input[type=checkbox]').each(function(){
+            var chkbox = $(this).attr('id');
+            if (document.getElementById(chkbox).checked == true) {
+                deleted++;
+            }
+        })
+        if (deleted > 0) {
+            return true;
+        } else {
+            alert("Please select a record(s) to be deleted.")
+            return false;
+        }
+    }
+</script>
+<style type="text/css">
+    .tblHeader {
+        color:#F7F7F7;
+        background-color:#000;
+        font-weight:bold;
+    }
+    .tblHeader th {
+        text-align:center;
+    }
+    #announcement-list tr td {
+        padding:2px;
+    }
+    #site-staffs-list{
+        width:100%;
+        border:1px solid #E7E7FF;
+        border-collapse:collapse;
+    }
+</style>
+
+<div>
+    <div id="mainco2">
+        <div class="roundedbox">
+            <h2>Group Leaders</h2>
+            <br>
+            <form onsubmit="return searchMembers();">
+                Search Members: <input type="text" id="search_text" name="search_text" class="txtField" size="60" >
+                <input type="button" value="Go" class="btn btngreen" onclick="return searchMembers()">
+                <br>
+                <span style="font-size:9px; color:#AAA; margin-left:125px"><i>(Enter member's name or email. Example: John Smith or johnsmith@empowered.org)</i></span>
+                <div id="search-results" style="display:none; margin:10px 0 20px 0;"></div>
+            </form>
+            <br><br>
+            <div>
+                <form method="post" action="/staff/delete/?SiteId=<?php echo $this->SiteId ?>&Level=<?php echo $this->Level ?>" id="delete_staffs" name="delete_staffs" onsubmit="return deleteStaffs();">
+                    <table id="site-staffs-list" cellspacing="0" cellpadding="3" border="0">
+                        <tr class="tblHeader" style="">
+                            <th scope="col" style="width:20px;"></th>
+                            <th scope="col" style="text-align:left">Title</th>
+                            <th scope="col" style="text-align:left">Member Name</th>
+                            <th scope="col" style="text-align:left">Email</th>
+                            <th scope="col" style="text-align:left; width:210px;">Edit</th>
+                        </tr>
+                        <?php if (count($this->sitestaffs) > 0) :?>
+                            <?php $ctr = 0; foreach($this->sitestaffs as $sitestaff) { ?>
+                        <tr style="background-color:<?php echo $ctr%2 == 1 ? "#e7e7e9" : "white" ?>;">
+                            <td>
+                                <input id="delete_<?php echo $sitestaff['ID'] ?>" type="checkbox" name="staffs_id[]" value="<?php echo $sitestaff['ID'] ?>" />
+                            </td>
+                            <td>
+                                        <?php echo stripslashes($sitestaff['Title']) ?>
+                            </td>
+                            <td>
+                                        <?php echo stripslashes($sitestaff['StaffName']) ?>
+                            </td>
+                            <td>
+                                        <?php echo $sitestaff['Email'] ?>
+                            </td>
+                            <td>
+                                <a id="edit_link_<?php echo $sitestaff['ID'] ?>" href="javascript:;" onclick="$('#edit_link_<?php echo $sitestaff['ID'] ?>').hide(); $('#edit_div_<?php echo $sitestaff['ID'] ?>').show(); $('#title_<?php echo $sitestaff['ID'] ?>').focus();">Edit Title</a>
+                                <div id="edit_div_<?php echo $sitestaff['ID'] ?>" style="display:none">
+                                    <input type="text" id="title_<?php echo $sitestaff['ID'] ?>" value="<?php echo $sitestaff['Title'] ?>"/>&nbsp;<input type="button" value="Edit" onclick="editTitle(<?php echo $sitestaff['ID'] ?>)"/>
+                                </div>
+                            </td>
+                        </tr>
+                            <?php } ?>
+                        <?php else:?>
+                        <tr>
+                            <td colspan="6" style="font-style:italic">&nbsp;No record(s) found.</td>
+                        </tr>
+                        <?php endif;?>
+                    </table>
+                </form>
+                <br/>
+                <div>
+		    <a class="btn btngreen" style="padding:3px 15px" href="/<?php echo $this->URLName ?>">Back</a>
+                    <?php if (count($this->sitestaffs) > 0) :?>
+                    <input type="button" class="btn btngreen" name="delete" value="Delete" onclick="delete_staffs.submit()" />
+                    <?php endif;?>
+                </div>
+                <input type="hidden" id="SiteId" name="SiteId" value="<?php echo $this->SiteId ?>" />
+                <input type="hidden" id="Level" name="Level" value="<?php echo $this->Level ?>" />
+            </div>
+            <br/><br/><br/>
+            <div id="message" style="display:none; border:2px solid silver; color:red;"></div>
+            <div id="form"></div>
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,97 @@
+<?php $this->headTitle("Empowered - Donor List"); 
+$ProjectId = "";
+if (!empty($this->ProjectId)) {
+    $ProjectId = $this->ProjectId;
+} else if (isset($_REQUEST['ProjectId'])) {
+    $ProjectId = $_REQUEST['ProjectId'];
+}
+?>
+<script type="text/javascript" language="javascript">
+    function download() {
+        $.post('profile/donorlist/', {UserId: $('#UserId').val()});
+        return false;
+    }
+    function filterByProject(ProjectId) {
+        window.location = "/profile/donorlist?UserId="+$('#UserId').val()+"&ProjectId="+ProjectId;
+    }
+</script>
+<style type="text/css">
+    #donor-list tr th {
+        text-align:center;
+    }
+    #donor-list tr td {
+        padding:2px 10 2px 2px;
+    }
+</style>
+<div class="wrapper">
+  <!-- user header -->
+  <?php echo $this->placeholder('header') ?>
+  <!-- // user header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+      <!-- user tabs -->
+      <?php echo $this->placeholder('tabs') ?>
+      <!-- // user tabs -->
+
+    <div class="mainC02">
+    <div class="spacer"></div>
+      <div class="rightMainBox BG01">
+          <div class="box004">
+            <div class="headingStyle02 full">Donations History</div>
+                        <strong>Filter by:</strong>&nbsp;
+                        <select onchange="filterByProject(this.value)">
+                            <option value="">All</option>
+                            <?php foreach($this->activities_joined as $activity) { ?>
+                            <option value="<?php echo $activity['ProjectId'] ?>" <?php echo $ProjectId == $activity['ProjectId'] ? "selected" : "" ?>><?php echo $activity['Name'] ?></option>
+                            <?php } ?>
+                        </select>
+                        <br><br>
+                        <table cellspacing="0" cellpadding="3" border="0" id="donor-list" style="background-color:White;border-color:White;border-width:1px;border-style:None;border-collapse:collapse;margin:auto;" width="100%">
+                            <tr style="color:#F7F7F7;background-color:#000;font-weight:bold;">
+                                <th scope="col">Volunteer Activity</th>
+                                <th scope="col">Donor Name</th>
+                                <th scope="col">Donor Email</th>
+                                <th scope="col">Donor's Comment</th>
+				<th scope="col">Donation Date</th>
+                                <th scope="col">Donation Amount</th>
+                            </tr>
+                            <?php
+                            $ctr = 0;
+                            $total_donation = 0;
+                            foreach($this->donor_list as $donor) {
+                                $total_donation += $donor['DonationAmount'];
+                                ?>
+                            <tr style="background-color:<?php echo $ctr%2 == 1 ? "#e7e7e9" : "white" ?>;<?php echo $donor['DonationAmount'] < 0 ? "color:#F00;" : "" ?>" align="center">
+                                <td><?php echo $donor['VolunteerActivity'] ?></td>
+                                <td><?php echo $donor['isAnonymous'] == 1 ? "Anonymous" : $donor['SupporterName'] ?></td>
+                                <td><?php echo $donor['isAnonymous'] == 1 ? "Anonymous" : $donor['SupporterEmail'] ?></td>
+                                <td><?php echo $donor['TransactionSource'] != 'Manual' ? $donor['DonationComments'] : "" ?></td>
+				<td><?php echo $donor['CreatedOn'] ?></td>
+                                <td align="right"><?php echo number_format($donor['DonationAmount'])?>&nbsp;&nbsp;</td>
+                            </tr>
+                                <?php $ctr++; } ?>
+                            <tr style="line-height:30px; background-color:<?php echo $ctr%2 == 1 ? "#e7e7e9" : "white" ?>">
+                                <td><b>TOTAL</b></td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+                                <td align="right"><b><?php echo number_format($total_donation) ?></b>&nbsp;&nbsp;</td>
+                            </tr>
+                        </table>
+                        <span style="font-size:12px; color:#F00;">* A row with red text denotes a donation that was cancelled or refunded</span>
+                        <br/><br />
+                        <div style="float:left;"><a href="/<?=$this->userNew->urlName?>/initiatives" class="btn btngreen">Back</a></div>
+                        <div style="padding-bottom:10px; height:20px;" align="right">
+                            <form method="post" accept="/profile/donorlist">
+                                <input type="hidden" id="UserId" name="UserId" value="<?=$this->user->id?>" />
+                                <input type="submit" name="add" value="Download" />
+                            </form>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

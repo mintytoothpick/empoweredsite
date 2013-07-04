@@ -1,0 +1,19 @@
+<?php $this->headTitle("Empowered.org - Page not found"); ?>
+<div>
+    <div id="mainco2">
+        <div class="roundedbox" style="min-height:200px;">
+            <div class="clear"></div><br><br>
+        <?php if (count($this->related_links)) { ?> 
+            <h2 style="color:#aaa; font-size:25px; font-weight:normal"><?= $this->message ?>.<br/> If you need assistance, please email support@empowered.org or you may view other related pages below:</h2>
+            <ul style="margin-left:40px">
+            <?php foreach ($this->related_links as $link) { ?>
+                <li><a style="font-size:15px" href="<?php echo $link['SiteName'] ?>"><?php echo $link['SiteName'] ?></a></li><br>
+            <?php } ?>
+            </ul>
+        <?php } else { ?>
+            <h1 style="color:#aaa; font-size:30px; text-align:center"><?= $this->message ?>.<br/> If you need assistance, please email support@empowered.org</h1>
+        <?php } ?>
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>

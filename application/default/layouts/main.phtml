@@ -1,0 +1,252 @@
+<?php
+echo '<?xml version="1.0" encoding="UTF-8" ?>';
+echo $this->doctype();
+
+require_once 'Zend/Controller/Front.php';
+$front = Zend_Controller_Front::getInstance();
+$controller = $front->getRequest()->getControllerName();
+$hide_links = array('index', 'faq', 'contactus', 'benefits', 'termsandcondition', 'aboutus', 'groups', 'privacypolicy', 'profile', 'getstarted', 'error', 'tour');
+?>
+
+<html>
+    <head>
+        <?= $this->headTitle(); ?>
+
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <?php $metaDescription = $this->headMeta(); if(empty($metaDescription)) { ?>
+            <meta name="description" content="Empowered.org is the world's fastest growing social action community, giving  groups of volunteers useful tools for recruiting and fundraising, both in local communities and abroad." />
+        <?php } else { ?>
+            <?= $metaDescription ?>
+        <?php } ?>
+        <meta name="google-site-verification" content="HFymK0U8mxk974FLxIa8AFzR8ZjcT_Ks_Mumsczmf2k" />
+        <meta name="msvalidate.01" content="7386726225BEA635FA5F707EA0A74BB0" />
+
+        <link rel="canonical" href="http://<?php echo $_SERVER['HTTP_HOST']; ?><?php echo $_SERVER['REQUEST_URI']; ?>" />
+
+        <?= $this->cssHelper(true); ?>
+        <?= $this->javascriptHelper(true); ?>
+
+        <script>
+            // Facebook canvas application workaround
+            if(self != top) {
+                top.location = '/';
+            }
+        </script>
+
+        <!--[if lte IE 7.5]><link rel="stylesheet" href="<?php echo $this->contentLocation ?>public/css/ie7.css" type="text/css" /><![endif]-->
+        <!--[if lte IE 6.5]><link rel="stylesheet" href="<?php echo $this->contentLocation ?>public/css/ie6.css" type="text/css" /><![endif]-->
+        <!--[if lte IE 7.5]>
+        <style>
+            ul.navmenu-h { z-index:99999!important; }
+            ul.navmenu-h li a { max-height:33px!important; }
+            ul.navmenu-h li a.general_icon { max-width:70px!important; }
+            ul.navmenu-h li #activity_icon  { max-width:180px!important; }
+            ul.navmenu-h li #campaign_icon  { max-width:190px!important; }
+            ul.navmenu-h li a.event_icon { max-width:65px!important; }
+            ul.navmenu-h li a span.arrow-down { margin-top:-33px; }
+            #TabbedPanels1 { z-index:100; }
+            #admin-panel { z-index:99999!important; position:relative; max-width:780px!important }
+        </style>
+        <![endif]-->
+            <!--[if !IE]>
+            <style>
+            .headerbox {
+                position:relative;
+                margin-top:5px;
+            }
+            .headerbox .rightContainer{
+                position:absolute;
+                top:5px;
+                right:5px;
+                margin-top:9px;
+        }
+            #menu {
+                margin-top:-30px;
+            }
+            </style>
+            <![endif]-->
+
+
+        <script type="text/javascript">
+
+        <?php if($this->needNameInfo) { ?>
+        $(function(){
+            $(document).trigger('showUserInfoModal');
+        });
+        <?php } ?>
+
+        <?php if($_SERVER['HTTP_HOST'] == 'www.empowered.org') { ?>
+
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', 'UA-17384953-2']);
+            _gaq.push(['_trackPageview']);
+            _gaq.push(['_trackPageLoadTime']);
+
+            (function() {
+                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+            })();
+
+            function loadpage(dropdownID){
+                s1 = document.getElementById(dropdownID);
+                window.location = s1.options[s1.selectedIndex].value;
+            }
+        <?php } ?>
+        </script>
+
+        <style type="text/css">
+            .more-nav li { padding: 3px 0px; }
+            .more-nav li a { border: none; cursor: pointer }
+        </style>
+    </head>
+
+    <body <?php if(isset($this->isHomePage)) { echo 'style="background-color:#AED5F8"'; } ?>>
+
+        <?php echo $this->placeholder('facebook_root'); ?>
+
+        <div id="centred">
+            <div class="headerbox" style="<?= in_array($controller, $hide_links) ? "" : (isset($this->isHomePage) ? "background-color:#AED5F8;" : "background-color:#E7E7DE;")."border:none; box-shadow:0 0 0px #fff; border-radius:0px" ?>">
+                <div class="rightContainer">
+                    <div class="topmenu" style="margin:0;">
+                        <div style="float:right; margin-top:10px;">
+                            <a id="drop-links" style="vertical-align:top; font-size:15px;" href="/<?php echo $this->userNew->urlName ?>" <?php if(strlen(stripslashes($this->userNew->firstName)) > 30) { echo 'class="tooltip NoBorder" title="'.stripslashes($this->userNew->firstName).'"'; } else { echo 'class="NoBorder"'; } ?>><?php if(strlen(stripslashes($this->userNew->firstName)) > 30) { echo 'Hi '.substr(stripslashes($this->userNew->firstName), 0, 27)."..."; } else { echo 'Hi '.stripslashes($this->userNew->firstName); } ?>
+                                <img src="/public/images/arrow-down.png" style="padding:4px 0 0 6px;" />
+                            </a>
+                            <div class="clear"></div>
+                            <div id="more-links" style="border-radius: 5px 5px 5px 5px; border: 1px solid #DADADA; position: absolute; margin-top: 8px; margin-left: -30px; padding: 7px; background-color: #fff; display: none">
+                                <ul style="list-style: none" class="more-nav">
+                                    <li><a href="/<?= $this->userNew->urlName ?>">Profile</a></li>
+                                    <li><a href="/profile/edit">Settings</a></li>
+                                    <li><a href="javascript:;" onclick="logout()">Logout</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <?php if(isset($_SESSION['UserId'])) { ?><img src="/profile/loadimage/?UserId=<?= $_SESSION['UserId'] ?>" style="width:24px; height:24px;margin-top:2px;" class="BorderStyle"/><?php } ?>
+                    </div>
+                <?php if ($controller != 'search') { ?>
+                    <form action="/search?utm_campaign=Internal&utm_medium=Search&utm_source=" method="post" onsubmit="beginSearch(); return false">
+                    <div class="topbar_search" style="float:right; display:block; background-color: #fff">
+                        <input name="search_text" type="text" class="searchbox" id="searchfield" />
+                        <input type="submit" value="" class="go"  />
+                    </div>
+                    </form>
+                    <?php } ?>
+                    <?php if (!in_array($controller, $hide_links)) { ?>
+                        <a href="http://<?= $_SERVER['HTTP_HOST'] ?>/" style="float: right; margin-right: 30px;"><img src="http://<?= $_SERVER['HTTP_HOST'] ?>/public/images/empowered-org-logo-all-grey.png" alt="Empowered.org"/></a>
+                    <?php } ?>
+                </div>
+                <?php if (in_array($controller, $hide_links)) { ?>
+                <div class="logo"><a href="http://<?= $_SERVER['HTTP_HOST'] ?>/"><img src="http://<?= $_SERVER['HTTP_HOST'] ?>/public/images/<?= $controller == 'index'? 'empowered-org-logo-blue.png' : 'empowered-org-logo-grey.png' ?>" alt="Empowered.org"/></a></div>
+                <?php } ?>
+                <div class="clear"></div>
+            </div>
+
+            <?php echo $this->layout()->content ?>
+
+        </div>
+
+
+            <!-- footer -->
+            <div id="pageFooterOuter" style="width:100%; margin-bottom:5px; <?php echo $this->controller == 'benefits' ? 'float:left; margin-top:5px' : '' ?>">
+                <div id="footer" style="margin:0 auto; width:1106px;">
+                    <div id="footerlogo">
+                        <a href="http://<?= $_SERVER['HTTP_HOST'] ?>/"><img src="http://<?= $_SERVER['HTTP_HOST'] ?>/public/images/<?= $this->controller == 'index'? 'empowered-org-logo-blue.png':'empowered-org-logo-grey.png'?>" alt="Empowered.org" style="margin:4px 0 0 16px;"/></a>
+                    </div>
+                    <div id="footermenu">
+                        <a href="http://<?= $_SERVER['HTTP_HOST'] ?>/about-us">About Us</a> |
+                        <a href="http://<?= $_SERVER['HTTP_HOST'] ?>/contactus">Contact Us</a> |
+                        <a href="http://blog.empowered.org/">Blog</a> |
+                        <a href="http://<?= $_SERVER['HTTP_HOST'] ?>/privacypolicy">Privacy Policy</a> |
+                        <a href="http://<?= $_SERVER['HTTP_HOST'] ?>/termsandcondition">Terms of Use</a> <br />
+                        <div id="copyrights" align="center" style="width:100%; color:#999;">
+                            &copy; 2011 Empowered.org, All Rights Reserved.
+                            <?php function endrendertime() {
+                                $time = explode(" ", microtime());
+                                $usec = (double)$time[0];
+                                $sec = (double)$time[1];
+                                return $sec + $usec;
+                            }
+                            $end = endrendertime();
+                            $run = $end - $this->starttime;
+                            echo "(rendered in ".substr($run, 0, 5)."s)"; ?>
+                            <?php if($controller != 'groups') { ?>
+                                <br /><span style="padding-top:2px;">Using this site constitutes acceptance of the <a href="/termsandcondition" style="padding:0; color:#999;">Terms of Use</a>.</span>
+                            <?php } ?>
+                        </div>
+                    </div>
+                    <div id="footersocialmedia" style="float:right;">
+                        <div style="height:15px; width:180px; font-size:12px; margin-top:3px;" align="center">Follow Us!<br />
+                            <a href="javascript:;" class="tooltip" title="coming soon"><img src="/public/images/footer_yt.png" style="float:right;margin-right:49px;margin-top:6px;"/></a>
+                            <a href="http://www.twitter.com/empoweredorg"><img src="/public/images/footer_tw.png" style="float:right;margin-right:5px;margin-top:6px;"/></a>
+                            <a href="http://www.facebook.com/empowered.org"><img src="/public/images/footer_fb.png" style="float:right;margin-right:5px;margin-top:6px;"/></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- e o footer -->
+
+
+            <script>
+                function logout() {
+                    var url = document.location.href;
+                        <?php if (0) { ?> //isset($_SESSION['FacebookId'])) { ?>
+                      //  FB.logout(function(response) {
+                      //      // do something with response
+                      //  });
+                        <?php } ?>
+                    $.post('/profile/logout', function(data) {
+                        if (url.search('profile') > -1 && (url.search('dashboard') < 0 && url.search('edit') < 0)) {
+                            window.location.href = '/profile/login';
+                        } else {
+                            window.location.reload(true);
+                        }
+                    })
+                    return false;
+                }
+
+                    $(function() {
+                        $('#drop-links').bind('mouseover', function() {
+                            $('#more-links').show();
+                        })
+                        $('.MainBody').bind('mouseover', function() {
+                            $('#more-links').hide();
+                        })
+                    })
+
+                <?php if ($controller != 'search') { ?>
+                    function beginSearch() {
+                        var srch_txt = $('#searchfield').val().toString();
+                        srch_txt = srch_txt.replace(/'/g, '');
+                        srch_txt = srch_txt.replace(/"/g, "");
+                        window.location.href = '/search?&search_text='+srch_txt;
+                    }
+                <?php } ?>
+            </script>
+
+    <?php if (0) { //isset($_SESSION['FacebookId'])) { ?>
+    <div id="fb-root"></div>
+    <script src="http://connect.facebook.net/en_US/all.js"></script>
+    <script>
+        FB.init({
+            appId  : '132371653490037',
+            status : true, // check login status
+            cookie : true, // enable cookies to allow the server to access the session
+            channelUrl : 'http://<?= $_SERVER['HTTP_HOST'] ?>/public/channel.html', // channel.html file
+            xfbml  : true, // parse XFBML
+            oauth  : true // enable OAuth 2.0
+        });
+    </script>
+    <?php } ?>
+
+    <?php echo $this->render('profile/popup_user_info.phtml'); ?>
+    <?php echo $this->render('profile/popup_user_survey.phtml'); ?>
+
+    <!-- popup user info -->
+    <?php echo $this->placeholder('popup_user_info') ?>
+    <?php echo $this->placeholder('popup_user_survey') ?>
+
+    </body>
+
+
+</html>

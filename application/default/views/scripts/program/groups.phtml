@@ -1,0 +1,111 @@
+<?php
+$this->headTitle($this->nonprofit['NetworkName']. " on Empowered.org");
+$this->placeholder('tab')->set('nonprofit');
+?>
+<link rel="stylesheet" href="<?php echo $this->contentLocation ?>public/css/scrollable-horizontal.css" type="text/css" media="screen" />
+<div>
+    <div id="mainco2">
+        <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+        <div class="block001">
+            <div class="blst001">
+                <div class="blst002">
+                    <div class="MainBody">
+                        <div class="logo2"><a href="/nonprofit/?NetworkId=<?php echo $this->nonprofit['NetworkId'] ?>"><img src="<?php echo $this->contentLocation ?>public/Media/full/<?php echo strtolower($this->media_image['SystemMediaName']) ?>" style="width:141px;height:70px; border-width:0px;" /></a></div>
+                        <div class="share">
+                            <!-- Share Button BEGIN -->
+                            <div class="addthis_toolbox addthis_default_style" style="float:right;">
+                                <div style="float:right;"><a class="addthis_button_email"></a>
+                                    <a class="addthis_button_facebook"></a>
+                                    <a class="addthis_button_twitter"></a></div><div style="float:right;padding-top:2px;">Share: </div>
+                            </div>
+                            <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4e319b9362855da9"></script>
+                            <!-- Share Button END -->
+                        </div>
+                        <h1 style="padding-top:14px; font-size:27px;"><a href="/nonprofit/?NetworkId=<?php echo $this->nonprofit['NetworkId'] ?>"><?php echo $this->nonprofit['NetworkName'] ?></a></h1>
+                        <div id="TabbedPanels1" class="TabbedPanels">
+                            <ul class="TabbedPanelsTabGroup">
+                                <li class="TabbedPanelsTab" ><a href="/<?php echo $this->data['URLName'] ?>" class="wht">Program Home</a></li>
+                                <li class="TabbedPanelsTab NoMarginLT current"><a href="#groups" class="wht">Program Groups</a></li>
+                            </ul>
+                            <div style="position:relative"; >
+                            <?php if ($this->isAdmin) { ?>
+                                 <div id="ctl00_divDropdownGlobalAdmin" class="topadminpanel">
+                                    <span style="float: left; margin-top: 3px;">Administer: </span>
+                                    <span style="float: left;">
+                                        <select id="sel005">
+                                                <?php foreach($this->admin_controls as $admin_control) { ?>
+                                            <option value="<?php echo $admin_control['value'] ?>"><?php echo $admin_control['display'] ?></option>
+                                                <?php } ?>
+                                        </select>
+                                    </span>
+                                    <span style="margin-top: 2px; margin-left: 5px;">
+                                        <input type="image" src="<?php echo $this->contentLocation ?>public/images/Button/go.gif" value="Go" onclick="loadpage('sel005');" />
+                                    </span>
+                                </div>
+                                <?php } ?>
+                            </div>
+                            <div class="TabbedPanelsContentGroup">
+                                <!-- FIRST TAB -->
+                                <div class="TabbedPanelsContent" style="display:none">
+                                    
+                                </div>
+                                <!-- e o FIRST TAB -->
+
+                                <!-- SECOND TAB -->
+                                <div class="TabbedPanelsContent">
+                                    <div class="Menu2Body">
+                                        <div class="whiteBox">
+                                            <div class="searchres02">
+                                                <?php if (count($this->sitegroups) > 0) { ?>
+                                                    <?php foreach($this->sitegroups as $sitegroup) {
+                                                        $group = $this->groups->loadInfo($sitegroup['GroupId']);
+                                                        $media = $this->sitemedia->getSiteMediaById($group['LogoMediaId']);
+                                                        $media_image = $this->contentLocation."public/Media/full/".$media['SystemMediaName'];
+                                                        $media_caption = $media['Caption'];
+														$location = $this->contact_info->generateLocation($group['GroupId']);
+                                                    ?>
+                                                <div class="sr2st05">
+                                                    <center><a href="/<?php echo $group['URLName'] ?>"><img src="<?php echo $media_image ?>" alt="<?php echo $media_caption ?>" height="auto" width="65%" /></a></center>
+                                                </div>
+                                                <div class="sr2st04">
+                                                    <h4><a href="/<?php echo $group['URLName'] ?>"><?php echo $group['GroupName'] ?></a></h4>
+                                                    <?php if($location != '') { ?><strong class="txt01">Location: </strong><?php echo $location ?><br/><? } ?>
+                                                    <strong class="txt01">Number of Volunteers: </strong><?php echo $this->groups->loadSupporters($group['GroupId']) ?><br/>
+                                                    <strong class="txt01">Amount Raised to Date: </strong> $<?php echo number_format($this->donations->getGroupDonations($group['GroupId'])) ?><br/>
+                                                    <strong class="txt01">About Us: </strong>
+                                                    <div id="divLessContent<?php echo $group['GroupId'] ?>" style="display:inline;">
+                                                        <span id="ctl00_ContentPHMain_ctrlGroupList1_repeatGroups_ctl00_lblDescriptionLessContent">
+                                                                    <?php echo strlen($group['Description']) > 100 ? substr($group['Description'], 0, 100)."..." : $group['Description'] ?>
+                                                        </span>
+                                                                <?php if (strlen($group['Description']) > 100) { ?>
+                                                        <a id="ReadMore" href="javascript:ShowHide('divLessContent<?php echo $group['GroupId'] ?>','divMoreContent<?php echo $group['GroupId'] ?>');">Read More</a>
+                                                                <?php } ?>
+                                                    </div>
+                                                            <?php if (strlen($group['Description']) > 100) { ?>
+                                                    <div id="divMoreContent<?php echo $group['GroupId'] ?>" style="display:none;">
+                                                        <span id="ctl00_ContentPHMain_ctrlGroupList1_repeatGroups_ctl00_lblDescriptionMoreContent"><?php echo $group['Description'] ?></span>
+                                                        <a id="ReadFewer" href="javascript:ShowHide('divMoreContent<?php echo $group['GroupId'] ?>','divLessContent<?php echo $group['GroupId'] ?>')">Read Less</a>
+                                                    </div>
+                                                            <?php } ?>
+                                                </div>
+                                                <div class="clear"></div>
+                                                    <?php }
+                                                } else { ?>
+                                                <div class="sr2st04"><h4>No record(s) found.</h4></div><div class="clear"></div>
+                                                <?php } ?>
+                                            </div>
+                                            <div class="clear"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- e o SECOND TAB -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </div>
+        <div class="block001f01"><div class="blst001"><div class="blst002"></div></div></div>
+    </div>
+</div>

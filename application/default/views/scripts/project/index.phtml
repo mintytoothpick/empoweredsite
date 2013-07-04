@@ -1,0 +1,249 @@
+<script>
+var volunteersLoaded = false;
+var activityFeed = false;
+var activityConf = {
+    scrolling: 'yes',
+    width: 630,
+    height:500,
+    autoDimensions: false,
+    autoScale: false,
+    centerOnScroll: true,
+    showNavArrows: false,
+};
+
+function deleteProject(PID) {
+    if (confirm("Are you sure you want to delete this initiative?") == true) {
+        $.post('/project/delete', {ProjectId: PID}, function(){
+            alert('This initiative has been successfully deleted');
+            <?php if (!empty($this->project->userId)) { ?>
+            window.location.href = '/<?php echo $this->userNew->urlName ?>';
+            <?php } else if(!empty($this->project->groupId)) { ?>
+            window.location.href = '/<?php echo $this->project->group->urlName ?>';
+            <?php } else { ?>
+            window.location.href = '/<?php echo $this->project->organization->urlName ?>';
+            <?php } ?>
+        });
+    }
+}
+
+function updateInformation() {
+    if($('#editDescription').val() == '') {
+        alert("Your initiative's description cannot be blank");
+        return false;
+    } else if ($('#editName').val() == '') {
+        alert("Your initiative's name cannot be blank");
+        return false;
+    } else {
+        if ($('#editStreet').val() == 'Street Address') {
+            $('#editStreet').val('');
+        }
+
+        var x = $('#editDetails').serialize();
+
+        $.post('/<?= $this->project->type == 1 ? "fundraisingcampaign" : "project" ?>/edit', $('#editDetails').serialize(), function() {});
+        return false;
+    }
+}
+
+function toogleDesc(elem, id) {
+    $(elem).hide();
+    $("."+id).addClass('moreDesc');
+}
+
+function formatTitle() {
+    return 'Activity Feed';
+}
+
+$(function() {
+    $("#fancyFund").fancybox({
+        onStart: function() {
+            var divList = $("#fancyFund").attr('href');
+            if (!volunteersLoaded) {
+                volunteersLoaded = true;
+                $(divList).prepend($("#startVolunteers").html()).show();
+                $(divList).prepend('<h1><?= $this->project->type == 1 ? "Fundraisers" : "Volunteers";?></h1><div class="clr></div>"');
+            } else {
+                $(divList).show();
+            }
+        },
+        onClosed: function () {
+            $($("#fancyFund").attr('href')).hide();
+        },
+        scrolling: 'yes',
+        width: 630,
+        height:500,
+        autoDimensions: false,
+        autoScale: false,
+        centerOnScroll: true,
+        showNavArrows: false,
+    });
+    $("#fancyAct").click(function() {
+        if (!activityFeed) {
+            $.ajax({
+                url: "project/allactivities",
+                data: 'projectId=<?=$this->project->id?>',
+                success: function(data) {
+                    activityFeed = '<h1>Activity Feed</h1><div class="cr"></div>' + data;
+                    $.fancybox(activityFeed, activityConf);
+                }
+            })
+        } else {
+            $.fancybox(activityFeed, activityConf);
+        }
+    });
+    $('#StartDate').datepicker({ changeMonth: true, changeYear: true })
+                    .change(function(){
+                        $(this).focus();
+                    });
+    $('#StartTime').calendricalTime();
+    $('#EndDate').datepicker({ changeMonth: true, changeYear: true })
+                    .change(function(){
+                        $(this).focus();
+                    });
+    $('#EndTime').calendricalTime();
+
+    <?php if(!isset($this->soloProject)) { ?>
+    filterInitiatives();
+    <?php }?>
+
+});
+</script>
+
+<div class="wrapper">
+  <!-- org header -->
+  <?php echo $this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="BodyCon">
+
+    <!-- breadcrumb -->
+    <?php echo $this->placeholder('breadcrumb') ?>
+    <!-- // breadcrumb -->
+    <div class="clr"></div>
+
+    <!-- tabs -->
+    <?php echo $this->placeholder('tabs') ?>
+    <!-- // tabs -->
+
+    <div class="mainC02">
+      <div class="spacer"></div>
+      <?php if(!isset($this->soloProject)) { ?>
+      <div class="leftC">
+        <div class="leftMainBox BG01">
+
+          <!-- admin tool box -->
+          <?php if($this->isAdmin) { ?>
+            <?=$this->placeholder('tool_box');?>
+            <div class="spacer"></div>
+          <?php } ?>
+          <!-- //admin tool box -->
+
+          <!-- initiatives -->
+          <?php echo $this->render('project/initiatives.phtml'); ?>
+          <!-- //initiatives -->
+
+          <!-- Files -->
+          <?php echo $this->render('nonprofit/files_list.phtml'); ?>
+          <?php echo $this->placeholder('files_list') ?>
+          <!-- //Files -->
+
+        </div>
+
+      </div>
+      <?php } ?>
+      <div class="rightC" <?= isset($this->soloProject) ? 'style="width:905px;"' : ''; ?>>
+              <?php if(isset($this->soloProject)) { ?>
+            <!-- admin tool box -->
+              <?php if($this->isAdmin || $this->showToolBox) { ?>
+                <?=$this->placeholder('tool_box');?>
+                <div class="spacer"></div>
+              <?php } ?>
+          <?php } ?>
+        <div class="rightMainBox BG01">
+          <div class="box004">
+            <div class="headingStyle02 rounded"><span id="projName"><?=stripslashes($this->project->name)?></span></div>
+            <div class="box004Content">
+                <?php $this->shareUrl = $_SERVER['HTTP_HOST'] . '/' . $this->project->urlName ?>
+                <?php $this->shareEmail = $this->project->name ?>
+                <?php echo $this->render('nonprofit/sociallinks.phtml'); ?>
+            <div class="clr"></div>
+
+            <!-- right box -->
+            <?php echo $this->placeholder('right_bar') ?>
+            <!-- //right box -->
+
+            <!-- general data -->
+              <div class="display-fields">
+                <?php if(!is_null($this->project->logo)) { ?><p><img src="<?=$this->contentLocation ?>public/Media/full/<?=$this->project->logo->systemMediaName?>" alt="<?=$this->project->name ?>"  style="margin-top:10px; max-width:350px; max-height:200px;"/></p><?php } ?>
+                <p style="width:350px;"><?php if($this->project->type == 0) { ?>Start Date: <span id="projStartDate"><?= date('M j, Y g:i A', strtotime($this->project->startDate)) ?></span><br /><?php } ?>
+                <?php if($this->project->endDate != '0000-00-00 00:00:00') { ?>End Date: <span id="projEndDate"><?= date('M j, Y g:i A', strtotime($this->project->endDate)) ?></span><?php } ?></p>
+                <?php if(!empty($this->project->contact->address)) { ?><p><span class="Text14">Location: </span><span id="projLocation"><?=$this->project->contact->address?></span></p><?php } ?>
+                <?php if(!empty($this->project->description)) { ?>
+                  <p><strong><span class="Text14"><?= $this->project->type == 1 ? 'Fundraising Campaign' : 'Volunteer Activity';?> Description:</span></strong><br />
+                    <span id="projDescription"><?=stripslashes(nl2br($this->project->description))?></span>
+                  </p>
+                <?php } ?>
+                <div class="spacer"></div>
+              </div>
+            <div class="spacer"></div>
+
+            <!-- //general data -->
+
+            <!-- Fundraisers -->
+            <div class="headingStyle02 rounded">
+                <?= $this->project->type == 1 ? 'Fundraisers' : 'Volunteers';?> (<?=count($this->project->volunteers)?>) <? if (count($this->project->volunteers) > 5) { ?><a href="#moreVolunteers" id="fancyFund" style="float:right; font-size:18px;">View All</a><? } ?>
+            </div>
+            <div class="spacer"></div>
+            <? $limit = 0; ?>
+            <? foreach ($this->project->volunteers as $fundraiser) { $limit ++; ?>
+            <? if ($limit == 1) { ?><div id="startVolunteers"><? } ?>
+            <? if ($limit == 6 ) { ?>
+            </div>
+            <div class="hide"><div id="moreVolunteers">
+            <? }?>
+            <div class="programBox">
+              <div class="memberImgStyle2"><a href="/<?=$fundraiser->user->urlName?>" title="<?=stripslashes($fundraiser->user->fullName) ?>"><img src="/profile/loadimage/?UserId=<?=$fundraiser->userId?>" alt="" width="55" height="52" /></a></div>
+              <span class="TextStyle06"><strong><a href="/<?=$fundraiser->user->urlName?>"><?=stripslashes($fundraiser->user->fullName) ?></a></strong></span>
+              <div class="programText03" <?= empty($fundraiser->user->aboutMe) ? 'style="background:white"' : ''; ?>>
+                <?=substr(stripslashes($fundraiser->user->aboutMe),0,100)?><? if(strlen($fundraiser->user->aboutMe) > 100) { ?><a href="javascript:;" onclick="toogleDesc(this,'<?=$fundraiser->id?>')">... read more</a><div class="hide <?=$fundraiser->id?>"><?=substr(stripslashes($fundraiser->user->aboutMe),100,strlen(stripslashes($fundraiser->user->aboutMe)))?></div><? } ?>
+              </div>
+
+              <?php if($this->project->isFundraising == 1 || $this->project->isFundraising == "Yes") { ?>
+
+              <div class="programGroup02">
+                <div class="RSVP noMR">
+                    <strong>
+                        <?php $this->fundraiserDonationUrl =  '/'. $this->project->urlName . '/' . $fundraiser->user->urlName . "/" . 'donate' ?>
+                        <a onclick="$(document).trigger('showProjectDonateModal', ['<?= $this->fundraiserDonationUrl ?>', <?= $this->isFinished ? "true":"false" ?> ]);" href="#" class="Text14">Donate</a>
+                    </strong>
+                </div>
+                <div class="donation"><strong><span class="text19"><?=$this->project->currency.number_format($fundraiser->userDonationGoal) ?></span></strong><br />Goal</div>
+                <div class="donation NoMarginLT"><strong><span class="text19"><?=$this->project->currency.number_format($fundraiser->raised)?></span></strong><br />Raised</div>
+              </div>
+
+              <?php } ?>
+
+            </div>
+            <? } if ($limit > 5) { ?>
+            </div></div>
+            <? } ?>
+            <div class="clr"></div>
+            <!-- //Fundraisers -->
+
+            <!-- activity feed -->
+            <div class="headingStyle02 rounded">
+                Activity Feed <a href="javascript:;" id="fancyAct" style="float:right; font-size:18px;">View All</a>
+            </div>
+            <div class="spacer"></div>
+            <? echo $this->render('project/activityfeed.phtml'); ?>
+            <!-- //activity feed -->
+
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+  <div class="clr"></div>
+  <div class="clr"></div>
+</div>

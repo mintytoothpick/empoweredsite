@@ -1,0 +1,344 @@
+<script type='text/javascript'>
+    var counter = 0;
+    var start_date;
+
+    $(function() {
+        $('#EndDate').datepicker({ changeMonth: true, changeYear: true }).change(function(){
+                           $(this).focus();
+                       });
+        $('#isfundraising01').click(function() {
+            if (document.getElementById("isfundraising01").checked == true) {
+                $('li.donationgoals').show();
+                document.getElementById("isfundraising02").checked = false;
+            }
+        });
+
+        $('.suggestedamount').keydown(function(e) {
+            var keycodes = new Array('48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '8', '13');
+            if (!keycodes.inArray(e.keyCode.toString())) {
+                return false;
+            }
+        });
+
+        //form contact validate
+        $("#CreateBrigade").validate({
+            onfocusout: function(element) { this.element(element); },
+            errorPlacement: function(error, element) {
+                if (element.attr("name") == "CampaignLogo") {
+                    error.insertAfter("#CampaignLogo");
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            rules: {
+                CampaignLogo: {
+                    accept: "jpeg|jpg|png|gif"
+                },
+<?php if($this->level == "organization"){ ?>
+  <?php if ($this->organization->hasPrograms) { ?>
+                ProgramId: {
+                    required: true,
+                },
+  <?php } ?>
+  <?php if ($this->organization->hasGroups) { ?>
+                GroupId: {
+                    required: true,
+                },
+   <?php } ?>
+<?php } ?>
+                Name: 'required',
+                Description: 'required',
+                DonationGoal: {
+                    required: true,
+                    number: true,
+                    min: 0,
+                },
+                EndDate: {
+                    required: true,
+                    dateFormat: true,
+                },
+                isRecurring: 'required',
+                VolunteerGoal: {
+                    required: true,
+                    number: true,
+                    max: 100000,
+                    min: 0
+                }
+            },
+            messages: {
+                CampaignLogo: {
+                    accept: 'Please upload pictures in jpeg, png and gif format only.'
+                },
+                Name: 'Please specify the fundraising campaign title.',
+<?php if($this->level == "organization"){ ?>
+  <?php if ($this->organization->hasPrograms) { ?>
+                ProgramId: {
+                    required: "You must associate this activity with an existing program or create a one to associate with it.",
+                },
+  <?php } ?>
+  <?php if ($this->organization->hasGroups) { ?>
+                GroupId: {
+                    required: 'You must associate this activity with an existing chapter or create a one to associate with it.'
+                },
+  <?php } ?>
+<?php } ?>
+                Description: "Please specify the fundraising campaign's description.",
+                DonationGoal: {
+                    required: "Please specify the fundraising campaign's donation goal.",
+                    number: 'Please specify a valid donation goal.',
+                    min: "Please enter a positive value",
+                },
+                EndDate: {
+                    required: "Please specify the fundraising campaign's end date.",
+                    dateFormat: "Please specify a valid date."
+                },
+                isRecurring: 'Please select a recurring donations option.',
+                VolunteerGoal: {
+                    required: 'Please specify the needed fundraisers.',
+                    number: 'Please specify a valid number for needed fundraisers.',
+                    max: 'Fundraisers goal must be less than 100,000.',
+                    min: 'Fundraisers goal must be greater than or equal to 0.'
+                }
+            }
+        });
+    });
+
+    function createProgram() {
+        $('#ProgramId').hide();
+        $('#ProgramId').rules("remove");
+        $('label[for=ProgramId]').remove();
+        $('#ProgramId').val('');
+        $('#ProgramName').show();
+        $('#ProgramName').rules("add",{
+            required: true,
+            notEqualTo: 'New Program Name',
+            messages: {
+                required: "The new program's name cannot be blank.",
+                notEqualTo: "The new program's name cannot be blank."
+            }
+        });
+        $('#CreateProgramLink').hide();
+        $('#GroupId').hide();
+        $('#CreateGroupLink').hide();
+        groupNameValid();
+    }
+
+    function createGroup() {
+        $('#GroupId').hide();
+        $('#GroupId').rules("remove");
+        $('#GroupId').val('');
+        $('label[for=GroupId]').remove();
+        $('#CreateGroupLink').hide();
+        groupNameValid();
+    }
+
+    function groupNameValid() {
+        $('#GroupName').show();
+        $('#GroupName').rules("add",{
+            required: true,
+            notEqualTo: 'New Chapter Name',
+            messages: {
+                required: "The new chapter's name cannot be blank.",
+                notEqualTo: "The new chapter's name cannot be blank."
+            }
+        });
+    }
+
+
+    function addAmount() { //needs to display data['currency'] instead of $ for suggetedamount
+        var new_amount = '<li class="amount" id="sugamt_'+counter+'"><input type="text" maxlength="5" class="suggestedamount" name="suggestedamount[]" value="$" style="" onfocus="this.value = \'\';" id="inpamt_'+counter+'" /></li><li class="amtdes" id="sugdes_'+counter+'"><input type="text" class="suggestedamountdesc" name="suggestedamountdesc[]" value="Description" onfocus="this.value = \'\';" id="inpdesc_'+counter+'" ><a href="javascript:;" class="remove-amount" onclick="removeAmount('+counter+')">Remove</a></li><div class="clear"></div><div><label for="inpamt_'+counter+'" class="error errAmt" generated="false"></label><label for="inpdesc_'+counter+'" class="error errAmt" generated="false"></label></div>';
+        $('#suggested-amounts .amounts').append(new_amount);
+        $('#inpamt_'+counter).rules("add", {
+            required: true,
+            number: true,
+            min: 1,
+            messages: {
+                required: "Please specify atleast one suggested amount donation.",
+                number: "Please specify a valid suggested amount donation.",
+                min: "The amount should be greater than $1.",
+            }
+        });
+        $('#inpdesc_'+counter).rules("add", {
+            required: true,
+            messages: {
+                required: "Please specify the suggested amount description.",
+            }
+        });
+        counter ++;
+    }
+
+    function removeAmount(ctr) {
+        $('#sugamt_'+ctr).remove();
+        $('#sugdes_'+ctr).remove();
+        var error = $('label[for=inpamt_'+ctr+']');
+        if (error) {
+            error.parent().remove();
+        }
+        counter --;
+    }
+
+    function loadGroup(PID) {
+        $('#groups-list').load('/fundraisingcampaign/loadgroups', {ProgramId: PID, create: 1});
+    }
+</script>
+<style>
+    label.error { color:red; display:block; padding: 5px 0 10px 0; }
+    label.errAmt { padding:5px 0 5px 0; }
+    .success { color:green; }
+    .field-label { float:left; font-weight:bold; color:#000; width:200px; margin-bottom:15px;}
+    .field-input { float:left; width:355px; margin-bottom:15px; }
+    .field-input .input { width:300px; }
+    /*.field-input input { padding:1px; }*/
+    .field-input .date { width:95px; }
+    .hidden { display:none }
+    .popup-box { width: 370px; left: 40%; right: 40%; top:25%; position: absolute; z-index: 999999!important; background-color:#ffffff; border:5px solid #e5e5e5; padding:10px 0 20px 0; -moz-border-radius:7px }
+    #ui-datepicker-div { font-size:11px }
+    .amount { float:left; width:60px; margin-right:5px; }
+    .amtdes { float:left; width:300px; }
+    .amount input { width:50px; margin-bottom:3px; }
+    .amtdes input { width:235px; margin-bottom:3px; margin-right:5px; }
+</style>
+<div class="wrapper">
+   <!-- org header -->
+  <?=$this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+
+    <?php if (isset($this->organization)) { ?>
+
+      <!-- breadcrumb -->
+      <?=$this->placeholder('breadcrumb') ?>
+      <!-- // breadcrumb -->
+      <div class="clr"></div>
+
+      <!-- tabs -->
+      <?=$this->placeholder('tabs') ?>
+      <!-- // tabs -->
+
+    <?php } else {
+      include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/profileheader.php';
+    } ?>
+
+    <div class="mainC">
+      <div class="box05">
+        <div class="headingStyle02">
+            Create a Fundraising Campaign
+        </div>
+            <a id="top" href="#top" style="text-decoration:none">&nbsp;</a>
+            <form name="CreateBrigade" method="post" action="" enctype="multipart/form-data" id="CreateBrigade">
+                <?php if ($this->level == "group") { ?>
+                <input type="hidden" id="GroupId" name="GroupId" value="<?=$this->group->id?>" />
+                <?php } else if ($this->level == "organization") { ?>
+                <input type="hidden" id="NetworkId" name="NetworkId" value="<?=$this->organization->id?>" />
+                <?php } ?>
+                <ul style="list-style:none; padding-bottom:0px">
+                    <li style="width:180px; float:left; margin-right:20px; margin-left:5px;">
+                        <div style=" background-color:#BDD1DE; width:105px; height:80px; padding:20px 35px; margin:0px;">
+                            <div style="border:2px solid rgb(255, 255, 255); width: 100px; height: 75px; margin:0px;">
+                                <img src="/public/images/addphoto.jpeg" style="width:100px; height:75px;" />
+                            </div>
+                        </div>
+                        <div style="width:180px; float:left; margin:0px; padding:10px">
+                            <input type="file" size="12" name="CampaignLogo" id="CampaignLogo" class="textfield" /><br>
+                        </div>
+                    </li>
+                    <li style="border-left:1px solid #e5e5e5; width:625px; float:left; padding-left:20px">
+                        <div id="message" class="error" style="width:500px; border:2px solid #e3e3e3; margin-bottom:15px; padding:5px; <?php if(!$this->message) { echo "display:none;"; } ?>"><?php if(isset($this->message)) { echo $this->message; } ?></div><br />
+                        <ul style="list-style:none; padding-bottom:0px; margin-bottom:0px">
+                        <?php if ($this->level == "organization") { ?>
+                            <?php if($this->organization->hasPrograms || $this->organization->hasGroups) { ?>
+                            <div id="CreateProgramExplanation" style="border:1px solid #dcbd00; background-color:#fff7c8; padding:10px; margin-bottom:10px;">You must create <?= count($this->programs) || count($this->groups) ? "or select" : "" ?> a <?=($this->organization->hasPrograms && !isset($_REQUEST['pid']) ? 'program' : '').($this->organization->hasGroups && !isset($_REQUEST['pid']) ? ' and chapter ' : ' chapter ') ?> to associate this volunteer activity with.</div>
+                            <?php } ?>
+                            <?php if ($this->organization->hasPrograms) { ?>
+                                <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Affiliated Program:</li>
+                                <li class="field-input">
+                                    <?php if (count($this->programs)) { ?>
+                                    <select name="ProgramId" id="ProgramId" onchange="loadGroup(this.value)">
+                                        <option value="">Select a Program</option>
+                                        <?php foreach($this->programs as $program) { ?>
+                                        <option value="<?=$program->id?>" <?php if(isset($_REQUEST['pid']) && $_REQUEST['pid'] == $program->id) { echo 'selected'; } ?>><?=stripslashes($program->name) ?></option>
+                                        <?php } ?>
+                                    </select>
+                                    <a id="CreateProgramLink" href="javascript:;" onclick="createProgram();" style="margin-left:10px;"> or Create a New Program</a>
+                                    <?php } ?>
+                                    <input type="text" id="ProgramName" name="ProgramName" value="New Program Name" class="input" onfocus="this.value=''; $('#ProgramName').css('color', '#000');" style="color:#AAA; <?=count($this->programs) == 0 ? '' : 'display:none;'?>" />
+                                </li>
+                                <div class="clear"></div>
+                            <?php } ?>
+                            <?php if ($this->organization->hasGroups) { ?>
+                            <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Affiliated Chapter:</li>
+                            <li class="field-input" id="groups-list">
+                                <?php if (count($this->programs) || count($this->groups)) { ?>
+                                <select name="GroupId" id="GroupId" <?php if(!isset($_REQUEST['pid']) && $this->organization->hasPrograms) { echo 'disabled'; } ?>>
+                                    <option value="">Select a Chapter</option>
+                                    <?php if(isset($this->groups)) { foreach($this->groups as $group) { ?>
+                                    <option value="<?=$group['GroupId'] ?>"><?=stripslashes($group['GroupName']) ?></option>
+                                    <?php } } ?>
+                                </select>
+                                <?php if(count($this->groups)) { ?><a id="CreateGroupLink" href="javascript:;" onclick="createGroup();" style="margin-left:10px;"> or Create a New Chapter</a><?php } ?>
+                                <?php } ?>
+                                <input type="text" id="GroupName" name="GroupName" value="New Chapter Name" class="input" onfocus="this.value=''; $('#GroupName').css('color', '#000');" style="color:#AAA; <?=count($this->groups) == 0 ? '' : 'display:none;'?>" />
+                            </li>
+                            <div class="clear"></div>
+                            <?php } ?>
+                                <?php if($this->organization->hasPrograms || $this->organization->hasGroups) { ?>
+                                    <br /><span style="font-weight:bold;text-decoration:underline;margin-bottom:12px;">Fundraising Campaign Details</span><br /><br />
+                                    <div class="clear"></div>
+                                <?php } ?>
+                            <?php } ?>
+                            <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Title:</li>
+                            <li class="field-input">
+                                <input name="Name" type="text" maxlength="50" id="Name" class="input" value="<?=isset($this->Name) ? $this->Name : "" ?>" />
+                            </li>
+                            <div class="clear"></div>
+                            <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>What are you fundraising for?</li>
+                            <li class="field-input">
+                                <textarea class="input" name="Description" rows="4" cols="20" id="Description" onblur="return fnKeepWordLenTrack(this,3000);" onkeyup="return fnKeepWordLenTrack(this,3000);"><?=isset($this->Description) ? $this->Description : "" ?></textarea>
+                            </li>
+                            <div class="clear"></div>
+                            <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Donation Goal:</li>
+                            <li class="field-input">
+                                <input class="input" name="DonationGoal" maxlength="6" type="text" id="DonationGoal" value="<?=isset($this->DonationGoal) ? $this->DonationGoal : "0" ?>" />
+                            </li>
+                            <div class="clear"></div>
+                            <li class="field-label">Suggested Amount:</li>
+                            <li class="field-input">
+                                <ul style="list-style:none" id="suggested-amounts">
+                                    <div class="amounts"></div>
+                                    <div style="width:100%; float:left; margin-bottom:3px;"><a href="javascript:addAmount()">Add Amount</a></div>
+                                </ul>
+                            </li>
+                            <div class="clear"></div>
+                            <li class="field-label" style="display:none;"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Activate Recurring Donations?</li>
+                            <li class="field-input" style="display:none;">
+                                <span><input type="radio" id="isRecurring01" name="isRecurring" value="Yes">&nbsp;Yes</span>
+                                <span style="margin-left:10px"><input type="radio" id="isRecurring02" name="isRecurring" value="No" checked>&nbsp;No</span>
+                            </li>
+                            <div class="clear"></div>
+                            <li class="field-label enddate"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Fundraising Campaign Active Until:</li>
+                            <li class="field-input enddate">
+                                <input style="cursor: pointer" class="text smaller" name="EndDate" type="text" maxlength="10" id="EndDate" value="<?=isset($this->EndDate) ? $this->EndDate : "" ?>" />
+                            </li>
+                            <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Fundraisers needed:</li>
+                            <li class="field-input">
+                                <input class="text smaller" name="VolunteerGoal" id="VolunteerGoal" type="text" maxlength="10" value="0" />
+                            </li>
+                            <div class="clear"></div>
+                            <li style="width:100%; float:left"><span style="color:#F00;font-size:16px;font-weight:bold;">*</span><span style="color:#AAA;"> denotes a required field.</span></li>
+                        </ul>
+                    </li>
+                </ul>
+                <div style="margin-left:250px; margin-top:15px; float:left; width:100%; margin-bottom:20px">
+                    <a class="btn btngreen" style="padding:3px 10px; margin-left:5px" title="Back" href="/<?= isset($this->group) ? $this->group->urlName : $this->organization->urlName ?>" >Back</a>
+                    <input type="submit" class="btn btngreen" name="btnCreateNew" value="Create New" id="btnCreateNew"/>
+                </div>
+            </form>
+            <div class="clear"></div>
+            </div>
+        </div>
+    <div class="clr"></div>
+    <div class="clr"></div>
+</div>

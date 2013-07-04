@@ -1,0 +1,186 @@
+<?php $this->headTitle("Empowered.org - Create a New Program");
+$this->placeholder('title')->set('home');
+$this->placeholder('currenttab')->set('orgprograms');
+?>
+<script type="text/javascript" language="javascript">
+var isValid = false;
+
+function showPrompt() {
+    $('.popup-box').toggle();
+    $('#popup-overlay').toggle();
+}
+
+function next(create_again) {
+    $('#create_again').val(create_again);
+    showPrompt();
+    isValid = true;
+    $('#CreateProgram').submit();
+}
+
+$(function() {
+
+    $("#CreateProgram").validate({
+        onfocusout: function(element) { this.element(element); },
+        rules: {
+            ProgramLogo: {
+                accept: "jpeg|jpg|png|gif"
+            },
+            ProgramName: 'required',
+            Description: 'required',
+            WebAddress: {
+                domainChk: true
+            }
+        },
+        messages: {
+            ProgramLogo: {
+                accept: 'Please upload pictures in jpeg, png and gif format only.'
+            },
+            ProgramName: 'Please specify the name of program.',
+            Description: "Please specify the program's description.",
+            WebAddress: {
+                required: 'You have entered an invalid website.',
+                url: 'You have entered an invalid website.'
+            }
+        }
+        <?php if (isset($this->getstarted) || isset($this->upgradeOrg)) { ?>,
+        submitHandler: function(form) {
+            if ($('#ProgramLogo').val() == "") {
+                showPrompt();
+                return false;
+            } else {
+                $(form).submit();
+            }
+        }
+        <? } ?>
+    });
+});
+</script>
+<style>
+    label.error { color:red; display: block; margin-top: 5px;}
+    .success { color:green; }
+    .field-label { float:left; font-weight:bold; color:#000; <?=(isset($this->edit)) ? 'width:200px' : 'width:140px'?>; margin-bottom:15px;}
+    .field-input { float:left; width:415px; margin-bottom:15px; }
+    .field-input .input { <?=(isset($this->edit)) ? 'width:350px' : 'width:300px'?>; }
+    .field-input input { padding:1px; }
+    .field-input .date { width:95px; }
+</style>
+<div id="popup-overlay"></div>
+<div class="popup-box" style="padding: 30px 20px; display: none">
+    Would you like to create another program?<br><br><br>
+    <center>
+        <a class="btn btngreen" href="javascript:;" onclick="next(1)">Yes</a>
+        &nbsp;&nbsp;
+        <a class="btn btngreen" href="javascript:;" onclick="next(0)">No</a>
+    </center>
+</div>
+<div class="wrapper">
+    <!-- org header -->
+    <?php echo $this->placeholder('header') ?>
+    <!-- // org header -->
+
+    <div class="BodyCon">
+
+        <?php if(isset($this->getstarted)) { ?>
+            <h2 style="font-size:14px">
+                <div style="color:#669933; width:21%; float:left">Step 1. Structure & Details</div>
+                <div style="color:#A9A9A9; width:18%; float:left">Step 2. Add Admins</div>
+                <div style="color:#A9A9A9; width:19%; float:left">Step 3. Add Members</div>
+                <div style="color:#A9A9A9; width:23%; float:left">Step 4. Activate Fundraising</div>
+                <div style="color:#A9A9A9; width:19%; float:left">Step 5. Spread the Word</div>
+                <div class="clear"></div>
+            </h2>
+        <?php } else { ?>
+            <!-- breadcrumb -->
+            <?php echo $this->placeholder('breadcrumb') ?>
+            <!-- // breadcrumb -->
+            <div class="clr"></div>
+
+            <!-- tabs -->
+            <?php echo $this->placeholder('tabs') ?>
+            <!-- // tabs -->
+        <?php } ?>
+
+        <div class="mainC">
+            <div class="box05">
+                <div class="headingStyle02">Create a New <?=$this->organization->programNamingSingular?></div>
+                <a id="top" href="#top" style="text-decoration:none">&nbsp;</a>
+                <form name="CreateProgram" method="post" action="" id="CreateProgram" enctype="multipart/form-data" >
+                    <input type="hidden" id="NetworkId" name="NetworkId" value="<?php (isset($this->edit)) ? $this->organization->id : $this->NetworkId ?>" />
+                    <input type="hidden" id="Type" name="Type" value="<?php echo $this->Type ?>" />
+                    <?php if (isset($this->getstarted) || isset($this->upgradeOrg)) { ?>
+                        <input type="hidden" id="create_again" name="create_again" value="" />
+                        <?php if (isset($this->getstarted)) { ?>
+                            <input type="hidden" id="getstarted" name="getstarted" value="1" />
+                        <?php } ?>
+                    <?php } ?>
+                    <ul style="list-style:none; padding-bottom:0px">
+                        <?php if (!isset($this->edit)) { ?>
+                        <li style="width:180px; float:left; margin-right:20px; margin-left:5px">
+                            <div style=" background-color:#BDD1DE; width:105px; height:80px; padding:20px 35px; margin:0px;">
+                                <div style="border:2px solid rgb(255, 255, 255); width: 100px; height: 75px; margin:0px;">
+                                    <img src="<?php echo $this->contentLocation ?>public/images/addphoto.jpeg" style="width:100px; height:75px;" />
+                                </div>
+                            </div>
+                            <div style="width:180px; margin-top:10px">
+                                <input type="file" size="12" name="ProgramLogo" id="ProgramLogo" class="textfield" style="max-width:180px;" onmouseover="$('#logo-info').show();" /><br>
+                                <div id="logo-info" class="info-boxes" style="margin-top:20px;width:170px; margin-left:0; display:none;">
+                                    <h3 style="text-align:center">Uploading a Logo?</h3><br />
+                                    Your image must be in either <strong>jpg</strong>, <strong>png</strong>, or <strong>gif</strong> format and it must be <strong>< 2MB</strong> in size.<br /><br />You will be asked to crop your logo on the following page
+                                </div>
+                            </div>
+                        </li>
+                        <? } ?>
+                        <li <?php if (!isset($this->edit)) { ?>style="border-left:1px solid #e5e5e5; width:625px; float:left; padding-left:20px"<? } ?>>
+                            <div id="message" class="error" style="width:600px; border:2px solid #e3e3e3; margin-bottom:15px; padding:5px; <?php if(!$this->message) { echo "display:none;"; } ?>"><?php if(isset($this->message)) { echo $this->message; } ?></div><br />
+                            <ul style="list-style:none; padding-bottom:0px; margin-bottom:0px">
+                                <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Name:</li>
+                                <li class="field-input">
+                                    <input name="ProgramName" type="text" id="ProgramName" class="input" value="<?=(isset($this->edit)) ? $this->program->name : $this->organization->name?>" />
+                                </li>
+                                <div class="clear"></div>
+                                <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Description:</li>
+                                <li class="field-input">
+                                    <?php
+                                        $desc = '';
+                                        if (!isset($this->edit)) {
+                                            $desc = stripslashes($this->organization->description);
+                                        } else {
+                                            $desc = $this->program->description;
+                                        }
+                                    ?>
+                                    <textarea name="Description" rows="10" cols="20" id="Description" class="input" onblur="return fnKeepWordLenTrack(this,800);" onkeyup="return fnKeepWordLenTrack(this,800);" style="font-size:14px"><?= $desc ?></textarea>
+                                </li>
+                                <div class="clear"></div>
+                                <li class="field-label">Website:</li>
+                                <li class="field-input">
+                                    <?php
+                                        $web = '';
+                                        if (!isset($this->edit)) {
+                                            $web = stripslashes($this->organization->contact->website);
+                                        } else {
+                                            if ($this->program->contact) {
+                                                $web = $this->program->contact->website;
+                                            }
+                                        }
+                                    ?>
+                                    <input name="WebAddress" type="text" id="WebAddress" class="input" value="<?=$web?>" />
+                                </li>
+                                <div class="clear"></div>
+                                <li class="field-label">Allow people to create chapters within this program?</li>
+                                <li class="field-input">
+                                    <input type="radio" name="isOpen" value="1" style="margin:0 10px;" <?=(isset($this->edit) && $this->program->isOpen) ? 'checked' : ''?>/>Yes
+                                    <input type="radio" name="isOpen" value="0" style="margin:0 10px;" <?=(!isset($this->edit) || (isset($this->edit) && !$this->program->isOpen)) ? 'checked' : '' ?> />No<br /><br />
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div style="margin-left:250px; margin-top:15px; float:left; width:100%; margin-bottom:20px">
+                        <a style="padding: 3px 15px;" class="btn btngreen" title="Back" href="/<?php echo $this->organization->urlName ?>" >Back</a>
+                        <input type="submit" class="btn btngreen" name="btnCreateNew" value="<?=(!isset($this->edit) ? 'Create New' : 'Save Changes')?>" id="btnCreateNew" />
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="clr"></div>
+        <div class="clr"></div>
+    </div>

@@ -1,0 +1,103 @@
+<script>
+$(function() {
+    $('#FromDate').datepicker({ changeMonth: true, changeYear: true });
+    $('#ToDate').datepicker({ changeMonth: true, changeYear: true });
+});
+
+function exportCsv() {
+    document.filter.target = '_blank';
+    document.filter.action = '/reporting/membershipexport';
+    document.filter.submit();
+    document.filter.target = '';
+    document.filter.action = '/<?=$this->group->urlName?>/membership-report';
+}
+</script>
+
+<div class="wrapper">
+   <!-- org header -->
+  <?=$this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+
+    <!-- breadcrumb -->
+    <?=$this->placeholder('breadcrumb') ?>
+    <!-- // breadcrumb -->
+    <div class="clr"></div>
+
+    <!-- tabs -->
+    <?=$this->placeholder('tabs') ?>
+    <!-- // tabs -->
+
+    <div class="mainC">
+      <div class="box05">
+        <div class="headingStyle02">
+            <?=$this->group->name?> Member Donations (Total Donations: <?=$this->group->currency?><?=number_format($this->totalDon)?>)
+        </div>
+        <div class="tab-container">
+            <div id="filter" style="margin: 0 10px 0 10px;">
+                <form name="filter" id="filter" method="post" action="/<?=$this->group->urlName?>/membership-report">
+                  <input type="hidden" value="<?=$this->group->id?>" name="GroupId" />
+                  <input type="text" name="searchFilter" style="width:250px; border:2px solid #528D19; padding:3px; float: left; color: gray; background: #fff url(/public/images/search.gif) no-repeat 98% center" <?= (!empty($this->searchText)) ? 'value="' . $this->searchText . '"' : ''?> />
+                  <span style="float:left;margin:3px 0 0 5px;">Show:
+                    <select name="show_list">
+                        <option value="10" <?= $this->showList == 10 ? "selected" : "" ?>>10</option>
+                        <option value="25" <?= $this->showList == 25 ? "selected" : "" ?>>25</option>
+                        <option value="50" <?= $this->showList == 50 ? "selected" : "" ?>>50</option>
+                        <option value="100" <?= $this->showList == 100 ? "selected" : "" ?>>100</option>
+                    </select>
+                  </span>
+                <div style="float:right;">
+                    <span style="float:left;">
+                        <div style="float:left; margin-top:5px; font-weight:bold; color:#693; font-size:13px;">Filter By Donation Date:&nbsp;</div>
+                        <input id="FromDate" name="FromDate" <?= (isset($this->fromDate)) ? 'value="' . $this->fromDate . '"' : '' ; ?> style="float:left; width:100px; cursor: pointer" class="text smaller" />
+                        <div style="float:left; width:20px; margin-top:5px; font-weight:bold; text-align:center; color:#693; font-size:13px;">&nbsp;to&nbsp;</div>
+                        <input id="ToDate" name="ToDate" <?= (isset($this->toDate)) ? 'value="' . $this->toDate . '"' : ''; ?> style="float:left; width:100px; cursor: pointer" class="text smaller" />
+                    </span>
+                </div>
+                <div class="clr"></div>
+                <input type="submit" class="btn btngreen btnSubmit" value="Filter" style="float:right; margin:3px 0 0 15px;"/>
+                <input type="button" class="btn btngreen btnSubmit" value="Export CSV"  style="float:left; margin:3px 0 0 0" onclick="exportCsv()"/>
+                </form>
+            </div>
+            <div class="clr"></div><br />
+
+            <table cellpadding="5" cellspacing="0" width="100%">
+                <tr>
+                    <td colspan="10" class="donation_tablehead">
+                        <div class="donation_navpage"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="do_col1" style="color: #000">Transaction ID</td>
+                    <td class="do_col2">Member</td>
+                    <td class="do_col2">Destination</td>
+                    <td class="do_col2" align="center">Amount</td>
+                    <td class="do_col2" align="center">Date</td>
+                    <td class="do_col3" align="center">Paid Until</td>
+                </tr>
+                <?php
+                if (count($this->payments) > 0) { foreach ($this->payments as $payment) {?>
+                <tr>
+                    <td class="xdo_col1"><?=$payment->transactionId?></td>
+                    <td class="xdo_col2"><a href="/<?=$payment->user->urlName ?>"><?=stripslashes($payment->user->fullName) ?></a></td>
+                    <td class="xdo_col2"><?=$payment->group->name?></td>
+                    <td class="xdo_col2" align="right"><?=$payment->group->currency?><?= number_format($payment->amount) ?></td>
+                    <td class="xdo_col2" align="center"><?= $payment->createdOn ?></td>
+                    <td class="xdo_col3" align="center"><?= ($payment->paidUntil == '0000-00-00') ? 'One Time' : $payment->paidUntil ?></td>
+                </tr>
+                <?php } } else { ?>
+                <tr><td colspan="4"><b>&nbsp;No records found.</b></td></tr>
+                <?php } ?>
+            </table>
+            <?= $this->paginationControl($this->payments, 'Sliding', 'nonprofit/new_page_selector.phtml', array('param' => 'page')); ?>
+            <br /><br />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="clr"></div>
+  <div class="clr"></div>
+</div>

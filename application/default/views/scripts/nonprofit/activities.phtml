@@ -1,0 +1,155 @@
+<?php if(count($this->organization->programs)) { ?>
+<script>
+$(function() {
+
+	$(".timeFilter").each(function() {
+		
+	    $(this).click(function() {
+	    	$(".timeFilter").each(function() {
+	    		$(this).removeClass("selected");
+	        });
+	    	var rel = $(this).attr("rel");
+	        $("#timeFilter").val(rel);
+	        filter(false);
+	        $(this).addClass("selected");
+		});
+	});
+	
+    //Program Filter
+    $("#program").change(function(){
+        if ($('#program').val() != 'all') {
+            <? if ($this->organization->hasGroups) { ?>
+            $("#loading").show();
+            $("#group").hide();
+            $("#group").children().remove().end().append($('<option>', { value : 'null' }).text('Select group ...'));
+            <? } ?>
+            $.ajax({
+                url: "<?=($this->organization->hasGroups)?'get-groups':strtolower($this->list).'-activities'?>",
+                <? if($this->organization->hasGroups) { ?>dataType: 'json',<? } ?>
+                data: 'ProgramId=' + $('#program').val() + '&filter=true',
+                success: function(data) {
+                    <? if ($this->organization->hasGroups) { ?>
+                    $("#group").show();
+                    for (i=0;i<data.length;i++) {
+                        $("#group").append($('<option value="'+data[i].GroupId+'">').text(data[i].GroupName));
+                    }
+                    $("#loading").hide();
+                    <? }?>
+                }
+            });
+            filter(false);
+        } else {
+            <? if ($this->organization->hasGroups) { ?>
+            $("#group").hide();
+            $("#group").children().remove();
+            <? } ?>
+            filter(false);
+        }
+    });
+
+    //Group Filter
+    <? if ($this->organization->hasGroups) { ?>
+    $("#group").change(function(){
+        filter(false);
+    });
+    <? } ?>
+
+    <? if (isset($this->filter)) { ?>
+        capturePaginators();
+    <? } ?>
+});
+
+function capturePaginators() {
+    $('.paginator').click(function(event) {
+        event.preventDefault();
+        filter($(this).attr('href'));
+    });
+}
+
+function filter(url) {
+    var urlParam = url;
+    if (!url) {
+        var urlParam = 'upcoming-activities';
+    }
+    var data = 'filter=true';
+    if ($('#program').val() != 'all') {
+        data += '&ProgramId=' + $('#program').val();
+        <? if ($this->organization->hasGroups) { ?>
+        if ($('#group').val() != 'null') {
+            data += '&GroupId=' + $('#group').val();
+        }
+        <? } ?>
+    }
+    data += '&Status='+ $("#timeFilter").val();
+    if ($('#searchFilter').val() != '') {
+        data += '&searchFilter=' + $('#searchFilter').val();
+    }
+    $("#contentData").html('Loading content ...');
+    $.ajax({
+        url: urlParam,
+        data:  data,
+        success: function(data) {
+            $("#contentData").html(data);
+            capturePaginators();
+            $("#activitiesTitleCount").text( $("#contentData #rowsCount").val() );
+            if ($("#timeFilter").val()=="past"){
+                $("#title").html("Past");
+            } else {
+                $("#title").html("Upcoming");
+            }
+        }
+    });
+    return false;
+}
+</script>
+<? } ?>
+
+<div class="wrapper">
+   <!-- org header -->
+  <?php echo $this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+    <!-- breadcrumb -->
+    <?php echo $this->placeholder('breadcrumb') ?>
+    <!-- // breadcrumb -->
+    <div class="clr"></div>
+
+    <!-- tabs -->
+    <?php echo $this->placeholder('tabs') ?>
+    <!-- // tabs -->
+
+    <div class="mainC">
+      <div class="searchInternalBox">
+        <form id="searchMembers" action="" method="post" onsubmit="return filter();">
+          <input id="timeFilter" type="hidden" value="<?= $this->status?>">
+          <input name="searchFilter" id="searchFilter" type="text" class="textField01" value="<?=$this->searchtext?>" />
+        </form>
+      </div>
+        <div class="internalFilter">
+          <strong>Filter By</strong>
+          <select name="program" class="textfield" id="program">
+            <option value="all">Program: All</option>
+            <? foreach($this->organization->programs as $program) { ?>
+            <option value="<?=$program->id?>" <?= (isset($this->program) && ($this->program->id == $program->id)) ? 'selected' : ''; ?>>Program: <?=$program->name?></option>
+            <? } ?>
+          </select>
+          <? if ($this->organization->hasGroups) { ?><select id="group" class="hide"></select><span id="loading" class="hide">Loading groups ...</span><? } ?>
+        </div>
+      <div class="box05">
+        <div class="headingStyle02 rounded">
+            <label id="title"><?= $this->list ?></label> Volunteer Activities (<label id="activitiesTitleCount"><?=$this->countRes?></label>)
+            <span class="titleTab noMR"><a class="<?php echo ($this->status=="past") ?"selected": "" ?> timeFilter" rel="past" href="#">Past</a></span>
+            <span class="titleTab noMR"><a class="<?php echo ($this->status=="upcoming") ?"selected": "" ?> timeFilter" rel="upcoming" href="#">Upcoming</a></span>
+        </div>
+        <div id="contentData">
+            <!-- content by default or by ajax -->
+            <?php echo $this->render('nonprofit/tabscontent/activities.phtml'); ?>
+        </div>
+      </div>
+    </div>
+  <div class="clr"></div>
+  <div class="clr"></div>
+</div>

@@ -1,0 +1,40 @@
+body { background:#f2f2f2; }
+#righttopmneu li { margin:0 10px 0 0; width:32px; }
+#righttopmneu li a {margin:0 -3px 0 0;}
+#righttopmneu li.fb {width:145px}
+#header {background:url(../images/bg/001p.jpg) 50% 0 no-repeat; }
+.block001h01 {background:url(../images/bg/003p.gif) no-repeat }
+.block001h01 .blst001 {background:url(../images/bg/004p.gif) 100% 0 no-repeat;}
+.block001 {background:url(../images/bg/005p.gif) repeat-y; zoom:1}
+.block001 .blst001 {background:url(../images/bg/006p.gif) 100% 0 repeat-y; zoom:1}
+.block001f01 {background:url(../images/bg/010p.gif) no-repeat}
+.block001f01 .blst001 {background:url(../images/bg/011p.gif) 100% 0 no-repeat;}
+.block001f01 .blst002 { background:url(../images/bg/012p.gif) repeat-x;}
+.gallery01  .gst05 , .gallery01  .gst06 { background:#fff;}
+.but001 .bst02 input  {width:80px; padding:3px 21px 4px;}
+.box06 .bst07 {left:-52px; top:3px;} 
+
+
+
+#righttopmneu li {float:left; padding:0 11px 0 0; display:block; margin:0 7px 0 0; list-style:none; background:url(../images/bg/008.gif) 100% 0 no-repeat}
+#righttopmneu li a {float:left; display:block; line-height:13px; font-size:11px; padding:7px 0 7px 11px; color:#fff; background:url(../images/bg/007.gif) no-repeat; margin:0 0 0 0; }
+#righttopmneu li.fb {background:url(../images/bg/008.gif) 100% 0 no-repeat; padding:0 11px 0 0 }
+#righttopmneu li.fb a {padding:7px 0 7px 33px; background:url(../images/bg/009.gif) no-repeat;}
+
+/*
+#userlogged  .lst01 {float:left; padding:0 0 0 0; display:block; margin:0 20px 0 0; list-style:none; background:url(../images/bg/007.gif) no-repeat;}
+
+#userlogged a:link, #userlogged a:visited {float:left; display:block; line-height:13px; font-size:11px; padding:7px 11px 7px 11px; color:#fff; background:url(../images/bg/008.gif) 100% 0 no-repeat; margin:0 -11px 0 0}
+*/
+#userlogged  .lst01 {float:right; padding:0 11px 0 0; display:block; margin:0 7px 0 0; list-style:none; background:url(../images/bg/008.gif) 100% 0 no-repeat}
+#userlogged a {display:block; float:left; line-height:13px; font-size:11px; padding:7px 0 7px 11px; color:#fff; background:url(../images/bg/007.gif) no-repeat; margin:0 0 0 0; }
+
+.wnote01 { position:absolute; left:-50px; top:0; font-size:12px; font-weight:bold; color:#a9a9a9}
+
+
+/*
+#righttopmneu li { margin:0 10px 0 0; width:32px; }
+#righttopmneu li a {margin:0 -3px 0 0;}
+#righttopmneu li.fb {width:145px}
+
+*/

@@ -1,0 +1,116 @@
+<?php
+$this->headTitle("Empowered.org - Survey");
+$type = array('Joining Activity' => 'before joining the activity', 'Joining Group' => 'before joining the chapter', 'Existing Members' => '');
+?>
+<script type="text/javascript" language="javascript">
+    var act_counter = 1;
+    var grp_counter = 1;
+    var mem_counter = 1;
+    function ValidateForm() {
+        var error = "";
+        if (validateFeedbacks() > 0) {
+            error += "Please answer the required questions below.";
+        }
+        if (error == '') {
+            return true;
+        } else {
+            $('#message').html(error).show();
+            return  false;
+        }
+    }
+
+    function validateFeedbacks() {
+        var ctr = 0;
+        $('.required').each(function() {
+            if (jQuery.trim($(this).val()) == '') {
+                ctr++;
+            }
+        })
+        return ctr;
+    }
+    function joinGroup() {
+        $.post('/group/joinrequest', {GroupId: $('#GroupId').val(), UserId: $('#UserId').val()}, function(data) {
+            alert(data);
+            window.location.href = "/<?php echo $this->groupInfo['URLName'] ?>";
+        })
+    }
+</script>
+<style type="text/css">
+    .success { color:green }
+    .error { color:red }
+    .field-label { float:left; font-weight:bold; color:#000; width:90px; margin-bottom:20px;}
+    .field-input { float:left; width:670px; padding-bottom:10px; }
+    .field-input input { padding:1px; }
+    .hidden { display:none }
+    .leftCol {
+        float:left;
+        width:325px;
+        padding-right:15px;
+        line-height:22px;
+        border-right:1px solid #e5e5e5;
+    }
+    .rightCol {
+        float:left;
+        width:325px;
+        padding-left:15px;
+        line-height:22px;
+    }
+    .label {
+        float:left;
+        width:80px;
+        margin-bottom:4px;
+        line-height:24px;
+    }
+    .field {
+        float:left;
+        width:600px;
+        margin-bottom:4px;
+        line-height:24px;
+    }
+    .input {
+        width:300px;
+    }
+</style>
+
+<div id="mainco2">
+    <div class="roundedbox">
+        <a id="top" href="#top" style="text-decoration:none">&nbsp;</a>
+        <form name="SurveyFeedback" method="post" action="/<?php echo $this->groupInfo['URLName'] ?>/survey/<?php echo $this->data['SurveyId'] ?>" id="SurveyFeedback" onsubmit="return ValidateForm()">
+            <input type="hidden" id="SurveyId" name="SurveyId" value="<?php echo $this->data['SurveyId'] ?>" />
+            <input type="hidden" id="GroupId" name="GroupId" value="<?php echo $this->data['GroupId'] ?>" />
+            <input type="hidden" id="UserId" name="UserId" value="<?php echo $_SESSION['UserId'] ?>" />
+            <input type="hidden" id="Type" name="Type" value="<?php echo $this->data['Type'] ?>" />
+            <div style="margin:auto; width:700px; padding-right:5px; ">
+                <ul style="list-style:none; padding:0px; margin-bottom:0px; margin:auto; margin:auto">
+                    <div style="margin-bottom:10px; background-color:yellow; font-weight:bold; padding:10px;<?php echo $this->data['Type'] == 'Existing Members' ? "width:500px;" : "" ?>">&nbsp;> <?php echo stripslashes($this->groupInfo['GroupName']) ?> would like you to fill the below form <?php echo $type[$this->data['Type']] ?></div>
+                    <h1 style="margin-bottom:15px; font-size:28px; font-weight:bold; padding-bottom:10px;"><?php echo $this->data['Title'] ?></h1>
+                    <div id="message" class="<?php echo isset($this->message) ? "success" : "error" ?>" style=" border:2px solid #e3e3e3; margin-bottom:15px; padding:5px; width:685px; <?php if(!$this->message) { echo "display:none;"; } ?>"><?php if(isset($this->message)) { echo $this->message; } ?></div>
+                    <div class="error">*Required</div>
+                    <li class="field-input">
+                        <?php foreach($this->questions as $question) { ?>
+                        <div style="margin:10px 0px;">
+                            <?php echo $question['Question'].($question['isRequired'] == 1 ? ' <span class="error">*</span>' : '') ?><br>
+                            <textarea class="<?php echo ($question['isRequired'] == 1 ? 'required' : '') ?>" rows="2" cols="60" name="Feedback[<?php echo $question['SurveyQuestionId'] ?>]"></textarea>
+                        </div>
+                        <?php } ?>
+                    </li>
+                    <li class="field-label" style="margin-top:-10px">&nbsp;</li>
+                    <li class="field-input" style="margin-top:-10px">
+                        <?php if ($this->data['isRequired'] == 0) { ?>
+                            <?php if ($this->data['Type'] == "Joining Activity") { ?>
+                            <a style="font-size:15px;" href="/signup/?ProjectId=<?php echo $this->data['ProjectId'] ?>">Skip</a>
+                            <?php } else if ($this->data['Type'] == "Joining Group") { ?>
+                            <a style="font-size:15px;" href="javascript:;" onclick="joinGroup()">Skip</a>
+                            <?php } else { ?>
+                            <a style="font-size:15px;" href="/<?php echo $this->groupInfo['URLName'] ?>">Skip</a>
+                            <?php } ?>
+                        &nbsp;&nbsp;<span style="color:#3366FF; font-size:15; font-weight:bold">&middot;</span>&nbsp;&nbsp;
+                        <?php } ?>
+                        <input type="submit" class="btn btngreen" name="btnCreateNew" value="Submit" style="padding:2px 15px" />
+                    </li>
+                </ul>
+            </div>
+        </form>
+        <div class="clear"></div>
+    </div>
+</div>

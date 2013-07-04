@@ -1,0 +1,90 @@
+<script>
+$(function() {
+    <? if (isset($this->filter)) { ?>
+        capturePaginators();
+    <? } ?>
+});
+
+function capturePaginators() {
+    $('.paginator').click(function(event) {
+        event.preventDefault();
+        filter($(this).attr('href'));
+    });
+}
+
+function filter(url) {
+    var urlParam = url;
+    if (!url) {
+        var urlParam = 'participate';
+    }
+    var data = 'filter=true';
+    if ($('#searchFilter').val() != '') {
+        data += '&searchFilter=' + $('#searchFilter').val();
+    }
+    $("#contentData").html('Loading content ...');
+    $.ajax({
+        url: urlParam,
+        data:  data,
+        success: function(data) {
+            $("#contentData").html(data);
+            capturePaginators();
+        }
+    });
+    return false;
+}
+</script>
+
+<div class="wrapper">
+
+  <!-- org header -->
+  <?=$this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+  <div class="BodyCon">
+
+    <!-- breadcrumb -->
+    <?= $this->placeholder('breadcrumb'); ?>
+    <!-- // breadcrumb -->
+
+    <div class="clr"></div>
+
+    <!-- tabs -->
+    <?=$this->placeholder('tabs') ?>
+    <!-- // tabs -->
+
+    <div class="clr"></div>
+    <div class="mainC02">
+        <div class="spacer"></div>
+	    <center>
+	        <span style="font-weight:bold;font-size:24px;line-height:28px;margin:10px 0">Participate in an Initiative</span><br />
+	        <span style="font-size:16px;line-height:18px;">Find an upcoming initiative you want to participate in!</span>
+	    </center>
+	    <div class="spacer"></div>
+	    <div style="width:74%;float:left;">
+        <div class="headingStyle02 rounded">Select an Initiative </div>
+        <div style="margin:15px 0 0 10px">
+          <form id="searchMembers" action="/<?=$this->organization->urlName?>/participate" method="post" onsubmit="return filter();">
+            <input name="searchFilter" id="searchFilter" type="text" class="textField01" value="<?=$this->searchtext?>" />
+          </form>
+        </div>
+        <div class="clear"></div>
+
+        <div id="contentData">
+          <!-- content by default or by ajax -->
+          <?php echo $this->render('nonprofit/tabscontent/participate.phtml'); ?>
+        </div>
+      </div>
+      
+      <div style="width:25%;float:right">
+	      <center><span style="font-weight:bold;font-size:18px;line-height:32px;">Cant find the right fit?</span></center>
+        <div class="spacer"></div>
+        <center><div class="startCBtn" style="margin:10px 35px;"><a href="/<?=$this->userNew->urlName?>/affiliations/<?= isset($this->group) ? $this->group->urlName : $this->organization->urlName?>">Participate Later</a></div></center>
+      </div>
+      
+    </div>
+  </div>
+  <div class="clr"></div>
+  <div class="clr"></div>
+</div>
+

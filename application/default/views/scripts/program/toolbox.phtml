@@ -1,0 +1,30 @@
+<?php $this->placeholder('tool_box')->captureStart() ?>
+<div class="adminPanelCon">
+  <div class="adminPanel">
+    <h1><span></span>Tools</h1>
+    <div class="tool-box-content">
+      <ul>
+        <li><a class="editDetails" href="/program/editinfo?ProgramId=<?=$this->program->id?>"><span style="vertical-align:top;">Edit Details</span></a></li>
+        <li><a class="logoIcon uploadLogo" href="javascript:;" ><span style="vertical-align:top; margin-right:15px;">Change Program Logo</span></a></li>
+      </ul>
+      <div class="adminPanelSeprator"></div>
+      <ul>
+        <li><a class="volunteerIcon" href="/<?=$this->program->urlName?>/volunteers"><span style="vertical-align:top;">View Volunteers</span></a></li>
+        <?php if($this->program->organization->googleId || $this->program->organization->paypalId) { ?>
+        <li><a class="donationIcon" href="/<?=$this->program->organization->urlName?>/donations?ProgamId=<?=$this->program->id?>"><span style="vertical-align:top;">View Donation History</span></a></li>
+        <li><a class="donorsIcon"  href="/<?=$this->program->urlName?>/donors"><span style="vertical-align:top;">View Donors</span></a></li>
+        <?php } ?>
+        <li><a class="reportsIcon" href="/<?=$this->program->urlName?>/reports"><span style="vertical-align:top;">View Reports</span></a></li>
+      </ul>
+      <div class="adminPanelSeprator"></div>
+      <ul>
+        <li><a href="javascript:;" onclick="deleteProgram('<?=$this->program->id?>')"><span style="vertical-align:top;">Delete</span></a></li>
+      </ul>
+    </div>
+  </div>
+<div class="clr"></div>
+</div>
+
+<?php echo $this->placeholder('popup_upload_logo') ?>
+
+<?php $this->placeholder('tool_box')->captureEnd() ?>

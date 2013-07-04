@@ -1,0 +1,80 @@
+<?php if ($this->isAdmin) { ?>
+<script>
+    function deleteEvent() {
+        if (confirm('Are you sure you want to delete the selected event?')) {
+            location.href = '/event/deleteevent?EventId=<?=$this->event->id?>';
+        }
+    }
+</script>
+<?php } ?>
+<div class="wrapper">
+
+  <!-- org header -->
+  <?php echo $this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="BodyCon">
+
+    <!-- breadcrumb -->
+    <?php echo $this->placeholder('breadcrumb') ?>
+    <!-- // breadcrumb -->
+
+    <div class="clr"></div>
+
+    <!-- tabs -->
+    <?php echo $this->placeholder('tabs') ?>
+    <!-- // tabs -->
+
+    <div class="mainC02">
+    <div class="spacer"></div>
+      <div class="leftC">
+        <div class="leftMainBox BG01">
+            <?php if ($this->isAdmin) { ?>
+            <!-- tool box -->
+            <?=$this->placeholder('tool_box'); ?>
+            <div class="clear"></div><br />
+            <!-- // tool box -->
+            <?php } ?>
+
+          <!-- events -->
+          <?php echo $this->render('event/events.phtml'); ?>
+          <!-- //events -->
+        </div>
+      </div>
+      <div class="rightC">
+        <div class="rightMainBox BG01">
+          <div class="box004">
+            <div class="headingStyle02"><?=stripslashes($this->event->title)?></div>
+            <div class="box004Content">
+                <?php $this->shareUrl = $_SERVER['HTTP_HOST'] . '/' . $this->shareUrlPrefix . '/events?EventId=' . $this->event->id ?>
+                <?php $this->shareEmail = $this->event->title ?>
+                <?php echo $this->render('nonprofit/sociallinks.phtml'); ?>
+              <div class="clr"></div>
+
+              <!-- right box -->
+              <?php echo $this->placeholder('right_bar') ?>
+              <!-- //right box -->
+
+              <!-- general data -->
+              <p><strong>Event Date:</strong> <?= date('M j, Y g:i A', strtotime($this->event->startDate)) ?></p>
+              <p><strong><span class="Text14">Event Description:</span></strong><br />
+              <?=stripslashes(nl2br($this->event->text))?>
+              </p>
+              <!-- //general data -->
+
+            </div>
+          </div>
+
+          <?php if($this->event->isSellTickets) { ?>
+          <!-- attendees -->
+          <?php echo $this->render('event/attendees.phtml'); ?>
+          <!-- //attendees -->
+          <?php } ?>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="clr"></div>
+  <div class="clr"></div>
+</div>

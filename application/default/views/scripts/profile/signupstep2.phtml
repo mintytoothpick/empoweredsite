@@ -1,0 +1,107 @@
+<?php $this->headTitle("Register with Empowered.org"); ?>
+<script>
+    function validateForm() {
+        var error = "";
+        if (jQuery.trim($('#upload').val()) != "") {
+            var image = $('#upload').val().split(".");
+            var accepted_files = new Array("jpeg", "jpg", "png", "gif");
+            var extension = image[image.length-1].toLowerCase();
+            if (!accepted_files.inArray(extension)) {
+                error += "Please select jpeg, png, or gif files only.";
+            }
+        }
+        if (error != "") {
+            $('#error').html(error).show();
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+<?php if(!$this->isLoggedIn) {?>
+
+$(function() {
+    $("#loginProfile").trigger("click");
+});
+
+<?php }?>
+</script>
+    <div id="centred">
+        <!-- main col - 100% width -->
+        <div id="mainco2">
+            <!-- block001 -->
+            <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+            <div class="block001">
+                <div class="blst001">
+                    <div class="blst002 hsp" style="background-color:#fff; <?php echo isset($this->error_message) ? "min-height:460px;" : "" ?>">
+                        <h1 style="font-size:20px">Hi <?php echo isset($_SESSION['FirstName']) ? $_SESSION['FirstName'] : (isset($this->userNew) ? $this->userNew->firstName : '') ?>! First create your user profile</h1>
+                        <div class="clear1"></div><br><br>
+                        <!-- register form -->
+                        <?php // echo $this->registerForm; ?>
+                        <form id="basicinfo" enctype="multipart/form-data" action="/profile/signup-step2" method="post" onsubmit="return validateForm();">
+                            <div style="width:100%">
+                                <div id="error" style="border: solid 2px #e3e3e3; color: red; padding: 4px; padding-right:20px; width: 400px; margin-bottom:20px; display:none"></div>
+                                <?php if (isset($this->error_message)) : ?>
+                                <div style="border: solid 2px #e3e3e3; color: red; padding: 4px; padding-right:20px; width: 400px; margin-bottom:20px;">
+                                    <?php echo $this->error_message ?>
+                                </div>
+                                <br>
+                                <?php endif; ?>
+                                <div class="form02" style="float:left; width:350px; padding-top:0px; padding-right:20px">
+                                    <div style="margin-left:20px;">
+                                        <div style="padding:3px; margin-top:-5px; font-size:13px; font-weight:bold; padding-right:10px; padding-bottom:3px; border-bottom:3px solid #e5e5e5; margin-bottom:5px; width:255px">Profile Picture <a style="font-size:15px; float:right; margin-left:15px; display:none" href="javascript:;" onclick="$('#upload').trigger('click')">Upload a Photo</a></div>
+                                        <img id="ctl00_ContentPHMain_imgUser" src="<?php echo $this->contentLocation ?>public/images/Pictures/person_icon.png" width="270px" style="border-width:0px; display: block; margin-bottom: 3px" />
+                                        <input type="file" name="upload" id="upload" size="35" class="textfield" />
+                                    </div>
+                                </div>
+                                <div class="form02" style="float:left; margin-left:10px; width:480px; padding-top:0px; padding-left:40px; border-left:2px solid#e5e5e5">
+                                    <? if ($this->showCreateOrg) { ?>
+                                    <div style="padding:10px 0px; margin-bottom:5px">
+                                    <label style="font-weight:bold; font-size:15px">Are you creating an account for an organization?</label>
+                                      <span style="margin-left:5px"><input type="radio" name="createOrg" value="yes" >&nbsp;Yes</span>
+                                      <span style="margin-left:10px"><input type="radio" name="createOrg" value="no" checked>&nbsp;No</span>
+                                    </div>
+                                    <? } ?>
+                                    <div style="padding:10px 0px; margin-bottom:5px">
+                                      <label for="txt001" style="font-weight:bold; font-size:15px">What are you passionate about?</label>
+                                      <textarea style="width:350px" name="passion" rows="3" cols="30" id="passion"><?php echo isset($this->passion) ? $this->passion : "" ?></textarea>
+                                    </div>
+                                    <div style="padding:10px 0px; margin-bottom:5px">
+                                        <label for="gender01" style="margin-top:4px; font-weight:bold; font-size:15px">Gender: </label>
+                                        <span style="margin-left:20px"><input type="radio" id="gender01" name="gender" value="1" <?php echo isset($this->gender) && $this->gender == '1' ? 'checked' : '' ?>>&nbsp;Male</span>
+                                        <span style="margin-left:20px"><input type="radio" id="gender02" name="gender" value="2" <?php echo isset($this->gender) && $this->gender == '2' ? 'checked' : '' ?>>&nbsp;Female</span>
+                                    </div>
+                                    <div style="margin-bottom:15px">
+                                        <label for="loc001" style="font-weight:bold; font-size:15px">Location: </label>
+                                        <input style="width:280px" name="location" type="text" id="location" class="textfield" value="<?php echo isset($this->location) ? $this->location : "" ?>" />
+                                    </div>
+                                    <div>
+                                        <label for="loc001" style="font-weight:bold; font-size:15px; margin-bottom:4px;">Empowered Web Address: </label><br />
+                                        <span style="float:left;margin: 5px 4px 0 0;">www.empowered.org/</span><input style="float:left; width:280px; margin-bottom:0px" name="URLName" type="text" id="URLName" class="textfield" value="<?php echo isset($this->URLName) ? $this->URLName : "" ?>" onfocus="if (this.value == 'www.empowered.org/') { this.value='' }" />
+                                        <div class="clear"></div><span style="font-size:11px; color:#AAA;"><i>(Your unique profile link)</i></span>
+                                    </div><br>
+                                </div>
+                                <div class="clear"></div><br />
+                                <div style="width:700px; clear: both;">
+                                    <input style="float:right" type="submit" name="btnSignUp" value="Save & Continue" id="ctl00_ContentPHMain_btnSignUp" class="btn btngreen" />
+                                    <input style="float:right" type="submit" name="btnSignUp" value="Skip" id="ctl00_ContentPHMain_btnSignUp" class="btn btngreen" />
+                                </div>
+                                <div class="clear"></div><br />
+                            </div>
+                        </form>
+                        <!-- e o login form -->
+                    </div>
+                </div>
+            </div>
+            <div class="block001f01">
+                <div class="blst001">
+                    <div class="blst002"></div>
+                </div>
+            </div>
+            <span id="ctl00_ContentPHMain_lblErrorMsg" class="divError"></span>
+            <!-- e o block001 -->
+        </div>
+        <!-- e o main col -->
+        <div class="clear"></div>
+        <a id="loginProfile"></a>
+    </div>

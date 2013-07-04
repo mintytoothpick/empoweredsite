@@ -1,0 +1,44 @@
+<div class="wrapper">
+   <!-- org header -->
+  <?php echo $this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="BodyCon">
+
+    <!-- breadcrumb -->
+    <?php echo $this->placeholder('breadcrumb') ?>
+    <!-- // breadcrumb -->
+    <div class="clr"></div>
+
+    <!-- tabs -->
+    <?php echo $this->placeholder('tabs') ?>
+    <!-- // tabs -->
+
+    <div class="mainC">
+      <div class="searchInternalBox">
+        <form id="searchMembers" action="/<?=$this->organization->urlName?>/programs" method="post">
+          <input name="searchFilter" type="text" class="textField01" value="<?=$this->searchtxt?>" />
+        </form>
+      </div>
+      <div class="box05">
+        <div class="headingStyle02 rounded"><?=$this->organization->programNamingPlural?> (<?=number_format(count($this->programs)) ?>)</div>
+        <?php if ($this->isAdmin) { ?><a class="adminLink" href="/<?=$this->organization->urlName?>/create-program">+ Create a new <?=strtolower($this->organization->programNamingSingular)?></a><div class="spacer"></div><? } ?>
+        <?php if (count($this->programs)) { ?>
+        <?php foreach ($this->programs as $program) { ?>
+        <div class="programBox02">
+           <div class="programImg program01"><a href="/<?=$program->urlName?>"><img src="<?=$this->contentLocation?>public/Media/full/<?=$program->logo->systemMediaName?>" class="greyBorder1"/></a></div>
+          <div class="programText02"><div class="programName"><a href="/<?=$program->urlName?>"><?=stripslashes($program->name)?></a></div><?= substr(stripslashes($program->description), 0, 120) ?> ...</div>
+          <div class="programGroup">
+            <div class="group"><span class="text19"><a href="/<?=$program->urlName?>/chapters" class="white"><?=number_format(count($program->groups))?></a></span><div class="clr"></div>Groups</div>
+            <div class="group"><span class="text19"><a href="/<?=$program->urlName?>/active-campaigns" class="white"><?=number_format(count($program->campaigns))?></a></span><br />Fundraising<br />Campaigns</div>
+            <div class="group noMR"><span class="text19"><a href="/<?=$program->urlName?>/upcoming-activities" class="white"><?=number_format(count($program->activities))?></a></span><br />Volunteer<br />Activities</div>
+          </div>
+        </div>
+        <? } ?>
+        <? } ?>
+      </div>
+    </div>
+
+  <div class="clr"></div>
+  <div class="clr"></div>
+</div>

@@ -1,0 +1,74 @@
+<script>
+var memberId = '';
+function stop(mId) {
+    memberId = mId;
+    $.fancybox($('#messageMembership').html());
+}
+function confirm() {
+    $.fancybox.showActivity();
+    $.post('/profile/membershipremove', {
+        memberId: memberId
+    },
+    function(data) {
+        $.fancybox.hideActivity();
+        $.fancybox('<p align="center"><b>Your request has been processed. Please check your inbox email to confirm the deactivation.</b></p><div class="volunteerBtn02"><a href="javascript:void();" onclick="$.fancybox.close()">Continue</a></div>');
+        $('#'+memberId).hide();
+    });
+}
+</script>
+
+<div id="messageMembership" class="hide">
+<p style="font-size:14px;" align="center"><b>Are you sure you want to deactivate your membership?</b></p>
+<p align="center">If you continue, you must receive an email confirmation of the action. <br />If you don't get the email in 24hs, please contact us to membership@globalbrigades.org</p>
+
+<div style="margin: 0 auto;display: block;width: 320px;">
+<div class="volunteerBtn03">
+  <a onclick="javascript:confirm();" href="javascript:;">Yes</a>
+</div>
+<div class="volunteerBtn03">
+  <a href="javascript:void();" onclick="$.fancybox.close()">No</a>
+</div>
+</div>
+</div>
+
+
+<div class="wrapper">
+  <!-- user header -->
+  <?php echo $this->placeholder('header') ?>
+  <!-- // user header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+      <!-- user tabs -->
+      <?php echo $this->placeholder('tabs') ?>
+      <!-- // user tabs -->
+
+    <div class="mainC02">
+      <div class="spacer"></div>
+      <div class="rightMainBox BG01">
+        <div class="box004">
+          <div class="headingStyle02 full">Active Membership List</div>
+          <div class="box005Content">
+            <?php $list = $this->userNew->getMembership();
+            if ($list) {
+            foreach ($list as $member) { ?>
+            <div id="<?=$member->id?>">
+              <div style="float:right">
+                <img src="/public/images/cancel.png" /> <a href="javascript:;" onclick="stop('<?=$member->id?>')">Stop Membership</a>
+              </div>
+              <a href="/<?=$member->group->urlName?>" class="headignStyle03"><?=$member->group->name?></a><br />
+              <?=$member->group->description?>
+            <div class="clr"></div><br />
+            </div>
+            <? } } else { ?>
+                No records found.
+            <? } ?>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="clr"></div>
+  <div class="clr"></div>
+</div>

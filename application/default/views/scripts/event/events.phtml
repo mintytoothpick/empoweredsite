@@ -1,0 +1,46 @@
+<? if (!isset($this->filter)) { ?>
+<script>
+function filterEvents() {
+    $("#loading").show();
+    $("#contentEvents").html('');
+    $.ajax({
+        url: "/event/filterevents",
+        data: 'eventId=<?=$this->event->id?><? if (!empty($this->group)) { ?>&SiteId=<?=$this->group->id?><? } else if(!empty($this->user)) { ?>&UserId=<?=$this->user->id?><? } else if(!empty($this->organization)) { ?>&NetworkId=<?=$this->organization->id?><? } ?>&status=' + $('#statusEvent').val(),
+        success: function(data) {
+            $("#contentEvents").html(data);
+            $("#loading").hide();
+        }
+    });
+}
+$(function() {
+    $('#statusEvent').change(function(){
+        filterEvents();
+    });
+});
+</script>
+
+<div class="box002 noMB">
+  <div class="headingStyle01 BG02">All Events</div>
+  <div class="box002Content">
+    <div class="filterBy03"><span>Sort By:</span>
+      <select id="statusEvent" class="dropDown01">
+        <option value="upcoming" <?=($this->status == 'upcoming')?'selected':''?>>Upcoming</option>
+        <option value="past" <?=($this->status == 'past')?'selected':''?>>Past</option>
+      </select>
+    </div>
+  </div>
+</div>
+<div id="loading" class="hide"><div class="box002Content">Loading initiatives ...</div></div>
+<div id="contentEvents">
+<? } ?>
+
+<? if(count($this->events) > 0) {
+foreach($this->events as $event) { ?>
+<a href="?EventId=<?=$event->id?>&status=<?=$this->status?>"><div class="leftBox <?=($event->id == $this->event->id) ? 'border01' : '' ?>">
+  <div class="month NoMarginTop"><strong><span class="color01"><?= date('M', strtotime($event->startDate)); ?></span></strong><br /><?= date('d', strtotime($event->startDate)); ?></div>
+  <p class="Style03"><?= $event->title ?></p>
+</div></a>
+<? } } else { ?>
+<div class="box002Content"><p>No events found.</p></div>
+<? } ?>
+<? if (!isset($this->filter)) { ?></div><? } ?>

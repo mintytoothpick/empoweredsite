@@ -1,0 +1,362 @@
+<?php
+if (!empty($this->organization)) {
+    $this->headTitle("Empowered.org - Edit Organization");
+} else {
+    $this->headTitle("Empowered.org - Start an Organization");
+}
+?>
+<?= $this->headScript() ?>
+<style>
+label.error {color:red; padding-bottom:7px;font-weight:normal;}
+</style>
+<script type="text/javascript" language="javascript">
+    $(function() {
+        //form contact validate
+        $("#formCreateOrganization").validate({
+            onfocusout: function(element) { this.element(element); },
+            errorPlacement: function(error, element) {
+                if (element.attr("name") == "isMultichaptered") {
+                    error.insertBefore("#phoneInput");
+                } else if (element.attr("name") == "hasPrograms") {
+                    error.insertBefore("#infoBox2");
+                } else if (element.attr("name") == "NetworkLogo") {
+                    error.insertAfter("#add-photo-pop");
+                } else if (element.attr("name") == "hasActivities") {
+                    error.insertAfter("#hasActivities-2");
+                } else if (element.attr("name") == "hasCampaigns") {
+                    error.insertAfter("#hasCampaigns-2");
+                } else if (element.attr("name") == "hasEvents") {
+                    error.insertAfter("#hasEvents-2");
+                } else if (element.attr("name") == "hasMembership") {
+                    error.insertAfter("#hasMembership-2");
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            rules: {
+                NetworkLogo: {
+                    accept: "jpeg|jpg|png|gif"
+                },
+                NetworkName: 'required',
+                Description: 'required',
+                Email: {
+                    required: true,
+                    email: true
+                },
+                WebAddress: 'simpleUrl',
+                Country: 'required',
+                Region: 'required',
+                City: 'required',
+                Street: 'required',
+                isMultichaptered: 'required',
+                hasPrograms: {
+                    // is required only if:
+                    required: "#isMultichaptered-1:checked"
+                },
+                groupNamingSingular: {
+                    required: "#isMultichaptered-1:checked"
+                },
+                groupNamingPlural: {
+                    required: "#isMultichaptered-1:checked"
+                },
+                programNamingSingular: {
+                    required: "#hasProgram-1:checked"
+                },
+                programNamingPlural: {
+                    required: "#hasProgram-1:checked"
+                },
+                hasActivities: {
+                    required: true
+                },
+                hasCampaigns: {
+                    required: true
+                },
+                hasMembership: {
+                    required: true
+                },
+                hasEvents: {
+                    required: true
+                },
+            },
+            messages: {
+                NetworkLogo: {
+                    accept: 'Please upload pictures in jpeg, png and gif format only.'
+                },
+                NetworkName: 'Please specify your organization name.',
+                Description: 'Please specify your organization description.',
+                Email: {
+                    required: "Please provide the organization's contact email.",
+                    email: 'Please specify a valid email address.'
+                },
+                WebAddress: 'You have entered an invalid website.',
+                Country: 'Please specify your country',
+                Region: 'Please specify your region/state',
+                City: 'Please specify your city',
+                Street: 'Please specify your street address',
+                isMultichaptered: 'Please specify if your organization is multi-chaptered or not.',
+                hasPrograms: {
+                    required: 'Please specify if your organization has programs or none.'
+                },
+                groupNamingSingular: {
+                    required: "Please, specify the singular naming for categories."
+                },
+                groupNamingPlural: {
+                    required: "Please, specify the plural naming for categories."
+                },
+                programNamingSingular: {
+                    required: "Please, specify the singular naming for extra categories."
+                },
+                programNamingPlural: {
+                    required: "Please, specify the plural naming for extra categories."
+                },
+                hasActivities: {
+                    required: 'Please specify if your organization has activities or none.'
+                },
+                hasCampaigns: {
+                    required: 'Please specify if your organization has campaigns or none.'
+                },
+                hasMembership: {
+                    required: 'Please specify if your organization has membership.'
+                },
+                hasEvents: {
+                    required: 'Please specify if your organization has events or none.'
+                },
+            }
+        });
+    })
+
+    function hideBoxes() {
+        $('.info-boxes').hide();
+    }
+
+</script>
+<style type="text/css">
+    .success { color:green }
+    label.error { color:red; display:block; padding: 5px 0 10px 0; }
+    .field-label { float:left; font-weight:bold; color:#000; width:200px; margin-bottom:15px;}
+    .field-input { float:left; width:455px; margin-bottom:15px; }
+    .field-input .input { width:300px; }
+    .field-input input { padding:1px; }
+    .field-input .date { width:95px; }
+    .hidden { display:none }
+</style>
+
+
+<div>
+    <div id="mainco2">
+        <div class="roundedbox">
+            <a id="top" href="#top" style="text-decoration:none">&nbsp;</a>
+            <form name="CreateOrganization" id="formCreateOrganization" method="post" enctype="multipart/form-data">
+                <div style="margin:auto; width:960px; padding-right:5px; ">
+                    <div id="message" class="error" style=" border:2px solid #e3e3e3; margin-bottom:15px; padding:5px; width:475px; display: none"></div>
+                    <ul style="list-style:none; padding-bottom:0px">
+                        <? if (empty($this->organization)) { ?>
+                        <li style="width:180px; float:left; margin-right:20px; margin-left:5px">
+                            <div style=" background-color:#BDD1DE; width:105px; height:80px; padding:20px 35px; margin:0px;">
+                                <div style="border:2px solid rgb(255, 255, 255); width: 100px; height: 75px; margin:0px;">
+                                    <img src="/public/images/addphoto.jpeg" style="width:100px; height:75px;" />
+                                </div>
+                            </div>
+                            <div style="width:180px; margin-top:10px">
+                                <strong>Want to add an image?</strong><br /><br />
+                                <input type="radio" name="logotype" value="logo" style="margin:0 10px;" onclick="$('#bannerinfo').hide(); $('#logoinfo').show();" />Logo
+                                <input type="radio" name="logotype" value="banner" style="margin:0 10px;" onclick="$('#logoinfo').hide(); $('#bannerinfo').show();" />Banner<br /><br />
+                                <input type="file" size="12" name="NetworkLogo" id="NetworkLogo" class="textfield" style="max-width:180px;" /><br>
+                                <div id="logoinfo" class="info-boxes" style="margin-top:20px;width:170px; margin-left:0; display:none;">
+                                    <h3 style="text-align:center">Uploading a Logo?</h3>
+                                    You will be asked to crop your logo on the following page.<br /><br />Your image must be in either <strong>jpg</strong>, <strong>png</strong>, or <strong>gif</strong> format and it must be <strong>< 2MB</strong> in size.
+                                </div>
+                                <div id="bannerinfo" class="info-boxes" style="margin-top:20px;width:170px; margin-left:0; display:none;">
+                                    <h3 style="text-align:center">Uploading a Banner?</h3>
+                                    You will be asked to crop your banner on the following page.<br /><br />Your image must be in either <strong>jpg</strong>, <strong>png</strong>, or <strong>gif</strong> format and it must be <strong>< 2MB</strong> in size.
+                                </div>
+                            </div>
+                        </li>
+                        <? } ?>
+                        <li style="<? if (empty($this->organization)) { ?>border-left:1px solid #e5e5e5;<? } ?>width:725px; float:left; padding-left:20px">
+                            <? if (!empty($this->organization)) { ?>
+                            <h1 style="margin-bottom:0px; font-size:23px; font-weight:bold">Edit Your Organization Profile</h1>
+                            <? } else { ?>
+                            <h1 style="margin-bottom:0px; font-size:23px; font-weight:bold"><?php echo isset($_REQUEST['customrequest']) && $_REQUEST['customrequest'] == 'true' ? 'Apply For A Custom Organization Setup' : 'Create Your Organization Profile'; ?></h1>
+                            <? } ?>
+                            <div id="message" class="error" style="width:500px; border:2px solid #e3e3e3; margin-bottom:15px; padding:5px; display: none"></div><br />
+                            <ul style="list-style:none; padding-bottom:0px; margin-bottom:0px">
+                                <span style="color:#A9A9A9; font-weight:bold; font-size:14px;">Details</span>
+                                <div class="clear" style="margin-bottom:20px;"></div>
+                                <li class="field-label">Organization Name:<span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;"> * </span></li>
+                                <li class="field-input">
+                                    <input name="NetworkName" type="text" id="NetworkName" class="input" value="<?=(!empty($this->organization)) ? $this->organization->name : ''?>" />
+                                </li>
+                                <li class="field-label">Description:<span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;"> * </span></li>
+                                <li class="field-input">
+                                    <textarea name="Description" rows="10" cols="20" id="Description" class="input" onblur="return fnKeepWordLenTrack(this,3000);" onkeyup="return fnKeepWordLenTrack(this,3000);" style="font-size:14px"><?=(!empty($this->organization)) ? $this->organization->description : ''?></textarea>
+                                </li>
+                                <li class="field-label locationbox">Street Address:<span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;"> * </span></li>
+                                <li class="field-input locationbox">
+                                    <input name="Street" type="text" maxlength="100" id="Street" class="input" value="<?=(!empty($this->organization)) ? $this->organization->contact->street : ''?>" />
+                                </li>
+                                <li class="field-label locationbox">Country:<span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;"> * </span></li>
+                                <li class="field-input locationbox">
+                                    <select type="text" name="CountryId" id="CountryId" style="width:300px" onchange="populateLocation('state', this.value); $('#Country').val(this.options[this.selectedIndex].text); populateLocation('city', 0);">
+                                        <option value="all" selected>All</option>
+                                        <?php foreach ($this->country_list as $country) { ?>
+                                        <option value="<?php echo $country['CountryId'] ?>" <?=(!empty($this->organization) && $this->organization->contact->countryId == $country['CountryId']) ? 'selected' : ''?>><?php echo $country['Country'] ?></option>
+                                        <?php } ?>
+                                    </select>
+                                    <input type="text" id="Country" name="Country" value="<?=(!empty($this->organization)) ? $this->organization->contact->countryId : '' ?>" style="display:none;" />
+                                </li>
+                                <li class="field-label locationbox">Region:<span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;"> * </span></li>
+                                <li class="field-input locationbox" id="state-list">
+                                    <select type="text" name="RegionId" id="RegionId" style="width:300px" onchange="populateLocation('city', this.value); $('#Region').val(this.options[this.selectedIndex].text);">
+                                        <option value="0">All</option>
+                                    </select>
+                                    <input type="text" id="Region" name="Region" value="<?=(!empty($this->organization)) ? $this->organization->contact->stateId : '' ?>" style="display:none;"/>
+                                </li>
+                                <li class="field-label locationbox">City:<span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;"> * </span></li>
+                                <li class="field-input locationbox" id="city-list">
+                                    <select type="text" name="CityId" id="CityId" style="width:300px" onchange="$('#City').val(this.options[this.selectedIndex].text);">
+                                        <option value="0">All</option>
+                                    </select>
+                                    <input type="text" id="City" name="City" value="<?=(!empty($this->organization)) ? $this->organization->contact->cityId : '' ?>" style="display:none;"/>
+                                </li>
+                                <div class="clear"></div>
+                                <li class="field-label">Contact Email:<span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;"> * </span></li>
+                                <li class="field-input">
+                                    <input name="Email" type="text" maxlength="50" id="Email" class="input" value="<?=(!empty($this->organization)) ? $this->organization->contact->email : ''?>" />
+                                </li>
+                                <li class="field-label">Website:</li>
+                                <li class="field-input">
+                                    <input name="WebAddress" type="text" id="WebAddress" class="input" value="<?=(!empty($this->organization)) ? $this->organization->contact->website : ''?>" />
+                                </li>
+                                <li class="field-label">Contact Phone:</li>
+                                <li class="field-input">
+                                    <? if (!empty($this->organization) && !empty($this->organization->contact->phone)) { ?>
+                                    <input name="phoneNumber" type="text" id="phoneNumber" value="<?=$this->organization->contact->phone?>" />
+                                    <? } else { ?>
+                                    <input name="phoneNumber" type="text" id="phoneNumber" value="1800-555-5555" style="color:#AAA;" onclick="this.value = ''; $('#phoneNumber').css('color', '#000');" />
+                                    <? } ?>
+                                </li>
+
+                                <div class="clear" style="border-bottom:1px solid #E5E5E5;margin-bottom:30px;"></div>
+                                <span style="color:#A9A9A9; font-weight:bold; font-size:14px;">Structure</span>
+                                <div class="clear" style="margin-bottom:20px;"></div>
+                                <li style="float: left; width: 100%;">
+                                    <strong>Does your organization consist of multiple groups or chapters?<span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;"> * </span></strong> <a href="javascript:;" onclick="$('#multichapteredInfo').toggle();">Learn More</a><br />
+                                    <div class="clear" style="margin-bottom:5px;"></div>
+                                    <div id="multichapteredInfo" class="info-boxes hide">A multi-chaptered organization is an organization with multiple divisions working towards the same goal. These divisions can be broken up in a variety of ways depending on your organization: by location, interest, age, etc.<br /></div>
+                                    <div class="info-boxes">Selecting 'yes' will enable your chapters or groups to create their unique pages under your umbrella organization.  These 'chapters' will be connected to your bank account and you will have all reporting visibility to their initiatives such as events, fundraising campaigns or volunteer activities.</div>
+                                    <div class="clear" style="margin-bottom:10px;"></div>
+                                    <span><input name="isMultichaptered" type="radio" id="isMultichaptered-1" class="create-opts" value="1" onclick="$('.chaptered-yes').show(); $('.multi-chaptered').show(); $('#phoneInput').show();" <?=(!empty($this->organization) && $this->organization->hasGroups) ? 'checked':''?>/> <span style="margin-right: 10px">Yes (we have multiple chapters)</span></span>
+                                    <div class="clear"></div>
+                                    <span><input name="isMultichaptered" type="radio" id="isMultichaptered-2" class="create-opts" value="0" onclick="$('.chaptered-no').show(); $('.multi-chaptered').hide(); $('#phoneInput').hide();" <?=(!empty($this->organization) && !$this->organization->hasGroups) ? 'checked':''?>/> <span style="margin-right: 10px">No (we have no chapters)</span></span>
+                                </li>
+                                <li style="float: left; width: 100%; margin:20px 0 20px 0;" class="multi-chaptered hide">
+                                    Chapter Naming Singular: <input name="groupNamingSingular" id="groupNamingSingular" type="text" value="<?=(!empty($this->organization)) ? $this->organization->groupNamingSingular : 'Chapter'?>"/><br />
+                                    Chapter Naming Plural: <input name="groupNamingPlural" id="groupNamingPlural" type="text" value="<?=(!empty($this->organization)) ? $this->organization->groupNamingPlural : 'Chapters'?>"/>
+                                    <div class="clear" style="margin-bottom:20px;"></div>
+                                    <strong><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Allow others to start chapters under your organization:</strong><br />
+                                    <div class="clear" style="margin-bottom:10px;"></div>
+                                    <input type="radio" name="isOpen" value="1" style="margin:0 10px;" <?=(!empty($this->organization) && $this->organization->isOpen) ? 'checked':''?>/>Without admin approval
+                                    <input type="radio" name="isOpen" value="0" style="margin:0 10px;" <?=(!empty($this->organization)) ? ((!$this->organization->isOpen) ? 'checked' : '') : 'checked'?> />With admin approval<br /><br />
+                                    <div class="clear" style="margin-bottom:10px;"></div>
+                                    <strong><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Would you like to add an additional category?</strong><br />
+                                    <div class="info-boxes2" id="infoBox2">
+                                        Adding extra categories, such as "programs," adds an extra level to segment your chapters, volunteer activities, fundraising campaigns, or events. Please see this image.
+                                        <center><img src="/public/images/sample-image2.gif" /></center>
+                                    </div>
+                                    <div class="clear"></div>
+                                    <span><input name="hasPrograms" type="radio" id="hasPrograms-1" class="create-opts" value="1" onclick="$('#programSettings').show()" <?=(!empty($this->organization) && $this->organization->hasPrograms) ? 'checked':''?>/> <span style="margin-right: 10px">Yes, Include Extra Category (I.e. Programs, Destinations, Etc...)</span></span><br />
+                                    <span><input name="hasPrograms" type="radio" id="hasPrograms-2" class="create-opts" value="0" onclick="$('#programSettings').hide()" <?=(!empty($this->organization) && !$this->organization->hasPrograms) ? 'checked':''?>/> <span style="margin-right: 10px">No, Exclude Extra Category</span></span>
+                                    <div class="<?=(!empty($this->organization) && $this->organization->hasPrograms) ? '' : 'hide'?>" id="programSettings" style="margin-top:15px;">
+                                        Category Naming Singular: <input name="programNamingSingular" type="text" value="<?=(!empty($this->organization)) ? $this->organization->programNamingSingular : 'Program'?>"/><br />
+                                        Category Naming Plural: <input name="programNamingPlural" type="text" value="<?=(!empty($this->organization)) ? $this->organization->programNamingPlural : 'Programs'?>"/>
+                                    </div>
+                                </li>
+                                <div class="clear" style="margin-bottom:10px;"></div>
+                                <li style="float: left; width: 100%;">
+                                    <strong>Enable Volunteer Activities?</strong> <a href="javascript:;" onclick="$('#volActInfo').toggle();">Learn More</a><br />
+                                    <div id="volActInfo" class="info-boxes hide"> Selecting "yes" will allow you to create and post volunteer activities for participants to register and even fundraise for based on unique goals that you set as the administrator.</div>
+                                    <div class="clear" style="margin-bottom:10px;"></div>
+                                    <span><input name="hasActivities" type="radio" value="1" <?=(!empty($this->organization) && $this->organization->hasActivities) ? 'checked':''?> /> <span style="margin-right: 10px">Yes</span></span>
+                                    <div class="clear"></div>
+                                    <span id="hasActivities-2"><input name="hasActivities" type="radio" value="0" <?=(!empty($this->organization) && !$this->organization->hasActivities) ? 'checked':''?> /> <span style="margin-right: 10px">No</span></span>
+                                </li>
+                                <div class="clear" style="margin-bottom:20px;"></div>
+                                <li style="float: left; width: 100%;">
+                                    <strong>Enable Fundraising Campaigns?</strong> <a href="javascript:;" onclick="$('#campaignsInfo').toggle();">Learn More</a><br />
+                                    <div id="campaignsInfo" class="info-boxes hide">Selecting "yes" will allow you to fundraise for projects outside of any volunteer activities.  Ideal for additional projects that are outside the scope of volunteer programming.</div>
+                                    <div class="clear" style="margin-bottom:10px;"></div>
+                                    <span><input name="hasCampaigns" type="radio" value="1" <?=(!empty($this->organization) && $this->organization->hasCampaigns) ? 'checked':''?>/> <span style="margin-right: 10px">Yes</span></span>
+                                    <div class="clear"></div>
+                                    <span id="hasCampaigns-2"><input name="hasCampaigns" type="radio" value="0" <?=(!empty($this->organization) && !$this->organization->hasCampaigns) ? 'checked':''?> /> <span style="margin-right: 10px">No</span></span>
+                                </li>
+                                <div class="clear" style="margin-bottom:20px;"></div>
+                                <li style="float: left; width: 100%;">
+                                    <strong>Enable Membership?</strong> <a href="javascript:;" onclick="$('#membershipInfo').toggle();">Learn More</a><br />
+                                    <div id="membershipInfo" class="info-boxes hide">Selecting 'yes' will allow you to enroll members and collect membership dues for your organization.</div>
+                                    <div class="clear" style="margin-bottom:10px;"></div>
+                                    <span><input name="hasMembership" type="radio" value="1" <?=(!empty($this->organization) && $this->organization->hasMembership) ? 'checked':''?> /> <span style="margin-right: 10px">Yes</span></span>
+                                    <div class="clear"></div>
+                                    <span id="hasMembership-2"><input name="hasMembership" type="radio" value="0" <?=(!empty($this->organization) && !$this->organization->hasMembership) ? 'checked':''?>/> <span style="margin-right: 10px">No</span></span>
+                                    <br />
+                                </li>
+                                <div class="clear" style="margin-bottom:20px;"></div>
+                                <li style="float: left; width: 100%;">
+                                    <strong>Enable Events Registration?</strong> <a href="javascript:;" onclick="$('#eventsInfo').toggle();">Learn More</a><br />
+                                    <div id="eventsInfo" class="info-boxes hide">Selecting 'yes' will enable your organizations and/or chapters to create and share events for participants to register for.  As an administrator you can set event fees and manage RSVPs.</div>
+                                    <div class="clear" style="margin-bottom:10px;"></div>
+                                    <span><input name="hasEvents" type="radio" value="1" <?=(!empty($this->organization) && $this->organization->hasEvents) ? 'checked':''?> /> <span style="margin-right: 10px">Yes</span></span>
+                                    <div class="clear"></div>
+                                    <span id="hasEvents-2"><input name="hasEvents" type="radio" value="0" <?=(!empty($this->organization) && !$this->organization->hasEvents) ? 'checked':''?> /> <span style="margin-right: 10px">No</span></span>
+                                    <br />
+                                </li>
+                                <div class="clear"></div><br />
+                                <? if (empty($this->organization)) { ?>
+                                <div class="clear" style="border-bottom:1px solid #E5E5E5;margin-bottom:20px;"></div>
+                                <li class="field-label" style="width:auto; margin-right:116px;">What is your online fundraising goal ($) this year?</li>
+                                <li>
+                                    <select id="fundraise_amount" name="fundraise_amount" style="margin-top:-6px; width:140px;">
+                                        <option value="stop">Select One</option>
+                                        <option value="<50k">Less than $50,000</option>
+                                        <option value="50k-1M">$50,000 - 1 Million</option>
+                                        <option value="1M+">More than 1 Million</option>
+                                    </select>
+                                </li>
+                                <div class="clear"></div>
+                                (This information will remain confidential)
+                                <div class="clear" style="margin-bottom:10px;"></div>
+                                <? } ?>
+                                <div style="margin-top:15px; float:left; width:100%; margin-bottom:20px">
+                                <? if (empty($this->organization)) { ?>
+                                    <a class="btn btngreen" title="Back" href="/getstarted">Back</a>
+                                    <input type="submit" class="btn btngreen" name="btnCreateNew" value="Create" id="btnCreateNew" />
+                                <? } else { ?>
+                                    <a class="btn btngreen" title="Back" href="/<?=$this->organization->urlName?>">Cancel</a>
+                                    <input type="submit" class="btn btngreen" name="btnCreateNew" value="Save" id="btnCreateNew" />
+                                <? } ?>
+                                </div>
+                                <? if (empty($this->organization)) { ?>
+                                <div class="clear"></div>
+                                By clicking 'Create' you are agreeing to the <a href="/termsandcondition">Terms of Service</a> and the <a href="/privacypolicy">Privacy Policy</a>
+                                <? } ?>
+                                <div clas="clear"></div><br />
+                                <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;">*</span><span style="color:#AAA;"> denotes a required field.</span></li>
+                                <li class="field-input">&nbsp;</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="clear"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<? if (!empty($this->organization)) { ?>
+<script>
+    populateLocation('state', '<?=$this->organization->contact->countryId?>','<?=$this->organization->contact->stateId?>');
+    populateLocation('city', '<?=$this->organization->contact->stateId?>','<?=$this->organization->contact->cityId?>');
+<? if ($this->organization->hasGroups) { ?>
+    $('.multi-chaptered').show();
+<? } ?>
+</script>
+<? } ?>

@@ -1,0 +1,355 @@
+<script type="text/javascript">
+    var ctr = 0;
+    $(function() {
+        $('#group').bind('click', function() {
+            if($('#group').attr('checked')) {
+                $('#activities').removeAttr('checked');
+                $('#campaigns').removeAttr('checked');
+                $('#members').removeAttr('checked');
+                $('#activity-list').hide();
+                $('#campaign-list').hide();
+                $('#member-list').hide();
+            }
+        })
+        $('#activities').bind('click', function() {
+            if($('#activities').attr('checked')) {
+                $('#group').removeAttr('checked');
+                $('#members').removeAttr('checked');
+                $('#campaigns').removeAttr('checked');
+                $('#activity-list').show();
+                $('#member-list').hide();
+                $('#campaign-list').hide();
+                $('#activity-list').show();
+            }
+        })
+        $('#campaigns').bind('click', function() {
+            if($('#campaigns').attr('checked')) {
+                $('#group').removeAttr('checked');
+                $('#members').removeAttr('checked');
+                $('#activities').removeAttr('checked');
+                $('#campaign-list').show();
+                $('#activity-list').hide();
+                $('#member-list').hide();
+            }
+        })
+        $('#members').bind('click', function() {
+            if($('#members').attr('checked')) {
+                $('#group').removeAttr('checked');
+                $('#activities').removeAttr('checked');
+                $('#campaigns').removeAttr('checked');
+                $('#member-list').show();
+                $('#activity-list').hide();
+                $('#campaign-list').hide();
+            }
+        })
+    })
+
+    function validateForm() {
+        var error = "";
+        <?php if (!empty($this->group)) { ?>
+        if($('#activities').attr('checked')) {
+            var sel_act = 0;
+            $('#activity-list ul li input[type=checkbox]').each(function() {
+                if ($(this).attr('checked')) {
+                    sel_act++;
+                }
+            })
+            if (sel_act == 0) {
+                error += "Please select atleast one volunteer activity.<br>";
+            }
+        }
+        <?php } ?>
+        if($('#members').attr('checked')) {
+            var sel_mem = 0;
+            $('#member-list ul li input[type=checkbox]').each(function() {
+                if ($(this).attr('checked')) {
+                    sel_mem++;
+                }
+            })
+            if (sel_mem == 0) {
+                error += "Please select atleast one <?php echo $this->Type ?>.<br>";
+            }
+        }
+        if (jQuery.trim($('#subject').val()) == "") {
+            error += "Please specify a subject.<br>";
+        }
+        if (jQuery.trim($('#message').val()) == "") {
+            error += "Please specify a message.<br>";
+        }
+
+        if (error == "") {
+            return true;
+        } else {
+            $('#error').html(error).show();
+            return false;
+        }
+    }
+
+    function addFromEmail() {
+       var error = "";
+       var emails = jQuery.trim($('#from_emails').val()).split(",");
+       if (emails.length > 0) {
+           for (var i = 0; i < emails.length; i++) {
+               if (!validateEmail(jQuery.trim(emails[i]))) {
+                   error = "Please specify a valid email address";
+                   break;
+               }
+           }
+       } else if (emails.length == 0 || jQuery.trim($('#from_emails').val()) == "") {
+           error = "Please specify atleast one email to continue.";
+       }
+       if (error == "") {
+            $('#loading-from').show();
+            $('#from-mail').hide();
+            $.post("/group/addemailsvalidation", {
+                    GroupId: $('#GroupId').val(),
+                    FromEmails: $('#from_emails').val()
+                },
+                function(data) {
+                    $('#loading-from').hide();
+                    $('#emails').html(data);
+                    $('#sent-mail').show();
+                }
+            );
+       } else {
+           alert(error);
+       }
+       return false;
+    }
+
+    function removeFromMail(id) {
+        $('#sentFrom_'+id).remove();
+        ctr--;
+    }
+
+</script>
+<style type="text/css">
+    .send-mail .field-label {
+        float:left;
+        width:70px;
+        margin-top:15px;
+        line-height:24px;
+    }
+    .send-mail .field-input {
+        float:left;
+        width:400px;
+        margin-right:100px;
+        margin-top:15px;
+        line-height:24px;
+    }
+    .send-mail .field-input span {
+        margin-right:20px;
+    }
+    .send-mail .field-list {
+        float:left;
+        width:720px;
+        display:none;
+        margin-left:70px;
+        margin-right:280px;
+        margin-top:10px;
+        border:1px solid #e5e5e5;
+    }
+    .send-mail .field-list .leftCol {
+        float:left;
+        width:325px;
+        padding-right:15px;
+        line-height:22px;
+        border-right:1px solid #e5e5e5;
+    }
+    .send-mail .field-list .rightCol {
+        float:left;
+        width:325px;
+        padding-left:15px;
+        line-height:22px;
+    }
+    #member-list {
+        width:720px;
+        display:none;
+        margin-left:70px;
+        margin-right:280px;
+    }
+    #member-list ul {
+        float:left;
+        width:325px;
+        margin-top:10px;
+        border:1px solid #e5e5e5;
+    }
+    <?php if(isset($this->project) && $this->Type == 'volunteers') { ?>
+    #activity-list {
+        display:block;
+    }
+    <?php } else if(isset($this->project) && $this->Type == 'fundraisers') { ?>
+    #campaign-list {
+        display:block;
+    }
+    <?php } ?>
+</style>
+<div class="wrapper">
+   <!-- org header -->
+  <?=$this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+
+    <?php if (isset($this->group)) { ?>
+
+      <!-- breadcrumb -->
+      <?=$this->placeholder('breadcrumb') ?>
+      <!-- // breadcrumb -->
+      <div class="clr"></div>
+
+      <!-- tabs -->
+      <?=$this->placeholder('tabs') ?>
+      <!-- // tabs -->
+
+    <?php } else {
+      include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/profileheader.php';
+    } ?>
+
+    <div class="mainC">
+      <div class="box05">
+        <div class="headingStyle02">
+            Email <?= isset($this->project) ? $this->project->name : $this->group->name ?>'s <?php echo ucfirst($this->Type) ?>
+        </div>
+        <div class="send-mail">
+            <div id="error" style="border:2px solid #e5e5e5; color:red; padding:5px;width:760px; display:none"></div>
+            <?php if ($this->sent) { ?>
+            <div style="margin:5px 0px; padding:5px; border:1px solid #93C47D; background: #D9EAD3; width:760px;"><?php echo $this->message ?></div>
+            <?php } ?>
+            <form method="post" onsubmit="return validateForm()">
+                <?php if (isset($this->project)) { ?>
+                <input type="hidden" id="ProjectId" name="ProjectId" value="<?php echo $this->project->id ?>" />
+                <? if (!empty($this->project->groupId)) { ?>
+                <input type="hidden" id="GroupId" name="GroupId" value="<?php echo $this->project->groupId ?>" />
+                <? } ?>
+                <?php } else { ?>
+                <input type="hidden" id="GroupId" name="GroupId" value="<?php echo $this->group->id ?>" />
+                <?php } ?>
+                <input type="hidden" id="action" name="actionEmail" value="Send Email" />
+                <input type="hidden" id="Type" name="Type" value="<?php echo $this->Type ?>" />
+                <div class="field-label">
+                    <strong>To:</strong>
+                </div>
+                <div class="field-input" style="width: 79%">
+                    <span><input id="group" type="radio" name="sendTo" value="<?php echo isset($this->group) ? 'Group' : 'All' ?>" <?php echo !isset($this->project) ? 'checked' : '' ?> /> <?php if($this->Type == 'members') { echo 'All Chapter Members'; } else if($this->Type == 'volunteers') { echo 'All Volunteers'; } else { echo 'All People Fundraising'; } ?></span>
+                    <?php if (isset($this->group)) { ?>
+                    <span <?php if($this->Type == 'members') { ?>style="display:none;"<?php } ?>><input id="activities" type="radio" name="sendTo" value="Activity" <?php echo isset($this->project) && $this->Type == 'volunteers' ? 'checked' : '' ?>/> <?php echo $this->Type == 'volunteers' ? 'Activity Volunteers' : 'Activity Volunteers Fundraising' ?></span>
+                    <span <?php if(($this->Type == 'volunteers' || $this->Type == 'members')) { ?>style="display:none;"<?php } ?>><input id="campaigns" type="radio" name="sendTo" value="Campaign" <?php echo isset($this->project) && $this->Type == 'fundraisers' ? 'checked' : '' ?> />People Fundraising for a Campaign</span>
+                    <?php } ?>
+                    <span><input id="members" type="radio" name="sendTo" value="<?php echo isset($this->group) ? 'Members' : 'specific '.$this->Type ?>" /> Specific <?php if($this->Type == 'members') { echo 'Members'; } else if($this->Type == 'volunteers') { echo 'Volunteers'; } else { echo 'People Fundraising'; } ?></span>
+                </div>
+                <?php if (isset($this->group)) { ?>
+                <div id="activity-list" class="field-list">
+                    <ul style="list-style:none; padding:10px; float:left">
+                        <div style="border:1px solid #dcbd00; background-color:#fff7c8; padding:10px; margin-top:8px;">Please select which volunteer activities' <?php echo $this->Type == 'volunteers' ? 'volunteers' : 'fundraisers'; ?> you would like to email:</div><br />
+                    <?php $ctr = 1; foreach($this->activities as $activity) { ?>
+                        <li class="<?php echo $ctr%2==1 ? "leftCol" : "rightCol" ?>">
+                            <input type="checkbox" name="activities[]" value="<?php echo $activity['ProjectId'] ?>" style="width:auto;" <?php echo isset($this->project) && $this->project->id == $activity['ProjectId'] ? 'checked' : '' ?> />&nbsp;<?php echo stripslashes(strlen($activity['Name']) > 45 ? substr($activity['Name'], 0, 42)."..." : $activity['Name']) ?>
+                        </li>
+                    <?php $ctr++; } ?>
+                    </ul>
+                </div>
+                <div id="campaign-list" class="field-list">
+                    <ul style="list-style:none; padding:10px; float:left">
+                        <div style="border:1px solid #dcbd00; background-color:#fff7c8; padding:10px; margin-top:8px;">Please select which fundraising campaigns' fundraisers you would like to email:</div><br />
+                    <?php $ctr = 1; foreach($this->campaigns as $activity) { ?>
+                        <li class="<?php echo $ctr%2==1 ? "leftCol" : "rightCol" ?>">
+                            <input type="checkbox" name="campaigns[]" value="<?php echo $activity['ProjectId'] ?>" style="width:auto;" <?php echo isset($this->project) && $this->project->id == $activity['ProjectId'] ? 'checked' : '' ?> />&nbsp;<?php echo stripslashes(strlen($activity['Name']) > 45 ? substr($activity['Name'], 0, 42)."..." : $activity['Name']) ?>
+                        </li>
+                    <?php $ctr++; } ?>
+                    </ul>
+                </div>
+                <?php } ?>
+                <div id="member-list">
+                    <?php $rows_per_column = count($this->members) < 2 ? 1 : count($this->members)/2; ?>
+                    <ul style="list-style:none; padding:10px; float:left; border-right: none">
+                    <?php $ctr = 1; foreach($this->members as $member) { ?>
+                        <?php if ($ctr <= $rows_per_column) { ?>
+                        <li>
+                            <input type="checkbox" name="members[]" value="<?php echo $member->email ?>" style="width:auto; line-height:14px;" />&nbsp;<?php echo strlen(stripslashes($member->fullName)) > 20 ? substr(stripslashes($member->fullName), 0, 20)."..." : stripslashes($member->fullName) ?>&nbsp;&nbsp;<span style="color:#a5a5a5"><?php echo (strlen($member->email) > 20 &&  strlen($member->fullName) > 20) ? substr($member->email, 0, 20)."..." : $member->email ?></span>
+                        </li>
+                        <?php } ?>
+                    <?php $ctr++; } ?>
+                    </ul>
+                    <ul style="list-style:none; padding:10px; float:left">
+                    <?php $ctr = 1; foreach($this->members as $member) { ?>
+                        <?php if ($ctr > $rows_per_column) { ?>
+                        <li>
+                            <input type="checkbox" name="members[]" value="<?php echo $member->email ?>" style="width:auto; line-height:14px;" />&nbsp;<?php echo strlen(stripslashes($member->fullName)) > 20 ? substr(stripslashes($member->fullName), 0, 20)."..." : stripslashes($member->fullName) ?>&nbsp;&nbsp;<span style="color:#a5a5a5"><?php echo (strlen($member->email) > 20 &&  strlen($member->fullName) > 20) ? substr($member->email, 0, 20)."..." : $member->email ?></span>
+                        </li>
+                        <?php } ?>
+                    <?php $ctr++; } ?>
+                    <?php if (count($this->members) < 2) { ?>
+                        <li><div style="line-height:19px;">&nbsp;</div></li>
+                    <?php } ?>
+                    </ul>
+                </div>
+                <div class="clear"></div>
+                <div class="field-label">
+                    <strong>From:</strong>
+                </div>
+                <div class="field-input" id="from-mail">
+                    <span>
+                        <select id="sentFrom" name="sentFrom" style="font-size:14px;padding:2px 1px">
+                            <?php foreach($this->emails as $email) { ?>
+                            <option value="<?php echo $email->email ?>"><?php echo $email->email ?></option>
+                            <?php } ?>
+                        </select>
+                    </span>
+                    <?php if (isset($this->group)) { ?>
+                    <a id="add-from" href="javascript:;" onclick="$('#add-from').hide(); $('#submit').hide(); $('#add-from-email').show();">Add From Email</a>
+                    <div id="add-from-email" style="margin-top:10px; display:none">
+                        <div style="border:1px solid #dcbd00; background-color:#fff7c8; padding:10px; margin-top:8px; width:484px; line-height:16px;">List the emails you want to send "from" in the box below, separated by commas. You will be sent an email to confirm your address before you can send emails from it. <br />You must choose to Add Emails or Cancel before you can continue with sending emails.</div>
+                        <textarea id="from_emails" name="from_emails" style="width:500px; margin-bottom:8px;" rows="4" cols="40"></textarea><br>
+                        <input type="button" class="btn btngreen" value="Add Emails" onclick="return addFromEmail()" />
+                        <input type="button" class="btn btngreen" value="Cancel" onclick="$('#add-from').show(); $('#submit').show(); $('#add-from-email').hide();" />
+                    </div>
+                    <?php } ?>
+                </div>
+                <div class="field-input" id="sent-mail" style="display:none">
+                    <div style="background-color:#F8DFEA; padding-left:5px; margin:5px 0px; width:700px;">An email has been sent to your account(s). Please click on the verification link in this email to add this email to your chapter's account. <br /> Afterwards, <a href="javascript:;" onclick="this.location.reload(true);">Refresh this page</a> to send out your emails.</div>
+                </div>
+                <div class="field-input" id="loading-from" style="display:none">
+                    Wait please, sending emails ...
+                </div>
+                <div class="clear"></div>
+                <div class="field-label">
+                    <strong>Subject:</strong>
+                </div>
+                <div class="field-input">
+                    <input style="width:380px;font-size:14px;padding:2px 1px" type="text" id="subject" name="subject" value="" />
+                </div>
+                <div class="clear"></div>
+                <div class="field-label">
+                    <strong>Message:</strong>
+                </div>
+                <div class="field-input">
+                    <textarea id="message" name="message" cols="92" rows="10"></textarea>
+                </div>
+                <div id="submit" style="margin:10px 0px;margin-left:70px; width:700px; float:left">
+                    <?php if (isset($this->group)) { ?>
+                        <?php if(isset($_REQUEST['Prev']) && $_REQUEST['Prev'] == 'volunteers' && isset($this->project)) { ?>
+                        <a class="btn btngreen" style="padding:3px 15px" href="/<?=$this->project->urlName?>/volunteers">Back</a>
+                        <?php } else if(isset($_REQUEST['Prev']) && $_REQUEST['Prev'] == 'fundraisers' && isset($this->project)) { ?>
+                        <a class="btn btngreen" style="padding:3px 15px" href="/<?=$this->project->urlName?>/fundraisers">Back</a>
+                        <?php } else if(isset($this->project)) { ?>
+                        <a class="btn btngreen" style="padding:3px 15px" href="/<?=$this->project->urlName?>">Back</a>
+                        <?php } else { ?>
+                        <a class="btn btngreen" style="padding:3px 15px" href="/<?=$this->group->urlName?>/<?php if($this->Type == 'members') { echo 'members'; } else if($this->Type == 'fundraisers') { echo 'fundraisers'; } else { echo 'volunteers'; } ?>">Back</a>
+                        <?php } ?>
+                    <?php } else { ?>
+                        <a class="btn btngreen" style="padding:3px 15px" href="/<?=$this->project->urlName?>">Back</a>
+                    <?php } ?>
+                    <input type="submit" class="btn btngreen" style="padding:3px 15px" value="Send" />
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="clear"></div>
+                </div>
+            </div>
+        <div class="clr"></div>
+        <div class="clr"></div>
+    </div>

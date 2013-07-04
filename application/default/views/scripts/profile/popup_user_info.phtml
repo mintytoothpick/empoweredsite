@@ -1,0 +1,26 @@
+<?php $this->placeholder('popup_user_info')->captureStart(); ?>
+<?php if($this->needNameInfo) { ?>
+<script type="text/javascript">
+$(function(){
+    $(document).trigger('showUserInfoModal');
+});
+</script>
+<!-- popup - user info -->
+<div id="userInfoFcyBx" style="display: none">
+    <div class="fcybxLogin">
+        <h2>Profile</h2>
+        <p>Please provide your name details.</p>
+        <div class="errorMsg hide"></div>
+        <form class="frmUserInfo" action="">
+            <fieldset><label>First Name:</label> <input type="text" class="required" name="firstName" value="<?=(isset($this->userNew) && !empty($this->userNew->firstName)) ? $this->userNew->firstName : '' ?>"/>
+            <label>Last Name:</label> <input type="text" class="required" name="lastName" value="<?=(isset($this->userNew) && !empty($this->userNew->lastName)) ? $this->userNew->lastName : '' ?>"/>
+            <div class="clr"></div>
+            <div class="btnLeft"><input type="submit" value="Submit"
+                class="btnSubmit box"></div>
+            </fieldset>
+        </form>
+    </div>
+</div>
+<!-- //popup - user info -->
+<? } ?>
+<?php $this->placeholder('popup_user_info')->captureEnd() ?>

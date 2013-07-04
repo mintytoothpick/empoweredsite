@@ -1,0 +1,258 @@
+<?php
+if ($this->level == "group") {
+    $this->placeholder('currenttab')->set('upcoming');
+} else if ($this->level == "organization") {
+    $this->placeholder('currenttab')->set('projects');
+}
+?>
+<script type="text/javascript">
+    function validate() {
+        var volunteer_id = '';
+        var curr_goal = 0;
+        var new_goal = 0;
+        var ctr = 1;
+        var error = 0;
+        $('#donations tr td input').each(function(){
+            if ($(this).attr('type') == 'hidden' && $(this).attr('name').search('VolunteerId') > -1) {
+                volunteer_id = $(this).val();
+            } else if ($(this).attr('type') == 'hidden' && $(this).attr('name').search('currgoal') > -1) {
+                curr_goal = $(this).val();
+            } else if ($(this).attr('type') == 'text' && $(this).attr('name').search('newgoal') > -1) {
+                new_goal = $(this).val();
+            }
+            if (ctr == 3) {
+                if (jQuery.trim(new_goal) != "") {
+                    if (parseFloat(curr_goal) > parseFloat(new_goal)) {
+                        //error++;
+                    }
+                }
+                ctr = 0;
+            }
+            ctr++;
+        })
+        if (error > 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    function updateGoals() {
+        //if (validate()) {
+            var project_id = '<?=$this->project->id?>';
+            var volunteer_id = '';
+            var curr_goal = 0;
+            var new_goal = 0;
+            var ctr = 1;
+            var updated = 0;
+            $('#donations tr td input').each(function(){
+                if ($(this).attr('type') == 'hidden' && $(this).attr('name').search('VolunteerId') > -1) {
+                    volunteer_id = $(this).val();
+                } else if ($(this).attr('type') == 'hidden' && $(this).attr('name').search('currgoal') > -1) {
+                    curr_goal = parseFloat($(this).val());
+                } else if ($(this).attr('type') == 'text' && $(this).attr('name').search('newgoal') > -1) {
+                    new_goal = parseFloat($(this).val());
+                }
+                if (ctr == 3) {
+                    if (jQuery.trim(new_goal) != "") {
+                        if (new_goal >= 0) {
+                            updated++;
+                            //$.post('/donation/updategoal', {ProjectId: project_id, VolunteerId: volunteer_id, NewGoal: new_goal});
+                        } else {
+                            alert('New donation goal must be greater or equal than 0');
+                            return false;
+                        }
+                    }
+                    ctr = 0;
+                }
+                ctr++;
+            })
+            if (updated > 0) {
+                alert("Changes have been saved successfully.")
+            }
+            return true;
+        //} else {
+        //    alert('Please specify a valid amount and must be greater than the current donation goal.')
+        //    return false;
+        //}
+    }
+    function generateReports() {
+        $.post('/donation/generatereport', {ProjectId: $('#ProjectId').val()});
+        return false;
+    }
+    function isFloat(value) {
+        if(value == ""){
+            return false;
+        }
+        value = value.replace(/,/, '.');
+        if(parseFloat(value) != (value*1)) {
+            return false;
+        }
+        return true;
+    }
+</script>
+<div class="wrapper">
+   <!-- org header -->
+  <?=$this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+
+    <?php if ($this->level == "group" || $this->level == "organization") { ?>
+
+      <!-- breadcrumb -->
+      <?=$this->placeholder('breadcrumb') ?>
+      <!-- // breadcrumb -->
+      <div class="clr"></div>
+
+      <!-- tabs -->
+      <?=$this->placeholder('tabs') ?>
+      <!-- // tabs -->
+
+    <?php } else {
+      include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/profileheader.php';
+    } ?>
+
+    <div class="mainC">
+      <div class="box05">
+        <div class="headingStyle02">
+            Donation Summary<?=isset($this->level) && $this->level != 'user' ? " - ".stripslashes($this->project->name) : '' ?>
+        </div>
+        <div>
+            <form id="manage_donations" method="post" action="" onsubmit="return updateGoals()">
+            <table id="donations" cellspacing="0" cellpadding="3" border="0" style="width:100%; border-collapse:collapse;">
+                <tr style="color:#F7F7F7;background-color:#000;font-weight:bold;height:25px;">
+                    <th scope="col">Volunteer</th>
+                    <th scope="col">Amount Raised</th>
+                    <th scope="col">Donation Goal</th>
+                    <th scope="col">New Goal</th>
+                </tr>
+                <?php
+                if (count($this->donations) > 0) {
+                    $ctr = $total_raised = $total_goal = 0;
+                    foreach ($this->donations as $donation) {
+                        $total_raised += $donation['AmountRaised'];
+                        $total_goal   += $donation['UserDonationGoal'];
+                        ?>
+                        <tr style="background-color:<?=$ctr%2 == 1 ? "#e7e7e9" : "white" ?>;border-bottom:1px solid #E7E7FF;<?php if($donation['IsDeleted']) { echo "color:#F00;"; $delMSG = 1; } ?>">
+                            <td style="border-right:1px solid silver;border-left:1px solid silver;width:200px">
+                                <input type="hidden" id="VolunteerId_<?=$donation['VolunteerId'] ?>" name="VolunteerId[]" value="<?=$donation['VolunteerId'] ?>" />
+                                &nbsp;<a href="/<?=$donation['URLName'] ?>"><?=stripslashes($donation['Volunteer']) ?></a>
+                            </td>
+                            <td style="text-align:right; width:110px; border-right:1px solid silver;"><?= number_format($donation['AmountRaised']) ?>&nbsp;&nbsp;</td>
+                            <td style="text-align:right; width:110px; border-right:1px solid silver;"><?= number_format($donation['UserDonationGoal']) ?>&nbsp;&nbsp;</td>
+                            <td style="text-align:center; width:120px;border-right:1px solid silver;">
+                                <input type="hidden" id="currgoal_<?=$donation['VolunteerId'] ?>" name="currgoal_<?=$donation['VolunteerId'] ?>" value="<?=$donation['VolunteerMinimumGoal'] ?>" />
+                                <input type="text" id="newgoal_<?=$donation['VolunteerId'] ?>" name="newgoal_<?=$donation['VolunteerId'] ?>" value="" class="textfield" style="text-align:right; width:80%; border:1px solid #CCC;" />
+                            </td>
+                        </tr>
+                        <?php $ctr++;?>
+                    <?php } ?>
+                    <?php $ctr++;?>
+                <?php $ctr++; $total_raised += $this->project->getGeneralDonations() + $this->project->getMembershipFunds(); $total_goal += $this->project->donationGoal; ?>
+                <!--tr style="background-color:<?=$ctr%2 == 1 ? "#e7e7e9" : "white" ?>;border:none; line-height:20px;">
+                    <td style="text-align:left; border-right:1px solid silver;border-left:1px solid silver;font-weight:bold;border-bottom:1px solid #E7E7FF;">&nbsp;Membership Transfers</td>
+                    <td style="text-align:right; border-right:1px solid silver;border-left:1px solid silver;font-weight:bold;border-bottom:1px solid #E7E7FF;"><?=number_format($this->project->getMembershipFunds())?>&nbsp;&nbsp;</td>
+                    <td style="text-align:right; border-right:1px solid silver;font-weight:bold;border-bottom:1px solid #E7E7FF;">&nbsp;&nbsp;</td>
+                    <td style="border:none; background-color:#fff"></td>
+                </tr-->
+                <tr style="background-color:<?=$ctr%2 == 1 ? "#e7e7e9" : "white" ?>;border:none; line-height:20px;">
+                    <td style="text-align:left; border-right:1px solid silver;border-left:1px solid silver;font-weight:bold;border-bottom:1px solid #E7E7FF;">&nbsp;General Donations</td>
+                    <td style="text-align:right; border-right:1px solid silver;border-left:1px solid silver;font-weight:bold;border-bottom:1px solid #E7E7FF;"><?=number_format($this->project->getGeneralDonations() + $this->project->getMembershipFunds())?>&nbsp;&nbsp;</td>
+                    <td style="text-align:right; border-right:1px solid silver;font-weight:bold;border-bottom:1px solid #E7E7FF;"><?=number_format($this->project->donationGoal) ?>&nbsp;&nbsp;</td>
+                    <td style="border:none; background-color:#fff"></td>
+                </tr>
+                <?php $ctr++;?>
+                <tr style="background-color:<?=$ctr%2 == 1 ? "#e7e7e9" : "white" ?>; border:none; line-height:20px;">
+                    <td style="text-align:left; border-right:1px solid silver;border-left:1px solid silver;font-weight:bold;border-bottom:1px solid #E7E7FF;">&nbsp;Total Donations</td>
+                    <td style="text-align:right; border-right:1px solid silver;border-left:1px solid silver;font-weight:bold;border-bottom:1px solid #E7E7FF;"><?=number_format($total_raised) ?>&nbsp;&nbsp;</td>
+                    <td style="text-align:right; border-right:1px solid silver;font-weight:bold;border-bottom:1px solid #E7E7FF;"><?=number_format($total_goal) ?>&nbsp;&nbsp;</td>
+                    <td style="border:none; background-color:#fff"></td>
+                </tr>
+                <?php } else { ?>
+                <? if (number_format($this->project->getGeneralDonations()) > 0 || number_format($this->project->getMembershipFunds()) > 0) { ?>
+                <!--tr style="background-color:white;border:none; line-height:20px;">
+                    <td style="text-align:left; border-right:1px solid silver;border-left:1px solid silver;font-weight:bold;border-bottom:1px solid #E7E7FF;">&nbsp;Membership Transfers</td>
+                    <td style="text-align:right; border-right:1px solid silver;border-left:1px solid silver;font-weight:bold;border-bottom:1px solid #E7E7FF;"><?=number_format($this->project->getMembershipFunds())?>&nbsp;&nbsp;</td>
+                    <td style="text-align:right; border-right:1px solid silver;font-weight:bold;border-bottom:1px solid #E7E7FF;">&nbsp;&nbsp;</td>
+                    <td style="border:none; background-color:#fff"></td>
+                </tr-->
+                <tr style="background-color:#e7e7e9;border:none; line-height:20px;">
+                    <td style="text-align:left; border-right:1px solid silver;border-left:1px solid silver;font-weight:bold;border-bottom:1px solid #E7E7FF;">&nbsp;General Donations</td>
+                    <td style="text-align:right; border-right:1px solid silver;border-left:1px solid silver;font-weight:bold;border-bottom:1px solid #E7E7FF;"><?=number_format($this->project->getGeneralDonations() + $this->project->getMembershipFunds())?>&nbsp;&nbsp;</td>
+                    <td style="text-align:right; border-right:1px solid silver;font-weight:bold;border-bottom:1px solid #E7E7FF;"><?=number_format($this->project->donationGoal) ?>&nbsp;&nbsp;</td>
+                    <td style="border:none; background-color:#fff"></td>
+                </tr>
+                <tr style="background-color:#e7e7e9; border:none; line-height:20px;">
+                    <td style="text-align:left; border-right:1px solid silver;border-left:1px solid silver;font-weight:bold;border-bottom:1px solid #E7E7FF;">&nbsp;Total Donations</td>
+                    <td style="text-align:right; border-right:1px solid silver;border-left:1px solid silver;font-weight:bold;border-bottom:1px solid #E7E7FF;"><?=number_format($this->project->getGeneralDonations() + $this->project->getMembershipFunds()) ?>&nbsp;&nbsp;</td>
+                    <td style="text-align:right; border-right:1px solid silver;font-weight:bold;border-bottom:1px solid #E7E7FF;"><?=number_format($this->project->donationGoal) ?>&nbsp;&nbsp;</td>
+                    <td style="border:none; background-color:#fff"></td>
+                </tr>
+                <? } else { ?>
+                <tr><td colspan="4"><b>&nbsp;No records found.</b></td></tr>
+                <?php } } ?>
+            </table>
+            <? if (count($this->donations) > 0) { ?>
+                <input class="btn btngreen" type="submit" name="update_goals" value="Update Goals" id="update_goals" style="float:right" />
+            <? } ?>
+            </form>
+            <br /><br />
+            <span style="font-weight:bold; color:#F00;">Donations below signify a volunteer who has been deleted from the activity</span><br />
+            <table id="donations" cellspacing="0" cellpadding="3" border="0" style="width:100%; border-collapse:collapse;">
+                <tr style="color:#F7F7F7;background-color:#000;font-weight:bold;height:25px;">
+                    <th scope="col">Volunteer</th>
+                    <th scope="col">Amount Raised</th>
+                    <th scope="col">Donation Goal</th>
+                </tr>
+                <?php
+                if (count($this->deleted_member_donations) > 0) {
+                    $ctr = $total_raised = $total_goal = 0;
+                    foreach ($this->deleted_member_donations as $donation) {
+                        $total_raised += $donation['AmountRaised'];
+                        $total_goal   += $donation['UserDonationGoal'];
+                        ?>
+                <tr style="background-color:<?=$ctr%2 == 1 ? "#e7e7e9" : "white" ?>;border-bottom:1px solid #E7E7FF;<?php if($donation['IsDeleted']) { echo "color:#F00;"; $delMSG = 1; } ?>">
+                    <td style="border-right:1px solid silver;border-left:1px solid silver;width:200px">
+                        <input type="hidden" id="VolunteerId_<?=$donation['VolunteerId'] ?>" name="VolunteerId_<?=$donation['VolunteerId'] ?>" value="<?=$donation['VolunteerId'] ?>" />
+                        &nbsp;<a href="/<?=$donation['URLName'] ?>"><?=stripslashes($donation['Volunteer']) ?></a>
+                    </td>
+                    <td style="text-align:right; width:110px; border-right:1px solid silver;"><?=number_format($donation['AmountRaised']) ?>&nbsp;&nbsp;</td>
+                    <td style="text-align:right; width:110px; border-right:1px solid silver;"><?=number_format($donation['UserDonationGoal']) ?>&nbsp;&nbsp;</td>
+                </tr>
+                    <?php $ctr++;?>
+                <?php } ?>
+                <?php $total_goal += $this->project->donationGoal; ?>
+                <tr style="background-color:<?=$ctr%2 == 1 ? "#e7e7e9" : "white" ?>; border:none; line-height:20px;">
+                    <td style="text-align:left; border-right:1px solid silver;border-left:1px solid silver;font-weight:bold;border-bottom:1px solid #E7E7FF;">&nbsp;Total Donations</td>
+                    <td style="text-align:right; border-right:1px solid silver;border-left:1px solid silver;font-weight:bold;border-bottom:1px solid #E7E7FF;"><?=number_format($total_raised) ?>&nbsp;&nbsp;</td>
+                    <td style="text-align:right; border-right:1px solid silver;font-weight:bold;border-bottom:1px solid #E7E7FF;"><?=number_format($total_goal) ?>&nbsp;&nbsp;</td>
+                </tr>
+                <?php } else {
+                    ?>
+                <tr><td colspan="4"><b>&nbsp;No records found.</b></td></tr>
+                <?php } ?>
+            </table>
+            <br /><br />
+            <div id="divUpdateDesc">
+                <a class="btn btngreen" style="float:right; padding:3px 15px;" title="Donations Detail" href="javascript:;" onclick="view_donations.submit();">Donations Detail</a>
+                <a class="btn btngreen" style="float:right; padding:3px 15px;" href="/donation/pullreport/?ProjectId=<?=$this->project->id?>">Pull Report</a>
+                <a class="btn btngreen" style="padding:3px 15px;" title="Back" href="/<?=$this->project->urlName?>">Back</a>
+            </div>
+        </div>
+        <form id="view_donations" name="view_donations" method="post" action="/<?=$this->project->urlName?>/donations?Prev=activity" style="display:none;">
+            <input type="hidden" name="ProjectId" value="<?=$this->project->id?>" />
+        </form>
+        <div class="clear"></div>
+    </div>
+    </div>
+                            </div>
+                        </div>
+                    </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+    <div class="clr"></div>
+    <div class="clr"></div>
+</div>

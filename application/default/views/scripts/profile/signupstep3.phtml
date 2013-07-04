@@ -1,0 +1,51 @@
+<?php $this->headTitle("Register with Empowered.org"); ?>
+<script type='text/javascript' src='<?php echo $this->contentLocation ?>public/js/CalendarControl.js'></script>
+<link rel="stylesheet" href="<?php echo $this->contentLocation ?>public/css/CalendarControl.css" type="text/css" media="screen" />
+<style>
+    #birthdate {
+        background: url(<?php echo $this->contentLocation ?>public/images/Pictures/003.gif) no-repeat right;
+        width: 110px;
+    }
+</style>
+
+    <div id="centred">
+        <!-- main col - 100% width -->
+        <div id="mainco2">
+            <!-- block001 -->
+            <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+            <div class="block001">
+                <div class="blst001">
+                    <div class="blst002 hsp" style="background-color:#fff; <?php echo isset($this->error_message) ? "min-height:440px;" : "" ?>">
+                        <div class="clear1"></div>
+                        <?php if (isset($this->error_message)) { ?>
+                        <div style="border: solid 2px #e3e3e3; color: red; padding: 8px; padding-right:20px; width: 400px; margin:10px 0px;">
+                            <?php echo $this->error_message ?>
+                        </div>
+                        <?php } ?>
+                        <h3 style="margin-left:5px">Security Check</h3>
+                        <form id="SignUpStep3" action="/profile/signup-step3" method="post">
+                            <?php echo $this->captcha ?>
+                            <br>
+                            <br>
+                            <?php if(empty($this->userNew->firstName)) { ?>
+                                First Name: <input type="text" name="firstname" id="firstname" /><br />
+                            <?php } if(empty($this->userNew->lastName)) { ?>
+                                Last Name: <input type="text" name="lastname" id="lastname" /><br />
+                            <?php } if(empty($this->userNew->password) || isset($_SESSION['tempPass'])) { ?>
+                                Password: &nbsp;<input type="password" name="password" id="password" /><br />
+                            <?php } ?>
+                            <input type="submit" name="ctl00$btnLogin" value="Sign Up" id="ctl00_btnLogin" class="button" />
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="block001f01">
+                <div class="blst001">
+                    <div class="blst002"></div>
+                </div>
+            </div>
+            <!-- e o block001 -->
+        </div>
+        <!-- e o main col -->
+        <div class="clear"></div>
+    </div>

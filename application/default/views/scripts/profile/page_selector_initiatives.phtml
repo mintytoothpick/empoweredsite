@@ -1,0 +1,34 @@
+<? $totalPages = $this->ajaxLim > 0 ? ceil($this->count/$this->ajaxLim) : 0; ?>
+
+<?php if ($this->count > 1) { ?>
+<center>
+<div class="paginationControl">
+<!-- Previous page link -->
+<?php if ($this->page > 1) { ?>
+  <a href="javascript:;" onclick="pagingInitiatives(<?=($this->page -1)?>)">
+    &laquo; Previous
+  </a>&nbsp;&nbsp;
+<?php } else if($totalPages) { ?>
+  <span class="disabled">&laquo; Previous</span>&nbsp;&nbsp;
+<?php } ?>
+  
+<!-- Numbered page links -->
+<?php for ($pageNum=1;$pageNum<=$totalPages;$pageNum++) { ?>
+    <?php if ($this->page != $pageNum) { ?>
+        <a  href="javascript:;" onclick="pagingInitiatives(<?php echo $pageNum; ?>)"><?=$pageNum;?></a>
+    <?php } else { ?>
+        <?=$pageNum ?>
+    <?php } ?>
+<?php } ?>
+
+<!-- Next page link -->
+<?php if ($this->page < $totalPages) { ?>
+  <a  href="javascript:;" onclick="pagingInitiatives(<?=($this->page+1)?>)">
+    Next &raquo;
+  </a>
+<?php } else if($totalPages) { ?>
+  <span class="disabled">Next &raquo;</span>
+<?php } ?>
+</div>
+</center>
+<?php } ?>

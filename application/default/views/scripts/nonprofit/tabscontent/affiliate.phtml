@@ -1,0 +1,11 @@
+          <?php if (count($this->paginator)) {
+          foreach($this->paginator as $chapter) { ?>
+          <div class="TextBox" style="width:auto;"><a href="javascript:joinGroup('<?=$chapter->id?>', '<?=$this->userNew->id?>', '<?=$chapter->urlName?>')" ><?=stripslashes($chapter->name)?></a></div>
+          <div class="clr" style="margin-bottom:20px;"></div>
+          <? } ?>
+          <div class="spacer"></div>
+          <?= $this->paginationControl($this->paginator, 'Sliding', 'nonprofit/new_page_selector_slim.phtml', array('param' => 'page')); ?>
+          <? } else { ?>
+          <p>No results found.</p>
+          <? } ?>
+

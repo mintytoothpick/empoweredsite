@@ -1,0 +1,41 @@
+<?php
+if ($this->isIndex) {
+    $activities = $this->project->activityFeed_5;
+} else {
+    $activities = $this->project->activityFeed;
+}
+
+
+// TODO: Put this "get currency" in the model
+if (!empty($this->project->group)) {
+    $currency = $this->project->group->currency;
+} else if (!empty($this->project->organization)) {
+    $currency = $this->project->organization->currency;
+} else {
+    $currency = $this->project->currency;
+}
+
+foreach($activities as $activity) { ?>
+<div class="supporterBox">
+
+    <? if($activity->type == 'File Added' && $activity->user) { ?>
+    <span class="color02">
+       <a href='/<?=$activity->user->urlName?>'><?=stripslashes($activity->user->fullName)?></a> uploaded <?=$activity->totalCount ?> new files
+    </span>
+    <? } else if($activity->type == 'Uploads' && $activity->user) { ?>
+    <img src="/public/images/ico/photo.gif" width="35" height="35" alt=" " /> <?=$this->urlHelper()->userUrl($activity->user)?>
+    <span class="color02">added a photo</span>
+    <? } else if($activity->type == 'User Donation' && $activity->user) { ?>
+    <img src="/public/images/dollar.png"  alt=" " /> <?=$this->urlHelper()->userUrl($activity->user)?>
+    <span class="color02">donated <?=$currency.number_format($activity->details)?></span>
+    <? } else if($activity->type == 'Guest Donation') { ?>
+    <img src="/public/images/dollar.png"  alt=" " /> Guest User
+    <span class="color02">donated <?=$currency.number_format($activity->details)?></span>
+    <? } else if($activity->type == 'Site Updated') { ?>
+    <span class="color02">Activity details was updated</span>
+    <? } else if ($activity->type == 'Joined Brigade' && $activity->user) { ?>
+    <?=$this->urlHelper()->userUrl($activity->user)?><span class="color02"> joined </span><a href="/<?=$this->project->urlName?>"><?=stripslashes($this->project->name)?></a>
+    <? } ?>
+    <span class="eventStyleText02"><?=$this->dateHelper($activity->date)?></span>
+</div>
+<? } ?>

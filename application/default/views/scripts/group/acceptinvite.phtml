@@ -1,0 +1,75 @@
+<?php $this->headTitle("Empowered.org : world's largest student-led global health and sustainable development organization"); ?>
+<script type="text/javascript">    
+    $(function() {
+        $('#userpassword001').focus(function() {
+            $('#userpassword001').hide();
+            $('#userpassword').show().focus();
+        })
+        $('#userpassword').blur(function() {
+            if (jQuery.trim($('#userpassword').val()) == "") {
+                $('#userpassword').hide();
+                $('#userpassword001').val('Password').show();
+            }
+        })
+    })
+</script>
+<style type="text/css">
+table tr th {
+    text-align:center;
+}
+.pptextfield {
+    display: block;
+    font-size: 15px;
+    margin: 3px 0px 5px;
+    padding: 2px;
+    width: 150px;
+}
+</style>
+
+<div>
+    <div id="mainco2">
+        <div class="roundedbox" style="padding:15px 25px">
+            <?php if ($this->valid_invite && !isset($_SESSION['UserId'])) { ?>
+            <h2 style="font-size:24px">Welcome to Empowered!</h2>
+            <span style="font-size:14px">To join <strong><?php echo $this->data['GroupName'] ?></strong> group we just need some quick information to get you started.</span><br><br>
+            <div style="width:340px">
+                <div class="ppst06" id="error-msg" style="color:red; margin: 5px 0px; border:2px solid #e5e5e5; padding:5px; <?php echo !empty($this->error_message) ? "" : "display: none" ?>"><?php echo !empty($this->error_message) ? $this->error_message : "" ?></div>
+                <form style="margin-top:10px;" method="post" action="/group/acceptinvite">
+                    <input type="hidden" id="GroupId" name="GroupId" value="<?php echo $this->data['GroupId'] ?>" />
+                    <input type="hidden" id="ActivationCode" name="ActivationCode" value="<?php echo $this->ActivationCode ?>" />
+                    <div style="width:330px; float:left">
+                        <div style="float:left; padding-right:30px; margin-right:15px; border-right:1px solid #e5e5e5; width:158px">
+                            <input style="margin-bottom:8px; width:173px;" name="firstname" type="text" id="firstname" class="pptextfield" onfocus="if (this.value=='First Name') { this.value = '' }" onblur="if (jQuery.trim(this.value) == '') { this.value='First Name' }" value="<?php echo isset($this->firstname) ? $this->firstname : "First Name" ?>" />
+                            <input style="margin-bottom:8px; width:173px;" name="lastname" type="text" id="lastname" class="pptextfield" onfocus="if (this.value=='Last Name') { this.value = '' }" onblur="if (jQuery.trim(this.value) == '') { this.value='Last Name' }" value="<?php echo isset($this->lastname) ? $this->lastname : "Last Name" ?>" />
+                            <input style="margin-bottom:8px; width:173px;" name="email" type="text" id="useremail" class="pptextfield" onfocus="if (this.value=='Email') { this.value = '' }" onblur="if (jQuery.trim(this.value) == '') { this.value='Email' }" value="<?php echo isset($this->email) ? trim($this->email) : "Email" ?>" />
+                            <input style="margin-bottom:8px; width:173px; <?php echo !isset($this->password) ? "display:none" : "" ?>" name="password" type="password" id="userpassword" class="pptextfield" value="<?php echo isset($this->password) ? $this->password : "" ?>" />
+                            <input style="margin-bottom:8px; width:173px; <?php echo isset($this->password) ? "display:none" : "" ?>" name="userpassword001" type="text" id="userpassword001" class="pptextfield" value="Password" />
+                        </div>
+                        <div style="float:left; width:117px;display:none;">
+                            <div style="font-size:11px; color:#000000; font-weight:bold; margin-bottom:5px">or login using:</div>
+                            <fb:login-button size="medium">&nbsp;&nbsp;Connect&nbsp;&nbsp;</fb:login-button>
+                        </div>
+                    </div>
+                    <div style="width:330px; float:left">
+                        <div style="width:72px; margin-right:20px; float:left">
+                            <input type="submit" name="ctl00$btnLogin" value="Sign Up" id="ctl00_btnLogin" class="button" />
+                        </div>
+                        <div style="margin-right:15px; float:left; font-size:11px; font-weight:normal; color:#999898; margin-top:5px">
+                            By clicking "Sign Up", you are agreeing to <br>the <a href="/termsandcondition" target="_blank">Terms of Service</a> and the <a href="/privacypolicy" target="_blank">Privacy Policy</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <?php } else if ($this->valid_invite && !isset($_SESSION['UserId'])) { ?>
+            <h2 style="font-size:24px">Chapter Invitation</h2>
+            <strong>You have successfully joined <?php echo stripslashes($this->data['GroupName']) ?></strong>
+            <a class="btn btngreen" href="/<?php echo $this->data['URLName'] ?>">Go to my Chapter</a>
+            <?php } else { ?>
+            <h2 style="font-size:24px">Chapter Invitation</h2>
+            <strong>Invalid group invitation link.</strong>
+            <?php } ?>
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>
+

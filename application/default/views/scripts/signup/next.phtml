@@ -1,0 +1,143 @@
+<?php $this->headTitle("Empowered.org:  Empowering groups of volunteers to create social change"); ?>
+<div class="wrapper">
+    <!-- org header -->
+    <?php echo $this->placeholder('header') ?>
+    <!-- // org header -->
+
+    <div class="BodyCon">
+
+        <!-- breadcrumb -->
+        <?php echo $this->placeholder('breadcrumb') ?>
+        <!-- // breadcrumb -->
+        <div class="clr"></div>
+
+        <!-- tabs -->
+        <?php echo $this->placeholder('tabs') ?>
+        <!-- // tabs -->
+
+        <div class="mainC">
+            <div class="box05">
+                <div class="headingStyle02">Get the Word Out!</div>
+                <p>
+                    <?php if ($this->project->status != "Open") { ?>
+                      <script type="text/javascript">
+                        function inviteFriendsClosed(projectName){
+                        	FB.login( function() {
+                        		FB.ui({
+                                    method : 'apprequests',
+                                    message: 'I just applied to <?= $this->project->type == 1 ? "fundraise" : "volunteer"?> for <?=$this->project->name?>. Apply with me!',
+                                }, function(response) {
+                                    if(response) {
+        							     jQuery.each(response.to, function(index, fbid) {
+        								    FB.api('/' + fbid + '/feed', 'post', {
+        									   message: 'I just applied to <?= $this->project->type == 1 ? "fundraise" : "volunteer"?> for <?=$this->project->name?>. Apply with me!',
+        									   link: 'http://<?php echo $_SERVER['HTTP_HOST']; ?>/<?php echo $this->project->urlName; ?>',
+        								    });
+        							     } );
+                                         
+                                         // Delete request. We don't want it.
+        							     FB.api(response.request, 'delete');
+                                    }
+
+                                    // Facebook Connect
+                                  	$.ajax({
+                                		url: '/social/facebookconnect',
+                                		xhrFields: {
+                                	        withCredentials: true    // Prevents session lost during call.
+                                	    },
+                                	});
+                                });
+                        	}, {scope: 'email,publish_stream,publish_actions'});
+                        }
+                      </script>
+                      <p style="padding:15px">
+                        1. You must wait for the admin to accept you to this <?= $this->project->type == 1 ? "fundraising campaign" : "volunteer activity"?>.<br /><br />
+                        2: <a href="javascript:;" onclick="inviteFriendsClosed('<?=$this->project->name?>')">Invite your friends to <?= $this->project->type == 1 ? "fundraise" : "volunteer"?></a><br /><br />
+                      </p>
+                    <?php } else { ?>
+                      <script type="text/javascript">
+                        function inviteFriends(projectName) {
+                        	FB.login( function() {
+                        		FB.ui({
+                                    method : 'apprequests',
+                                    message: 'I <?= $this->project->type == 1 ? "am fundraising" : "just volunteered"?> for ' + projectName + '. Join me!',
+                                }, function(response) {
+                                    if(response) {
+        							  jQuery.each(response.to, function(index, fbid) {
+        								  FB.api('/' + fbid + '/feed', 'post', {
+        									message: 'I <?= $this->project->type == 1 ? "am fundraising" : "just volunteered"; ?> for <?php echo $this->project->name; ?>. Join me!',
+        									link: 'http://<?php echo $_SERVER['HTTP_HOST']; ?>/<?php echo $this->project->urlName; ?>',
+        								  });
+        							  } );
+
+        							  // Delete request. We don't want it.
+     							      FB.api(response.request, 'delete');
+                                    }
+
+                                     // Facebook Connect
+                                  	  $.ajax({
+                                			url: '/social/facebookconnect',
+                                			xhrFields: {
+                                		        withCredentials: true    // Prevents session lost during call.
+                                		    },
+                                	  });
+
+                                      return false;
+                                });
+                        	}, {scope: 'email,publish_stream,publish_actions'});
+                        }
+                        
+                        function inviteDonors(projectName) {
+                        	FB.login( function() {
+                        		FB.ui({
+                                    method : 'apprequests',
+                                    message: 'I am fundraising for ' + projectName + '. Please support me with a donation!',
+                                }, function(response) {
+                                    if(response) {
+                                	  jQuery.each(response.to, function(index, fbid) {
+        								  FB.api('/' + fbid + '/feed', 'post', {
+        									message: 'I am fundraising for <?php echo $this->project->name; ?>. Please support me with a donation!',
+        									link: 'http://<?php echo $_SERVER['HTTP_HOST']; ?>/<?php echo $this->project->urlName; ?>',
+        								  });
+        							  } );
+
+                                      // Delete request. We don't want it.
+                                      FB.api(response.request, 'delete');
+                                    }
+
+                                    // Facebook Connect
+                              	    $.ajax({
+                                			url: '/social/facebookconnect',
+                                			xhrFields: {
+                                		        withCredentials: true    // Prevents session lost during call.
+                                		    },
+                                	});
+                                });
+                        	}, {scope: 'email,publish_stream,publish_actions'});
+                        }
+                        
+                        function streamPublish(name, description, hrefTitle, hrefLink, userPrompt, projectLogo){
+                          FB.ui({ method : 'feed',
+                            message: userPrompt,
+                            link   :  hrefLink,
+                            caption:  hrefTitle,
+                            picture: projectLogo
+                          });
+                         }
+                      </script>
+                      <p style="padding:15px;">
+                        1: <a href="javascript:;" onclick="streamPublish('<?= $this->project->name?>', '<?= $this->project->description?>', '<?= $this->project->name ?>', '<?= 'http://'.$_SERVER['HTTP_HOST'].'/'.$this->project->urlName?>', 'I just joined this awesome activity!', '<?= 'http://'.$_SERVER['HTTP_HOST'].'/public/Media/full/'.$this->project->urlName.'-logo.jpg' ?>')">Post to Facebook</a><br /><br />
+                        2: <a href="javascript:;" onclick="inviteFriends('<?=$this->project->name?>')">Invite your friends to <?= $this->project->type == 1 ? "fundraise" : "volunteer"?></a><br /><br />
+                        <?php if($this->project->isFundraising) { ?>
+                          3: <a href="javascript:;" onclick="inviteDonors('<?=$this->project->name?>')">Ask friends to make a donation</a>
+                        <?php } ?>
+                      </p>
+                    <?php } ?>
+                </p>
+                <p><a  href="/<?=$this->project->urlName?>">Continue to Volunteer Activity</a></p>
+                <div class="clear"></div>
+            </div>
+        </div>
+    <div class="clr"></div>
+    <div class="clr"></div>
+</div>

@@ -1,0 +1,20 @@
+<?php
+$this->headTitle("Empowered.org - Non Profit Management");
+$this->placeholder('tab')->set('project');
+?>
+
+<div>
+	<div id="mainco2">
+	<div class="roundedbox">
+        <div class="MainBody">
+        	<h2>Do you want to delete "<?php echo $this->data['Name'] ?>"?</h2>
+            <form id="DeleteBrigade" name="DeleteBrigade" method="post" action="/project/delete">
+                <input type="hidden" id="ProjectId" name="ProjectId" value="<?php echo $this->data['ProjectId'] ?>" />
+                <input type="submit" name="btnYes" value="Yes" id="btnYes" />
+                <input type="button" name="btnNo" value="No" id="btnNo" onclick="location.href='/<?php echo $this->data['groupLink'] ?>';" />
+            </form>
+        </div>
+        <div class="clear"></div>
+ 	</div> 	
+ 	</div>
+</div>

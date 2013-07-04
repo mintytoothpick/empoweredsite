@@ -1,0 +1,62 @@
+<?php $this->headTitle("Empowered.org - Upload New Volunteers"); ?>
+<script type="text/javascript">
+    function share() {
+        var checked = false;
+        if (document.getElementById('fb-share').checked == true) {
+            $('#share-fb').click();
+            checked = true;
+        }
+        if (document.getElementById('email-share').checked == true) {
+            $('.addthis_button_email').click();
+            $('#at_msg').val($('#share-content').val());
+            checked = true;
+        }
+        if (!checked) {
+            alert('Please select Facebook and or email to share your post.')
+            return false;
+        }
+        return true;
+    }
+</script>
+<div>
+    <div id="mainco2">
+        <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+        <div class="block001">
+            <div class="blst001">
+                <div class="blst002">
+                    <div id="TabbedPanels1" class="TabbedPanels">
+                        <div class="panes TabbedPanelsContentGroup">
+                            <!-- FIRST TAB -->
+                            <div class="TabbedPanelsContent">
+                                <div class="whiteBox" style="font-size:13px;">
+                                <form method="post" action="/project/uploadvolunteers" enctype="multipart/form-data">
+				    <input type="hidden" name="ProjectId" value="<?php echo $this->data['ProjectId'] ?>" />
+                                    <input type="hidden" name="GroupId" value="<?php echo $this->data['GroupId'] ?>" />
+				    <h1 style="margin-bottom:10px; font-weight:bold;">Upload New Volunteers</h1>
+                                    <span style="color:#F00;">Please select valid .xls files only.</span><br /><br />
+                                    <span style="font-weight:bold">Select an excel file:&nbsp;</span>
+                                    <input type="hidden" id="action" name="action" value="upload" />
+                                                <input type="hidden" id="ProjectId" name="ProjectId" value="<?php echo $this->data['ProjectId'] ?>" />
+                                    <input type="hidden" name="GroupId" value="<?php echo $this->data['GroupId'] ?>" />
+                                    <input type="file" size="24" name="uploadExcel" id="uploadExcel" class="textfield" /><br>
+                                    <div style="border:1px solid #dcbd00; background-color:#fff7c8; padding:10px; margin-top:8px; width: 50%">
+                                        You can import an existing list of members using an excel spreadsheet. Please set up the columns in the following format:<br />
+                                        Column 1 - First Name<br />
+                                        Column 2 - Last Name<br />
+                                        Column 3 - Email Address 
+                                    </div>
+                                    <div class="clear" style="margin-bottom: 10px"></div>
+                                    <input class="btn btngreen" type="submit" value="Submit" >
+				</form>
+			    	</div>
+                            </div>
+                            <!-- e o FIRST TAB -->
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </div>
+        <div class="block001f01"><div class="blst001"><div class="blst002"></div></div>
+    </div>
+</div>

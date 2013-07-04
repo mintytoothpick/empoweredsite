@@ -1,0 +1,682 @@
+<?php $this->headTitle(stripslashes($this->data['FullName'])."'s Profile on Empowered.org"); ?>
+<script type="text/javascript">
+    //var TabbedPanels1 = new Spry.Widget.TabbedPanels("TabbedPanels1");
+    $(document).ready(function(){
+        $("ul.tabs").tabs("div.panes > div");
+    })
+
+    /* progress bar animations - setting initial values */
+    $(function() {
+        $(".scrollable4").scrollable();
+
+        $(".item").click(function() {
+            $(".item").removeClass("active");
+            $(this).addClass("active");
+        }).filter(":first").click();
+    });
+
+    function getActivityDetail(projectId) {
+        $('#activityDetail').load('/profile/activitydetail',{projectId:projectId},function(data) {
+        });
+    }
+
+    function showUpcomingActivities(show) {
+        if (show) {
+            $('#show-upcoming-brigades-all').hide();
+            $('#show-upcoming-brigades-less').show();
+            $('.show-all-upcoming-activities').show();
+        } else {
+            $('#show-upcoming-brigades-all').show();
+            $('#show-upcoming-brigades-less').hide();
+            $('.show-all-upcoming-activities').hide();
+        }
+    }
+
+    function showPastActivities(show) {
+        if (show) {
+            $('#show-past-brigades-all').hide();
+            $('#show-past-brigades-less').show();
+            $('#past-activities .show-all-past-activities').show();
+        } else {
+            $('#show-past-brigades-all').show();
+            $('#show-past-brigades-less').hide();
+            $('#past-activities .show-all-past-activities').hide();
+        }
+    }
+
+    function showPastCampaigns(show) {
+        if (show) {
+            $('#show-past-campaigns-all').hide();
+            $('#show-past-campaigns-less').show();
+            $('#past-campaigns .show-all-past-campaigns').show();
+        } else {
+            $('#show-past-campaigns-all').show();
+            $('#show-past-campaigns-less').hide();
+            $('#past-campaigns .show-all-past-campaigns').hide();
+        }
+    }
+
+    function showActiveCampaigns(show) {
+        if (show) {
+            $('#show-active-campaigns-all').hide();
+            $('#show-active-campaigns-less').show();
+            $('.show-all-active-campaigns').show();
+        } else {
+            $('#show-active-campaigns-all').show();
+            $('#show-active-campaigns-less').hide();
+            $('.show-all-active-campaigns').hide();
+        }
+    }
+
+    function showNonprofits(show) {
+        if (show) {
+            $('#show-nonprofits-all').hide();
+            $('#show-nonprofits-less').show();
+            $('.show-all-nonprofits').show();
+        } else {
+            $('#show-nonprofits-all').show();
+            $('#show-nonprofits-less').hide();
+            $('.show-all-nonprofits').hide();
+        }
+    }
+
+    function showGroups(show) {
+        if (show) {
+            $('#show-groups-all').hide();
+            $('#show-groups-less').show();
+            $('.show-all-groups').show();
+        } else {
+            $('#show-groups-all').show();
+            $('#show-groups-less').hide();
+            $('.show-all-groups').hide();
+        }
+    }
+
+    function showPastEvents(show) {
+        if (show) {
+            $('#show-past-events-all').hide();
+            $('#show-past-events-less').show();
+            $('#past-events .show-all-past-events').show();
+        } else {
+            $('#show-past-events-all').show();
+            $('#show-past-events-less').hide();
+            $('#past-events .show-all-past-events').hide();
+        }
+    }
+
+    function showActiveEvents(show) {
+        if (show) {
+            $('#show-active-events-all').hide();
+            $('#show-active-events-less').show();
+            $('.show-all-active-events').show();
+        } else {
+            $('#show-active-events-all').show();
+            $('#show-active-events-less').hide();
+            $('.show-all-active-events').hide();
+        }
+    }
+
+    function showBlogs(show) {
+        if (show) {
+            $('#show-blogs-all').hide();
+            $('#show-blogs-less').show();
+            $('.show-all-blogs').show();
+        } else {
+            $('#show-blogs-all').show();
+            $('#show-blogs-less').hide();
+            $('.show-all-blogs').hide();
+        }
+    }
+
+    $(document).ready(function() {
+        //When page loads...
+        $(".tab_content").hide(); //Hide all content
+        $("ul.tabs-01 li:first").addClass("active").show(); //Activate first tab
+        $(".tab_content:first").show(); //Show first tab content
+
+        //On Click Event
+        $("ul.tabs-01 li").click(function() {
+
+            $("ul.tabs-01 li").removeClass("active"); //Remove any "active" class
+            $(this).addClass("active"); //Add "active" class to selected tab
+            $(".tab_content").hide(); //Hide all tab content
+
+            var activeTab = $(this).find("a").attr("href"); //Find the href attribute value to identify the active tab + content
+            $(activeTab).fadeIn(); //Fade in the active ID content
+            return false;
+        });
+
+    });
+</script>
+<link rel="stylesheet" href="<?php echo $this->contentLocation ?>public/css/scrollable-horizontal.css" type="text/css" media="screen" />
+
+<div>
+    <div id="mainco2">
+        <!-- <div class="roundedbox">-->
+        <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+        <div class="block001">
+            <div class="blst001">
+                <div class="blst002">
+                    <div class="MainBody">
+                        <div style="float:left; margin-right:30px; margin-bottom:10px; width:100px;"><img src="/profile/loadimage/?UserId=<?php echo $this->data['UserId'] ?>" style="width:100px; height:100px;" class="BorderStyle"/></div>
+                        <table>
+                            <tr>
+                                <td><h1 style="padding:0; font-size:23px;line-height:24px"><?php echo stripslashes($this->data['FirstName'])." ".stripslashes($this->data['LastName']) ?></h1></td>
+							</tr>
+								<?php if(isset($_SESSION['UserId']) && $_SESSION['UserId'] == $this->data['UserId']) { ?><tr><td style="border:1px solid #dcbd00; background-color:#fff7c8; padding:10px; margin:8px 0 0 12px;">Hey <?php echo stripslashes($this->data['FirstName']) ?>. Click <a href="/profile/dashboard">here</a> to manage your account.</td></tr><?php } ?>
+                        </table>
+                        <table>
+                            <?php if (!empty($this->data['AboutMe'])):?>
+                            <tr>
+                                <td style="width:70px; color:#AAA;">passions</td>
+                                <td><?php echo stripslashes($this->data['AboutMe']) ?></td>
+                            </tr>
+                            <?php endif;?>
+                            <?php if (!empty($this->data['Location'])):?>
+                            <tr>
+                                <td style="color:#AAA;">lives in</td>
+                                <td><?php echo stripslashes($this->data['Location']) ?></td>
+                            </tr>
+                            <?php endif;?>
+                        </table>
+
+                        <div id="TabbedPanels1" class="TabbedPanels">
+                            <ul class="TabbedPanelsTabGroup">
+                                <li class="TabbedPanelsTab current"><a id="t1" href="#home_tab" class="wht">About Me</a></li>
+                                <?php if (count($this->upcoming_brigades) || count($this->active_campaigns) || count($this->past_brigade) || count($this->inactive_campaigns)) { ?>
+                                <li class="TabbedPanelsTab NoMarginLT" ><a id="t2" href="/<?php echo $this->data['URLName'] ?>/fundraising-pages" class="wht">Fundraising Pages</a></li>
+                                <?php } ?>
+                            </ul>
+
+                            <div class="TabbedPanelsContentGroup">
+                                <!-- FIRST TAB -->
+                                <div class="TabbedPanelsContent">
+                                    <div class="whiteBox">
+                                        <div class="leftC">
+                                            <div class="box1" style="width:272px">
+                                                <h3>Accomplishments</h3>
+                                                <div class="TextBox" style="width:110px;margin-bottom:8px;"><strong><?php echo $this->currency_display.number_format($this->data['total_donations']) ?><br />
+                                                        <span class="SmallText">Fundraised</span></strong>
+                                                </div>
+                                                <div class="TextBox" style="width:110px"><strong><?php echo $this->data['brigades_participated'] ?><br />
+                                                        <span class="SmallText">Activities</span></strong>
+                                                </div>
+                                                <div class="clr"></div>
+                                            </div>
+                                            <?php if (count($this->nonprofit_supported)) { ?>
+                                            <h3 style="color:#693">Organizations <?php if (count($this->nonprofit_supported) > 4) { ?><span style="font-size:11px; float:right"><a id="show-nonprofits-all" href="javascript:showNonprofits(true)">(<?php echo count($this->nonprofit_supported) ?>) Show All</a><a id="show-nonprofits-less" href="javascript:showNonprofits(false)" style="display:none">Show Less</a></span><?php } ?></h3>
+                                            <ul class="sidebar_list">
+                                                    <?php $ctr = 0;
+                                                    foreach($this->nonprofit_supported as $org) {
+														if ($org['NetworkId'] != '2A3801E4-203D-11E0-92E6-0025900034B2') {
+                                                        $ctr++;
+                                                        ?>
+                                                <li style="margin-bottom:10px;<?php echo $ctr > 4 ? "display:none" : "" ?>" <?php echo $ctr > 4 ? "class='show-all-nonprofits'" : "" ?>>
+                                                    <div style="float:left;">
+                                                        <a href="/<?php echo $org['URLName'] ?>" <?php if(strlen($org['NetworkName']) > 40) { echo 'class="tooltip" title="'.$org['NetworkName'].'"'; } ?> ><?php echo $org['NetworkName'] ?></a></td>
+                                                    </div>
+                                                    <div class="clr"></div>
+                                                </li>
+                                                    <?php } else if (count($this->nonprofit_supported) == 1) { echo 'None'; }
+ 												} ?>
+                                            </ul>
+                                            <?php } ?>
+                                            <?php if (count($this->supported_groups)) { ?>
+                                            <h3 style="color:#693">Groups <?php if (count($this->supported_groups) > 4) { ?><span style="font-size:11px; float:right"><a id="show-groups-all" href="javascript:showGroups(true)">(<?php echo count($this->supported_groups) ?>) Show All</a><a id="show-groups-less" href="javascript:showGroups(false)" style="display:none">Show Less</a></span><?php } ?></h3>
+                                            <ul class="sidebar_list">
+                                                    <?php $ctr = 0;
+                                                    foreach($this->supported_groups as $group) {
+                                                        $ctr++;
+                                                        ?>
+                                                <li style="margin-bottom:10px;<?php echo $ctr > 4 ? "display:none" : "" ?>" <?php echo $ctr > 4 ? "class='show-all-groups'" : "" ?>>
+                                                    <div style="float:left;">
+                                                        <a href="/<?php echo $group['URLName'] ?>" <?php if(strlen(stripslashes($group['GroupName'])) > 40) { echo 'class="tooltip" title="'.stripslashes($group['GroupName']).'"'; } ?> ><?php if(strlen(stripslashes($group['GroupName'])) > 40) { echo substr(stripslashes($group['GroupName']), 0, 40)."..."; } else { echo stripslashes($group['GroupName']); } ?></a>
+                                                    </div>
+                                                    <div class="clr"></div>
+                                                </li>
+                                                    <?php } ?>
+                                            </ul>
+                                            <?php } ?>
+                                            <!-- BLOG LIST -->
+                                            <?php if (count($this->blogs)) { ?>
+                                            <h3 style="color:#693">Blogs <?php if (count($this->blogs) > 4) { ?><span style="font-size:11px; float:right"><a id="show-blogs-all" href="javascript:showBlogs(true)">(<?php echo count($this->blogs) ?>) Show All</a><a id="show-blogs-less" href="javascript:showBlogs(false)" style="display:none">Show Less</a></span><?php } ?></h3>
+                                            <ul class="sidebar_list">
+                                                    <?php $ctr = 0;
+                                                    foreach($this->blogs as $blog) {
+                                                        $ctr++;
+                                                        ?>
+                                                <div id="Blog_<?php echo $blog['BlogId'] ?>">
+                                                    <li style="border-bottom:1px solid #E5E5E5; padding-bottom:4px; margin-bottom:10px; <?php echo $ctr > 4 ? "display:none" : "" ?>" <?php echo $ctr > 4 ? "class='show-all-blogs'" : "" ?>><a href="javascript:ShowHide('Blog_<?php echo $blog['BlogId'] ?>', 'BlogContent_<?php echo $blog['BlogId'] ?>');" <?php if(strlen(stripslashes($blog['Title'])) > 25) { echo "class=\"tooltip\" title=\"".stripslashes($blog['Title'])."\""; } ?>><span class="bigText"><?php if(strlen(stripslashes($blog['Title'])) > 25) { echo substr(stripslashes($blog['Title']), 0, 25)."..."; } else { echo stripslashes($blog['Title']); } ?></span></a><span style="float:right;color:#666;"><?php echo date("M j, Y", strtotime($blog['CreatedOn'])) ?></span><div class="clear"></div>
+                                                    </li>
+                                                </div>
+                                                <div id="BlogContent_<?php echo $blog['BlogId'] ?>" style="display:none;">
+                                                    <li style="border-bottom:1px solid #E5E5E5; padding-bottom:4px; margin-bottom:10px; <?php echo $ctr > 4 ? "display:none" : "" ?>" <?php echo $ctr > 4 ? "class='show-all-blogs'" : "" ?>><a href="javascript:ShowHide('BlogContent_<?php echo $blog['BlogId'] ?>', 'Blog_<?php echo $blog['BlogId'] ?>');" <?php if(strlen(stripslashes($blog['Title'])) > 25) { echo "class=\"tooltip\" title=\"".stripslashes($blog['Title'])."\""; } ?>><span class="bigText"><?php if(strlen(stripslashes($blog['Title'])) > 25) { echo substr(stripslashes($blog['Title']), 0, 25)."..."; } else { echo stripslashes($blog['Title']); } ?></span></a><span style="float:right;color:#666;"><?php echo date("M j, Y", strtotime($blog['CreatedOn'])) ?></span><div class="clear"></div><span style="color:#000;"><?php echo nl2br(stripslashes($blog['Description'])) ?></span>
+                                                    </li>
+                                                </div>
+                                                    <?php } ?>
+                                            </ul>
+                                            <?php } ?>
+                                        </div>
+                                        <div class="rightC">
+                                            <?php if (count($this->upcoming_brigades) > 0) : ?>
+                                            <h1 style="color:#999999; border-bottom:1px solid #ccc; font-size:22px;padding-bottom:10px; margin:-5px 0 20px;">Upcoming Activities<?php if (count($this->upcoming_brigades) > 2) { ?><span style="font-size:11px; float:right"><a id="show-upcoming-brigades-all" href="javascript:showUpcomingActivities(true)">(<?php echo count($this->upcoming_brigades) ?>) Show All</a><a id="show-upcoming-brigades-less" href="javascript:showUpcomingActivities(false)" style="display:none">Show Less</a></span><?php } ?></h1>
+                                            <div class="grayBox">
+                                                    <?php $ctr=0;?>
+                                                    <?php foreach($this->upcoming_brigades as $brigade) : ?>
+                                                        <?php $ctr++;?>
+                                                		<div <?php if($ctr > 2) { ?>class="show-all-upcoming-activities" style="display:none;"<?php } ?>>
+                                                    		<h2 style="margin-bottom:5px"><a href="/<?php echo $brigade['pURLName'] ?>"><?php echo stripslashes($brigade['Name']) ?></a></h2>
+                                                            <?php
+                                                            $vid = $this->volunteer->getVID($this->data['UserId'], $brigade['ProjectId']);
+                                                            $volunteer = $this->volunteer->loadInfo($vid);
+                                                            $total_donations = $this->project_donations->getUserProjectDonations($this->data['UserId'], $brigade['ProjectId']);
+                                                            $volunteer['UserDonationGoal'] = $volunteer['UserDonationGoal'] > $brigade['VolunteerMinimumGoal'] ? $volunteer['UserDonationGoal'] : $brigade['VolunteerMinimumGoal'];
+                                                            $total_volunteer = $this->brigades->countVolunteers($brigade['ProjectId']);
+                                                            $individual_goal = $this->volunteer->getUserDonationGoal($this->data['UserId'], $brigade['ProjectId'], true);
+                                                            $total_donations = !empty($total_donations) ? $total_donations : 0;
+                                                            $volunteer['UserDonationGoal'] = !empty($volunteer['UserDonationGoal']) ? $volunteer['UserDonationGoal'] : 0;
+                                                            ?>
+                                                    <span class="TextStyle" style="line-height:14px">Location:</span><?php echo stripslashes($this->contact->getContactInfo($brigade['ProjectId'], 'Location')) ?><br />
+                                                    <?php if (!empty($brigade['StartDate']) && $brigade['StartDate'] != '0000-00-00 00:00:00' && $brigade['EndDate'] != '0000-00-00 00:00:00') { ?>
+                                                        <span class="TextStyle" style="line-height:14px">When:</span>
+                                                        <div style="margin-left:80px">
+                                                            <?php echo date('M d, Y g:i A', strtotime($brigade['StartDate'])) ?>
+                                                            <?php if (!empty($brigade['EndDate']) && $brigade['EndDate'] != '0000-00-00 00:00:00') { ?> to <br/>
+                                                            <?php echo date('M d, Y g:i A', strtotime($brigade['EndDate'])) ?><?php } ?>
+                                                        </div>
+                                                    <?php } else if (empty($brigade['StartDate']) && !empty($brigade['EndDate'])) { ?>
+                                                        <span class="TextStyle" style="line-height:14px">Ends:</span>
+                                                        <?php echo date('M d, Y g:i A', strtotime($brigade['EndDate'])) ?>
+                                                    <?php } ?>
+                                                    <br/>
+													<?php if ($brigade['isFundraising'] == 'Yes' || $brigade['isFundraising'] == 1) { ?>
+                                                    <span class="TextStyle" style="line-height:14px;margin-top:<?php echo (number_format($volunteer['UserDonationGoal']) > 0) ? "13px" : "2px" ?>;">Support me:</span>
+                                                    <?php } ?>
+                                                    <div style="margin-left:80px; width: 400px">
+														<?php if ($brigade['isFundraising'] == 'Yes' || $brigade['isFundraising'] == 1) { ?>
+                                                        <table class="no-style" style="margin-top:-9px; width:270px; float:left">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td style="vertical-align:bottom;"><a href="/<?php echo $brigade['pURLName'] ?>/<?php echo $this->data['URLName'] ?>/donate" target="_blank" class="btnbig orange" style="padding: 0.3em 1.5em 0.35em;">DONATE</a></td>
+                                                                    <td style="text-align:center">
+                                                                        <div class="progress_label">Donations: <?php echo $brigade['Currency'].number_format($total_donations) ?>
+                                                                                        <?php if (number_format($total_donations) < $volunteer['UserDonationGoal']) :?>
+                                                                        	of <?php echo $brigade['Currency'].$individual_goal ?>
+                                                                                        <?php endif;?>
+                                                                        </div>
+                                                                        <div id="progress<?php echo $brigade['ProjectId']?>" class="progress full <?php echo $total_donations > $volunteer['UserDonationGoal'] || ($total_donations != 0 && $volunteer['UserDonationGoal'] != 0) ? 'progress-green' : '' ?>"><span><b></b></span></div>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td colspan="2" style="text-align:right; border:none !important"><a href="/<?php echo $this->data['URLName'] ?>/<?php echo $brigade['pURLName'] ?>">See my fundraising page>></a></td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                        <script type="text/javascript">
+                                                            Administry.progress("#progress<?php echo $brigade['ProjectId']?>",<?php echo $total_donations ?>, <?php echo $volunteer['UserDonationGoal'] ?>);
+                                                        </script>
+	                                                    <?php } ?>
+                                                        <div class="addthis_toolbox addthis_default_style addthis_32x32_style" style="float:right; width:110px;">
+                                                            <a class="addthis_button_email" addthis:url="http://<?php echo $_SERVER['HTTP_HOST'].'/'.$this->data['URLName'].'/'.$brigade['pURLName'] ?>"></a>
+                                                            <a class="addthis_button_facebook" addthis:url="http://<?php echo $_SERVER['HTTP_HOST'].'/'.$this->data['URLName'].'/'.$brigade['pURLName'] ?>"></a>
+                                                            <a class="addthis_button_twitter" addthis:url="http://<?php echo $_SERVER['HTTP_HOST'].'/'.$this->data['URLName'].'/'.$brigade['pURLName'] ?>"></a>
+                                                        </div>
+                                                    </div>
+                                                            <?php if ($ctr < 2):?>
+                                                    <div class="divider"></div>
+                                                    <div class="clr"></div>
+                                                            <?php else:?>
+                                                    <div class="divider"></div>
+                                                    <div class="clr"></div>
+                                                                <?php //break;?>
+                                                            <?php endif;?>
+                                                </div>
+                                                    <?php endforeach; ?>
+                                            </div>
+                                            <?php endif;?>
+
+                                            <!-- PAST ACTIVITIES -->
+                                            <?php if (count($this->past_brigade)) :?>
+                                            <h1 style="color:#999999; border-bottom:1px solid #ccc; font-size:22px;padding-bottom:10px; margin:<?php echo count($this->upcoming_brigades) ? "20px" : "-5px" ?> 0 20px;">Past Activities <?php if (count($this->past_brigade) > 2) { ?><span style="font-size:11px; float:right"><a id="show-past-brigades-all" href="javascript:showPastActivities(true)">(<?php echo count($this->past_brigade) ?>) Show All</a><a id="show-past-brigades-less" href="javascript:showPastActivities(false)" style="display:none">Show Less</a></span><?php } ?></h1>
+                                            <div id="past-activities">
+                                                    <?php $ctr = 0;?>
+                                                    <?php foreach($this->past_brigade as $brigade):?>
+                                                        <?php $ctr ++;?>
+                                                        <?php $location = $this->contactManage->getContactInfo($brigade['ProjectId'], 'Location');?>
+                                                        <?php $total_donations = $this->donationManage->getUserProjectDonations($this->data['UserId'], $brigade['ProjectId']);?>
+                                                <div class="box_full <?php echo $ctr > 2 ? "show-all-past-activities" : "" ?>" style="margin-bottom:20px; <?php echo $ctr > 2 ? "display:none" : "" ?>">
+                                                    <a href="/<?php echo $brigade['pURLName']?>" class="acitivity_name"><?php echo stripslashes($brigade['Name'])?></a><br>
+                                                    <?php if ($brigade['StartDate'] != '0000-00-00 00:00:00' && $brigade['EndDate'] != '0000-00-00 00:00:00') { ?>
+                                                    <span style="float:left;"><?php echo date('M d, Y', strtotime($brigade['StartDate'])) .(!empty($brigade['EndDate']) ? ' - '. date('M d, Y', strtotime($brigade['EndDate'])) : "") ?></span><span style="float:left;margin-left:45px;"> <?php echo $location ?></span>
+                                                    <?php } ?>
+                                                            <?php if ($brigade['isFundraising'] == 'Yes'  || $brigade['isFundraising'] == 1) { ?>
+                                                    <div style="float:left; margin-left:45px;">
+                                                        <div style="float:left">
+                                                            		Amount Raised: <?php echo $brigade['Currency'].number_format($total_donations)?>
+                                                        </div>
+                                                    </div>
+                                                            <?php } ?>
+                                                    <div class="clr"></div>
+                                                </div>
+                                                    <?php endforeach;?>
+                                            </div>
+                                            <?php endif;?>
+
+                                            <!-- Active Fundraising Campaigns -->
+					    					<?php if (count($this->active_campaigns)) { ?>
+                                            <h1 style="color:#999999; border-bottom:1px solid #ccc; font-size:22px;padding-bottom:10px; margin:<?php echo count($this->active_campaigns) ? "20px" : "-5px" ?> 0 20px;">Active Fundraising Campaigns <?php if (count($this->active_campaigns) > 2) { ?><span style="font-size:11px; float:right"><a id="show-active-campaigns-all" href="javascript:showActiveCampaigns(true)">(<?php echo count($this->active_campaigns) ?>) Show All</a><a id="show-active-campaigns-less" href="javascript:showInactiveCampaigns(false)" style="display:none">Show Less</a></span><?php } ?></h1>
+                                                <?php
+                                                    $ctr = 0;
+                                                    foreach($this->active_campaigns as $campaign) :
+                                                    $ctr ++;
+                                                    $total_donations = $this->donationManage->getProjectDonations($campaign['ProjectId']);
+                                                    $end_date_year = date('Y', strtotime($campaign['EndDate']));
+                                                    $donors = $this->donationManage->getVolunteerDonors($this->data['UserId'], $campaign['ProjectId']);
+                                                ?>
+                                            <div class="grayBox3 <?php echo $ctr > 2 ? "show-all-active-campaigns" : "" ?>" style="padding:10px 20px; margin-bottom:5px; <?php echo $ctr > 2 ? "display:none" : "" ?>">
+                                                <div class="box_full">
+                                                    <a href="/<?php echo $campaign['pURLName']?>" class="acitivity_name"><?php echo stripslashes($campaign['Name'])?></a><br>
+                                                    <span>Active till: <?php echo $end_date_year == '1969' ? "Not Specified" : date('M d, Y', strtotime($campaign['EndDate'])) ?>  </span>
+                                                    <div class="divider" style="height:25px"></div>
+                                                    <div>
+                                                        <div style="float:left">
+                                                            <table style="width:140px">
+                                                                <tr>
+                                                                    <td>Amount Raised</td><td><?php echo $campaign['Currency'].number_format($total_donations)?></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>Donation Goal</td><td><?php echo $campaign['Currency'].number_format($campaign['DonationGoal'])?></td>
+                                                                </tr>
+                                                            </table>
+                                                        </div>
+                                                        <div style="float:left; margin-left:10px">
+                                                            <table style="width:70px">
+                                                                <tr>
+                                                                    <td><?php if(number_format($total_donations)) { ?><a href="/<?php echo $this->data['URLName'] ?>/<?php echo $brigade['pURLName'] ?>/donor-list">Pull Report</a><?php } ?>&nbsp;</td>
+                                                                </tr>
+                                                                <?php if(number_format($campaign['DonationGoal'])) { ?><tr>
+                                                                    <td><div id="progress_<?php echo $campaign['ProjectId']?>" class="progress full progress-green"><span><b></b></span></div>
+                                                    		        <script type="text/javascript">
+                                                                		Administry.progress("#progress_<?php echo $campaign['ProjectId']?>", <?php echo $total_donations?>, <?php echo $campaign['DonationGoal']?>);
+                                                            		</script></td>
+                                                                </tr><?php } ?>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="clr"></div>
+                                                    <div style="margin-top:20px">
+                                                        <div style="float:left">
+                                                            <table style="width:150px">
+                                                                <tr>
+                                                                    <td>Share Fundraising Page</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td><a href="/<?php echo stripslashes($this->data['URLName']).'/'.stripslashes($campaign['pURLName']) ?>">Edit Fundraising Page</a></td>
+                                                                </tr>
+                                                            </table>
+                                                        </div>
+                                                        <div style="float:left; margin-left:10px">
+                                                            <div class="addthis_toolbox addthis_default_style addthis_32x32_style">
+                                                                <a class="addthis_button_email" addthis:url="http://<?php echo $_SERVER['HTTP_HOST'].'/'.stripslashes($this->data['URLName']).'/'.stripslashes($campaign['pURLName']) ?>"></a>
+                                                                <a class="addthis_button_facebook" addthis:url="http://<?php echo $_SERVER['HTTP_HOST'].'/'.stripslashes($this->data['URLName']).'/'.stripslashes($campaign['pURLName']) ?>"></a>
+                                                            </div>
+                                                            <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4e319b9362855da9"></script>
+                                                        </div>
+                                                    </div>
+                                                    <div class="clr"></div>
+                                                    <div>
+                                                        <div style="float:left;width:415px">
+                                                            <div class="divider" style="height:25px"></div>
+                                                            <div class="menu_activity">
+                                                                <a href="/<?php echo $campaign['pURLName'] ?>/<?php echo $this->data['URLName'] ?>/donate" style="margin-left:0">Donate to Fundraising Campaign</a>
+                                                                <a href="javascript:;" onclick="endCampaign('<?php echo $campaign['VolunteerId'] ?>')">End Fundraising Campaign</a>
+                                                                <?php if (count($donors)) { ?>
+                                                                <a href="/<?php echo $campaign['pURLName'] ?>/email-donors">Email Donors</a>
+                                                                <?php } ?>
+                                                            </div>
+                                                        </div>
+                                                        <div style="float:right;margin-top:10px">
+                                                            <a href="/<?php echo $campaign['pURLName']?>" class="btnbig gray" style="padding: .8em; font-size: 12px"><strong>More about this Campaign</strong></a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="clr"></div>
+                                                </div>
+                                            </div>
+                                                <?php endforeach;?>
+                                            <?php } ?>
+
+                                            <!-- Inactive Fundraising Campaigns -->
+					    <?php if (count($this->inactive_campaigns)) { ?>
+                                            <h1 style="color:#999999; border-bottom:1px solid #ccc; font-size:22px;padding-bottom:10px; margin:<?php echo count($this->inactive_campaigns) ? "20px" : "-5px" ?> 0 20px;">Past Fundraising Campaigns <?php if (count($this->inactive_campaigns) > 2) { ?><span style="font-size:11px; float:right"><a id="show-past-campaigns-all" href="javascript:showPastCampaigns(true)">(<?php echo count($this->inactive_campaigns) ?>) Show All</a><a id="show-past-campaigns-less" href="javascript:showPastCampaigns(false)" style="display:none">Show Less</a></span><?php } ?></h1>
+                                            <div id="past-campaigns">
+                                            <?php $ctr = 0;
+                                             foreach($this->inactive_campaigns as $campaign):
+                                                $ctr ++;
+                                                $total_donations = $this->donationManage->getProjectDonations($campaign['ProjectId']);
+                                                $end_date = $campaign['isActive'] == 1 ? date('M d, Y', strtotime($campaign['EndDate'])) : date('M d, Y', strtotime($campaign['DateEnded']));
+                                                $donors = $this->donationManage->getVolunteerDonors($this->data['UserId'], $campaign['ProjectId']);
+                                            ?>
+                                                <div class="box_full <?php echo $ctr > 2 ? "show-all-past-campaigns" : "" ?>" style="margin-bottom:20px; <?php echo $ctr > 2 ? "display:none" : "" ?>">
+                                                    <a href="/<?php echo $campaign['pURLName']?>" class="acitivity_name"><?php echo stripslashes($campaign['Name'])?></a><br>
+                                                    <span>Ended: <?php echo $end_date ?></span>
+                                                    <div>
+                                                        Amount Raised: <?php echo $campaign['Currency'].number_format($total_donations)?>
+                                                    </div>
+                                                    <?php if (count($donors)) { ?>
+                                                    <br><a href="/<?php echo $campaign['pURLName'] ?>/email-donors" style="font-weight:bold">Email Donors</a>
+                                                    <?php } ?>
+                                                <div class="clr"></div>
+                                                </div>
+                                                <?php endforeach;?>
+                                            </div>
+                                            <?php } ?>
+
+                                            <!-- Upcoming Events -->
+					    <?php if (count($this->upcoming_events)) { ?>
+                                            <h1 style="color:#999999; border-bottom:1px solid #ccc; font-size:22px;padding-bottom:10px;">Upcoming Events <?php if (count($this->upcoming_events) > 2) { ?><span style="font-size:11px; float:right"><a id="show-active-events-all" href="javascript:showActiveEvents(true)">(<?php echo count($this->upcoming_events) ?>) Show All</a><a id="show-active-events-less" href="javascript:showActiveEvents(false)" style="display:none">Show Less</a></span><?php } ?></h1>
+                                            <div id="past-events">
+                                            <?php $ctr = 0;
+                                             foreach($this->upcoming_events as $event):
+                                                $ctr ++;
+                                            ?>
+                                                <div class="box_full <?php echo $ctr > 2 ? "show-all-active-events" : "" ?>" style="margin-bottom:20px; <?php echo $ctr > 2 ? "display:none" : "" ?>">
+                                                    <a href="/<?php echo $event['URLName']?>/events?EventId=<?php echo $event['EventId'] ?>" class="acitivity_name"><?php echo stripslashes($event['Title'])?></a><br>
+                                                    <span style="margin-right: 50px"><?php echo date('F d, Y', strtotime($event['StartDate']))." - ".date('F d, Y', strtotime($event['EndDate'])) ?></span>
+                                                    <span><?php echo stripslashes($event['Link']) ?></span>
+                                                <div class="clr"></div>
+                                                </div>
+                                                <?php endforeach;?>
+                                            </div>
+                                            <?php } ?>
+
+                                            <!-- Past Events -->
+					    <?php if (count($this->past_events)) { ?>
+                                            <h1 style="color:#999999; border-bottom:1px solid #ccc; font-size:22px;padding-bottom:10px;">Past Events <?php if (count($this->past_events) > 2) { ?><span style="font-size:11px; float:right"><a id="show-past-events-all" href="javascript:showPastEvents(true)">(<?php echo count($this->past_events) ?>) Show All</a><a id="show-past-events-less" href="javascript:showPastEvents(false)" style="display:none">Show Less</a></span><?php } ?></h1>
+                                            <div id="past-events">
+                                            <?php $ctr = 0;
+                                             foreach($this->past_events as $event):
+                                                $ctr ++;
+                                            ?>
+                                                <div class="box_full <?php echo $ctr > 2 ? "show-all-past-events" : "" ?>" style="margin-bottom:20px; <?php echo $ctr > 2 ? "display:none" : "" ?>">
+                                                    <a href="/<?php echo $event['URLName']?>/events?EventId=<?php echo $event['EventId'] ?>" class="acitivity_name"><?php echo stripslashes($event['Title'])?></a><br>
+                                                    <span style="margin-right: 50px"><?php echo date('F d, Y', strtotime($event['StartDate']))." - ".date('F d, Y', strtotime($event['EndDate'])) ?></span>
+                                                    <span><?php echo stripslashes($event['Link']) ?></span>
+                                                <div class="clr"></div>
+                                                </div>
+                                                <?php endforeach;?>
+                                            </div>
+                                            <?php } ?>
+                                            
+                                            <!-- activity01 - recent activity -->
+                                            <h1 style="color:#999999; border-bottom:1px solid #ccc; font-size:22px;padding-bottom:10px; margin:<?php echo (count($this->upcoming_brigades) || count($this->past_brigade)) ? "20px" : "-5px" ?> 0 20px;">Feed</h1>
+                                            <?php if ($this->is_logged_in) { ?>
+                                            <div class="txt01">Leave <?php echo stripslashes($this->data['FirstName']) ?> a message</div>
+                                            <input type="hidden" id="recipient" name="recipient" value="XXXX" />
+                                            <textarea cols="60" rows="3" style="margin-bottom:10px; font-size:13px; width:98%;" id="wall-post" name="wall-post"></textarea>
+                                            <input type="button" class="btn btngreen" id="share-post" name="submit" value="Share" style="margin-top:-5px; margin-bottom:5px; margin-right:10px; float:right; display:none;" />
+                                            <div class='clear1'></div><br>
+                                            <?php } ?>
+                                            <div class="activity01">
+                                                <?php if (count($this->site_activities)) { ?>
+                                                    <?php foreach($this->site_activities as $activity) {
+                                                    if (date('Y-m-d', strtotime($activity['ActivityDate'])) < date('Y-m-d')) {
+                                                        $activity['ActivityDate'] = date('Y-m-d', strtotime($activity['ActivityDate']));
+                                                    }
+                                                    //echo "ActivityType: ".$activity['ActivityType']."<br>SiteId: ".$activity['SiteId'];
+                                                    $avatar = $comment_box = '';
+                                                    $comments_list = $this->comments->getSiteActivityComments($activity['SiteActivityId']);
+                                                    $comments = "<ul id='ul_".$activity['SiteActivityId']."'".(count($comments_list) > 0 ? "" : "style='display:none'").">";
+                                                    foreach($comments_list as $comment) {
+                                                        $comments .= '<li><table><tr><td style="width:34px;"><img src="/profile/loadimage?UserId='.$comment['UserId'].'" /></td><td style="width:316px;"><span class="comment"><a href="/'.$comment['URLName'].'">'.stripslashes($comment['FirstName']).' '.stripslashes($comment['LastName']).'</a>&nbsp;&nbsp;'.stripslashes($comment['Comment']).'<br><span class="time">'.$this->class->getDateFormat($comment['CommentedOn']).'</span></span></td></tr></table></li>';
+                                                    }
+                                                    $comments .= "</ul>";
+                                                    if ($this->is_logged_in) {
+                                                        $comment_link = "<a href='javascript:;' id='commentlink_".$activity['SiteActivityId']."' style='float:right;'>Comment</a>";
+                                                        $avatar = "<img id='avatar_".$activity['SiteActivityId']."' src='/profile/loadimage?UserId=".$this->curr_user['UserId']."' height='25px' width='25px' style='float:left; margin-right:3px; vertical-align:top; display:none;' />";
+                                                        $comment_box = '<div style="padding:3px; width:90%; margin:0 0 3px 34px; float:left;">'.$comment_link.$avatar.'<textarea id="comment_'.$activity['SiteActivityId'].'" cols="50" rows="1" style="float:left; font-size:11px; height:20px; width:98%; display:none;">Write a comment...</textarea><input id="submit_'.$activity['SiteActivityId'].'" class="btn btngreen" style="display:none; float:right;" type="submit" value="Comment"/></div>';
+                                                    }
+                                                    if ($activity['ActivityType'] == 'Uploads') {
+                                                        $brigadeInfo = $this->brigadesclass->loadInfo1($activity['SiteId']);
+                                                        if (!empty($activity['CreatedBy'])) {
+                                                            $userInfo = $this->users_class->loadInfo($activity['CreatedBy']);
+                                                            $display = "<p style='margin-bottom:-20px;'><img src='/public/images/ico/photo.gif'>&nbsp;&nbsp;<a href='/".$userInfo['URLName']."'>".stripslashes($userInfo['FullName'])."</a> added ".$activity['TotalCount']." photo".($activity['TotalCount'] > 1 ? "s" : "")." to <a href='/".$brigadeInfo['projectLink']."'>".stripslashes($brigadeInfo['Name'])."</a> - ".$this->class->getDateFormat($activity['ActivityDate']).".";
+                                                            // $display = "<p style='margin-bottom:-20px;'><img src='/public/images/ico/photo.gif'>&nbsp;&nbsp;".$activity['TotalCount'].($activity['TotalCount'] > 1 ? " <a href='".$activity['Link']."'>photos</a> were " : " <a href='".$activity['Link']."'>photo</a> was - ")."added ".$this->class->getDateFormat($activity['ActivityDate']).".";
+                                                        }
+                                                    } else if ($activity['ActivityType'] == 'User Donation') {
+                                                        $brigadeInfo = $this->brigadesclass->loadInfo1($activity['SiteId']);
+                                                        $userInfo = $this->users_class->loadInfo($activity['Recipient']);
+                                                        $display = "<p style='margin-bottom:-20px;'><img src='/public/images/ico/donation.gif'>&nbsp;&nbsp;<a href='/".$userInfo['URLName']."'>".stripslashes($userInfo['FullName'])."</a> donated ".$this->currency_display.number_format($activity['Details'])." to <a href='/".$brigadeInfo['projectLink']."'>".stripslashes($brigadeInfo['Name'])."</a> on ". stripslashes($this->data['FirstName']) ."'s behalf - ".$this->class->getDateFormat($activity['ActivityDate']).".";
+                                                    } else if ($activity['ActivityType'] == 'Joined Brigade') {
+                                                        $brigadeInfo = $this->brigadesclass->loadInfo1($activity['SiteId']);
+                                                        if ($activity['TotalCount'] <= 1) {
+                                                            $userInfo = $this->users_class->loadInfo($activity['CreatedBy']);
+                                                            $display = "<a href='/".$userInfo['URLName']."'>".stripslashes($userInfo['FullName'])."</a> joined <a href='/".$brigadeInfo['projectLink']."'>".stripslashes($brigadeInfo['Name'])."</a> - ".$this->class->getDateFormat($activity['ActivityDate']);
+                                                        } else {
+                                                            $display = $activity['TotalCount']." users joined <a href='/".$brigadeInfo['projectLink']."'>".stripslashes($brigadeInfo['Name'])."</a> - ".$this->class->getDateFormat($activity['ActivityDate']);
+                                                        }
+                                                    } else if ($activity['ActivityType'] == 'Group Member Joined') {
+                                                        $userInfo = $this->users_class->loadInfo($activity['CreatedBy']);
+                                                        $groupInfo = $this->groupManage->loadInfo1($activity['SiteId']);
+                                                        $display = "<a href='".$userInfo[$URLName]."'>".stripslashes($userInfo['FullName'])."</a> joined the <a href='".$groupInfo['URLName']."'>".$groupInfo['GroupName']."</a> chapter ".$this->class->getDateFormat($activity['ActivityDate']).".";
+                                                    } else if ($activity['ActivityType'] == 'Purchased Ticket') {
+                                                        $eventInfo = $this->events->loadInfo($activity['Details']);
+                                                        if (!empty($eventInfo['SiteId'])) {
+                                                            $siteURL = $this->lookuptable->getURLbyId($eventInfo['SiteId']);
+                                                        } else {
+                                                            $siteURL = $this->lookuptable->getURLbyId($eventInfo['UserId']);
+                                                        }
+                                                        $display = "Purchased ticket from <a href='/$siteURL/events?EventdId=".$eventInfo['EventId']."'>".$eventInfo['Title']."</a> event - ".$this->class->getDateFormat($activity['ActivityDate']).".";
+                                                    } else if ($activity['ActivityType'] == 'Profile Updated') {
+                                                        $display = "Updated profile information - ".$this->class->getDateFormat($activity['ActivityDate']).".";
+                                                    }
+                                                    if(!empty($display)) { echo "$display<br><br>$comments$comment_box</p><div class='clear1'></div>"; }
+                                                    }
+                                                } else {
+                                                	if (count($this->past_brigade) == 0 && count($this->upcoming_brigade) == 0 && count($this->site_activities) == 0) { ?>
+                                                    	<?php echo stripslashes($this->data['FullName']) ?> joined Empowered.org
+                                                	<?php }
+												} ?>
+                                            </div>
+                                        </div>
+                                    </div></div>
+                                <!-- e o FIRST TAB -->
+                           </div>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </div>
+        <div class="block001f01"><div class="blst001"><div class="blst002"></div></div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(function() {
+            $('.activity01 > div > textarea').each(function() {
+                $(this).bind('focus', function() {
+                    var id = $(this).attr('id').split('_');
+                    if ($(this).val() == 'Write a comment...') { $(this).val(''); $(this).css('height', '30px').css('width', '90%'); }
+                    $('#submit_'+id[1]).show();
+                    $('#avatar_'+id[1]).show();
+                })
+                $(this).bind('blur', function() {
+                    var id = $(this).attr('id').split('_');
+                    if (jQuery.trim($(this).val()) == '') {
+                        $(this).val('Write a comment...');
+                        $(this).css('height', '15px').css('width', '98%');
+                        $('#avatar_'+id[1]).hide();
+                        $('#submit_'+id[1]).hide();
+                    }
+                })
+            });
+            $('.activity01 > div > input[type=submit]').each(function() {
+                $(this).bind('click', function() {
+                    var id = $(this).attr('id').split('_');
+                    if (jQuery.trim($('#comment_'+id[1]).val()) != '') {
+                        $.post('/profile/addcomment', {SiteActivityId: id[1], Comment: jQuery.trim($('#comment_'+id[1]).val())}, function(data) {
+                            $('#ul_'+id[1]).append(data).show();
+                        });
+                    }
+                    $('#comment_'+id[1]).val('Write a comment...');
+                    $('#comment_'+id[1]).css('height', '15px').css('width', '98%');
+                    $('#submit_'+id[1]).hide();
+                    $('#avatar_'+id[1]).hide();
+                })
+            });
+            $('.activity01 > div > a').each(function() {
+                $(this).bind('click', function() {
+                    var id = $(this).attr('id').split('_');
+                    $('#comment_'+id[1]).val('Write a comment...');
+                    $('#comment_'+id[1]).css('height', '15px').css('width', '554px');
+                    $('#comment_'+id[1]).show();
+                    $('#submit_'+id[1]).show();
+                    $('#avatar_'+id[1]).show();
+                    $('#commentlink_'+id[1]).hide();
+                })
+            });
+            $('#wall-post').focus(function() {
+                $('#share-post').show();
+            });
+            $('#wall-post').blur(function() {
+                if (jQuery.trim($('#wall-post').val()) == '') {
+                    $('#share-post').hide();
+                }
+            });
+            $('#share-post').click(function() {
+                if (jQuery.trim($('#wall-post').val()) != '') {
+                    $.post('/profile/addwallpost', {Comment: jQuery.trim($('#wall-post').val()), Recipient: $('#recipient').val()}, function(data) {
+                        $('.activity01').prepend(data);
+                        $('#wall-post').val('');
+                        $('#share-post').hide();
+                    });
+                }
+            });
+        });
+        function commentfocus(e) {
+            var id = $(e).attr('id').split('_');
+            if ($(e).val() == 'Write a comment...') { $(e).val(''); $(e).css('height', '30px').css('width', '90%'); }
+            $('#submit_'+id[1]).show();
+            $('#avatar_'+id[1]).show();
+        }
+        function commentblur(e) {
+            var id = $(e).attr('id').split('_');
+            if (jQuery.trim($(e).val()) == '') {
+                $(e).val('Write a comment...');
+                $(e).css('height', '15px').css('width', '98%');
+                $('#avatar_'+id[1]).hide();
+                $('#submit_'+id[1]).hide();
+            }
+        }
+        function commentpost(e) {
+            var id = $(e).attr('id').split('_');
+            if (jQuery.trim($('#comment_'+id[1]).val()) != '') {
+                $.post('/profile/addcomment', {SiteActivityId: id[1], Comment: jQuery.trim($('#comment_'+id[1]).val())}, function(data) {
+                    $('#ul_'+id[1]).append(data).show();
+                });
+            }
+            $('#comment_'+id[1]).val('Write a comment...');
+            $('#comment_'+id[1]).css('height', '15px').css('width', '98%');
+            $('#submit_'+id[1]).hide();
+            $('#avatar_'+id[1]).hide();
+        }
+    </script>

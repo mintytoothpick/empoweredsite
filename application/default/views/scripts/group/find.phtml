@@ -1,0 +1,184 @@
+<?php $this->headTitle("Empowered.org - Find Groups"); ?>
+<script type="text/javascript">
+    //var TabbedPanels1 = new Spry.Widget.TabbedPanels("TabbedPanels1");
+    $(document).ready(function(){
+        $("ul.tabs").tabs("div.panes > div");
+        $('#text_search').addClass("watermark");
+
+        //$(".toggle_container").hide();
+        $("#advance_search").click(function(){
+            $(this).next(".toggle_container").slideToggle("slow,");
+        });
+
+    })
+    function myFocus(element) {
+        if (element.value == element.defaultValue) {
+            $(element).removeClass("watermark");
+            element.value = '';
+        }
+    }
+    function myBlur(element) {
+        if (element.value == '') {
+            $(element).addClass("watermark");
+            element.value = element.defaultValue;
+        }
+    }
+
+    var json_options = {
+        script:'/volunteer/searchactivity?limit=10',
+        varname:'text_search',
+        json:true,
+        shownoresults:true,
+        maxresults:10,
+        callback: function (obj) {  }
+    };
+
+    $(function(){
+        //$('#text_search').autoComplete(json_options);
+    });
+
+    function joinGroup(GID, UID) {
+        $.post('/group/joinrequest', {GroupId: GID, UserId: UID}, function(data) {
+            $('#join_'+GID).hide();
+            alert(data);
+        })
+    }
+</script>
+<style type="text/css">
+    .search-column {
+        width:650px;
+        margin-top:10px;
+    }
+    .search-column .results-header {
+        padding-bottom:5px;
+        border-bottom:1px solid #e5e5e5;
+    }
+    
+    .search-column .search-results .item .logo {
+        width:110px;
+        float:left;
+        margin-right:10px;
+        min-height:60px!important;
+    }
+    .search-column .search-results .item .logo img {
+        height:60px;
+        width:90px;
+        float:left;
+    }
+    .search-column .search-results .item .info {
+        width:508px;
+        float:right;
+    }
+    .search-column .search-results .item {
+        padding-bottom:8px;
+        margin-bottom:10px;
+        border-bottom:1px solid #e5e5e5;
+    }
+    .search-column .search-results .item .info a.name {
+        color:#669933;
+        font-size:13px;
+    }
+</style>
+<div>
+    <div id="mainco2">
+        <!-- <div class="roundedbox">-->
+        <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+        <div class="block001">
+            <div class="blst001">
+                <div class="blst002">
+                    <div id="TabbedPanels1" class="TabbedPanels">
+                        <div class="panes TabbedPanelsContentGroup">
+                            <!-- FIRST TAB -->
+                            <div class="TabbedPanelsContent">
+                                <div class="whiteBox" style="font-size:13px;">
+                                    <h1 style="margin:0; font-weight:bold">Find a Chapter Near You!</h1><br />
+                                    <div class="srch03" style="height:auto">
+                                        <form name="search-groups" id="search-groups" method="post" action="/group/find">
+                                            <input type="text" name="text_search" id="text_search" class="s3st03" value="Search..." onfocus="myFocus(this);" onblur="myBlur(this);" />
+                                            <input type="submit" class="btn btngreen" value="Search" /><br>
+                                            <!--  Advance Search -->
+                                            <a id="advance_search" style="line-height:25px; font-size:14px; margin-left:10px;" href="javascript:;">Filter by Location</a>
+                                            <div class="toggle_container" style="width:600px; margin-top:10px; display:none;">
+                                                <div class="block">
+                                                    <div class="txt01">Country:</div>
+                                                    <select type="text" name="Country" style="width:300px" onchange="populateLocation('state', this.value)">
+                                                        <option value="All" selected>All</option>
+                                                        <?php /* NOT SURE IF USED foreach($this->country_list as $country) { ?>
+                                                        <option value="<?php echo $country['CountryId'] ?>"><?php echo $country['Country'] ?></option>
+                                                        <?php } */?>
+                                                    </select>
+                                                    <div class="txt01">State:</div>
+                                                    <div id="state-list">
+                                                        <select type="text" id="state" name="State" style="width:300px" onchange="populateLocation('city', this.value)">
+                                                            <option value="All" selected>All</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="txt01">City:</div>
+                                                    <div id="city-list">
+                                                        <select type="text" id="city" name="City" style="width:300px">
+                                                            <option value="All" selected>All</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="search-column">
+                                    	<div class="results-header"><span style="font-size:18px;"><?php echo $this->search ?></span></div>
+                                    	<div class="search-results" style="margin-top:20px">
+                                    	    <?php foreach($this->groups as $group) {
+                                                $media = $this->sitemedia->getSiteMediaById($group['LogoMediaId']);
+                                                $media_image = $media['SystemMediaName'];
+                                                $media_caption = $media['Caption'];
+                                                $locationInfo = $this->contact_info->getContactInfo($group['GroupId']);
+                                                $members = count($this->group_members->getGroupMembers($group['GroupId']));
+                                                $group['Description'] = str_replace(array("\\", "\\'"), array("", "'"), stripslashes($group['Description']));
+                                            ?>
+                                        	<div class="item">
+                                                <div class="logo">
+                                                	<?php if(file_exists("/home/$this->envUsername/public_html/public/Media/$media_image") && trim($media_image) != '') : ?>
+                                                    	<center><a href="/<?php echo $group['URLName'] ?>"><img src="<?php echo $this->contentLocation ?>public/Media/<?php echo $media_image ?>" alt="<?php echo $media_caption ?>" /></a></center>
+                                                    <?php endif;?>
+                                                </div>
+        	                                    <div class="info">
+        	                                    	<h4><a class="name" href="/<?php echo $group['URLName'] ?>"><?php echo stripslashes($group['GroupName']) ?></a></h4>
+                                                    <div class="site-desc">
+                                                        <?php if ($members > 0) { ?>
+                                                        <a href="/<?php echo $group['URLName'] ?>/members"><?php echo $members ?> Members</a><br/>
+                                                        <?php } ?>
+                                                        <div id="divLessContent<?php echo $group['GroupId'] ?>" style="display:inline;">
+                                                            <span ><?php echo (strlen($group['Description']) > 100 ? stripslashes(substr($group['Description'], 0, 100))."..." : stripslashes($group['Description'])) ?></span>
+                                                            <?php echo (strlen($group['Description']) > 100 ? '<a href="javascript:ShowHide(\'divLessContent'.$group['GroupId'].'\',\'divMoreContent'.$group['GroupId'].'\');">Read More</a>' : "") ?>
+                                                        </div>
+                                                        <?php if (strlen($group['Description']) > 100) { ?>
+                                                            <div id="divMoreContent<?php echo $group['GroupId'] ?>" style="display:none;">
+                                                                <span><?php echo stripslashes($group['Description']) ?></span>
+                                                                <a href="javascript:ShowHide('divMoreContent<?php echo $group['GroupId'] ?>','divLessContent<?php echo $group['GroupId'] ?>')">Read Less</a>
+                                                            </div>
+                                                        <?php } ?>
+                                                    </div>
+                                                </div>
+                                            	<div class="clear"></div>
+                                        	</div>
+                                        	<?php }
+						//if(count($this->groups) == 0) { echo "No groups satisfied your search criteria. Please revise your search and try again."; } ?>
+    					</div>
+					</div>
+                                    <div class="clear"></div>
+                                    <div class='s2st03 s2st03l' style="margin-top:20px;margin-left:140px;"><?= $this->paginationControl($this->groups, 'Sliding', 'group/page_selector.phtml'); ?></div>
+                                </div>
+                            </div>
+                            <!-- e o FIRST TAB -->
+
+                            <!-- SECOND TAB -->
+
+                            <!-- e o SECOND TAB -->
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </div>
+        <div class="block001f01"><div class="blst001"><div class="blst002"></div></div>
+        </div>
+    </div>

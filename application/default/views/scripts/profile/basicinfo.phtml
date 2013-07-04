@@ -1,0 +1,69 @@
+<?php
+$this->placeholder('tab')->set('profile');
+?>
+<script type='text/javascript' src='<?php echo $this->contentLocation ?>public/js/CalendarControl.js'></script>
+<link rel="stylesheet" href="<?php echo $this->contentLocation ?>public/css/CalendarControl.css" type="text/css" media="screen" />
+<style>
+#birthdate {
+	background: url(<?php echo $this->contentLocation ?>public/images/Pictures/003.gif) no-repeat right;
+	width: 102px;
+}
+</style>
+	<div>
+		<div id="centred">
+			<!-- main col - 100% width -->
+			<div id="mainco2">
+				<div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+				<div class="block001">
+					<div class="blst001">
+						<div class="blst002 hsp">
+							<h1>Basic Information</h1>
+							<?php if (count($this->error_message) > 0) : ?>
+							<div style="border: solid 2px silver; color: red; padding: 4px; padding-right:40px; width: 250px;">
+								<?php foreach ($this->error_message as $error) : ?>
+								<?php echo $error.'<br>'?>
+								<?php endforeach; ?>
+							</div>
+							<?php endif; ?>
+							<!-- basic info form -->
+							<?php echo $this->basicinfoForm; ?>
+							<!-- 
+							<div class="form02">
+								<label for="txt001">What are you passionate about?</label>
+								<textarea name="ctl00$ContentPHMain$txtAboutMe" rows="3" cols="27" id="ctl00_ContentPHMain_txtAboutMe"></textarea>
+								<label for="bd001">Birth Date</label> 
+								<div class="birthdate01">
+									<input name="ctl00$ContentPHMain$txtDateOfBirth" type="text" id="ctl00_ContentPHMain_txtDateOfBirth" />
+		                    		<a href ="javascript:showCalendarControl(document.getElementById('ctl00_ContentPHMain_txtDateOfBirth'));"><img src="/Images/Pictures/003.gif" alt=""/></a>
+									<div class="clear"></div>
+								</div>
+								<label for="gender01">Gender</label> 
+							    <select name="ctl00$ContentPHMain$ddlGender" id="ctl00_ContentPHMain_ddlGender">
+									<option selected="selected" value="0">Select Gender</option>
+									<option value="1">Male</option>
+									<option value="2">Female</option>
+								</select>
+								<h3>Contact Info</h3>			
+								<label for="phone001">Phone Number</label> 
+								<input name="ctl00$ContentPHMain$txtPhone" type="text" id="ctl00_ContentPHMain_txtPhone" class="textfield" /> 
+								<label for="loc001" >Location</label> 
+								<input name="ctl00$ContentPHMain$txtLocation" type="text" id="ctl00_ContentPHMain_txtLocation" class="textfield" /> 
+								<div class="but001">
+									<div class="bst02">
+										<a id="ctl00_ContentPHMain_LinkButton1" href="javascript:__doPostBack('ctl00$ContentPHMain$LinkButton1','')">Next</a>
+									</div>  
+								</div>
+							</div>
+							 -->
+							<!-- e o register form -->					
+						</div>					
+					</div>	
+				</div>
+				<div class="block001f01"><div class="blst001"><div class="blst002"></div></div></div>
+				<!-- e o block001 -->	
+			</div>
+			<!-- e o main col -->
+			<span id="ctl00_ContentPHMain_lblErrorMsg" class="divError"></span>
+			<div class="clear"></div>
+		</div>
+	</div>

@@ -1,0 +1,69 @@
+/* CSS Document */
+#right
+{
+	width:710px;
+	float:left;
+	margin-bottom:5px;
+	display:inline;
+	
+}
+#box
+{
+	width:345px;
+	float:left;
+	padding-right:10px;
+	
+}
+#boxtop
+{
+	width:345px;
+	height:14px;
+	background-image: url(../images/NewDesign/tabletop.jpg);
+	background-repeat:no-repeat;
+	float:left;
+	overflow:hidden;
+}
+#boxmiddle
+{
+	width:345px;
+	background-image: url(../images/NewDesign/tablemiddle.jpg);
+	background-repeat:repeat-y;
+	float:left;
+
+	
+}
+#boxbottom
+{
+	width:345px;
+	height:16px;
+	float:left;
+	background-image: url(../images/NewDesign/tablebottom.jpg);
+	background-repeat:no-repeat;
+}
+#boxmiddle h1
+{
+	padding:0px 10px 0px 15px;
+	margin:0px;
+	font-family:Arial;
+	font-size:22px;
+	color: #333333;
+	font-weight:bold;
+	line-height:27px;
+
+}
+#boxmiddle h3
+{
+	font-family:Arial;
+	font-size:14px;
+	color:#333333;
+	padding:10px;
+	font-weight:100;
+
+}
+
+em{
+color:#3F66FF;
+font-family:Arial;
+font-size: 14px;
+font-style:normal;
+}

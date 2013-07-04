@@ -1,0 +1,28 @@
+<?php $this->placeholder('tabs')->captureStart();
+$curTab  = $this->currentTab;
+$cssCurr = ' class="current"';
+?>
+
+<div id="tabs">
+  <ul>
+    <? if (!empty($this->group)) { ?>
+    <li><a href="/<?=$this->group->urlName?>"<?=($curTab=='home') ? $cssCurr :''; ?>>Home</a></li>
+    <?php if (count($this->group->initiatives)) { ?><li><a href="/<?=$this->group->urlName?>/initiatives"<?=($curTab=='initiatives') ? $cssCurr :''; ?>>Initiatives</a></li><? } ?>
+    <?php if (count($this->group->getUpcomingEvents()) > 0) { ?>
+        <li><a href="/<?=$this->group->urlName?>/upcoming-events"<?=($curTab=='events') ? $cssCurr :''; ?>>Events</a></li>
+    <? }elseif (count($this->group->getPastEvents()) > 0) { ?>
+        <li><a href="/<?=$this->group->urlName?>/past-events"<?=($curTab=='events') ? $cssCurr :''; ?>>Events</a></li>
+    <? } ?>
+    <li><a href="/<?=$this->group->urlName?>/members"<?=($curTab=='members') ? $cssCurr :''; ?>>Members</a></li>
+    <?php if (count($this->group->initiatives)) { ?><li><a href="/<?=$this->group->urlName?>/photos"<?=($curTab=='photos') ? $cssCurr :''; ?>>Photos</a></li><?php } ?>
+    <? } ?>
+  </ul>
+  
+    <form action="/search?utm_campaign=Internal&utm_medium=Search&utm_source=" method="post" onsubmit="beginSearch(); return false">
+    <div class="topbar_search" style="float:right;display:block;margin-right:20px;background-color: #fff">
+        <input name="search_text" type="text" class="searchbox" id="searchfield" />
+        <input type="submit" value="" class="go"  />
+    </div>
+    </form>
+</div>
+<?php $this->placeholder('tabs')->captureEnd() ?>

@@ -1,0 +1,103 @@
+<script>
+$(function() {
+    <? if (isset($this->filter)) { ?>
+        capturePaginators();
+    <? } ?>
+});
+
+function capturePaginators() {
+    $('.paginator').click(function(event) {
+        event.preventDefault();
+        filter($(this).attr('href'));
+    });
+}
+
+function filter(url) {
+    var urlParam = url;
+    if (!url) {
+        var urlParam = 'affiliate';
+    }
+    var data = 'filter=true';
+    if ($('#searchFilter').val() != '') {
+        data += '&searchFilter=' + $('#searchFilter').val();
+    }
+    $("#contentData").html('Loading content ...');
+    $.ajax({
+        url: urlParam,
+        data:  data,
+        success: function(data) {
+            $("#contentData").html(data);
+            capturePaginators();
+        }
+    });
+    return false;
+}
+
+//become a group member
+function joinGroup(GID, UID, GURL) {
+    $.post('/group/joinrequest', {GroupId: GID, UserId: UID}, function(data) {
+        if(data == 'participate') {
+          window.location.href = '/' + GURL + '/participate';
+        } else {
+          alert(data);
+          window.location.href = '/' + GURL;
+        }
+    })
+}
+
+</script>
+
+<div class="wrapper">
+
+  <!-- org header -->
+  <?=$this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+  <div class="BodyCon">
+
+    <!-- breadcrumb -->
+    <?= $this->placeholder('breadcrumb'); ?>
+    <!-- // breadcrumb -->
+
+    <div class="clr"></div>
+
+    <!-- tabs -->
+    <?=$this->placeholder('tabs') ?>
+    <!-- // tabs -->
+
+    <div class="clr"></div>
+    <div class="mainC02">
+        <div class="spacer"></div>
+        <center>
+            <span style="font-weight:bold;font-size:24px;line-height:28px;margin:10px 0">Affiliate With a Chapter</span><br />
+            <span style="font-size:16px;line-height:18px;">Find an existing chapter to join. <br />If it doesn't exist start a new chapter.</span>
+        </center>
+        <div class="spacer"></div>
+      <div style="width:74%;float:left;">
+          <div class="headingStyle02 rounded">Find Your Chapter</div>
+        <div style="margin:15px 0 0 10px">
+          <form id="searchMembers" action="/<?=$this->organization->urlName?>/affiliate" method="post" onsubmit="return filter();">
+            <input name="searchFilter" id="searchFilter" type="text" class="textField01" value="<?=$this->searchtext?>" />
+          </form>
+        </div>
+        <div class="clear"></div>
+
+        <div id="contentData">
+          <!-- content by default or by ajax -->
+          <?php echo $this->render('nonprofit/tabscontent/affiliate.phtml'); ?>
+        </div>
+      </div>
+      <? if ($this->organization->hasGroups && $this->organization->isOpen) { ?>
+      <div style="width:25%;float:right">
+          <center><span style="font-weight:bold;font-size:18px;line-height:20px;">Want to create a new chapter?</span></center>
+        <div class="spacer"></div>
+        <center><div class="startCBtn" style="margin:10px 40px;"><a href="/<?=$this->organization->urlName?>/create-group">Start a Chapter</a></div></center>
+      </div>
+      <? } ?>
+    </div>
+  </div>
+  <div class="clr"></div>
+  <div class="clr"></div>
+</div>
+

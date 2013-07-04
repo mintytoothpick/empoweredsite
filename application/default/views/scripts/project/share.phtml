@@ -1,0 +1,89 @@
+<div class="wrapper">
+   <!-- org header -->
+  <?=$this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+
+    <?php if (isset($this->group)) { ?>
+
+      <!-- breadcrumb -->
+      <?=$this->placeholder('breadcrumb') ?>
+      <!-- // breadcrumb -->
+      <div class="clr"></div>
+
+      <!-- tabs -->
+      <?=$this->placeholder('tabs') ?>
+      <!-- // tabs -->
+
+    <?php } else {
+      include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/profileheader.php';
+    } ?>
+    <div class="mainC">
+      <div class="box05">
+        <div class="headingStyle02">Get the word out!</div>
+        <div class="programBox02">
+          <script type="text/javascript">
+            var published = false;
+            var invited   = false;
+            function streamPublish(name, description, hrefTitle, hrefLink, userPrompt, projectLogo){
+              FB.ui({ method : 'feed',
+                message: userPrompt,
+                link   :  hrefLink,
+                caption:  hrefTitle,
+                picture: projectLogo
+              },
+              function(response) {
+                if (response && response.post_id) {
+                  published = true;
+                  if (!invited) {
+                      if (confirm('Your post was published. Do you want to invite your friends?')) {
+                          inviteFriends('<?=$this->project->name?>');
+                      } else {
+                          location.href = "/<?=$this->userNew->urlName?>/initiatives/<?=$this->project->urlName?>";
+                      }
+                  } else {
+                      location.href = "/<?=$this->userNew->urlName?>/initiatives/<?=$this->project->urlName?>";
+                  }
+                } else {
+                  alert('Post was not published. Please try again later.');
+                }
+              });
+             }
+             function inviteFriends(projectName){
+               var receiverUserIds = FB.ui({
+                 method : 'apprequests',
+                 message: 'I just created ' + projectName + ' on empowered.org. Please volunteer with me!',
+               },
+               function(receiverUserIds) {
+                if (receiverUserIds && receiverUserIds.request) {
+                    invited = true;
+                    if (!published) {
+                        if (confirm('Do you want to share your initiative?')) {
+                            streamPublish('<?=$this->project->name?>');
+                        } else {
+                            location.href = "/<?=$this->userNew->urlName?>/initiatives/<?=$this->project->urlName?>";
+                        }
+                    } else {
+                        location.href = "/<?=$this->userNew->urlName?>/initiatives/<?=$this->project->urlName?>";
+                    }
+                } else {
+                    alert('Post was not published. Please try again later.');
+                }
+               });
+             }
+          </script>
+          1: <a href="javascript:;" onclick="streamPublish('<?= $this->project->name?>', '<?= $this->project->description?>', '<?= $this->project->name ?>', '<?= 'http://'.$_SERVER['HTTP_HOST'].'/'.$this->project->urlName?>', 'I just joined this awesome activity!', '<?= 'http://'.$_SERVER['HTTP_HOST'].'/public/Media/full/'.$this->project->urlName.'-logo.jpg' ?>')">Post to Facebook!</a><br /><br />
+          2: <a href="javascript:;" onclick="inviteFriends('<?=$this->project->name?>')">Invite Your Friends to Volunteer!</a>
+        <div class="clear"></div><br />
+        <span id="current-links">
+        <a href="/<?=$this->userNew->urlName?>/initiatives/<?=$this->project->urlName?>" class="btn btngreen">Skip</a>
+        </span>
+        </div>
+    </div>
+</div>
+<div class="clr"></div>
+<div class="clr"></div>
+</div></div>

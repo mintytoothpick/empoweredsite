@@ -1,0 +1,238 @@
+<?php $this->placeholder('header')->captureStart() ?>
+<? if ($this->isLoggedIn) { ?>
+
+<script>
+function closeProfileVideo() {
+    $('#popup-overlay').hide();
+    $('.popup-box').hide();
+
+    var video = document.getElementsByTagName("video")[0]
+    if( video.pause ) {
+        video.pause();
+    }
+}
+
+function showProfileVideo() {
+    var top = (screen.height/2)-274;
+    $('.popup-box').toggle().css('top', top);
+    $('#popup-overlay').toggle('fast', function() {
+        var video = document.getElementsByTagName("video")[0]
+        if( video.play ) {
+            video.play();
+        }
+    });
+}
+
+$(function() {
+    //message group to user
+    $("#btnMsgUser").click(function() {
+        $(".msgToUser").show();
+        $(".msgResToUser").hide();
+        $.fancybox($("#msgToUser").html());
+    });
+
+    <?php
+    if(!empty($this->showProfileVideo)) {
+        echo 'showProfileVideo();';
+    }
+    ?>
+});
+
+function sendMsgUsr() {
+    $.fancybox.showActivity();
+    var elems = $('.msgBoxToUser');
+    $.ajax({
+        url: "/<?=$this->user->urlName?>/contact-user",
+        type: 'POST',
+        data: 'message=' + elems[1].value,
+        dataType: 'json',
+        success: function(data){
+            if (data.ok) {
+                $.fancybox.hideActivity();
+                $(".msgToUser").hide();
+                $(".msgResToUser").show();
+            } else {
+                $.fancybox.hideActivity();
+            }
+        }
+    });
+}
+
+function deactivate(UID) {
+  if (confirm("Are you sure you want to deactivate your account? This action will lose all your data of empowered.") == true) {
+      $.post('/profile/deactivate', {UserId: UID}, function(data) {
+        if(data == 'success') {
+          location.href = "/";
+         } else {
+          alert('Error, please contact admin.');
+         }
+      })
+  }
+}
+
+<? if ($this->isLoggedIn && $this->isGlobAdmin && ($this->user->id != $this->userNew->id)) { ?>
+function deleteUser() {
+    if (confirm('Are you sure you want to delete the account? This is going to remove the user from any initiative that is volunteering or fundraising, all memberships of groups and organizations.')) {
+        $.ajax({
+            url: "/profile/delete?UserId=<?=$this->user->id?>",
+            type: 'POST',
+            success: function(data){
+                if (data == 'ok') {
+                    location.href = "/";
+                } else {
+                    alert('Error, please contact admin.');
+                }
+            }
+        });
+    }
+}
+<? } ?>
+
+</script>
+
+<style>
+    .popup-box { left: 25%; right: 25%; top:20%; position: absolute; z-index: 999999!important; background-color:#ffffff; border:5px solid #e5e5e5; padding:10px 0 20px 0; -moz-border-radius:7px }
+    #popup-overlay {
+        background: url(<?php echo $this->contentLocation ?>public/images/bg-overlay.png);
+        height:100%;
+        position:fixed;
+        display:block;
+        left:0;
+        top:0;
+        width:100%!important;
+        z-index:998;
+        display:none;
+    }
+</style>
+
+<div id="popup-overlay"></div>
+<div class="popup-box" style="padding: 30px 20px; display:none; width:640px; height:390px;">
+    <?php
+    //$origin = 'http://cdn.empowered.org/';
+    $origin = 'http://' . $_SERVER['HTTP_HOST'];
+
+    $video_path = $origin . "/public/videos/MemberVideo.mp4";
+    ?>
+    <div id="video-js-box" class="video-js-box" style="margin-top:0px; position:absolute;">
+        <video id="video_1" class="video-js" width="640" height="360" controls="controls" preload="auto" poster="<?php echo $origin; ?>/public/images/NewHomePage/video.png">
+            <source src="<?php echo $video_path; ?>" type="video/mp4" />
+            <source src="<?php echo str_replace('.mp4', '.webm', $video_path); ?>" type="video/webm" />
+            <source src="<?php echo str_replace('.mp4', '.ogv', $video_path); ?>" type="video/ogg" />
+
+            <!-- Flash Fallback. Use any flash video player here. Make sure to keep the vjs-flash-fallback class. -->
+            <object class="vjs-flash-fallback" width="640" height="360" type="application/x-shockwave-flash" data="<?php echo $origin; ?>/public/videos/flowplayer-3.2.10.swf">
+                <param name="movie" value="<?php echo $origin; ?>/public/videos/flowplayer-3.2.10.swf" />
+                <param name="allowfullscreen" value="true" />
+                <param name="wmode" value="transparent">
+                <param name="flashvars" value='config={"playlist":["<?php echo $origin; ?>/public/images/NewHomePage/video.png", {"url": "<?php echo $video_path ?>","autoPlay":false, "autoBuffering":true}]}' />
+
+                <!-- Image Fallback. Typically the same as the poster image. -->
+                <img src="<?php echo $origin; ?>/public/images/NewHomePage/video.png" width="640" height="360" alt="Poster Image" title="No video playback capabilities." />
+            </object>
+        </video>
+    </div>
+    <div class="clear" style="margin-bottom:390px;"></div>
+    <a class="btn btngreen" style="float:right;" href="javascript:;" onclick="closeProfileVideo(); return false;">Close</a>
+</div>
+
+<!-- Message Group Administrator -->
+<div id="msgToUser" style="display:none;">
+  <div class="msgToUser">
+    <p><strong>Send a message to the user:</strong></p>
+    <textarea rows="5" cols="50" class="msgBoxToUser"></textarea>
+    <div class="volunteerBtn02"><a href="javascript:;" onclick="sendMsgUsr()" id="btnSend">Send</a></div>
+  </div>
+  <div class="msgResToUser" style="display:none;">
+    <p align="center"><strong>Your message has been sent.</strong>.</p>
+    <div class="volunteerBtn02"><a href="javascript:;" onclick="$.fancybox.close()">Close</a></div>
+  </div>
+</div>
+<!-- //Message Group Administrator -->
+<? } ?>
+
+
+<div class="header02">
+  <img src="/profile/loadimage?UserId=<?=$this->user->id?>" alt=" " width="145" class="imgstyle5" />
+
+  <div class="TextBox4">
+    <p><strong><span class="Text36"><?=stripslashes($this->user->fullName)?></span></strong> <span class="color02"><?= $this->user->location == 'Not Entered' ? '' : stripslashes($this->user->location); ?></span>
+    <? if ($this->isLoggedIn && $this->isGlobAdmin && ($this->user->id != $this->userNew->id)) { ?><br /><a href="javascript:;" onclick="deleteUser()" class="deleteBtn small">[Delete Account]</a><? } ?>
+    </p>
+    <p>
+      <?php if(!empty($this->user->aboutMe)) { ?>Passionate about: <span class="color02"><?=stripslashes(nl2br($this->user->aboutMe))?></span> <br /><?php } ?>
+      <? if (isset($this->userNew) && $this->userNew->id == $this->user->id) { ?>
+        <?php if (!$this->userNew->isActive) { ?>
+          <div class="errorBox"><b>You're account isn't activated yet!</b> <a href="/profile/signup-step3">Activate Here</a></div>
+        <?php } else { ?>
+          <?php if ($this->toolsUsage < 100) { ?>
+          <div class="info-boxes" style="width:450px; margin-top:-10px; margin-left:0">
+            <div class="progress_label"></div>
+            <div id="progress4" class="progress progress-green"><span><b></b></span></div>
+            <script type="text/javascript">Administry.progress("#progress4", <?= intval($this->toolsUsage) ?>, <?= intval(100) ?>);</script>
+            <div class="clear" style="margin-bottom:6px;"></div>
+            <a href="#" onclick="showProfileVideo(); return false;">Watch Intro Video</a>
+            <br />
+            <?php if(!$this->hasProfilePic) { ?><a href="/profile/edit">Upload</a> a profile picture (+10%)<br /><?php } ?>
+            <?php if(count($this->userNew->affiliationsOrganization)) { ?><a href="/participating-organizations">Affiliate</a> yourself with or <a href="/getstarted/create-organization">create</a> an Organization (+40%)<br />
+              <?php if(!count($this->userNew->initiatives)) { ?>Join a <a href="/<?=$this->userNew->affiliationsOrganization[0]->urlName?>/upcoming-activities">volunteer activity</a> or <a href="/<?=$this->userNew->affiliationsOrganization[0]->urlName?>/active-campaigns">fundraising campaign</a> (+25%)<br /><?php } ?>
+            <?php } ?>
+            <?php if(empty($this->userNew->faceBookId)) { ?>
+              <a href="#" onclick="facebookConnect(); return false;">Connect</a> your profile with your <a href="#" onclick="facebookConnect(); return false;">Facebook account</a> (+10%)
+            <?php } ?>
+          </div>
+          <?php } ?>
+          <div class="adminPanelCon" style="float:left;">
+            <div class="adminPanel">
+              <h1><span></span>Tools</h1>
+              <div class="tool-box-content">
+                <ul>
+                  <li><a href="#" onclick="showProfileVideo(); return false;">Watch Intro Video</a></li>
+                </ul>
+                <div class="adminPanelSeprator"></div>
+                <ul>
+                  <li><a class="editDetails" href="/profile/edit"><span style="vertical-align:top;">Edit Information</span></a></li>
+                </ul>
+                <div class="adminPanelSeprator"></div>
+                <ul>
+                  <li><a class="donorsIcon" href="/profile/create-event"><span style="vertical-align:top;">Create an Event</span></a></li>
+                </ul>
+                <div class="adminPanelSeprator"></div>
+                <ul>
+                  <? if ($this->userNew->getMembership()) { ?><li><a href="/profile/membership">Deactivate Membership</a></li><? } ?>
+                  <li><a href="javascript:;" onclick="deactivate('<?=$this->userNew->id?>');"><span style="vertical-align:top;">Deactivate Account</span></a></li>
+                </ul>
+              </div>
+            </div>
+          <div class="clr"></div>
+          </div>
+        <?php } ?>
+
+        <div class="volunteerBtn01" style="float:left; <?= $this->userNew->isActive ? 'margin-left:20px;' : ''?>"><a href="javascript:;" onclick="logout();">Sign Out</a></div>
+      <? } else if ($this->isLoggedIn) { ?>
+      <div class="volunteerBtn01"><a href="javascript:;" id="btnMsgUser">Message Me</a></div>
+      <? } else { ?>
+      <a style="cursor: pointer;" id="headerProfileLogin">Log in</a> to message to this user.
+      <? } ?>
+  </div>
+  <div id="profileLoginBox">
+    <!-- login link -->
+    <?php echo $this->placeholder('login_link') ?>
+    <!-- //login link -->
+  </div>
+  <div class="TopBox4">
+    <div class="box001">
+      <div class="textSTyle01">
+          <div class="spacer"></div>
+          <?=$this->user->currency.number_format($this->user->raised)?><br />
+          <?=number_format(count($this->user->initiatives))?><br />
+      </div>
+      <div class="textSTyle02">
+          <p>Raised<br />
+            Initiatives</p>
+      </div>
+    </div>
+  </div>
+  <div class="clr"></div>
+
+</div>
+<?php $this->placeholder('header')->captureEnd() ?>

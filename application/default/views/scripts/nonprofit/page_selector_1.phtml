@@ -1,0 +1,42 @@
+<?php
+$params = "";
+$params .= isset($this->ProgramId) ? "ProgramId=$this->ProgramId&" : "";
+$params .= isset($this->GroupId) ? "GroupId=$this->GroupId&" : "";
+$params .= isset($this->search_text) ? "search_text=$this->search_text&" : "";
+$params .= isset($this->limit) ? "limit=$this->limit&" : "";
+$params .= isset($this->param) ? "$this->param" : "";
+?>
+<?php if ($this->pageCount > 1): ?>
+<center>
+<div class="paginationControl" style="font-weight:normal">
+<!-- Previous page link -->
+<?php if (isset($this->previous)): ?>
+  <a href="/<?php echo $_REQUEST['URLName'] ?>/<?php echo $_REQUEST['page'] ?>?<?php echo $params ?>=<?php echo $this->previous; ?>">
+    &laquo; Previous
+  </a>&nbsp;&nbsp;
+<?php else: ?>
+  <span class="disabled" style="color:#000">&laquo; Previous</span>&nbsp;&nbsp;
+<?php endif; ?>
+
+<!-- Numbered page links -->
+<?php foreach ($this->pagesInRange as $page): ?>
+    <?php if ($page != $this->current): ?>
+        <a href="/<?php echo $_REQUEST['URLName'] ?>/<?php echo $_REQUEST['page'] ?>?<?php echo $params ?>=<?php echo $page; ?>">
+            <?php echo $page; ?>
+        </a><?php echo (count($this->pagesInRange) != $page ? " <span style='color:#000'>|</span>" : "") ?>
+    <?php else: ?>
+        <span class="disabled" style="color:#000"><?php echo $page.(count($this->pagesInRange) != $page ? " |" : ""); ?></span>
+    <?php endif; ?>
+<?php endforeach; ?>
+
+<!-- Next page link -->
+<?php if (isset($this->next)): ?>
+  <a href="/<?php echo $_REQUEST['URLName'] ?>/<?php echo $_REQUEST['page'] ?>?<?php echo $params ?>=<?php echo $this->next; ?>">
+    Next &raquo;
+  </a>
+<?php else: ?>
+  <span class="disabled" style="color:#000">Next &raquo;</span>
+<?php endif; ?>
+</div>
+</center>
+<?php endif; ?>

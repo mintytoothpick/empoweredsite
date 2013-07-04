@@ -1,0 +1,623 @@
+.fbPhotosReorderableGrid .dragWrapper, .fbPhotosReorderableGrid .dragWrapper .uiMediaThumb {
+    float:left;    
+}
+
+.uiMediaThumbAlbLarge, .uiMediaThumbLarge .uiMediaThumbWrap img{    
+   	height: 150px;
+    width: 200px;
+    background: none repeat scroll 0 0 #FFFFFF;
+}
+
+.uiMediaThumbAlb {
+    margin-bottom: 4px;
+    margin-right: 4px;
+}
+
+.uiMediaThumb {
+     background: none repeat scroll 0 0 #FFFFFF;
+    border: 1px solid #CCCCCC;
+    display: inline-block;
+    outline: medium none;
+    padding: 4px;
+    position: relative;
+    vertical-align: bottom;
+}
+a {
+    color: #3B5998;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.photopeche {
+	border: 1px solid #CCCCCC;    
+    outline: medium none;
+    padding: 4px;
+    color: #3B5998;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.cajita {
+	float:left;	
+    width: 190px;
+    margin: 0 65px 0 0;	
+}
+
+.photoDetails a{
+    width: 154px;
+    color: #3B5998;
+    cursor: pointer;
+    text-decoration: none;
+}
+.photoDetails {
+    overflow: hidden;
+    padding-top: 2px;
+    width: 166px;
+    word-wrap: break-word;
+}
+.fcg {
+    color: #808080;
+    font-weight: normal;
+    font-size: 11px;
+}
+
+/*to showphotos*/
+.uiHeaderPage {
+    padding: 6px 0 16px;
+}
+.clearfix {
+    display: block;
+}
+
+.uiHeaderPage .uiHeaderActions {
+    margin-top: -1px;
+    background: none repeat scroll 0 0 #6e6e6e;    
+    width: 145px;
+}
+
+.rfloat {
+    float: right;
+}
+
+.uiButton a {
+    -moz-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+}
+.uiButton .img {
+    margin-top: 2px;
+    vertical-align: top;
+}
+
+.sx_8245ae {
+    background-position: -11px -15px;
+}
+
+.sp_7q4u4m {
+    background-image: url("/public/images/blankupload.jpeg");
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: 14px;
+    width: 11px;
+}
+
+.mrs {
+    margin-right: 5px;
+}
+a.uiButton span{
+    -moz-border-radius: 5px 5px 0 0;
+    -moz-user-select: none;
+    background: none repeat scroll 0 0 #6e6e6e;
+    color: #FFFFFF;
+    cursor: pointer;
+    float: left;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 30px;
+    list-style: none outside none;
+    margin: 0 0px 0 0;
+    position: relative;
+    text-align: center;
+    width: 110px;
+}
+a.uiButton a:link, a:visited {
+    color: #3366FF;
+    text-decoration: none;
+}
+
+.imagenupload{
+	cursor:pointer;
+	float: left;
+    margin: 5px 0 0 5px;
+}
+
+
+/* for photo/picture */
+
+.imgdetail {
+	margin: 0px ;    
+    /*width: 720px;*/
+    background: none repeat scroll 0 0 #F4F4F4;
+    border: 1px solid #D2D1D1;
+    padding: 10px 20px;
+    float: left;	
+    
+}
+.imgdetail2 {    
+    background: none repeat scroll 0 0 #F4F4F4;
+    border: 1px solid #D2D1D1;    
+    float: left;
+    margin: 3px 0 10px 20px;
+    padding: 3px;
+    width: 190px;       
+}
+.comments {    
+	font-size: 15px !important;
+    display:block;    
+    float: left;
+    margin: 10px 25px;
+    width: 720px;          
+}
+.uploadcomments{
+display: block;
+    float: left;
+    font-size: 15px !important;
+    width: 350px;
+}
+.linktag {    
+	font-size: 15px !important;
+    display:block;    
+    float: left;
+    margin: 5px;    
+    border-bottom: 1px solid #E5E5E5;
+    padding-bottom: 4px;
+    width: 100%;          
+}
+
+.multiplephotos{
+font-size: 15px;
+}
+
+
+/* concern to file manage*/
+.captionfile{
+   border-bottom-color: #000000;
+    border-bottom-width: 2px;
+    display: inline-block;
+    margin: 5px;
+    width: 15%;
+    text-align: center;
+   
+}
+.uno{
+width: 100%;
+}
+.dos{
+ bottom: 14px;
+    margin: 10px;
+    position: relative;
+    width: 100%;
+}
+.tres{
+width: 100%;
+}
+.submenuf{
+width: 100%;
+border-bottom: 1px solid #E5E5E5;
+ margin-top: 20px;
+}
+.filesm{
+width: 100%;
+/*border-bottom: 1px solid #E5E5E5;*/
+}
+/*
+.modif{
+    bottom: 387px;
+    left: 800px;
+    position: relative;
+}*/
+.modif{
+float: left;
+    margin: 0 50px;
+}
+ 
+
+
+
+.bluetext{
+	 color: #365aff;
+    text-decoration: none;
+}
+.add{
+	 float: left;
+	 margin:5px 15px;
+    
+}
+.whiteBoxx{
+ background: none repeat scroll 0 0 #FFFFFF;
+    border: 10px solid #C1DBDB;
+    float: left;
+    padding: 20px;
+    width: 990px;
+    margin-bottom: 10px;
+}
+/*---------home-banner---*/
+.honebanner{
+color: #000000 !important;
+    font-size: 22px !important;
+    font-weight: bold !important;
+    letter-spacing: 1px !important;
+    line-height: 40px !important;
+    margin: 9px 0 13px !important;    
+    text-align: left !important;
+    border-bottom: 1px solid #E5E5E5 !important;
+    width: 485px !important;
+    padding: 0px !important;
+}
+.pbanner{
+ bottom: 14px;
+    margin: 10px;
+    position: relative;
+    width: 100%;
+}
+
+.singupbanner{
+	left: 125px;
+    position: relative;
+    top: -23px;
+    width: 100%;
+}
+.learnmore{
+	font-size: 11px !important;
+	left: 210px;
+    position: relative;
+    top: -20px;
+    width: 100%;
+}
+
+/* the same upcoming */ 
+
+#activities-popup li {
+    background-color: #C1DBDB;
+}
+#activities-popup li:hover {
+    background-color: #999898;
+}
+.left_side .calendar {
+    border-color: #999898;
+    border-style: solid;
+    border-width: 2px 2px 6px;
+    color: #FFFFFF;
+    font-weight: bold;
+    margin-right: 40px;
+    width: 50px;
+}
+.left_side .calendar .on-going {
+    border-color: #669933;
+    border-style: solid;
+    border-width: 2px 2px 6px;
+    color: #FFFFFF;
+    font-weight: bold;
+    margin-right: 40px;
+    width: 50px;
+}
+ul.tabs {
+    border-bottom: 1px solid #999999;
+    float: left;
+    height: 32px;
+    list-style: none outside none;
+    margin: 0 10px;
+    padding: 0;
+    width: 98%;
+}
+ul.tabs li {
+    background: none repeat scroll 0 0 #E0E0E0;
+    border: 1px solid #999999;
+    float: left;
+    height: 31px;
+    line-height: 31px;
+    margin: 0 3px -1px 0;
+    overflow: hidden;
+    padding: 0;
+    position: relative;
+}
+ul.tabs li a {
+    border: 1px solid #FFFFFF;
+    color: #000000;
+    display: block;
+    font-size: 1.2em;
+    outline: medium none;
+    padding: 0 20px;
+    text-decoration: none;
+}
+ul.tabs li a:hover {
+    background: none repeat scroll 0 0 #CCCCCC;
+}
+html ul.tabs li.active, html ul.tabs li.active a:hover {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border-bottom: 1px solid #FFFFFF;
+}
+.tab_container {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border-top: medium none;
+    clear: both;
+    float: left;
+    margin: 0 10px;
+    overflow: hidden;
+    width: 98%;
+}
+.tab_content {
+    padding: 10px 0;
+}
+ 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+</head>
+<body>
+<div id="uservoice-feedback">
+</div>
+<div id="_atssh" style="visibility: hidden; height: 1px; width: 1px; position: absolute; z-index: 100000;">
+</div>
+<div id="centred">
+<div class="headerbox">
+</div>
+<script type="text/javascript">
+</script>
+<style>
+</style>
+<link media="screen" type="text/css" href="/public/css/scrollable-horizontal.css" rel="stylesheet">
+</link>
+<link media="screen" type="text/css" href="/public/css/navigation.css" rel="stylesheet">
+</link>
+<div>
+<div id="mainco2">
+<div class="block001h01">
+</div>
+<div class="block001">
+<div class="blst001">
+<div class="blst002" style="padding-top: 6px;">
+<div class="MainBody">
+<div align="center">
+</div>
+<div class="clr"></div>
+<div class="logo2">
+</div>
+<div style="float: left; width: 870px;">
+</div>
+<div id="TabbedPanels1" class="TabbedPanels">
+<ul class="TabbedPanelsTabGroup">
+</ul>
+<div class="TabbedPanelsContentGroup">
+<div class="TabbedPanelsContent"> </div>
+<div class="TabbedPanelsContent">
+<div class="whiteBox" style="padding: 7px;">
+<h3 style="font-weight: bold; color: rgb(102, 153, 51); font-size: 20px; margin: 10px 0px 20px 10px;">Upcoming Volunteer Activities</h3>
+<style>
+</style>
+<script>
+</script>
+<ul class="tabs">
+<li class="active" style="margin-left: 5px;">
+<a class="current" href="/x/upcoming" tip="">Upcoming</a>
+</li>
+<li class="">
+<a class="" href="/x/past" tip="">Past</a>
+</li>
+</ul>
+<div class="tab_container">
+<div id="tab1" class="tab_content">
+<div style="padding: 8px 0px; margin: 0px 10px; border-bottom: 1px solid rgb(204, 204, 204); height: 80px;">
+<div class="left_side" style="padding-left: 10px; width: 650px;">
+<div style="float: left;">
+<ul class="calendar" style="list-style: none outside none; padding: 0px; border-width: 2px 2px 6px; border-style: solid; border-color: rgb(102, 153, 51);">
+<li style="text-align: center; padding: 0px 3px 3px; background-color: rgb(102, 153, 51);">Feb</li>
+<li style="text-align: center; padding: 6px; color: rgb(0, 0, 0); font-size: 18px;">11</li>
+</ul>
+<ul style="list-style: none outside none; padding: 0px; width: 50px;">
+</ul>
+</div>
+<div style="float: left;">
+</div>
+</div>
+<div class="right_side">
+</div>
+</div>
+<div style="padding: 8px 0px; margin: 0px 10px; border-bottom: 1px solid rgb(204, 204, 204); height: 80px;">
+</div>
+<div style="padding: 8px 0px; margin: 0px 10px; border-bottom: 1px solid rgb(204, 204, 204); height: 80px;">
+</div>
+<div style="padding: 8px 0px; margin: 0px 10px; border-bottom: 1px solid rgb(204, 204, 204); height: 80px;">
+</div>
+<div style="padding: 8px 0px; margin: 0px 10px; border-bottom: 1px solid rgb(204, 204, 204); height: 80px;">
+</div>
+<div style="padding: 8px 0px; margin: 0px 10px; border-bottom: 1px solid rgb(204, 204, 204); height: 80px;">
+</div>
+<br>
+<br>
+</div>
+</div>
+</div>
+</div>
+<div class="TabbedPanelsContent"> </div>
+<div class="TabbedPanelsContent"> </div>
+</div>
+</div>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+<div class="block001f01">
+</div>
+</div>
+</div>
+<div id="footer">
+</div>
+</div>
+<script type="text/javascript">
+</script>
+<div id="fb-root" class=" fb_reset">
+</div>
+<script src="http://connect.facebook.net/en_US/all.js" type="text/javascript">
+</script>
+<script src="http://static.ak.fbcdn.net/connect/en_US/core.debug.js" type="">
+</script>
+<script type="text/javascript">
+</script>
+<div id="toolTip" style="top: 0pt; visibility: hidden;"></div>
+</body>
+</html>
+<html>
+<head></head>
+<body>The site is currently being updated. Please check back at 4:30PST</body>
+</html>
+#activities-popup li {
+    background-color: #C1DBDB;
+}
+#activities-popup li:hover {
+    background-color: #999898;
+}
+.left_side .calendar {
+    border-color: #999898;
+    border-style: solid;
+    border-width: 2px 2px 6px;
+    color: #FFFFFF;
+    font-weight: bold;
+    margin-right: 40px;
+    width: 50px;
+}
+.left_side .calendar .on-going {
+    border-color: #669933;
+    border-style: solid;
+    border-width: 2px 2px 6px;
+    color: #FFFFFF;
+    font-weight: bold;
+    margin-right: 40px;
+    width: 50px;
+}
+ul.tabs {
+    border-bottom: 1px solid #999999;
+    float: left;
+    height: 32px;
+    list-style: none outside none;
+    margin: 0 10px;
+    padding: 0;
+    width: 98%;
+}
+ul.tabs li {
+    background: none repeat scroll 0 0 #E0E0E0;
+    border: 1px solid #999999;
+    float: left;
+    height: 31px;
+    line-height: 31px;
+    margin: 0 3px -1px 0;
+    overflow: hidden;
+    padding: 0;
+    position: relative;
+}
+ul.tabs li a {
+    border: 1px solid #FFFFFF;
+    color: #000000;
+    display: block;
+    font-size: 1.2em;
+    outline: medium none;
+    padding: 0 20px;
+    text-decoration: none;
+}
+ul.tabs li a:hover {
+    background: none repeat scroll 0 0 #CCCCCC;
+}
+html ul.tabs li.active, html ul.tabs li.active a:hover {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border-bottom: 1px solid #FFFFFF;
+}
+.tab_container {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border-top: medium none;
+    clear: both;
+    float: left;
+    margin: 0 10px;
+    overflow: hidden;
+    width: 98%;
+}
+.tab_content {
+    padding: 10px 0;
+}
+
+
+
+
+/*end upcoming */
+
+#activities-popup li {
+    background-color: #C1DBDB;
+}
+#activities-popup li:hover {
+    background-color: #999898;
+}
+.left_side .calendar {
+    border-color: #999898;
+    border-style: solid;
+    border-width: 2px 2px 6px;
+    color: #FFFFFF;
+    font-weight: bold;
+    margin-right: 40px;
+    width: 50px;
+}
+.left_side .calendar .on-going {
+    border-color: #669933;
+    border-style: solid;
+    border-width: 2px 2px 6px;
+    color: #FFFFFF;
+    font-weight: bold;
+    margin-right: 40px;
+    width: 50px;
+}
+ul.tabs {
+    border-bottom: 1px solid #999999;
+    float: left;
+    height: 32px;
+    list-style: none outside none;
+    margin: 0 10px;
+    padding: 0;
+    width: 98%;
+}
+ul.tabs li {
+    background: none repeat scroll 0 0 #E0E0E0;
+    border: 1px solid #999999;
+    float: left;
+    height: 31px;
+    line-height: 31px;
+    margin: 0 3px -1px 0;
+    overflow: hidden;
+    padding: 0;
+    position: relative;
+}
+ul.tabs li a {
+    border: 1px solid #FFFFFF;
+    color: #000000;
+    display: block;
+    font-size: 1.2em;
+    outline: medium none;
+    padding: 0 20px;
+    text-decoration: none;
+}
+ul.tabs li a:hover {
+    background: none repeat scroll 0 0 #CCCCCC;
+}
+html ul.tabs li.active, html ul.tabs li.active a:hover {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border-bottom: 1px solid #FFFFFF;
+}
+.tab_container {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border-top: medium none;
+    clear: both;
+    float: left;
+    margin: 0 10px;
+    overflow: hidden;
+    width: 98%;
+}
+.tab_content {
+    padding: 10px 0;
+}
+

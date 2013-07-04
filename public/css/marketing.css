@@ -1,0 +1,379 @@
+body{
+	background:#aed5f8;
+	margin:0;
+	padding:0;
+	}
+	
+body, select, input, div{
+	font-family:Arial, Helvetica, sans-serif, Calibri;
+	font-size:12px;
+	color:#555;
+	line-height:18px;
+	}	
+	
+img{
+	border:none;
+	}
+	
+.clr{
+	clear:both;
+	height:0;
+	}
+	
+hr{
+	margin:15px 0;
+	}
+
+a{
+	color:#a11a13;
+	text-decoration:none;
+	outline:none;
+	}
+
+a:hover{
+	color:#ff0200;
+	text-decoration:none;
+	outline:none;	
+	}
+
+.color1{
+	color:#a11a13;
+	}
+
+.NoMargin{
+	margin:0 !important;
+	}
+
+.container{
+	width:1112px;
+	margin:0 auto;
+	}
+
+.MainBody{
+	background:url(../images/box1Btm.png) no-repeat bottom;
+	width:1106px;
+	float:left;
+	padding:0 3px;
+	padding-bottom:16px;
+	margin-top:10px;
+	}
+
+.MainBodyContents{
+	background:url(../images/box1Top.png) no-repeat top #fff;
+	width:1026px;
+	float:left;
+	padding:30px 40px;
+	}
+
+.marketing_banner{width:1026px;
+	float:left;
+	margin-bottom:40px;
+	}
+
+.marketing_banner h1{
+	color:#4d8219;
+	font-size:36px;
+	font-weight:bold;
+	line-height:36px;
+	margin:0 0 5px 0;
+	}
+
+.marketing_banner h2{
+	color:#000;
+	font-size:20px;
+	font-weight:normal;
+	line-height:24px;
+	margin:0;
+	}
+
+.marketing_banner ul{
+	margin:15px 0;
+	padding:0;
+	}
+
+.marketing_banner ul li{
+	font-size:16px;
+	list-style:none;
+	line-height:20px;
+	padding:8px 0 8px 45px;
+	}
+
+.img01{ background:url(../images/img01.png) no-repeat 0 9px;}
+.img02{ background:url(../images/img02.png) no-repeat 0 8px;}
+.img03{ background:url(../images/img03.png) no-repeat 0 10px;}
+
+.signupBtn02{
+	height:45px;
+	width:204px;
+	float:left;
+	margin:0;
+	}
+
+.signupBtn02 a{
+	background:url(../images/signupBtn02.png) no-repeat top; 
+	height:45px;
+	width:204px;
+	display:block;
+	}
+
+.signupBtn02 a:hover{
+	background:url(../images/signupBtn02.png) no-repeat bottom;
+	}
+
+.bannerBox{
+	background:#ebebeb;
+	height:250px;
+	width:520px;
+	float:right;
+	margin:0;
+	}
+
+
+.menuText{
+	background:url(../images/bullet.png) no-repeat 122px 13px;
+	width:145px;
+	font-size:18px;
+	text-align:left;
+	float:left;
+	color:#4d8219;
+	}
+
+#tabbed_menu{
+	width:484px;
+	float:left;
+	font-size:14px;
+	font-weight:bold;
+	line-height:39px;
+	height:39px;
+	text-align:center;
+	margin-bottom:20px;
+	border-bottom:1px solid #cacaca;
+	}
+	
+#tabbed_menu ul{
+	background:url(../images/bullet.png) no-repeat 0 0;
+	margin:0; 
+	padding:0;
+	}
+	
+#tabbed_menu ul li{
+	float:left;
+	display:inline;
+	list-style:none;
+	margin-right:2px;
+	}
+
+#tabbed_menu ul li a{
+	background:url(../images/menuBg02.png) no-repeat top right;
+	height:39px;
+	color:#fff;
+	display:block;
+	padding:0 20px 0 0;
+	text-decoration:none;
+	}
+
+#tabbed_menu ul li a:hover{
+	background:url(../images/menuBg.png) no-repeat bottom right;
+	text-decoration:none;
+	}
+
+#tabbed_menu ul li a span{
+	background:url(../images/menuBg02.png) no-repeat top left;
+	height:39px;
+	float:left;
+	display:block;
+	padding-left:20px;
+	}
+
+#tabbed_menu ul li a:hover span{
+	background:url(../images/menuBg.png) no-repeat bottom left;
+	}
+
+#menu02{
+	width:542px;
+	float:right;
+	font-size:14px;
+	font-weight:bold;
+	line-height:39px;
+	height:39px;
+	text-align:center;
+	margin-bottom:20px;
+	border-bottom:1px solid #cacaca;
+	}
+	
+#menu02 ul{
+	background:url(../images/bullet.png) no-repeat 0 0;
+	margin:0; 
+	padding:0;
+	}
+	
+#menu02 ul li{
+	float:left;
+	display:inline;
+	list-style:none;
+	margin-right:2px;
+	}
+
+#tabbed_menu ul li .activetab{
+        background:url(../images/menuBg.png) no-repeat top right;
+        }
+
+#tabbed_menu ul li .activetab span{
+        background:url(../images/menuBg.png) no-repeat top left;
+        }
+
+#menu02 ul li .activetab{
+	background:url(../images/menuBg.png) no-repeat top right;
+	}
+
+#menu02 ul li .activetab span{
+	background:url(../images/menuBg.png) no-repeat top left;
+	}
+
+#menu02 ul li a{
+	background:url(../images/menuBg02.png) no-repeat top right;
+	height:39px;
+	color:#fff;
+	display:block;
+	padding:0 20px 0 0;
+	text-decoration:none;
+	}
+
+#menu02 ul li a:hover{
+	background:url(../images/menuBg.png) no-repeat bottom right;
+	text-decoration:none;
+	}
+
+#menu02 ul li a.active{
+	background:url(../images/menuBg.png) no-repeat top right;
+	height:39px;
+	color:#fff;
+	display:block;
+	padding:0 20px 0 0;
+	text-decoration:none;
+	}
+
+#menu02 ul li a span{
+	background:url(../images/menuBg02.png) no-repeat top left;
+	height:39px;
+	float:left;
+	display:block;
+	padding-left:20px;
+	}
+
+#menu02 ul li a:hover span{
+	background:url(../images/menuBg.png) no-repeat bottom left;
+	}
+
+#menu02 ul li a.active span{
+	background:url(../images/menuBg.png) no-repeat top left;
+	text-decoration:none;
+	}
+
+.leftC{
+	float:left;
+	width:790px;
+	border-right:1px solid #cacaca;
+	}
+
+.box1{
+	width:355px;
+	float:left;
+	font-size:14px;
+	line-height:20px;
+	margin-top:20px;
+	padding-right:40px;
+	border-bottom:0;
+	color:#000;
+	margin-bottom:0;
+	padding-bottom:0;
+	}
+
+.box1 h2{
+	font-size:20px;
+	font-weight:bold;
+	}
+
+.box1 h3{
+	color:#4d8219;
+	font-size:18px;
+	font-weight:bold;
+	margin:0 0 5px 0;
+	}
+
+.ImgBox{
+	width:349px;
+	height:174px;
+	float:left;
+	margin-top:20px;
+	border:3px solid #cacaca;
+	}
+
+.ImgBox img {
+	max-width:345px;
+	max-height:170px;
+	margin:auto;
+	display:block;
+	}
+
+.rightC{
+	width:210px;
+	float:right;
+	}
+
+.siderMenu{
+	width:210px;
+	float:left;
+	margin:0;
+	}
+
+.siderMenu h3{
+	background:url(../images/bg01.png) no-repeat bottom;
+	color:#fff;
+	font-size:14px;
+	line-height:30px;
+	padding:0 0 8px 10px;
+	margin:0;	
+	}
+
+.siderMenu ul{
+	margin:10px 0 0 0;
+	padding:0;
+	}
+
+.siderMenu ul li{
+	list-style:none;
+	line-height:50px;
+	padding-left:50px;
+	}
+
+.siderMenu ul li a{
+	font-size:14px;
+	font-weight:bold;
+	color:#1458ff;
+	text-decoration:none;
+	}
+
+.siderMenu ul li a:hover{
+	text-decoration:underline;
+	}
+
+.service{ background:url(../images/services.png) no-repeat 0 7px;}
+.community{ background:url(../images/community.png) no-repeat 0 7px;}
+.run{ background:url(../images/run.png) no-repeat 0 7px;}
+.faith{ background:url(../images/faith.png) no-repeat 0 7px;}
+.group{ background:url(../images/group.png) no-repeat 0 7px;}
+.organization{ background:url(../images/organization.png) no-repeat 0 7px;}
+
+a.button-orange {
+    background-color:#ffa200;
+    background-image:url(/public/images/NewHomePage/arrow.png);
+    background-repeat:no-repeat;
+    background-position:92%;
+    color:#fff;
+    padding:5px 10px;
+    font-weight:bold;
+    -moz-border-radius:10px;
+    -webkit-border-radius: 10px;
+    -khtml-border-radius: 10px;
+}

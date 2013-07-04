@@ -1,0 +1,3 @@
+AuthType Basic
+AuthUserFile C:\xampp\htdocs\Brigades_PHP\library\GoogleCheckout\.htpasswd
+require valid-user AuthName "Google checkout Basic Authentication"

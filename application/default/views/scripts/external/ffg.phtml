@@ -1,0 +1,161 @@
+<style>
+fieldset {border: 0; margin:0;padding:0;}
+fieldset label {display:block;float:left;width:150px;clear:both;}
+fieldset input {display:block; width:240px;float:left;}
+label.error {color:red; margin-top: 0; display: block;width:400px}
+fieldset label.error {padding-left:150px;width:200px;margin-bottom:5px;clear:both;}
+ul.bannerFFG {margin:0;padding:0;}
+ul.bannerFFG li {list-style: none; float:left; width:49%;}
+ul.bannerFFG li img {float:left;margin-right:5px;}
+ul.bannerFFG li div {padding-top: 15px;float:left;}
+ul.bannerFFG li div span {font-size:15px;padding-top:5px}
+</style>
+
+<script>
+$(function() {
+    //organization change
+    $("#organization").change(function(){
+        if ($("#organization").val() != 'null') {
+            $.fancybox('<h2>Wait please</h2><p>Validating fundraised amount ...</p>', {
+                'showCloseButton':false,
+                'enableEscapeButton':false,
+                'hideOnOverlayClick':false
+            });
+
+            $.ajax({
+                url: '/external/ffgvalidate',
+                type: 'POST',
+                data: {
+                    organizationId: $("#organization").val()
+                },
+                success: function(data) {
+                    if (data == 'login') {
+                        alert('Session timeout, please refresh the site.');
+                    } else {
+                        $('#validateStatus').html(data);
+                        $('#validateStatus').show();
+                        setTimeout(function () {
+                            $.fancybox.close();
+                        }, 500);
+                    }
+                }
+            });
+        }
+    });
+
+    $("#helpFee").click(function() {
+        $.fancybox('<p>There is <?=$this->currency?> $<?=$this->fee?> contribution to Empowered.org for the use of the platform to fundraise for this humanitarian flight.</p>');
+    });
+
+
+    $("#nominationOrg").validate({
+        onfocusout: function(element) { this.element(element); },
+        submitHandler: function(form) {
+            $("#btnSub").hide();
+            $("#loadingReq").show();
+            $.ajax({
+                type: "POST",
+                url: "/external/ffgorgnomination",
+                data: $("#nominationOrg").serialize(),
+                success: function(data) {
+                    $("#nominationOrg").hide();
+                    $("#loadingReq").hide();
+                    $("#thanksMsg").show();
+                }
+            });
+        }
+    });
+});
+</script>
+
+
+<div class="wrapper">
+
+  <!-- org header -->
+  <?=$this->placeholder('header_small') ?>
+  <!-- // org header -->
+  <div class="clr"></div>
+
+  <div class="BodyCon"><br />
+    <div class="mainC">
+
+
+    <h3><img src="/public/images/external/ffg-logo.jpg"/></h3>
+
+    <div class="roundedBox textSTyle02">Fly For Good Ticket - <?=$this->description?></div>
+
+    <ul class="bannerFFG">
+        <li><img src="/public/images/external/plane.jpg"/><div><span>Fundraise for your Airfare</span><br />Using social media, your friends, family<br /> and colleages can all support your efforts.</div></li>
+        <li><img src="/public/images/external/arrows.jpg"/><div><span>You and your donors receive an instant Tax Receipt</span><br />Average tax savings of $224 per ticket.</div></li>
+    </ul>
+
+    <div class="clr"></div><hr />
+
+<?php if (isset($this->loginForm)) { ?>
+    <!-- login form -->
+    <div class="roundedBox2">
+    <h3>If you have an Empowered account login</h3>
+    <?php echo $this->loginForm; ?>
+    <? if (isset($this->errorLogin)) { ?><div><label class="error">The username or password you entered is incorrect.</label></div><? } ?><br />
+    </div>
+    <div class="clr"></div><br />
+    <!-- e o login form -->
+<?php } ?>
+
+    <div class="leftAuto padLeft">
+      <label class="amtns">Ticket Amount: <span><?=$this->currency?> $<?=$this->amount?></span> </label> <br />
+      <label class="amtns">Fee Charge: <span><?=$this->currency?> $<?=$this->fee?></span></label> <div class="btnHelp"><a href="javascript:;" id="helpFee">?</a></div><br />
+      <b style="font-size:15px;"><label class="amtns">Total Amount: <span><?=$this->currency?> $<?=number_format(($this->totalAmnt), 2)?></label></b>
+    </div>
+  <div class="clr"></div><br />
+
+<?php if (!isset($this->loginForm)) { ?>
+    <?php
+    $show = false;
+    //check available orgs
+    if(count($this->userNew->organizationsRaised) > 0) {
+        foreach($this->userNew->organizationsRaised as $org) {
+            if (in_array($org->id, Organization::$withFlyForGood)) {
+                $show = true;
+                break;
+            }
+        }
+    }
+    if ($show) {
+    ?>
+    <p><b style="font-size:14px;padding-left:20px;">Select organization fundraised:</b>
+    <select id="organization">
+        <option value="null">...</option>
+        <?php foreach($this->userNew->organizationsRaised as $org) {
+        if (in_array($org->id, Organization::$withFlyForGood)) { ?>
+        <option value="<?=$org->id?>"><?=$org->name?></option>
+        <?php } } ?>
+    </select>
+    </p>
+    <div class="clear"></div><br />
+    <div id="validateStatus" class="hide"></div>
+    <?php } else { ?>
+    <div id="validateStatus">No organization fundraised found.</div>
+    <?php } ?>
+<?php } ?>
+
+<hr />
+<p>
+    *If your organization is not currently a participating member, please fill out
+    the form below to nominate them.
+</p>
+<h3>Nominate an Organization so you can fundraise</h3>
+<div id="thanksMsg" class="hide"><b>Thanks we will get back to you in 24 hours.</b></div>
+<form name="nominationOrg" id="nominationOrg" method="post" action="">
+    <fieldset>
+        <label>Organization Name:</label> <input type name="name" class="required"/>
+        <label>Contact Email:</label> <input type name="email" class="required email"/>
+        <label>Phone Number:</label> <input type name="phone" />
+    </fieldset>
+    <input type="submit" value="Nominate" id="btnSub"/>
+    <div id="loadingReq" class="hide">Sending request ...</div>
+</form><br /><br />
+</div>
+<div class="clr"></div>
+<div class="clr"></div>
+</div></div>

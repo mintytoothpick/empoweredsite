@@ -1,0 +1,12 @@
+<?php $this->placeholder('breadcrumb')->captureStart() ?>
+<div class="breadcrumbCon">
+  <ul>
+    <? foreach($this->breadcrumb as $k => $crumb) { ?>
+    <li class="bread<?=($k+1)?>"><?=$crumb?></li>
+    <? } ?>
+  </ul>
+</div>
+<? if (isset($this->level) && $this->level == 'user') { ?>
+<div class="clear"></div><br />
+<? } ?>
+<?php $this->placeholder('breadcrumb')->captureEnd() ?>

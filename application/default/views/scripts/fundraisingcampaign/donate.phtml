@@ -1,0 +1,640 @@
+<?php $this->headTitle("Make a donation to ".stripslashes($this->project->name)); ?>
+<script>
+    function validatePayment() {
+        var selected_amount = 0;
+        var error = "";
+
+        $('#suggested-donations input[type=radio]').each(function(){
+            if ($(this).attr('checked')) {
+                selected_amount++;
+            }
+        })
+
+        if (selected_amount > 0) {
+
+            if ($('#suggested_amount_other').attr('checked')) {
+                if (jQuery.trim($('#other_amount').val()) == "" || jQuery.trim($('#other_amount').val()) == "Other...") {
+                    error += "Please specify your donation amount.<br>";
+                } else if (!isFloat(jQuery.trim($('#other_amount').val()))) {
+                    error += "Please specify a valid donation amount.<br>";
+                } else if (!($('#other_amount').val() >= 1)) {
+                    error += "The amount should be greater than $1.<br>";
+                }
+
+            }
+        } else {
+            error += "Please select a donation amount.<br>";
+        }
+
+        if (document.getElementById("paypal_option").checked == true) {
+        } else if (document.getElementById("direct_option").checked == true) {
+            if (jQuery.trim($('#firstName').val()) == "") {
+                error += "Please specify your first name.<br>";
+            }
+            if (jQuery.trim($('#lastName').val()) == "") {
+                error += "Please specify your last name.<br>";
+            }
+            if (jQuery.trim($('#creditCardNumber').val()) == "") {
+                error += "Please specify your credit card number.<br>";
+            }
+            if (jQuery.trim($('#address').val()) == "") {
+                error += "Please specify your address.<br>";
+            }
+            if (jQuery.trim($('#city').val()) == "") {
+                error += "Please specify your city.<br>";
+            }
+            if (jQuery.trim($('#state').val()) == "") {
+                error += "Please specify your state.<br>";
+            }
+            if (jQuery.trim($('#zipcode').val()) == "") {
+                error += "Please specify your zip code.<br>";
+            }
+            if (jQuery.trim($('#email').val()) == "") {
+                error += "Please specify your email.<br>";
+            } else if (!validateEmail(jQuery.trim($('#email').val()))) {
+                error += "Please specify a valid email.<br>";
+            }
+        } else {
+            error += "Please select a payment method.<br>";
+        }
+
+        if (error == "") {
+            return true;
+        } else {
+            $('#error').html(error).show();
+            window.location.href = "#error";
+            return false;
+        }
+    }
+
+    function validateDonation() {
+        var selected_amount = 0;
+        var error = "";
+        var donation;
+        $('#suggested-donations input[type=radio]').each(function(){
+            if ($(this).attr('checked')) {
+                selected_amount++;
+                donation = $(this).val();
+            }
+        })
+
+        if (selected_amount > 0) {
+            if ($('#suggested_amount_other').attr('checked')) {
+                if (jQuery.trim($('#other_amount').val()) == "" || jQuery.trim($('#other_amount').val()) == "Other...") {
+                    error += "Please specify your donation amount.<br>";
+                } else if (!isFloat(jQuery.trim($('#other_amount').val()))) {
+                    error += "Please specify a valid donation amount.<br>";
+                } else if (!($('#other_amount').val() >= 1)) {
+                    error += "The amount should be greater than $1.<br>";
+                } else {
+                    donation = $('#other_amount').val();
+                }
+            }
+        } else {
+            error += "Please select a donation amount.<br>";
+        }
+
+        <?php if($this->project->allowPercentageFee == 'optional' && ($this->project->paypalId || $this->project->percentageFee > 0)) { ?>
+            if (!$('#coverTransFee1').attr('checked') && !$('#coverTransFee2').attr('checked')) {
+                error += "Please select if you want to cover the transaction fee or not.<br>";
+            }
+        <?php } ?>
+
+        if (error == "") {
+            return true;
+        } else {
+            $('#error').html(error).show();
+            window.location.href = "#error";
+            return false;
+        }
+    }
+
+    function displayPayment(toggle) {
+        if (toggle == 'Direct Payment') {
+            $('#direct-payment').show();
+        } else {
+            $('#direct-payment').hide();
+        }
+    }
+
+    function getStatelist(id) {
+        $('#statelist').load('/donation/getstatelist', {countryID: id});
+    }
+
+    function validateForm() {
+        var selected_amount = 0;
+        var error = "";
+        var donation;
+        $('#suggested-donations input[type=radio]').each(function(){
+            if ($(this).attr('checked')) {
+                selected_amount++;
+                donation = $(this);
+            }
+        })
+
+        if (selected_amount > 0) {
+            if ($('#suggested_amount_other').attr('checked')) {
+                if (jQuery.trim($('#other_amount').val()) == "" || jQuery.trim($('#other_amount').val()) == "Other...") {
+                    error += "Please specify your donation amount.<br>";
+                } else if (!isFloat(jQuery.trim($('#other_amount').val()))) {
+                    error += "Please specify a valid donation amount.<br>";
+                } else if ( !($('#other_amount').val() >= 1) ) {
+                    error += "The amount should be greater than $1.<br>";
+                } else {
+                    donation = $('#other_amount');
+                }
+            }
+        } else {
+            error += "Please select a donation amount.<br>";
+        }
+        <?php if($this->project->allowPercentageFee == 'optional' && ($this->project->paypalId || $this->project->percentageFee > 0)) { ?>
+            if (!$('#coverTransFee1').attr('checked') && !$('#coverTransFee2').attr('checked')) {
+                error += "Please select if you want to cover the transaction fee or not.<br>";
+            }
+        <?php } ?>
+
+        if (error != "") {
+            $('#error').html(error).show();
+            return false;
+        } else {
+            $("#btnSubmit").hide();
+            $('#loadingStatus').show();
+            return true;
+        }
+    }
+
+    function isFloat(value) {
+        if(value == ""){
+            return false;
+        }
+        value = value.replace(/,/, '.');
+        if(parseFloat(value) != (value*1)) {
+            return false;
+        }
+        return true;
+    }
+
+    function updateItemName() {
+        var item_name = "Your donation on behalf of ";
+        if (document.getElementById('rdoName').checked == true) {
+            item_name += $('#Name').val();
+            document.getElementById('fundraisers').disabled = true;
+            $('#VolunteerId').val('');
+        } else if (document.getElementById('rdoFundraiser').checked == true) {
+            item_name += $('#fundraisers option:selected').text();
+            document.getElementById('fundraisers').disabled = false;
+            $('#VolunteerId').val($('#fundraisers').val());
+        }
+        item_name += " is being processed";
+        $('#item_name_1').val(item_name);
+    }
+
+    function updateFundraiser(val) {
+        $('#VolunteerId').val(val);
+        $('#item_name_1').val("Your donation on behalf of "+$('#fundraisers option:selected').text()+" is being processed");
+    }
+
+    function manualEntry() {
+        if (!isFloat($('#other_amount').val())) {
+            alert('Please enter a valid donation amount.');
+            return false;
+        } else {
+            $.post('/donation/manualentry', {ProjectId: $('#ProjectId').val(), VolunteerId: $('#VolunteerId').val(), DonationAmount: $('#other_amount').val(), DonationComments: $('#DonationComments').val()}, function(data) {
+                alert(data);
+                $('#item_price_1').val('');
+                $('#DonationComments').val('');
+                window.location.href = '/<?php echo $this->project->urlName ?>';
+            });
+        }
+    }
+
+    function updateTotalBill() {
+        var percent = $('#PercentageFee').val();
+        $('#suggested-donations input[type=radio]').each(function(){
+            if ($(this).attr('checked') && $(this).val() != 'Other Amount') {
+                $('#trans-fee').html(Number($(this).val() * (percent/100)).toFixed(2));
+            } else if ($(this).attr('checked') && $(this).val() == 'Other Amount') {
+                $('#trans-fee').html(Number($('#other_amount').val() * (percent/100)).toFixed(2));
+            }
+        })
+    }
+
+    function updateTotalPaypalBill() {
+        var percent = $('#PercentageFee').val();
+        $('#suggested-donations input[type=radio]').each(function(){
+            if ($(this).attr('checked') && $(this).val() != 'Other Amount') {
+                $('#trans-fee').html(Number($(this).val() * ((percent/100) + 0.015)).toFixed(2));
+            } else if ($(this).attr('checked') && $(this).val() == 'Other Amount') {
+                $('#trans-fee').html(Number($('#other_amount').val() * ((percent/100) + 0.015)).toFixed(2));
+            }
+        })
+    }
+
+    <?php if($this->project->isGlobalProject()) { ?>
+    $(function() {
+        $("input:radio[name=coverTransFee]").click(function() {
+            var val = $(this).val();
+            if (val == 0) {
+                $("#feebox").show();
+            } else {
+                $("#feebox").hide();
+            }
+        });
+     });
+    <?php } ?>
+</script>
+<div class="wrapper">
+    <!-- org header -->
+    <?php echo $this->placeholder('header') ?>
+    <!-- // org header -->
+
+    <div class="BodyCon">
+
+        <!-- breadcrumb -->
+        <?php echo $this->placeholder('breadcrumb') ?>
+        <!-- // breadcrumb -->
+        <div class="clr"></div>
+
+        <!-- tabs -->
+        <?php echo $this->placeholder('tabs') ?>
+        <!-- // tabs -->
+
+        <div class="mainC02">
+            <div class="box05 BG01">
+                <div class="headingStyle02">Donate to <?=$this->project->name?></div>
+                <div style="padding:0 10px;">
+                <p>
+                    <? if ($this->project->organizationId == 'DAF7E701-4143-4636-B3A9-CB9469D44178') { ?>
+                    Your donation to <?=$this->project->organization->name?> is sincerely appreciated and much needed! Your support is driving health and sustainable development initiatives year-round in under resourced communities. Thank you!
+                    <? } else { ?>
+                    Your donation to <?php echo stripslashes($this->project->name) ?> is sincerely appreciated and much needed! You and your support help make social change possible. Thank you!<br /><br />
+                    <?php } ?>
+                </p>
+                <div id="error" style="color:red; padding:5px; margin:5px 0px 10px 0px; border:solid 1px #e5e5e5; <?php echo !$this->error ? "display:none" : "font-size:15px; padding:8px" ?>"><?php echo $this->error ? "This group is not set up for fundraising yet." : "" ?></div>
+
+                <h2>Destination</h2>
+                <?php if (count($this->fundraisers)) { ?>
+                    <p style="height: 21px;">
+                        <span class="ist03"><input id="rdoFundraiser" type="radio" name="ctl00$ContentPHMain$DonationMode" value="rdoFundraiser" <?php echo $this->UserId != '' ? 'checked="checked"' : "" ?> onclick="updateItemName()" /></span>
+                        <label for="rdoFundraiser">Make a donation on behalf of a fundraiser: </label> &nbsp;
+                        <select name="fundraisers" id="fundraisers" onchange="updateFundraiser(this.value)" <?php echo $this->UserId != '' ? "" : 'disabled' ?>>
+                        <?php foreach ($this->fundraisers as $fundraiser) { ?>
+                            <option value="<?php echo $fundraiser['UserId'] ?>" <?php echo ($fundraiser['UserId'] == $this->UserId ? 'selected' : "") ?> ><?php echo stripslashes(ucwords($fundraiser['FullName'])) ?></option>
+                        <?php } ?>
+                        </select><br />&nbsp;
+                        <?php if($this->project->googleId == "1") { ?>
+                            <span style="color:#666;font-size:10px;margin-left:15px;">*Please be aware that donations on behalf of a fundraiser are still made to Global Brigades Inc.</span>
+                        <?php } ?>
+                    </p>
+                <?php } ?>
+                <p>
+                    <span class="ist03"><input id="rdoName" type="radio" name="ctl00$ContentPHMain$DonationMode" value="rdoName" <?php echo $this->UserId == '' ? 'checked="checked"' : "" ?> onclick="updateItemName()" /></span>
+                    <label for="rdoName">Make general donation to <?php echo stripslashes($this->project->name).(!empty($this->project->groupId) ? " / ".stripslashes($this->project->group->name) : "") ?></label>
+                </p>
+                <?php if(!empty($this->project->bluePayId) && $this->project->bluePayId > 0 && !$this->error) { ?>
+                    <h2>Amount</h2>
+                    <? echo $this->placeholder('paymentform');
+                } else if($this->project->paypalId) { ?>
+                    <form action="/donation/chainedpayment" method="post" onsubmit="return validateDonation()">
+                        <input type="hidden" id="expType" name="expType" value="light" />
+                        <input type="hidden" id="ProjectId" name="ProjectId" value="<?php echo $this->project->id; ?>" />
+                        <input type="hidden" id="VolunteerId" name="VolunteerId" value="<?php echo $this->UserId != '' ? $this->UserId : '' ?>" />
+                        <input type="hidden" id="PaypalEmail" name="PaypalEmail" value="<?php echo $this->paypal['email'] ?>" />
+                        <input type="hidden" id="CurrencyCode" name="CurrencyCode" value="<?php echo $this->paypal['currencyCode'] ?>" />
+                        <?php if($this->project->allowPercentageFee != 'no') { ?>
+                        <input type="hidden" id="PercentageFee" name="PercentageFee" value="<?php echo $this->project->percentageFee ?>" />
+                        <?php } ?>
+                        <h2>Amount</h2>
+                        <div id="suggested-donations">
+                            <?php foreach($this->suggested_donations as $suggested_amount) { ?>
+                            <input style="margin-bottom:5px;" type="radio" id="suggested_amount_<?php echo $suggested_amount['SuggestedDonationId'] ?>" name="suggested_amount" value="<?php echo number_format($suggested_amount['Amount']) ?>" onclick="updateTotalPaypalBill(); <?php echo $this->project->allowPercentageFee == 'mandatory' ? "$('#transfeemandatory').show();" : "$('#transfee').show();"; ?>">&nbsp;<span style="margin-right:10px;">$<?php echo number_format($suggested_amount['Amount']) ?></span><?php echo $suggested_amount['Description'] ?><br>
+                            <?php } ?>
+                            <span style="margin-right:23px;"><input style="margin-bottom:5px;" type="radio" id="suggested_amount_other" name="suggested_amount" value="Other Amount" <?php echo count($this->suggested_donations) == 0 ? 'checked' : ''; ?>>&nbsp;<?php echo $this->project->currency ?></span>
+                            <input type="text" id="other_amount" name="other_amount" value="Other..." style="margin-top:5px;" size="6" onfocus="$('#suggested_amount_other').attr('checked', 'checked'); if (this.value == 'Other...') { this.value = ''; }" onblur="if (jQuery.trim(this.value) == '') { this.value = 'Other...'; } else { updateTotalPaypalBill(); <?php echo $this->project->allowPercentageFee == 'mandatory' ? "$('#transfeemandatory').show();" : "$('#transfee').show();"; ?> }"><br><br>
+                        </div>
+                        <?php if($this->project->allowPercentageFee == 'mandatory') { ?>
+                        <h2>Transaction Fees</h2>
+                        <input type="hidden" name="coverTransFee" value="1" />
+                        <input type="hidden" name="allowPercentageFee" value="mandatory" />
+                        <input type="hidden" name="PercentageFee" value="<?php echo $this->project->percentageFee ?>" />
+                        <p style="padding-bottom:0px">
+                            <?php if($this->project->paypalId == 211) { ?>
+                            Thank you for contributing an extra <?=($this->project->percentageFee + 1.5) ?>% to cover credit card and transaction costs so our communities receive the full benefit of your donation.<br />
+                            <?php } else { ?>
+                            Thank you for contributing <?=($this->project->percentageFee + 1.5) ?>% of your donation to cover the online credit card and transaction fees; this ensures 100% of your donation goes to its purpose.
+                            <?php } ?>
+                        </p>
+
+                        <span id="transfeemandatory" style="font-weight: bold; display: none"><br>An additional amount of <?php echo $this->project->currency ?><span id="trans-fee"></span> will be added to your total donation to cover online transaction costs and ensure 100% of your donation is received.</span><br>
+                        <div class="clear"></div>
+                        <?php } else if($this->project->allowPercentageFee == 'optional') {  ?>
+                        <h2>Transaction Fees</h2>
+                        <input type="hidden" name="allowPercentageFee" value="optional" />
+                        <input type="hidden" name="PercentageFee" value="<?php echo $this->project->percentageFee ?>" />
+                        <p style="padding-bottom:0px">
+                            <?php if($this->project->paypalId == 211) { ?>
+                            Would you help us by contributing an extra <?=($this->project->percentageFee + 1.5) ?>% to cover credit card and transaction costs so our communities receive the full benefit of your donation?<br />
+                            <?php } else { ?>
+                            Thank you for contributing an extra <?=($this->project->percentageFee + 1.5) ?>% to cover any credit card and transaction costs, so 100% of your donation can go towards its purpose.<br />
+                            <?php } ?>
+                            <span><input type="radio" id="coverTransFee1" name="coverTransFee" value="1" checked /> Yes</span>
+                            <span style="margin-left: 15px"><input type="radio" id="coverTransFee2" name="coverTransFee" value="0" /> No</span>
+                            <div style="display:none;" id="feebox" class="errorBox" style="">Please reconsider making this extra contribution. These small amounts compounded over all supporters can make up nearly half of our total administrative budget. These savings help fund our supplemental community projects voted on by the Campus Chairpeople. To learn more about how Global Brigades budgets, please contact admin@globalbrigades.org. Regardless of this extra contribution, we certainly appreciate your support!</div>
+                            <span id="transfee" style="font-weight: bold; display: none"><br >By selecting yes, an additional amount of <?php echo $this->project->currency ?><span id="trans-fee"></span> will be added to your total donation to cover online transaction costs and ensure 100% of your donation is received.</span>
+                            <div class="clear"></div>
+                        </p>
+                        <?php } ?>
+                        <?php if (0) { //$this->data['isRecurring'] == 'Yes') {} ?>
+                            <h2>Frequency</h2>
+                            <input type="radio" name="isRecurring" value="No" style="margin-bottom:5px;" checked onclick="$('#recurringDonationFields').hide()">&nbsp;I want to make a one-time donation<br>
+                            <input type="radio" name="isRecurring" value="Yes" onclick="$('#recurringDonationFields').show()">&nbsp;I want to make a recurring donation
+                        <?php } ?>
+                        <ul style="list-style:none">
+                        <li style="width:100%; display:block; line-height:30px; margin-top:15px;">
+                            <!--
+                            <p style="padding-bottom:0px">Please enter the amount you wish to donate:</p>
+                            <p style="padding-bottom:0px"><strong><?php echo $this->project->currency ?></strong>
+                            <input id="donationAmount" name="donationAmount" onfocus="this.style.color='black'; this.value='';" size="11" style="color:grey;" type="text" value="Enter Amount"/></p>
+                            -->
+                            <div id="recurringDonationFields" style="display:none;">
+                                <p style="padding-bottom:0px">How often would you like this donation made?</p>
+                                <p style="padding-bottom:0px">
+                                    <select name="recurrence_period" id="recurrence_period">
+                                    <option value="WEEKLY">Weekly</option>
+                                    <option value="BIWEEKLY">Bi-Weekly</option>
+                                    <option value="MONTHLY">Monthly</option></select>
+                                    for
+                                    <select name="recurrence_ends" id="recurrence_ends">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option></select>
+                                    Months</p>
+                            </div>
+                            <p style="padding-bottom:0px">Please provide your name:</p>
+                            <p><input type="text" name="DonorsName" id="DonorsName" class="anonymousToggle" value="<?php echo isset($this->donorsName) ? stripslashes($this->donorsName) : ''; ?>" />
+                                <input type="checkbox" id="isAnonymous" name="isAnonymous" />&nbsp;Make my donation anonymous</p>
+                        </li>
+                        <li style="width:100%; display:block;">
+                            <h2>Comment</h2>
+                            <p>Leave a comment<br />Your message will be displayed on the volunteer's & group's pages</p>
+                            <textarea name="DonationComments" rows="3" cols="70" id="DonationComments"></textarea><br><br>
+                        </li>
+                        <input id="embeddedPaypal" name="embeddedPaypal" type="image" src="/public/images/paypaldonate.jpg" />
+                    </form>
+                    <script type="text/javascript" charset="utf-8">
+                        var embeddedPPFlow = new PAYPAL.apps.DGFlow({trigger: 'embeddedPaypal'});
+                        function get_full_url(url_path)
+                        {
+                            var loc = window.location;
+                            var url = '' + loc.protocol + '//' + loc.host + url_path;
+                            return url;
+                        }
+
+                        function MyEmbeddedFlow(embeddedFlow) {
+                              this.embeddedPPObj = embeddedFlow;
+                              this.paymentSuccess = function () {
+                                   this.embeddedPPObj.closeFlow();
+                                   window.location.href = get_full_url('/donation/thankyou');
+                              };
+                              this.paymentCanceled = function () {
+                                   this.embeddedPPObj.closeFlow();
+                                   window.location.href = get_full_url('/donation/cancelpayment?ProjectId=' + '<?php echo $this->project->id ?>');
+                              };
+
+                        }
+
+                        var myEmbeddedPaymentFlow = new MyEmbeddedFlow(embeddedPPFlow);
+                    </script>
+
+                <?php } else { ?>
+
+                <form action="/fundraisingcampaign/newdonation" id="BB_BuyButtonForm" method="post" name="BB_BuyButtonForm" onSubmit="return validateForm();">
+                    <?php if (!$this->error) { ?>
+                    <input type="hidden" id="PercentageFee" name="PercentageFee" value="<?php echo $this->project->percentageFee ?>" />
+                    <h2>Amount</h2>
+                    <div id="suggested-donations">
+                        <?php foreach($this->suggested_donations as $suggested_amount) { ?>
+                        <input style="margin-bottom:5px;" type="radio" id="suggested_amount_<?php echo $suggested_amount['SuggestedDonationId'] ?>" name="suggested_amount" value="<?php echo number_format($suggested_amount['Amount']) ?>" onclick="updateTotalBill(); <?php echo $this->project->allowPercentageFee == 'mandatory' ? "$('#transfeemandatory').show();" : "$('#transfee').show();"; ?>">&nbsp;<span style="margin-right:10px;">$<?php echo number_format($suggested_amount['Amount']) ?></span><?php echo $suggested_amount['Description'] ?><br>
+                        <?php } ?>
+                        <span style="margin-right:23px;"><input style="margin-bottom:5px;" type="radio" id="suggested_amount_other" name="suggested_amount" value="Other Amount" <?php echo count($this->suggested_donations) == 0 ? 'checked' : ''; ?>>&nbsp;$</span>
+                        <input type="text" id="other_amount" name="other_amount" value="Other..." style="margin-top:5px;" size="6" onfocus="$('#suggested_amount_other').attr('checked', 'checked'); if (this.value == 'Other...') { this.value = ''; }" onblur="if (jQuery.trim(this.value) == '') { this.value = 'Other...'; } else { updateTotalBill(); <?php echo $this->project->allowPercentageFee == 'mandatory' ? "$('#transfeemandatory').show();" : "$('#transfee').show();"; ?> }"><br><br>
+                    </div>
+                    <?php if($this->project->allowPercentageFee == 'mandatory' && $this->project->percentageFee > 0) { ?>
+                    <h2>Transaction Fees</h2>
+                    <input type="hidden" name="coverTransFee" value="1" />
+                    <input type="hidden" name="allowPercentageFee" value="mandatory" />
+                    <input type="hidden" name="PercentageFee" value="<?php echo $this->project->percentageFee ?>" />
+                    <p style="padding-bottom:0px">
+                            <?php if($this->project->googleId == 1 || $this->project->googleId == 2) { ?>
+                            Thank you for contributing an extra <?=$this->project->percentageFee?>% to cover credit card and transaction costs so our communities receive the full benefit of your donation.<br />
+                            <?php } else { ?>
+                            Thank you for contributing <?=$this->project->percentageFee ?>% of your donation to cover the online credit card and transaction fees; this ensures 100% of your donation goes to its purpose.<br />
+                            <?php } ?>
+                        </p>
+                    </p>
+                    <span id="transfeemandatory" style="font-weight: bold; display: none"><br>An additional amount of <?php echo $this->project->currency ?><span id="trans-fee"></span> will be added to your total donation to cover online transaction costs and ensure 100% of your donation is received.</span><br><br>
+                    <div class="clear"></div>
+                    <?php } else if($this->project->allowPercentageFee == 'optional' && $this->project->percentageFee > 0) {  ?>
+                    <h2>Transaction Fees</h2>
+                    <input type="hidden" name="allowPercentageFee" value="optional" />
+                    <input type="hidden" name="PercentageFee" value="<?php echo $this->project->percentageFee ?>" />
+                    <p style="padding-bottom:0px">
+                        <?php if($this->project->googleId == 1 || $this->project->googleId == 2) { ?>
+                        Would you help us by contributing an extra <?=$this->project->percentageFee?>% to cover credit card and transaction costs so our communities receive the full benefit of your donation?<br />
+                        <?php } else { ?>
+                        Thank you for contributing an extra <?=$this->project->percentageFee?>% to cover any credit card and transaction costs, so 100% of your donation can go towards its purpose.<br />
+                        <?php } ?>
+                        <span><input type="radio" id="coverTransFee1" name="coverTransFee" value="1" checked /> Yes</span>
+                        <span style="margin-left: 15px"><input type="radio" id="coverTransFee2" name="coverTransFee" value="0" /> No</span>
+                        <div style="display:none;" id="feebox" class="errorBox" style="">Please reconsider making this extra contribution. These small amounts compounded over all supporters can make up nearly half of our total administrative budget. These savings help fund our supplemental community projects voted on by the Campus Chairpeople. To learn more about how Global Brigades budgets, please contact admin@globalbrigades.org. Regardless of this extra contribution, we certainly appreciate your support!</div>
+                        <span id="transfee" style="font-weight: bold; display: none"><br >By selecting yes, an additional amount of <?php echo $this->project->currency ?><span id="trans-fee"></span> will be added to your total donation to cover online transaction costs and ensure 100% of your donation is received.</span>
+                        <div class="clear"></div>
+                    </p>
+                    <?php } ?>
+                    <?php if ($this->project->isRecurring == 1) { ?>
+                    <h2>Frequency</h2>
+                    <input type="radio" name="isRecurring" value="No" style="margin-bottom:5px;" checked>&nbsp;I want to make a one-time donation<br>
+                    <input type="radio" name="isRecurring" value="Yes">&nbsp;I want to make a recurring donation&nbsp;&nbsp;&nbsp;
+                    <select name="recurrence_period">
+                        <option value="WEEKLY">Weekly</option>
+                        <option value="SEMI_MONTHLY">Semi-Monthly</option>
+                        <option value="MONTHLY">Monthly</option>
+                        <?php if ($this->project->organizationId != '7D428431-A7C7-4DF6-A667-F9207E14674E') { ?>
+                        <option value="EVERY_TWO_MONTHS">Every 2 Months</option>
+                        <option value="QUARTERLY">Quarterly</option>
+                        <?php } ?>
+                        <option value="YEARLY">Yearly</option>
+                    </select><br><br>
+                    <?php } ?>
+                    <h2>Comment</h2>
+                    <input type="hidden" id="ProjectId" name="ProjectId" value="<?php echo $this->project->id ?>" />
+                    <input type="hidden" id="VolunteerId" name="VolunteerId" value="<?php echo $this->UserId != '' ? $this->UserId : '' ?>" />
+                    <?php if ($this->project->paypalId > 0 && $this->project->googleId == 0 && !$this->error) { ?>
+                    <input name="item_description" type="hidden" value="A receipt will be emailed to you after processing your donation to <?php echo !empty($this->project->organizationId) ? $this->project->organization->name : $this->project->name ?>. Please address any concerns to <?php if($this->project->googleId == "3") { echo "sfpgrants@serviceforpeace.org"; } else if($this->project->googleId == "4") { echo "volunteer@amizade.org"; } else if($this->project->googleId == "5") { echo "trips@volunteerhonduras.org"; } else { echo "accounting@globalbrigades.org"; } ?>"/>
+                    <?php } else if ($this->project->googleId > 0 && $this->project->paypalId == 0 && !$this->error) { ?>
+                    <input id="item_name_1" name="item_name_1" type="hidden" value="Your donation is being processed"/>
+                    <input name="item_description_1" type="hidden" value="A receipt will be emailed to you after processing your donation to <?php echo !empty($this->project->organizationId) ? $this->project->organization->name : $this->project->name ?>. Please address any concerns to <?php if($this->project->googleId == "3") { echo "sfpgrants@serviceforpeace.org"; } else if($this->project->googleId == "4") { echo "volunteer@amizade.org"; } else if($this->project->googleId == "5") { echo "trips@volunteerhonduras.org"; } else { echo "accounting@globalbrigades.org"; } ?>"/>
+                    <input name="item_quantity_1" type="hidden" value="1"/>
+                    <input name="item_currency_1" type="hidden" value="USD"/>
+                    <input name="item_is_modifiable_1" type="hidden" value="true"/>
+                    <input name="item_min_price_1" type="hidden" value="0.01"/>
+                    <input name="item_max_price_1" type="hidden" value="25000.0"/>
+                    <input id="item_price_1" name="item_price_1" value="" type="hidden" />
+                    <input name="_charset_" type="hidden" value="utf-8"/>
+                    <?php } ?>
+                    <p>Leave a comment, your message will be displayed on the fundraising/group page</p>
+                    <textarea name="DonationComments" rows="3" cols="70" id="DonationComments"></textarea><br />
+                    <p><input type="checkbox" id="isAnonymous" name="isAnonymous">&nbsp;Make donation anonymous</p><br>
+                    <?php if ($this->project->paypalId && $this->project->googleId == 0 && !$this->error) { ?>
+                    <style>
+                        #direct-payment ul li input {
+                            width:237px;
+                        }
+                    </style>
+                    <ul style="list-style:none">
+                        <li style="width:100%; display:block; line-height:30px;">
+                            <h2>Payment Options</h2>
+                        </li>
+                        <li style="width:100%; display:block; line-height:30px;">
+                            <input type="radio" id="paypal_option" name="payment-option" value="Express Checkout" onClick="displayPayment(this.value)" style="float:left;">
+                            <img src="https://www.paypal.com/en_US/i/logo/PayPal_mark_37x23.gif" align="left" style="margin-right:7px; margin-left:3px" alt="">
+                            <span style="font-size:11px; font-family: Arial, Verdana;">The safer, easier way to pay.</span>
+                        </li>
+                        <li style="width:100%; display:block; line-height:30px;">
+                            <input type="radio" id="direct_option" name="payment-option" value="Direct Payment" onClick="displayPayment(this.value)" style="float:left; margin-top:7px">
+                            <img src="/public/images/credit_cards.gif" align="left" height="29px" alt="">
+                        </li>
+                    </ul><br />
+                    <div id="direct-payment" style="display:none">
+                        <ul style="list-style:none; padding:4px 0px">
+                            <li style="padding:4px 0px">
+                                <strong style="font-size:14px">Card Details</strong>
+                            </li>
+                            <li style="padding:4px 0px">
+                                <div class="txt01">First Name:</div>
+                                <input type="text" size="30" maxlength="32" id="firstName" name="firstName" value="" />
+                            </li>
+                            <li style="padding:4px 0px">
+                                <div class="txt01">Last Name:</div>
+                                <input type="text" size="30" maxlength="32" id="lastName" name="lastName" value="" />
+                            </li>
+                            <li style="padding:4px 0px">
+                                <div class="txt01">Card Type:</div>
+                                <span class="select-type">
+                                    <select name="creditCardType" style="width:240px" onChange="javascript:generateCC(); return false;">
+                                        <option value="Visa" selected>Visa</option>
+                                        <option value="MasterCard">MasterCard</option>
+                                        <option value="Discover">Discover</option>
+                                        <option value="Amex">American Express</option>
+                                    </select>
+                                </span>
+                            </li>
+                            <li style="padding:4px 0px">
+                                <div class="txt01">Card Number:</div>
+                                <input type="text" size="19" maxlength="19" id="creditCardNumber" name="creditCardNumber" value="" />
+                            </li>
+                            <li style="padding:4px 0px">
+                                <div class="txt01">Expiration Date:</div>
+                                <span class="border-only" >
+                                    <select id="expDateMonth" name="expDateMonth" >
+                                        <?php
+                                        for($i = 1; $i <= 12; $i ++ ) {
+                                            $ii = $i < 10 ? "0$i" : $i; //add 0
+                                            echo '<option value="'.$i.'">'.$ii.'</option>';
+                                        }
+                                        ?>
+                                    </select>
+                                    <select id="expDateYear" name="expDateYear">
+                                        <?php
+                                        $this_year = date("Y");
+                                        for($i = $this_year; $i < $this_year + 10; $i ++ ) {
+                                            echo '<option value="'.$i.'">'.$i.'</option>';
+                                        }
+                                        ?>
+                                    </select>
+                                </span>
+                            </li>
+                            <li style="padding:4px 0px">
+                                <div class="txt01">CVV2: </div>
+                                <input type="text" size="11" maxlength="4" id="cvv2Number" name="cvv2Number" value="" style="width:95px" />&nbsp;
+                                <a class="tooltip" style="font-weight:bolder" href="javascript:;" Name="For MasterCard or Visa, it's the last three digits in the signature area on teh back of your card. For American Express, it's the four digits on the fron of the card">?</a>
+                            </li>
+                            <li style="padding:4px 0px">
+                                <strong style="font-size:14px">Billing Address</strong>
+                            </li>
+                            <li style="padding:4px 0px">
+                                <div class="txt01">Address:</div>
+                                <input type="text" size="30" id="address" name="address" value="" />
+                            </li>
+                            <li style="padding:4px 0px">
+                                <div class="txt01">City:</div>
+                                <input type="text" size="30" id="city" name="city" value="" />
+                            </li>
+                            <li style="padding:4px 0px">
+                                <div class="txt01">Country:</div>
+                                <select id="country" name="country" onchange="getStatelist(this.value)">
+                                <?php foreach ($this->country_list as $country) { ?>
+                                    <option value="<?php echo $country['countries_iso_code_2'] ?>"><?php echo $country['countryLong'] ?></option>
+                                <?php } ?>
+                                </select>
+                            </li>
+                            <li style="padding:4px 0px">
+                                <div class="txt01">State:</div>
+                                <div id="statelist"><input type="text" size="30" id="state" name="state" value="" /></div>
+                            </li>
+                            <li style="padding:4px 0px">
+                                <div class="txt01">Zip Code:</div>
+                                <input type="text" size="10" maxlength="5" id="zipcode" name="zipcode" value="" style="width:95px" />
+                            </li>
+                            <li style="padding:4px 0px">
+                                <div class="txt01">Email:</div>
+                                <input type="text" id="email" name="email" value="" /><br>
+                                <span style="font-size:11px; color:#AAA;"><i>(Your receipt will be emailed to you at the email address supplied above)</i></span>
+                            </li>
+                        </ul>
+                    </div>
+                    <br />
+                    <input type="submit" value="Submit" class="btn btngreen" />
+                    <?php } else { ?>
+                    <div style="padding:10px;"><b>Attn: </b>You will need a Google account to successfully make transactions via Google Wallet. If you already have a Gmail account, you can use this email address and password when checking out. Otherwise, you'll need to create a username and password for Google that you will use each time you make transactions. Click here for a short tutorial.</div>
+                    <?php if($this->project->googleId == "1") { ?>
+                        <div style="padding:10px; color:#F00;">Please note! Donations made via Google Wallet will show up on your credit card statement as: Google*GlobalBrigades.</div><br />
+                    <?php } ?>
+                    <div class="box14">
+                        <div id="loadingStatus" class="hide">Loading please wait ...</div>
+                        <input alt="Donate" src="https://sandbox.google.com/checkout/buttons/donateNow.gif?merchant_id=<?php echo $this->merchant_id ?>&amp;w=115&amp;h=50&amp;style=white&amp;variant=text&amp;loc=en_US" type="image" id="btnSubmit"/>
+                        <?php if ($this->isAdmin && ($this->isNetworkAdmin || $this->isGlobAdmin)) { ?>
+                        <input type="button" id="ManualEntry" name="ManualEntry" value="Manual Entry" style="vertical-align:top; margin-top:5px; margin-left:15px;" onclick="return manualEntry()">
+                        <?php } ?>
+                    </div>
+                    <span style="color:#F00;"><br />
+                        <?php if(isset($this->project->organization->nonProfitId)) { echo $this->project->group->organization->name; ?>
+                            is a registered Non-Profit Organization (ID:
+                        <?php echo $this->project->group->organization->nonProfitId.')'; } ?>
+                    </span>
+                    <?php if($this->project->googleId == "1") { ?>
+                    <p><a href="/donation/refund" target="_blank">Refund Policy</a></p>
+                    <?php } else {
+                        ;
+                    } ?>
+                    <?php } ?>
+                <?php } ?>
+                    <br>
+                </form>
+                <?php } ?>
+                <div class="clear"></div>
+            </div>
+            </div>
+        </div>
+    <div class="clr"></div>
+    <div class="clr"></div>
+</div>

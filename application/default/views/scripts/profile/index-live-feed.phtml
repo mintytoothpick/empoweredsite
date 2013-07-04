@@ -1,0 +1,70 @@
+<? if (!isset($this->ajaxCall)) { ?>
+<script>
+var wall      = false;
+var wallConf  = {
+    width: 630,
+    height:500,
+    autoDimensions: false,
+    autoScale: false,
+    centerOnScroll: true,
+    showNavArrows: false
+};
+$(function() {
+    $("a.live-feed").click(function() {
+        if (!wall) {
+            $.ajax({
+                url: $(this).attr('href'),
+                success: function(data) {
+                    wall = '<h1>Live Feed</h1><div class="cr"></div><br />' + data;
+                    $.fancybox(wall, wallConf);
+                }
+            });
+        } else {
+            $.fancybox(wall, wallConf);
+        }
+
+        return false;
+    });
+});
+</script>
+
+
+<div class="box006 NoMarginLT">
+    <div class="rightMainBox BG01">
+    <div class="box004">
+        <div class="headingStyle02 box006Heading"><a href="/<?=$this->user->urlName?>/live-feed" class="live-feed">See More</a>Live Feed</div>
+
+<? } ?>
+     <?php if(!is_null($this->activityFeed)) { ?>
+        <?php foreach($this->activityFeed as $activity) { ?>
+        <p class="box006Style01 Text16">
+        <?php if($activity->type == 'Joined Brigade' && $activity->entity) { ?>
+            <strong><?=stripslashes($activity->user->fullName) ?></strong> joined <strong><?=stripslashes($activity->entity->name)?></strong><br />
+        <?php } else if($activity->type == 'User Donation') { ?>
+            <img src="/public/images/dollar.png" width="35" height="35" alt=" " /> <?=stripslashes($activity->user->fullName) ?> donated <?=$activity->entity->currency?><?=$activity->details?> to <?=($activity->recipient && isset($activity->recipient->fullName)) ? stripslashes($activity->recipient->fullName) : stripslashes($activity->entity->name) ?>
+        <?php } else if($activity->type == 'Guest Donation') { ?>
+          <? if ($activity->createdById == 'Anonymous') { ?>
+            <img src="/public/images/dollar.png" width="35" height="35" alt=" " /> Guest User donated <?=$activity->entity->currency?><?=$activity->details?> to <?=stripslashes($this->user->firstName) ?>
+          <? } else {
+            if (trim($activity->createdById) == '') $activity->createdById = 'Guest User';
+          ?>
+            <img src="/public/images/dollar.png" width="35" height="35" alt=" " /> <?=$activity->createdById?> donated <?=$activity->entity->currency?><?=$activity->details?> to <?=stripslashes($this->user->firstName) ?>
+          <? } ?>
+        <?php } else if($activity->type == 'Uploads' && $activity->entity) { ?>
+            <strong><?=stripslashes($activity->user->fullName) ?></strong> uploaded a photo to <?=stripslashes($activity->entity->name)?>
+        <?php } else if($activity->type == 'User Joined') { ?>
+            <strong><?=stripslashes($activity->user->fullName) ?></strong> joined Empowered.org
+        <?php } else if($activity->type == 'Profile Updated') { ?>
+            <strong><?=stripslashes($activity->user->fullName) ?></strong> updated <?=$activity->user->gender == 1 ? 'his' : ($activity->user->gender == 2 ? 'her' : 'his or her'); ?> profile information
+        <?php } ?>
+        <span class="watermark"><?=$this->dateHelper($activity->date)?></span>
+        </p><br />
+        <?php } ?>
+     <?php } else { ?>
+        <p class="box006Style01 Text16">Empty live feeds.</p><br />
+     <?php } ?>
+<? if (!isset($this->ajaxCall)) { ?>
+    </div>
+    </div>
+</div>
+<? } ?>

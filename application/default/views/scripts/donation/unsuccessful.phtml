@@ -1,0 +1,44 @@
+<?php $this->headTitle("Empowered.org - Your donation was unsuccesful"); ?>
+<script type="text/javascript" src="https://www.paypalobjects.com/js/external/dg.js"></script>
+
+<script type="text/javascript" charset="utf-8">
+    function handleEmbeddedFlow() {
+        if (top && top.opener && top.opener.top) {
+            top.opener.top.myEmbeddedPaymentFlow.paymentCanceled();
+            window.close();
+        } else if (top.myEmbeddedPaymentFlow) {
+            top.myEmbeddedPaymentFlow.paymentCanceled();
+	    window.close();
+        } else {
+            alert('Please close the window and reload to continue');
+        }
+    })
+</script>
+
+<div id="mainco2" onLoad='setTimeout(handleEmbeddedFlow(), 200);'>
+    <!-- block001 -->
+    <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+    <div class="block001">
+        <div class="blst001">
+            <div class="blst002 hsp">
+                <h2>Unsuccessful Donation</h2>
+                <p><span style="font-size:15px">Sorry! Your donation was unsuccessful due to either a technical issue or a cancellation.<br /><br /></span>
+		    How can we help you proceed?<br></p>
+		    <?php if(isset($this->project->name)) { ?>
+		    Try again: <a href="/fundraisingcampaign/donate/<?php echo $this->project->id ?>">return to donation page</a><br /><br />
+		    <?php } else { ?>
+		    Try again: <a href="/donation/<?php echo $this->project->id ?>">return to doantion page</a><br /><br />
+		    <?php } ?>
+		    Support another group: <a href="/group/find">find groups</a><br /><br />
+		    <?php if(isset($_SESSION['UserId'])) { ?>
+		    Return home: <a href="/<?=$this->userNew->urlName?>">view dashboard</a>
+		    <?php } else { ?>
+		    Return home: <a href="/">Empowered.org</a>
+		    <?php } ?>
+                <div class="clear"></div>
+            </div>
+        </div>
+    </div>
+    <div class="block001f01"><div class="blst001"><div class="blst002"></div></div></div>
+    <!-- e o block001 -->
+</div>

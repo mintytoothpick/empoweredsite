@@ -1,0 +1,310 @@
+<?php $this->headTitle("Empowered.org - Survey");
+if ($this->level == "group") {
+    $site_media = $this->sitemedia->getSiteMediaBySiteId($this->data['GroupId']);
+    $contactinfo = $this->contactinfo->getContactInfo($this->data['GroupId'], 'All');
+    if (!empty($this->data['BannerMediaId'])) {
+        $group_banner = $this->sitemedia->getSiteMediaById($this->data['BannerMediaId']);
+    }
+	if(isset($_REQUEST['Prev']) && $_REQUEST['Prev'] == 'members') {
+		$this->placeholder('currenttab')->set('members');
+	}
+} else if ($this->level == "organization") {
+    $site_media = $this->sitemedia->getSiteMediaBySiteId($this->network['NetworkId']);
+    $contactinfo = $this->contactinfo->getContactInfo($this->network['NetworkId'], 'All');
+	$this->placeholder('currenttab')->set('orgmembers');
+}
+?>
+<script type="text/javascript" language="javascript">
+    $(function() {
+        $('.surveys').bind('click', function() {
+            var id = $(this).attr('id').replace('SurveyId-', '');
+            $('.survey-info').each(function() {
+                $(this).hide();
+            })
+            $('.survey-form').each(function() {
+                $(this).hide();
+            })
+            $('#survey-'+id).show();
+        })
+    })
+
+    function deleteSurvey(id) {
+        if (confirm("Are you sure you want to delete the selected survey?") == true) {
+            $.post('/survey/delete', {SurveyId: id});
+            alert('Survey has been successfully deleted.');
+            window.location.reload(true);
+        }
+        else {
+            return false;
+        }
+    }
+
+    function updateSurvey(id) {
+        $.post('/survey/edit', $('#update-form-'+id).serialize(), function(data) {
+            alert(data);
+            window.location.reload(true);
+        });
+
+        return false;
+    }
+
+    function addQuestion(div) {
+        var counter = 0;
+        $(div+' tr td textarea').each(function() {
+            counter++;
+        })
+        counter++;
+        var new_question = '<tr class="questions-'+counter+'"><td style="width:70px">Question '+counter+'</td><td style="width:400px"><textarea rows="2" cols="50" name="Questions['+counter+']"></textarea>&nbsp;&nbsp;<input type="checkbox" name="isRequired['+counter+']" value="1" />&nbsp;Required&nbsp;&nbsp;&nbsp;<a href="javascript:;" onclick="removeQuestion('+counter+')">Remove</a>';
+        $(div).append(new_question);
+    }
+    function removeQuestion(elem) {
+        if (elem > 0) {
+            $('.questions-'+elem).hide();
+            $('.questions-'+elem+' input[type=hidden]').val(1);
+        } else {
+            $('.questions'+elem).remove();
+        }
+    }
+</script>
+<style type="text/css">
+    .success { color:green }
+    .error { color:red }
+    .field-label { float:left; font-weight:bold; color:#000; width:90px; margin-bottom:20px;}
+    .field-input { float:left; width:670px; padding-bottom:10px; }
+    .field-input input { padding:1px; }
+    .hidden { display:none }
+    .leftCol {
+        float:left;
+        width:320px;
+        padding-right:15px;
+        line-height:22px;
+        border-right:1px solid #e5e5e5;
+    }
+    .rightCol {
+        float:left;
+        width:320px;
+        padding-left:15px;
+        line-height:22px;
+    }
+    .label {
+        float:left;
+        width:80px;
+        margin-bottom:4px;
+        line-height:24px;
+    }
+    .field {
+        float:left;
+        width:600px;
+        margin-bottom:4px;
+        line-height:24px;
+    }
+    .input {
+        width:300px;
+    }
+    .actions {
+        margin:10px 0px;
+    }
+    .actions a {
+        margin:0 20px;
+    }
+</style>
+
+<div id="mainco2">
+    <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+    <div class="block001">
+        <div class="blst001">
+            <div class="blst002">
+                <div class="MainBody">
+                    <?php $is_image_exists = file_exists("/home/$this->envUsername/public_html/public/Media/full/".$site_media['SystemMediaName']); ?>
+                    <?php if($is_image_exists && trim($site_media['SystemMediaName']) != '' && !isset($group_banner)) { ?>
+                    <div class="logo2"><img src="<?php echo $this->contentLocation ?>public/Media/full/<?php echo $site_media['SystemMediaName'] ?>" style="width:141px;height:70px; border-width:0px;" /></div>
+                    <?php } else if (isset($group_banner)) { ?>
+                    <center><img src="/public/Photos/banner/<?php echo $group_banner['SystemMediaName'] ?>" style="max-height:100px; max-width:1045px;" /></center>
+                    <div class="clear"></div>
+                        <?php } ?>
+                    <div style="float:left; <?php echo $is_image_exists ? 'width:870px' : 'width:100%' ?>">
+                        <?php if (empty($this->data['BannerMediaId'])) { ?>
+                        <h1 style="font-size:27px; line-height:27px; float:left"><?php echo stripslashes(isset($this->data['GroupName']) ? $this->data['GroupName'] : $this->network['NetworkName']) ?></h1>
+                        <?php } ?>
+                        <div class="clear"></div>
+                    </div>
+                    <div id="TabbedPanels1" class="TabbedPanels">
+                        <?php if ($this->level == "group") {
+                            include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/groupheader.php';
+                        } else {
+                            include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/nonprofitheader.php';
+                        } ?>
+                        <div class="TabbedPanelsContentGroup">
+                            <div class="TabbedPanelsContent">
+                                <div id='whiteBox' class="whiteBox">
+        <a id="top" href="#top" style="text-decoration:none">&nbsp;</a>
+        <?php if ($this->level == "organization") { ?>
+        <input type="hidden" id="NetworkId" Title="NetworkId" value="<?php echo $this->data['NetworkId'] ?>" />
+        <?php } else { ?>
+        <input type="hidden" id="GroupId" Title="GroupId" value="<?php echo $this->data['GroupId'] ?>" />
+        <?php } ?>
+        <div style="width:700px; padding-right:5px; ">
+            <ul style="list-style:none; padding:0px; margin-bottom:0px; margin:auto; margin:auto">
+                <h1 style="margin-bottom:15px; font-size:28px; font-weight:bold; padding-bottom:10px;">Manage Surveys</h1>
+                <div id="message" class="error" style=" border:2px solid #e3e3e3; margin-bottom:15px; padding:5px; width:475px; <?php if(!$this->message) { echo "display:none;"; } ?>"><?php if(isset($this->message)) { echo $this->message; } ?></div>
+                <li class="field-input">
+                    <ul style="list-style:none; padding:7px; float:left; border:1px solid #e5e5e5; width:680px">
+                    <?php if (count($this->surveys)) { ?>
+                        <?php $ctr = 1; foreach($this->surveys as $survey) { ?>
+                        <li class="<?php echo $ctr%2==1 ? "leftCol" : "rightCol" ?>">
+                            <input class="surveys" type="radio" id="SurveyId-<?php echo $survey['SurveyId'] ?>" name="SurveyId" value="<?php echo $survey['SurveyId'] ?>" style="width:auto; line-height:14px;" />&nbsp;<?php echo strlen(stripslashes($survey['Title'])) > 40 ? substr(stripslashes($survey['Title']), 0, 37)."..." : stripslashes($survey['Title']) ?>
+                        </li>
+                        <?php $ctr++; } ?>
+                    <?php } else { ?>
+                        <li style="width:680px; padding:5px; font-weight:bold">There are no surveys yet, click <a href="/<?php echo $this->data['URLName'] ?>/create-survey<?php echo isset($_REQUEST['Prev']) ? '?Prev='.$_REQUEST['Prev'] : ''; ?>">here</a> to create a survey.</li>
+                    <?php } ?>
+                    </ul>
+                    <?php if (count($this->surveys)) { ?>
+                    <ul style="list-style:none; float:left; width:695px">
+                        <?php $ctr = 1; foreach($this->surveys as $survey) { ?>
+                        <li id="survey-<?php echo $survey['SurveyId'] ?>" class="hidden survey-info">
+                            <div class="actions">
+                                <a href="javascript:;" onclick="$('#survey-form-'+<?php echo $survey['SurveyId'] ?>).show()">Edit Survey</a>
+                                <?php if (count($survey['feedbacks'])) { ?>
+                                <a href="/survey/edit-responses/<?php echo $survey['SurveyId'] ?>">Edit Responses</a>
+                                <?php } ?>
+                                <?php if (count($survey['respondents']) > 0 || $survey['Type'] == 'Existing Members') { ?>
+                                <a href="/<?php echo $this->data['URLName'] ?>/email-survey/<?php echo $survey['SurveyId'] ?>">Email Survey</a>
+                                <?php } ?>
+                                <a href="/survey/pullreport/?SurveyId=<?php echo $survey['SurveyId'] ?>">Pull Report</a>
+                                <a href="javascript:;" onclick="deleteSurvey(<?php echo $survey['SurveyId'] ?>)">Delete</a>
+                            </div>
+                            <div id="survey-form-<?php echo $survey['SurveyId'] ?>" class="hidden survey-form" style="float:left; margin:20px 0px 30px 20px; width:665px">
+                                <div style="color:#669933; font-size:20px; font-weight:bold; margin-bottom:5px;">Edit Survey</div>
+                                <form method="post" id="update-form-<?php echo $survey['SurveyId'] ?>" onsubmit="return updateSurvey(<?php echo $survey['SurveyId'] ?>)">
+                                    <input type="hidden" name="SurveyId" value="<?php echo $survey['SurveyId'] ?>" />
+                                    <table border="0" width="700px">
+                                        <tr>
+                                            <td style="width:70px">Survey Title</td>
+                                            <td style="width:400px">
+                                                <input type="text" class="input" name="SurveyTitle" value="<?php echo $survey['Title'] ?>" style="width:405px" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width:70px">Survey Type:</td>
+                                            <td style="width:400px">
+                                                <select name="Type">
+                                                    <option value="Existing Members" <?php echo $survey['Type'] == "Existing Members" ? "selected" : "" ?>>Existing members</option>
+                                                    <option value="Joining Activity" <?php echo $survey['Type'] == "Joining Activity" ? "selected" : "" ?>>People joining a Volunteer Activity</option>
+                                                    <option value="Joining Group" <?php echo $survey['Type'] == "Joining Group" ? "selected" : "" ?>>People joining the chapter</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                                <table border="0" width="100%" id="questions-<?php echo $survey['SurveyId'] ?>">
+                                                    <?php
+                                                    if (count($survey['questions'])) {
+                                                        $ctr = 1;
+                                                        foreach ($survey['questions'] as $question) {
+                                                    ?>
+                                                        <tr class="questions-<?php echo $question['SurveyQuestionId'] ?>">
+                                                            <td style="width:70px">Question <?php echo $ctr ?></td>
+                                                            <td style="width:400px">
+                                                                <input type="hidden" name="isDeleted[<?php echo $question['SurveyQuestionId'] ?>]" value="0" />
+                                                                <textarea rows="2" cols="50" name="Questions[<?php echo $question['SurveyQuestionId'] ?>]"><?php echo stripslashes($question['Question']) ?></textarea>
+                                                                &nbsp;<input type="checkbox" id="" name="isRequired[<?php echo $question['SurveyQuestionId'] ?>]" value="1" <?php echo $question['isRequired'] == 1 ? "checked" : "" ?> />&nbsp;Required
+                                                                &nbsp;&nbsp;<a href="javascript:;" onclick="removeQuestion(<?php echo $question['SurveyQuestionId'] ?>)">Remove</a>
+                                                            </td>
+                                                        </tr>
+                                                    <?php $ctr++; } ?>
+                                                    <?php } ?>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width:70px">&nbsp;</td>
+                                            <td style="width:400px">
+                                                <a href="javascript:;" onclick="addQuestion('#questions-<?php echo $survey['SurveyId'] ?>')">Add Question</a>
+                                            </td>
+                                        </tr>
+                                        <tr style="margin-top:10px;">
+                                            <td style="width:70px">&nbsp;</td>
+                                            <td style="width:400px">
+                                                <input type="submit" value="Submit" class="btn btngreen" style="padding:2px 10px;" />
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </form>
+                            </div>
+                            <div style="float:left; width:695px">
+                                <table cellspacing="0" cellpadding="3" border="0" style="border:1px solid #E7E7FF; border-collapse:collapse; width:100%">
+                                    <tr style="color:#F7F7F7;background-color:#0a0a0a;font-weight:bold;height:25px;">
+                                        <th scope="col" align="left">&nbsp;&nbsp;Filled Survey</th>
+                                        <th scope="col">Email</th>
+                                    </tr>
+                                    <?php
+                                    if (count($survey['feedbacks'])) {
+                                        foreach ($survey['feedbacks'] as $feedback) {
+                                    ?>
+                                    <tr style="background-color:<?php echo $ctr%2 == 1 ? "#e7e7e9" : "white" ?>;">
+                                        <td style="width:160px;">
+                                            &nbsp;&nbsp;<?php echo stripslashes($feedback['FullName']) ?>
+                                        </td>
+                                        <td style="text-align:center" class="td">
+                                            &nbsp;<?php echo stripslashes($feedback['Email']) ?>
+                                        </td>
+                                    </tr>
+                                    <?php
+                                        }
+                                    } else { ?>
+                                    <tr>
+                                        <td colspan="2"> No records found.</td>
+                                    </tr>
+                                    <?php } ?>
+                                </table>
+                            </div>
+                            <div style="float:left; width:695px; margin-top:10px">
+                                <table cellspacing="0" cellpadding="3" border="0" style="border:1px solid #E7E7FF; border-collapse:collapse; width:100%">
+                                    <tr style="color:#F7F7F7;background-color:#0a0a0a;font-weight:bold;height:25px;">
+                                        <th scope="col" align="left">&nbsp;&nbsp;Didn't Filled Survey</th>
+                                        <th scope="col">Email</th>
+                                    </tr>
+                                    <?php
+                                    if (count($survey['respondents'])) {
+                                        foreach ($survey['respondents'] as $respondent) {
+                                    ?>
+                                    <tr style="background-color:<?php echo $ctr%2 == 1 ? "#e7e7e9" : "white" ?>;">
+                                        <td style="width:140px;">
+                                            &nbsp;&nbsp;<?php echo stripslashes($respondent['FullName']) ?>
+                                        </td>
+                                        <td style="text-align:center" class="td respondents-<?php echo $survey['SurveyId'] ?>">
+                                            &nbsp;&nbsp;<?php echo stripslashes($respondent['Email']) ?>
+                                        </td>
+                                    </tr>
+                                    <?php
+                                        }
+                                    } else { ?>
+                                    <tr>
+                                        <td colspan="2"> No records found.</td>
+                                    </tr>
+                                    <?php } ?>
+                                </table>
+                            </div>
+                        </li>
+                        <?php $ctr++; } ?>
+                    </ul>
+                    <?php } ?>
+                </li>
+                <li class="field-input" style="margin-top:20px;">
+                    <a class="btn btngreen" style="padding:2px 15px" href="/<?php echo $this->data['URLName'] ?>/<?php echo isset($_REQUEST['Prev']) && $_REQUEST['Prev'] == 'members' ? "members" : "volunteers" ?>">Back</a>
+                </li>
+            </ul>
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="block001f01"><div class="blst001"><div class="blst002"></div></div>

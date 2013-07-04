@@ -1,0 +1,104 @@
+<?php $this->headTitle("Empowered.org: Why We're Different"); ?>
+<script src="<?php echo $this->contentLocation ?>public/SpryAssets/SpryTabbedPanels.js" type="text/javascript" language="javascript"></script>
+<link href="/public/css/style2.css" type="text/css" rel="stylesheet">
+<link href="<?php echo $this->contentLocation ?>public/SpryAssets/SpryTabbedPanels.css" type="text/css" rel="stylesheet"></script>
+
+<style>
+    .TextBox { border: none; width: 740px }
+    #footermenu a, #copyrights { font-size: 11px }
+    #copyrights span { margin-top: -5px }
+</style>
+<script>
+		$('.TabbedPanelsContent').each(function() {
+            $(this).hide();
+        });
+		<?php if(isset($this->tab)) {
+			echo '#'.$this->tab ?> {
+				display:block;
+			}
+		<?php } ?>
+</script>
+<div class="container" style="margin-top: -10px">
+    <div class="MainBody">
+        <div class="MainBodyTop"></div>
+        <div class="MainBodyContents"> 
+            <div class="leftC" style="margin-right: 40px">
+				<?php echo $this->placeholder('left_tour_nav'); ?>
+            </div>
+            <div class="rightC"><span class="Heading01">Who We Help</span><span class="Heading02">Empowered.org is designed for</span>
+                <div class="TabBoxC">
+                    <div id="TabbedPanels1" class="TabbedPanels">
+                        <ul class="TabbedPanelsTabGroup">
+                            <li class="TabbedPanelsTab"><div><img src="<?php echo $this->contentLocation ?>public/images/NewDesign/trip02.png" width="73" height="74" alt=" " /></div>Service Trips</li>
+                            <li class="TabbedPanelsTab"><div><img src="<?php echo $this->contentLocation ?>public/images/NewDesign/community2.png" width="73" height="74" alt=" " /></div>Community</li>
+                            <li class="TabbedPanelsTab"><div><img src="<?php echo $this->contentLocation ?>public/images/NewDesign/run02.png" width="73" height="74" alt=" " /></div>Run - Walks</li>
+                            <li class="TabbedPanelsTab"><div><img src="<?php echo $this->contentLocation ?>public/images/NewDesign/group02.png" width="73" height="74" alt=" " /></div>Your Group</li>
+                            <li class="TabbedPanelsTab"><div><img src="<?php echo $this->contentLocation ?>public/images/NewDesign/chapters.png" width="73" height="74" alt=" " /></div>Your Chapters</li>
+                        </ul>
+                        <div class="TabbedPanelsContentGroup">
+                            <div class="TabbedPanelsContent">
+                                <div class="TabBox">
+                                    <div class="TabBoxContents" id="servicetrips"><span class="TabBoxHeading">International Service Trips</span>
+                                        <p>Whether you’re going abroad to build schools, improve health systems, or share culture, Empowered.org will help take your service trip to the  next level. As you’re globetrotting, we’ll be here to help you no matter where it is you call home:</p>
+                                        <ul class="TabStyle">
+                                            <li>Volunteer  Management: have your participants register online so you can keep tabs easier  and send them reminder notes as important milestones approach…don’t forget your  vaccinations!</li>
+                                            <li>Donor Management:  create and track participant fundraising goals, manage checks and credit card  donations, and customize thank you notes on behalf of your team… all from your  admin panel</li>
+                                            <li>Personalized  Approach: have your volunteers create their unique fundraising pages under your  group to garner support from their friends and family… the ever powerful  multiplier effect.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="TabbedPanelsContent" id="communityprojects">
+                                <div class="TabBox">
+                                    <div class="TabBoxContents"><span class="TabBoxHeading">Local Community Projects </span>
+                                        <p>Some groups act local before thinking global. We make  it FREE and easy for you to coordinate a canned-food drive, a beach clean-up, or  tree planting. We only assess a 1.5% charge for Paypal transactions and <strong>no charge</strong> for Google Checkout transactions when a donation is collected for the project; volunteer registrants are free and unlimited.</p>
+                                        <ul class="TabStyle">
+                                            <li>Volunteer  Management: our easy-to-use group admin page allows you to keep track of all  volunteers, run internal messaging, make events open or closed for registration  and tell your story</li>
+                                            <li>Fundraising: connect with supporters both in your area and around the world to get  donations. Keep tabs with sophisticated donor reports and send automatic  receipts to make life easy. 501c status is not required and Empowered.org is available to groups in 190  countries.</li>
+                                            <li>Quantify your impact: Customizable survey functions allow you to gather data from community  members prior to and after the project is completed. Then share charts and  pictures about your impact on your Empowered page.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="TabbedPanelsContent" id="runwalks">
+                                <div class="TabBox">
+                                    <div class="TabBoxContents"><span class="TabBoxHeading">Run Walks</span>
+                                        <p>You’d crawl, walk and run to raise support for a good  cause. So shouldn’t you belong to a platform that would do anything to help  you? We make sure anyone involved with a Run-Walk gets more then they need:</p>
+                                        <ul class="TabStyle">
+                                            <li>Unbeatable Rate  and Direct Processing: Empowered charges the industry-low for run/walk fundraising platforms (with just a 1.5% processing fee for Paypal transactions and no fee for Google Checkout transactions) and we&rsquo;re the only  platform that connects directly to your merchant account so you get money as it  is fundraised and not in lump monthly sums.</li>
+                                            <li>Live Customer  Support: 9am to 5pm PST M-F and live instant messaging via &ldquo;snap.&rdquo;</li>
+                                            <li>Volunteer and  Donor Management Tools beyond Your Expectation: Keep track of every walker and  their donors in 190 countries, with a full range of reporting features.  Integrated CRM, automated donor receipts, waiver collections/surveys,  customizable group and individual pages, all via the only platform that is  dynamic enough for you to illustrate the successes of past run/walks while promoting upcoming ones on the same platform!</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="TabbedPanelsContent" id="yourgroup">
+                                <div class="TabBox">
+                                    <div class="TabBoxContents"><span class="TabBoxHeading">Your Group</span>
+                                        <p>We are the platform that has the features that can  grow with a grass-roots organization. Customize your Group’s page to attract  donors and members and over time establish chapters while keeping them sorted  under your umbrella. Set up fundraising drives, volunteer activities, community  events that are all connected to your home page.</p>
+                                        <ul class="TabStyle">
+                                            <li>Go Viral: Have  your supporters create their own profile pages so they can exponentially expand  your message and solicit support with Facebook and twitter already integrated.</li>
+                                            <li>Second-to-none  Reporting Functionality: An easy and user-friendly admin panel lets you manage  your group members, keep track of donors and makes the book-keeping side of  your group stress-free</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="TabbedPanelsContent" id="chapters">
+                                <div class="TabBox">
+                                    <div class="TabBoxContents"><span class="TabBoxHeading">Your Organization </span>
+                                        <p>We define an  &ldquo;NGO&rdquo; as a large, multi-layered charity with many chapters, affiliates or sets  of volunteers that it can designate as a &ldquo;group.&rdquo; The NGO may have many  programs or initiatives in which it solicits support and mobilizes volunteers. Empowered.org is ideal for these umbrella organizations to monitor  hundreds of groups at a time, keeping track of every contribution across the  world over the course of time. </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="clr"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="clear" style="margin-bottom:5px;"></div>
+<script type="text/javascript">
+var TabbedPanels1 = new Spry.Widget.TabbedPanels("TabbedPanels1");
+</script>

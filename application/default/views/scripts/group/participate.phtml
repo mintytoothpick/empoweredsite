@@ -1,0 +1,155 @@
+<?php $this->headTitle("Empowered.org - ".$this->data['GroupName']); ?>
+<style>
+    ul.tabs {
+        margin: 0px 10px;
+        padding: 0;
+        float: left;
+        list-style: none;
+        height: 32px; /*--Set height of tabs--*/
+        border-bottom: 1px solid #999;
+        /* border-left: 1px solid #999; */
+        width: 98%;
+    }
+    ul.tabs li {
+        float: left;
+        margin: 0;
+        padding: 0;
+        height: 31px; /*--Subtract 1px from the height of the unordered list--*/
+        line-height: 31px; /*--Vertically aligns the text within the tab--*/
+        border: 1px solid #999;
+        margin-bottom: -1px; /*--Pull the list item down 1px--*/
+        overflow: hidden;
+        position: relative;
+        background: #e0e0e0;
+        margin-right:3px
+    }
+    ul.tabs li a {
+        text-decoration: none;
+        color: #000;
+        display: block;
+        font-size: 1.2em;
+        padding: 0 20px;
+        border: 1px solid #fff; /*--Gives the bevel look with a 1px white border inside the list item--*/
+        outline: none;
+    }
+    ul.tabs li a:hover {
+        background: #ccc;
+    }
+    html ul.tabs li.active, html ul.tabs li.active a:hover  { /*--Makes sure that the active tab does not listen to the hover properties--*/
+        background: #fff;
+        border-bottom: 1px solid #fff; /*--Makes the active tab look like it's connected with its content--*/
+    }
+    .tab_container {
+        /* border: 1px solid #999; */
+        border-top: none;
+        overflow: hidden;
+        clear: both;
+        float: left;
+        width: 98%;
+        background: #fff;
+        margin: 0px 10px;
+    }
+    .tab_content {
+        padding: 10px 0px;
+    }
+</style>
+<script>
+    $(document).ready(function() {
+        $("ul.tabs li a").click(function() {
+            var id = $(this).attr('href');
+            $("ul.tabs li").each(function() {
+                $(this).removeClass('active');
+            })
+            $('.tab_content').each(function() {
+                $(this).hide();
+            })
+            $(id+'-link').addClass('active');
+            $(id).show();
+        });
+    });
+</script>
+<div>
+    <div id="centred">
+        <!-- main col - 100% width -->
+        <div id="mainco2">
+            <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+            <div class="block001">
+                <div class="blst001">
+                    <div class="blst002 hsp">
+                        <h2 style="font-size:18px">Thank you for joining <?php echo $this->data['GroupName'] ?></h2>Would you like to also participate in any of the following activities or fundraising campaigns?<a href="/<?php echo $this->data['URLName'] ?>"> Skip</a></span>
+                        <br><br>
+                        <ul class="tabs">
+                            <li id="activities-link" class="active" style="margin-left:5px;"><a href="#activities">Upcoming Activities</a></li>
+                            <li id="campaigns-link" class=""><a href="#campaigns">Active Campaigns</a></li>
+                        </ul>
+                        <div class="tab_container">
+                            <div id="activities" class="tab_content">
+                            <?php
+                            if (count($this->brigades)) {
+                                foreach ($this->brigades as $brigade) { ?>
+                                <div style="padding:8px 0px; margin:0px 10px; border-bottom:solid 1px #CCCCCC; height:80px">
+                                    <div class="left_side" style="padding-left:10px; width:650px">
+                                        <div style="float:left">
+                                            <div style="margin-bottom:5px;">
+                                                <a style="font-weight:bold; margin-right:20px;" href="/<?php echo $brigade['pURLName'] ?>"><?php echo stripslashes($brigade['Name']) ?></a>
+                                                <a href="/signup?ProjectId=<?php echo $brigade['ProjectId'] ?>" class="btnsmall orange">VOLUNTEER</a>
+                                            </div>
+                                            <?php if ($brigade['StartDate'] == "0000-00-00 00:00:00" && $brigade['EndDate'] == "0000-00-00 00:00:00") { ?>
+                                            (NOTE: This is an ongoing Volunteer Activity)<br>
+                                            <?php } else { ?>
+                                            <?php echo (date("Y-m-d", strtotime($brigade['StartDate'])) <= date('Y-m-d') ? date("l", strtotime($brigade['StartDate']))." at ".date("g:ia", strtotime($brigade['StartDate'])) : date("F j", strtotime($brigade['StartDate']))." at ".date("g:ia", strtotime($brigade['StartDate']))).((!empty($brigade['EndDate']) && $brigade['EndDate'] != '0000-00-00 00:00:00') ? " - ".date("F j", strtotime($brigade['EndDate']))." at ".date("g:i a", strtotime($brigade['EndDate'])) : "") ?><br>
+                                            <?php } ?>
+                                            <?php echo $this->contactinfo->generateLocation($brigade['ProjectId']) ?><br>
+                                        </div>
+                                    </div>
+                                    <div class="right_side">
+                                        <span> Volunteers: <?php echo number_format($brigade['total_volunteers'])?></span><br>
+                                        <?php if ($brigade['isFundraising'] == 'Yes' || $brigade['isFundraising'] == 1) { ?>
+                                        <span> Donations: <?php echo $this->data['Currency'].number_format($this->donations->getProjectDonations($brigade['ProjectId']), 2)?></span>
+                                        <?php } ?>
+                                        <br><br><br><br>
+                                    </div>
+                                </div>
+                                <?php } ?>
+                            <?php } else { ?>
+                                <strong style="margin-left:10px; font-size:14px">There are no upcoming volunteer activities yet.</strong>
+                            <?php } ?>
+                            <br><br>
+                            </div>
+                            <div id="campaigns" class="tab_content" style="display:none">
+                            <?php if (count($this->campaigns) > 0) { ?>
+                                <?php foreach ($this->campaigns as $campaign) { $total_donation = 0; ?>
+                                <div style="padding:8px 0px; margin:0px 10px; border-bottom:solid 1px #CCCCCC; height:40px">
+                                    <div class="left_side" style="padding-left:10px; width:650px">
+                                        <div style="float:left">
+                                            <div style="margin-bottom:5px;">
+                                                <a style="font-weight:bold" href="/<?php echo $campaign['URLName'] ?>"><?php echo stripslashes($campaign['Title']) ?></a>
+                                                <a href="/fundraisingcampaign/join/<?php echo $campaign['FundraisingCampaignId'] ?>" class="btnsmall orange">FUNDRAISE</a>
+                                            </div>
+                                            Ends <?php echo date('M d, Y', strtotime($campaign['EndDate'])) ?><br>
+                                        </div>
+                                    </div>
+                                    <div class="right_side">
+                                        <span> Fundraisers: <?php echo number_format($campaign['total_fundraisers'])?></span><br>
+                                        <span> Donations: <?php echo $this->data['Currency'].number_format($campaign['total_donations'])?></span>
+                                    </div>
+                                </div>
+                                <?php } ?>
+                            <?php } else { ?>
+                                <strong style="margin-left:10px; font-size:14px">There are no active fundraising campaigns yet.</strong>
+                            <?php } ?>
+                                <br><br>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="block001f01"><div class="blst001"><div class="blst002"></div></div></div>
+            <!-- e o block001 -->
+        </div>
+        <!-- e o main col -->
+        <span id="ctl00_ContentPHMain_lblError"></span>
+        <div class="clear"></div>
+    </div>
+</div>
+

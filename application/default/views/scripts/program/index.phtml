@@ -1,0 +1,281 @@
+<script>
+function showDetails(id) {
+    $("#details-"+id).show();
+    $("#btnHide-"+id).show();
+    $("#btnShow-"+id).hide();
+}
+
+function hideDetails(id) {
+    $("#details-"+id).hide();
+    $("#btnHide-"+id).hide();
+    $("#btnShow-"+id).show();
+}
+
+function searchOrganization() {
+    var srch_txt = $('#search_text').val().toString();
+    srch_txt = srch_txt.replace(/'/g, '');
+    srch_txt = srch_txt.replace(/"/g, "");
+    if(srch_txt != '') {
+        window.location.href = "/<?=$this->organization->urlName?>/search?&search_text="+srch_txt;
+    } else {
+        alert('please enter your search criteria.');
+    }
+}
+
+<?if (!$this->is_member && $this->isLoggedIn) {?>
+function joinOrganization(NID, UID) {
+    $.post('/nonprofit/joinrequest', {NetworkId: NID, UserId: UID}, function(data) {
+        alert(data);
+        $('#join-org').hide();
+    });
+}
+<? } ?>
+
+<?php if($this->isAdmin) { ?>
+function updateInformation() {
+    if($('#editDescription').val() == '') {
+        alert("Please enter your organization's description");
+        return false;
+    } else if ($('#editEmail').val() == '' || !validateEmail($('#editEmail').val())) {
+        alert("Please enter your organization's contact email address");
+        return false;
+    } else {
+        if ($('#editStreet').val() == 'Street Address') {
+            $('#editStreet').val('');
+        }
+        if ($('#editWebsite').val() == 'Email Address') {
+            $('#editWebsite').val('');
+        }
+        if ($('#editWebsite').val() == 'Website') {
+            $('#editWebsite').val('');
+        }
+        if ($('#editPhone').val() == 'Phone #') {
+            $('#editPhone').val('');
+        }
+
+        $.post('/program/editinfo', $('#editDetails').serialize());
+
+        location.reload();
+    }
+}
+
+function deleteProgram(PID) {
+    if (confirm("Are you sure you want to delete the selected  <?=strtolower($this->organization->programNamingSingular)?>?") == true) {
+        $.post('/program/delete', {ProgramId: PID, redirect : 0}, function() {
+            alert("You have successfully deleted the selected program");
+            window.location.href = "<?php echo $this->program->organization->urlName ?>";
+        })
+    }
+}
+<?php } ?>
+
+</script>
+<div class="wrapper">
+
+  <!-- org header -->
+  <?=$this->placeholder('header') ?>
+  <!-- // org header -->
+
+    <div class="clr"></div>
+    <div class="BodyCon">
+
+    <!-- breadcrumb -->
+    <?=$this->placeholder('breadcrumb') ?>
+    <!-- // breadcrumb -->
+
+    <div class="clr"></div>
+
+    <!-- tabs -->
+    <?=$this->placeholder('tabs') ?>
+    <!-- // tabs -->
+
+  <div class="clr"></div>
+  <div class="mainC">
+    <?php $this->shareUrl = $_SERVER['HTTP_HOST'] .'/'. $this->program->urlName ?>
+    <?php $this->shareEmail = $this->program->name ?>
+    <?php echo $this->render('nonprofit/sociallinks.phtml'); ?>
+    <div class="spacer"></div>
+    <div class="leftC">
+      <?php if ($this->isAdmin) { ?>
+        <!-- tool box -->
+        <?=$this->placeholder('tool_box'); ?>
+        <!-- // tool box -->
+
+        <div class="spacer"></div>
+      <?php } ?>
+
+      <div class="box01 rounded">
+        <div class="textSTyle01"><?=$this->organization->currency.number_format($this->program->raised)?></div>
+        <div class="textSTyle02">Raised</div>
+      </div>
+
+      <div class="leftMainBox">
+
+        <form id="editDetails" method="post" enctype="multipart/form-data" onsubmit="return updateInformation();">
+        <div class="box02">
+          <div class="headingStyle01 rounded">About</div>
+          <div class="box02Content box02Editable">
+            <?php if (!empty($this->program->contact->website)) { ?>
+                <p><strong>Website</strong> <a class="anchorHiddenOverflow" href="<?=$this->program->contact->website?>" target="_blank"><span id="orgWebsite"><?=$this->program->contact->website?></span></a></p>
+            <? } ?>
+            <span id="programDescription"><?= stripslashes(nl2br($this->program->description)) ?></span></div>
+          <div class="box02HiddenInput">
+            <textarea class="box02Textarea" id="editDescription" name="Description"><?= stripslashes($this->program->description) ?></textarea>
+            <div class="spacer"></div>
+            Allow people to create chapters within this <?=strtolower($this->organization->programNamingSingular)?>?
+            <div class="spacer"></div>
+            <input type="radio" name="isOpen" value="1" style="margin:0 10px;" <?= $this->program->isOpen ? 'checked' : '' ?> />Yes
+            <input type="radio" name="isOpen" value="0" style="margin:0 10px;" <?= !$this->program->isOpen ? 'checked' : '' ?> />No<br /><br />
+            <input type="submit" value="Update" />
+          </div>
+        </div>
+        <div class="box02">
+          <div class="headingStyle01 rounded">Contact</div>
+          <div class="box02Content box02Editable">
+            <?php if (!empty($this->program->contact->email)) { ?><p><strong>Email</strong> <span id="orgEmail"><?=$this->program->contact->email?></span></p><? } ?>
+          </div>
+          <div class="box02HiddenInput">
+            <input class="box02Input" id="editWebsite" name="WebAddress" type="text" value="<?= !empty($this->program->contact->website) ? $this->program->contact->website : 'Website'; ?>" />
+            <input class="box02Input" id="editEmail" name="Email" type="text" value="<?= !empty($this->program->contact->email) ? $this->program->contact->email : 'Email Address'; ?>" />
+            <input type="hidden" id="ProgramId" name="ProgramId" value="<?=$this->program->id?>" />
+            <input type="hidden" id="ContactId" name="ContactId" value="<?=$this->program->contact->id?>" />
+            <input type="submit" value="Update" />
+          </div>
+        </div>
+        </form>
+
+      </div>
+    </div>
+
+    <div class="rightC">
+
+      <div class="rightMainBox">
+
+        <!-- Groups -->
+        <?php if ($this->program->countGroups && $this->program->organization->hasGroups) { ?>
+        <div class="box04">
+          <div class="headingStyle02 rounded"><?php if($this->program->countGroups) { ?><a href="<?=$this->program->showCoalitions ? '/coalition' : ''?>/<?=$this->program->urlName?>/chapters">See More</a><?php } ?><?=$this->organization->groupNamingPlural?> (<?= $this->program->countGroups ?>)</div>
+          <?php if ($this->program->isOpen) { ?>
+          <div class="startCBtn" style="margin:0 0 0 15px;"><a <?=($this->isLoggedIn)?'href="/'.$this->program->urlName.'/create-group"':'href="javascript:;" class="joinS"'?> >Start a <?=$this->organization->groupNamingSingular?></a></div>
+          <?php } else if ($this->isAdmin) { ?><a href="/<?=$this->program->urlName?>/create-group" class="adminLink">+ Create a new <?=strtolower($this->organization->groupNamingSingular)?></a><? } ?>
+          <div class="box04Content">
+            <?php if (count($this->groups) > 0) { ?>
+            <div class="clr"></div>
+            <?php foreach ($this->groups as $group) { ?>
+            <div class="programSearch">
+              <div class="memberCon"> <span class="member"><?=number_format(count($group->members))?> Members</span> <span class="city"><?= isset($group->contact->state) ? $group->contact->state->name : ''?></span></div>
+              <a href="/<?=$group->urlName?>" class="headignStyle03"><?=stripslashes($group->name)?></a><br />
+              <div class="clr"></div>
+              <div class="box04GroupDescription"><?=stripslashes($group->description)?></div>
+            </div>
+            <? } ?>
+            <? } ?>
+          </div>
+        </div>
+        <? } ?>
+        <!-- // Groups -->
+
+        <!-- Fundraising Campaign -->
+        <?php if (($this->program->countCampaigns || $this->isAdmin)  && $this->program->organization->hasCampaigns){ ?>
+        <div class="box04">
+          <div class="headingStyle02 rounded">
+            <?php if ($this->program->countCampaigns) { ?><a href="<?=$this->program->showCoalitions ? '/coalition' : ''?>/<?=$this->program->urlName?>/active-campaigns">See More</a><?php } ?>
+                Fundraising Campaigns (<?= $this->program->countCampaigns ?>)
+          </div>
+          <?php if ($this->isAdmin) { ?><?php if (!$this->program->countCampaigns) { ?>There are currently no campaigns. <?php } ?><a href="/<?=$this->program->urlName?>/create-fundraisingcampaign" class="adminLink">+ Create a new campaign</a><? } ?>
+          <div class="box04Content">
+            <?php if (count($this->campaigns) > 0) { ?>
+            <?php foreach ($this->campaigns as $campaign) { ?>
+            <div class="CampaignsCon">
+              <div class="dollar"></div>
+              <div class="CampaignsText"><a href="/<?=$campaign->urlName?>"><?= stripslashes($campaign->name) ?></a></div>
+              <div class="fundRaising"><?=number_format(count($campaign->volunteers))?><br />
+                <?=$this->organization->currency.number_format($campaign->raised) ?> </div>
+              <div class="donation01">Fundraisers
+              Donations</div>
+            </div>
+            <? } ?>
+            <? } ?>
+          </div>
+        </div>
+        <? } ?>
+        <!-- //Fundraising Campaign -->
+
+        <!-- Volunteer Activities -->
+        <?php if (($this->program->countActivities || $this->isAdmin) && $this->program->organization->hasActivities) { ?>
+        <div class="box04">
+          <div class="headingStyle02 rounded">
+              <?php if ($this->program->countActivities) { ?><a href="<?=$this->program->showCoalitions ? '/coalition' : ''?>/<?=$this->program->urlName?>/upcoming-activities">See More</a><?php } ?>
+                  Volunteer Activities (<?= $this->program->countActivities ?>)</div>
+          <?php if ($this->isAdmin) { ?><?php if (!$this->program->countActivities) { ?>There are currently no activities. <?php } ?><a href="/<?=$this->program->urlName?>/create-activity?Prev=home" class="adminLink">+ Create a new activity</a><? } ?>
+          <div class="box04Content">
+            <div class="clr"></div>
+            <?php if (count($this->activities) > 0) { ?>
+            <?php foreach ($this->activities as $activity) { ?>
+            <div class="dateCon">
+              <div class="month"><strong><span class="color01"><?= date('M', strtotime($activity->tartDate)); ?></span></strong><br />
+              <?= date('d', strtotime($activity->startDate)); ?></div>
+              <div class="dateConText"><a href="/<?=$activity->urlName?>"><?=stripslashes($activity->name) ?></a><br />
+              <?=date('m/d/Y g:i A', strtotime($activity->startDate)) ?> - <?=date('m/d/Y g:i A', strtotime($activity->endDate)) ?><br />
+              <?php // display location here instead --- echo stripslashes($activity['Description']) ?>
+              </div>
+            </div>
+            <? } ?>
+            <? } ?>
+          </div>
+        </div>
+        <? } ?>
+        <!-- //Volunteer Activities -->
+
+        <!-- Events -->
+        <?php if (0){//count($this->program->events)) { ?>
+        <div class="box04">
+          <div class="headingStyle02 rounded"><a href="<?=$this->program->showCoalitions ? '/coalition' : ''?>/<?=$this->program->urlName?>/upcoming-events">See More</a>Events (<?= number_format(count($this->program->events)) ?>)</div>
+          <?php if ($this->isAdmin) { ?><a href="/<?=$this->program->urlName?>/create-event?Prev=home" class="adminLink">+ Create a new event</a><? } ?>
+          <div class="box04Content">
+            <div class="clr"></div>
+            <?php foreach ($this->program->events as $event) { ?>
+            <div class="dateCon">
+              <div class="month"><strong><span class="color01"><?= date('M', strtotime($event->startDate)); ?></span></strong><br />
+              <?= date('d', strtotime($event->startDate)); ?></div>
+              <div class="dateConText"><a href="/<?=$this->organization->urlName?>/events?EventId=<?=$event->id?>" class="headignStyle03"><?=stripslashes($event->title) ?></a><br />
+              <?=date('m/d/Y g:i A', strtotime($event->startDate)) ?> - <?=date('m/d/Y g:i A', strtotime($event->endDate)) ?><br />
+              <?=stripslashes($event->link) ?>
+              </div>
+            </div>
+            <? $limit ++; if ($limit>2) break; ?>
+            <? } ?>
+          </div>
+        </div>
+        <? } ?>
+        <!-- //Events -->
+
+        <!-- Members -->
+        <?php if (0){//count($this->members)) { ?>
+        <? $limit = 1; ?>
+        <div class="box04">
+          <div class="headingStyle02 rounded"><a href="/<?=$this->data['URLName'] ?>/members">See More</a>Members (<?= number_format($this->members_count) ?>)</div>
+          <?php if ($this->isAdmin) { ?><a href="/<?= $this->data['URLName'] ?>/add-members" class="adminLink">+ Add Members</a><? } ?>
+          <div class="box04Content">
+            <div class="clr"></div>
+            <?php foreach ($this->members as $member) { ?>
+            <div class="memberCon01">
+              <div class="memberImg"><a href="/<?=$member['URLName'] ?>"><img src="/profile/loadimage/?UserId=<?= $member['UserId'] ?>" alt="" width="53px" height="53px" class="BorderStyle" /></a></div>
+              <div class="memberText">
+                <span class="headignStyle03"><?=stripslashes($member['FullName']) ?></span> Joined <span class="joinedDate"><?=date('F d, Y', strtotime($member['JoinedOn'])) ?></span><br />
+                  <p><?= $member['AboutMe'] ?></p>
+              </div>
+            </div>
+            <? $limit ++; if ($limit>2) break; ?>
+            <? } ?>
+          </div>
+        </div>
+        <? } ?>
+        <!-- //Members -->
+
+      </div>
+    </div>
+  </div>
+  <div class="clr"></div>
+  <div class="clr"></div>
+</div>

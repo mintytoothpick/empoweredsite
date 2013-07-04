@@ -1,0 +1,86 @@
+/*
+	jQuery Coda-Slider v2.0 - http://www.ndoherty.biz/coda-slider
+	Copyright (c) 2009 Niall Doherty
+	This plugin available for use in all personal or commercial projects under both MIT and GPL licenses.
+*/
+
+/* Insignificant stuff, for demo purposes */
+
+	noscript div { margin: 20px 0; padding: 0 }
+
+/* Most common stuff you'll need to change */
+
+	.coda-slider-wrapper { padding:20px 0; }
+	.coda-slider {
+		background:url(../images/book.png) no-repeat;
+		width:708px;
+		z-index:1;
+		}
+	
+	/* Use this to keep the slider content contained in a box even when JavaScript is disabled */
+	.coda-slider-no-js .coda-slider { height: 465px; overflow: auto !important; padding-right:0px }
+	
+	/* Change the width of the entire slider (without dynamic arrows) */
+	.coda-slider, .coda-slider .panel { width: 708px; padding:30px 0 20px 0;}
+	
+	/* Change margin and width of the slider (with dynamic arrows) */
+	.coda-slider-wrapper.arrows .coda-slider, .coda-slider-wrapper.arrows .coda-slider .panel { width: 708px }
+	.coda-slider-wrapper.arrows .coda-slider { overflow:hidden; margin:0}
+	
+	/* Arrow styling */
+	.coda-nav-left a{ }
+	.coda-nav-right a { }
+	
+	/* Tab nav */
+	.coda-nav ul li a.current { }
+	
+	/* Panel padding */
+	.coda-slider .panel-wrapper { padding:0; height:425px;}
+	
+	/* Preloader */
+	.coda-slider p.loading { padding: 20px; text-align: center }
+
+/* Don't change anything below here unless you know what you're doing */
+
+	/* Tabbed nav */
+	.coda-nav ul { clear: both; display: block; margin: auto; overflow: hidden }
+	.coda-nav ul li { display: inline }
+	.coda-nav ul li a { background: #000; color: #fff; display: block; float: left; margin-right: 1px; padding: 3px 6px; text-decoration: none }
+	
+	/* Miscellaneous */
+	.coda-slider-wrapper { clear: both; overflow: auto }
+	.coda-slider { float: left; overflow: hidden; position: relative }
+	.coda-slider .panel { display: block; float: left }
+	.coda-slider .panel-container { position: relative }
+
+	.coda-nav-left{
+		width:18px;
+		height:16px;
+		position:absolute;
+		margin:420px 0 0 70px;
+		z-index:2;
+		 }
+
+	.coda-nav-left a{
+		background:url(../images/bookAro1.png) no-repeat;
+		width:18px;
+		height:16px;
+		display:block;
+		}
+		
+	.coda-nav-right {
+		width:18px;
+		height:16px;
+		position:absolute;
+		margin:420px 0 0 640px;
+		z-index:2;
+		}
+	
+	.coda-nav-right a {
+		background:url(../images/bookAro2.png) no-repeat;
+		width:18px;
+		height:16px;
+		display:block;
+		}
+	
+	.panel-wrapper { height:645px;}

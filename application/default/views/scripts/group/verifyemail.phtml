@@ -1,0 +1,22 @@
+<?php
+$this->headTitle($this->data['GroupName']);
+?>
+<div>
+    <div id="mainco2">
+        <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+        <div class="block001">
+            <div class="blst001">
+                <div class="blst002">
+                    <div class="MainBody">
+                        <h2 style="color:#669933">Email Verification</h2>
+                        <span style="color:<?php echo $this->verified ? "green" : "red" ?>"><?php echo $this->message ?></span>
+						<br /><br />
+						<a href="/<?php echo $this->data['URLName'] ?>"/>Return to your group</a>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </div>
+        <div class="block001f01"><div class="blst001"><div class="blst002"></div></div></div>
+    </div>
+</div>

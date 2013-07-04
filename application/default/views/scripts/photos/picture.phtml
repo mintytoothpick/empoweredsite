@@ -1,0 +1,169 @@
+<?php $this->placeholder('currenttab')->set('photos');
+$this->headMeta()->appendName('description', stripslashes($this->photo['Description']));
+?>
+<script src="http://code.jquery.com/jquery-1.4.4.js"></script>
+<script type='text/javascript' src="<?php echo $this->contentLocation ?>public/js/jquery.tools.min.js"></script>
+<link rel="stylesheet" href="<?php echo $this->contentLocation ?>public/css/photogallery.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="<?php echo $this->contentLocation ?>public/css/scrollable-horizontal.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="<?php echo $this->contentLocation ?>public/css/navigation2.css" type="text/css" media="screen" />
+
+<script type='text/javascript'>
+    $(document).ready(function(){
+        $(".navmenu-h li").hover(
+        	function() { $(this).addClass("iehover"); },
+        	function() { $(this).removeClass("iehover"); }
+    	);
+    });
+
+	function getphotos(Sid,Gid) {
+        $('#whiteBox').load('/photos/showphotos/GroupId/', {GroupId: Gid, SiteId: Sid});
+    }
+
+	function setAsAlbumCover(photoId, projectId) {
+    	$.post('/photos/setprimary',
+			{PhotoId: photoId, ProjectId: projectId},
+			function() {
+        		alert('This photo is now the album cover for this album');
+				$('.setAsAlbumCoverLink').hide();
+        	}
+		);
+	}
+		
+	function updatePhotoDescription(photoId, newDescription) {
+		$.post('/photos/updatedescription',
+			{PhotoId: photoId, newPhotoDescription: newDescription},
+			function() {
+				alert("This photo's description has been updated.");
+				window.location.reload(true);
+			}
+		);
+	}
+
+    $(function() {
+        $(".scrollable").scrollable();
+
+        // volunteer activities tab popup
+        $('#volunteers-tab').mouseover(function() {
+            $('#activities-popup').show();
+        });
+        $('#volunteers-tab').mouseout(function() {
+            $('#activities-popup').hide();
+        });
+        $('#activities-popup').mouseout(function() {
+            $('#activities-popup').hide();
+        });
+    });
+
+</script>
+
+<script>
+sfHover = function() {
+	var sfEls = document.getElementById("navmenu-h").getElementsByTagName("LI");
+	for (var i=0; i<sfEls.length; i++) {
+		sfEls[i].onmouseover=function() {
+			this.className+=" sfhover";
+		}
+		sfEls[i].onmouseout=function() {
+			this.className=this.className.replace(new RegExp(" sfhover\\b"), "");
+		}
+	}
+}
+if (window.attachEvent) window.attachEvent("onload", sfHover);
+</script>
+
+<style>
+    #activities-popup li {
+        background-color: #999898;
+    }
+
+    #activities-popup li:hover {
+        background-color: #e5e5e5;
+    }
+</style>
+
+<div>
+    <div id="mainco2">
+        <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+        <div class="block001">
+            <div class="blst001">
+                <div class="blst002">
+                    <div class="MainBody">
+                            <?php include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/groupheader.php'; ?>
+                            <div class="TabbedPanelsContentGroup">
+                                <!-- FIRST TAB -->
+                                <div class="TabbedPanelsContent"></div>
+                                <!-- e o FIRST TAB --> <!-- SECOND TAB -->
+                                <div class="TabbedPanelsContent">
+                                    <div id='whiteBox' class="whiteBox">
+                                        <div style="margin-bottom:10px; float:left;">
+                                            <a href="/<?php echo $this->project['pURLName'] ?>/show-photos">Back to <?php echo stripslashes($this->project['Name']) ?> Album</a>
+										<?php if ($this->isAdmin) { ?>
+										<span class="setAsAlbumCoverLink" style="margin:0 4px; color:#36F;">&bull;</span>
+										<a class="setAsAlbumCoverLink" href="javascript:;" onclick="setAsAlbumCover('<?php echo $this->photo['PhotoId']?>, <?php echo $this->project['ProjectId']?>');">Set as Album Cover</a>
+										<?php }
+										if ($this->isAdmin || isset($_SESSION['UserId']) && $_SESSION['UserId'] == $this->photo['CreatedBy']) { ?>
+										<span style="margin:0 4px; color:#36F;">&bull;</span>
+										<a href="javascript:;" onclick="deletePhoto('<?php echo $this->photo['PhotoId'] ?>, <?php echo $this->photo['SystemMediaName'] ?>', '/<?php echo $this->project['pURLName'] ?>/show-photos')">Delete</a>
+										<?php } ?>
+                                        </div>
+                                        <div class="clear"></div>
+                                        <div id="activityPhoto" class="imgdetail" style="min-height:160px; width:720px" align="center">
+                                        <?php if (!count($this->photo)) { echo "This photo does not exist."; }
+                                            if(!empty($this->photo['SystemMediaName']) && file_exists("/home/$this->envUsername/public_html/public/Photos/full/".$this->photo['SystemMediaName'])) { ?>
+                                            <?php if (isset($this->prev_photo)) { ?>
+                                                <a href="/<?php echo $this->project['pURLName'] ?>/view-photo/<?php echo $this->prev_photo ?>">
+                                                    <img src="<?php echo $this->contentLocation ?>public/images/left_arrow.png" style="margin-right:15px; vertical-align:middle; margin-left:-10px" width="20">
+                                                </a>
+                                            <?php } ?>
+                                            <img src="<?php echo $this->contentLocation ?>public/Photos/full/<?php echo $this->photo['SystemMediaName'] ?>" style="margin:5px; max-width:650px; max-height:540px; vertical-align:middle" />
+                                            <?php if (isset($this->next_photo)) { ?>
+                                                <a href="/<?php echo $this->project['pURLName'] ?>/view-photo/<?php echo $this->next_photo ?>">
+                                                    <img src="<?php echo $this->contentLocation ?>public/images/right_arrow.png" style="margin-left:15px; vertical-align:middle; margin-right:-10px" width="20">
+                                                </a>
+                                            <?php } ?>
+                                        <?php }?>
+                                        </div>
+                                        <div class="imgdetail2">
+											<span style="font-weight:bold; text-decoration:underline;">Photo Details</span>
+											<div class="clear"></div><br />
+											<?php if($this->photo['Description'] != '') { ?>
+												<div class="AddDescriptionLink">
+													<?php echo stripslashes(nl2br($this->photo['Description']));
+													if ($this->isAdmin || isset($_SESSION['UserId']) && $_SESSION['UserId'] == $this->photo['CreatedBy']) { ?>
+													<a href="javascript:;" onclick="$('.AddDescriptionLink').hide();$('.AddDescriptionInput').show();"><img src="/public/images/icon_edit.jpg" style="width:16px; height:16px; margin-left: 3px;" /></a>
+													<a href="javascript:;" onclick="updatePhotoDescription(<?php echo $this->photo['PhotoId'] ?>, '');"><img src="/public/images/icon_delete.gif" style="width:16px; height:16px; margin-left: 3px;" /></a>
+													<?php } ?>
+													<div class="clear"></div><br />
+												</div>
+											<?php } else if($this->isAdmin) { ?>
+												<div class="AddDescriptionLink">
+													<a href="javascript:;" onclick="$('.AddDescriptionLink').hide();$('.AddDescriptionInput').show();">Add Description</a>
+													<div class="clear"></div><br />
+												</div>
+											<?php } ?>
+											<div class="AddDescriptionInput" style="display:none;">
+												<form id="photoDescriptionForm" method="post">
+                                                    <textarea id="newPhotoDescription" name="NewPhotoDescription" cols="30" rows="8"><?php echo $this->photo['Description'] ?></textarea>
+													<div class="clear" style="margin-bottom:4px;"></div>
+                                                    <a href="javascript:;" class="btn btngreen" onclick="updatePhotoDescription(<?php echo $this->photo['PhotoId'] ?>, $('#newPhotoDescription').val())">Update</a>
+                                                </form><br />
+											</div>
+                                            From the Album: <br /><a href="/<?php echo $this->project['pURLName'] ?>/show-photos"><?php echo $this->project['Name'] ?></a>
+                                            <div class="clear"></div><br />
+                                            Added on <?php echo date('m/d/Y', strtotime($this->photo['CreatedOn'])) ?><br />
+                                            by <a href="/<?php echo $this->uploader['URLName'] ?>"><?php echo stripslashes($this->uploader['FullName']) ?></a>
+                                            <div class="clear"></div><br />
+                                            <a href="mailto:admin@empowered.org??subject=Report this photo <?php echo $this->photo['SystemMediaName'] ?>">Report this photo</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </div>
+        <div class="block001f01"><div class="blst001"><div class="blst002"></div></div></div>
+    </div>	
+</div>

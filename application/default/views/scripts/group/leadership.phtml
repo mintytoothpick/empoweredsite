@@ -1,0 +1,80 @@
+<script>
+function searchMembers() {
+    var srch_txt = $('#search_text').val().toString();
+    srch_txt = srch_txt.replace(/'/g, '');
+    srch_txt = srch_txt.replace(/"/g, "");
+    window.location.href = "/<?=$this->group->urlName?>/leadership?search_text="+srch_txt;
+}
+
+function removeAdmin(GID, UID) {
+    $.post('/administrator/delete', {SiteId: GID, UserId: UID}, function(data) {
+        alert(data);
+        <?php if($this->list != 'members') { ?>
+            $('#box_'+UID).hide();
+        <?php } else { ?>
+            $('#status_'+UID).hide();
+        <?php } ?>
+    });
+}
+</script>
+
+<div class="wrapper">
+  <!-- org header -->
+  <?php echo $this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+  <div class="BodyCon">
+
+  <!-- breadcrumb -->
+  <?php echo $this->placeholder('breadcrumb') ?>
+  <!-- // breadcrumb -->
+
+  <div class="clr"></div>
+
+  <!-- tabs -->
+  <?php echo $this->placeholder('tabs') ?>
+  <!-- // tabs -->
+    <div class="mainC02 BG01">
+        <div class="spacer"></div>
+<?php if(!$this->group->isActive) { ?>
+        <div class="errorBox">
+            This chapter has not been activated yet and may not actually be associated with this organization.<?php if($this->isAdmin && $this->group->createdBy != $this->userNew->id) { ?><a href="javascript:;" onclick="activateGroup('<?=$this->group->id?>')">Click here to activate it now</a><?php } ?>
+        </div>
+<?php } ?>
+
+      <div class="leftC">
+        <?=$this->placeholder('memberstoolbox')?>
+      </div>
+      <div class="rightC">
+
+      <div class="programBox02">
+        <p><strong><span class="Text14">Find an Administrator</span></strong></p>
+        <form id="searchMembers" action="/<?=$this->group->urlName?>/leadership" method="post" onsubmit="searchMembers(); return false;">
+            <input name="search_text" id="search_text" type="text" class="textField01" value="<?=$this->searchtxt?>" />
+        </form>
+      </div>
+      <?php if(count($this->paginator)) {
+          foreach($this->paginator as $user) { ?>
+          <div class="programBox02" id="box_<?=$user->id?>"><a href="/<?=$user->urlName?>"><img src="/profile/loadimage/?UserId=<?=$user->id?>" alt=" " width="55" height="52" class="memberImgStyle" /></a>
+            <span class="TextStyle06"><!-- <?=$user->id?> --><a href="/<?=$user->urlName?>"><?=stripslashes($user->fullName)?></a>
+              <span style="float:right;">
+                <a id="status_<?=$user->id?>" href="javascript:;" onclick="removeAdmin('<?=$this->group->id?>', '<?=$user->id?>')" style="font-size:11px; margin-right:11px;">Remove Admin</a>
+                <a href="javascript:;" onclick="removeAdmin('<?=$this->group->id?>', '<?=$user->id?>')">
+                  <img src="/public/images/cancel.png" />
+                </a>
+              </span>
+            </span>
+            <?= stripslashes($user->aboutMe) ?><br />
+          </div>
+          <?php } ?>
+          <?= $this->paginationControl($this->paginator, 'Sliding', 'nonprofit/new_page_selector.phtml', array('param' => 'page')); ?>
+      <?php } else { ?>
+          <div class="programBox02">
+          <span class="TextStyle06">There are currently no administrators for this <?= !empty($this->searchtxt) ? 'search query' : 'group'; ?>.</span>
+          </div>
+      <?php } ?>
+    </div>
+  </div>
+  <div class="clr"></div>
+</div>

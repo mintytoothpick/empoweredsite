@@ -1,0 +1,11 @@
+<div class="headingStyle02 rounded"><?=$this->organization->groupNamingPlural?> (<?= $this->countGroups ?>)</div>
+<div class="spacer"></div>
+
+<?php if (count($this->paginator)) {
+foreach($this->paginator as $chapter) { ?>
+<div class="TextBox"> <span class="country"><?= ($chapter->content) ? stripslashes($chapter->contact->state->name) : ''; ?></span><span class="member02"><?=number_format(count($chapter->members))?> members</span><span class="headingStyle03"><a href="/<?=$chapter->urlName?>"><?=stripslashes($chapter->name)?></a></span><?=stripslashes($chapter->description)?></div><div class="clr" style="margin-bottom:20px;"></div>
+<? } ?>
+<?= $this->paginationControl($this->paginator, 'Sliding', 'nonprofit/new_page_selector.phtml', array('param' => 'page')); ?>
+<? } else { ?>
+<p>No results found.</p>
+<? } ?>

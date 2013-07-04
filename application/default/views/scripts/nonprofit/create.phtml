@@ -1,0 +1,117 @@
+<?php $this->headTitle("Empowered.org - Create a Non-Profit"); ?>
+<script type="text/javascript" type='text/javascript'>
+    function ValidateForm() {
+        var error = "";
+        if (jQuery.trim($('#NetworkLogo').val()) == '') {
+            error += "Please specify the non-profit's image/logo.<br>";
+        } else {
+            var image = $('#NetworkLogo').val().split(".");
+            var accepted_files = new Array("jpeg", "jpg", "png", "gif");
+            var extension = image[image.length-1].toLowerCase();
+            if (!accepted_files.inArray(extension)) {
+                error += "Please upload pictures in jpeg, png and gif format only.<br>";
+            }
+        }
+        if (jQuery.trim($('#NetworkName').val()) == '') {
+            error += "Please specify the name of the non-profit.<br>";
+        }
+        if (jQuery.trim($('#AboutUs').val()) == '') {
+            error += "Please provide a brief info about the non-profit.<br>";
+        }
+        if (jQuery.trim($('#Email').val()) == '') {
+            error += "Please specify the non-profit contact email.<br>";
+        }
+        if (jQuery.trim($('#Administrator').val()) == '') {
+            error += "Please specify the administrator's email.<br>";
+        }
+
+        if (error != '') {
+            if (jQuery.trim($('#Administrator').val()) != '') {
+                $.get('/profile/validateuseremail', {email: jQuery.trim($('#Administrator').val())}, function(data) {
+                    if (data == 0) { error += "Administrator email does not exists."; }
+                    $('#message').removeClass('success').addClass('error').html(error).show();
+                });
+            } else { $('#message').removeClass('success').addClass('error').html(error).show(); }
+            $('#top').focus();
+            return false;
+        } else {
+            $.get('/profile/validateuseremail', {email: jQuery.trim($('#Administrator').val())}, function(data) {
+                if (data == 0) {
+                    $('#message').removeClass('success').addClass('error').html('Administrator email does not exists.').show();
+                    return false;
+                } else {
+                    return true;
+                }
+            });
+        }
+    }
+    function validateAdmin(email) {
+        $.get('/profile/validateuseremail', {email: email}, function(data) {
+            return data;
+        });
+    }
+</script>
+<style>
+    .success { color:green }
+    .error { color:red }
+    .txt01 { margin-top: 7px }
+</style>
+<div>
+    <div id="mainco2">
+        <div class="roundedbox">
+            <a id="top" href="#top" style="text-decoration:none">&nbsp;</a>
+            <form name="CreateOrganization" method="post" action="/nonprofit/create" id="CreateOrganization" enctype="multipart/form-data" onsubmit="return ValidateForm()">
+                <h1><span id="lblHeading">Create a New Non-Profit Organization</span></h1>
+                <div>
+                    <div id="message" class="error" style="width:600px; border:2px solid #e3e3e3; margin-bottom:15px; padding:5px; <?php if(!$this->message) { echo "display:none;"; } ?>"><?php if(isset($this->message)) { echo $this->message; } ?></div>
+                    <h2>Network Header</h2>
+                    <div class="txt01"><label for="vcvsdv2">Name of the Non-Profit: (max 50 characters)</label></div>
+                    <input name="NetworkName" type="text" maxlength="50" id="NetworkName" class="inp001" style="width:600px;" value="<?php echo isset($this->NetworkName) ? $this->NetworkName : "" ?>" />
+                    <span class="test01">*</span>
+                    <div class="txt01"><label for="vcvsdv3">Google Checkout Account: </label></div>
+                    <select name="GoogleCheckoutAccountId" id="GoogleCheckoutAccountId" class="inp001" style="width:300px;">
+                        <option value="23" >TEMP - INVALID</option>
+                    </select>
+                    <div class="txt01"><label for="vcvsdv6">Location: </label>
+                        <span class="txt02">Where is this organization located?</span>
+                    </div>
+                    <input name="Location" type="text" id="Location" class="inp001" style="width:600px;" value="<?php echo isset($this->Location) ? $this->Location : "" ?>" />
+                    <div class="txt01"><label for="vcvsdv3">Network Type: </label></div>
+                    <select name="NetworkType" id="NetworkType" class="inp001" style="width:600px;">
+                        <option value="Non Profit" <?php echo (isset($this->NetworkType) && $this->NetworkType == "Non Profit") ? "selected" : "" ?>>Non-Profit</option>
+                        <option value="Social Enterprise" <?php echo (isset($this->NetworkType) && $this->NetworkType == "Social Enterprise") ? "selected" : "" ?>>Social Enterprise</option>
+                    </select>
+                    <div class="txt01"><label for="vcvsdv3">About Us: (max 800 characters)</label></div>
+                    <textarea name="AboutUs" rows="2" cols="20" id="AboutUs" class="inp001" onblur="return fnKeepWordLenTrack(this,5000);" onkeyup="return fnKeepWordLenTrack(this,5000);" style="height:300px;width:600px;"><?php echo isset($this->AboutUs) ? $this->AboutUs : "" ?></textarea>
+                    <span class="test01">*</span>
+                    <div class="txt01"><label for="vcvsdv3">Enable Programs?</label></div>
+                    <div>
+                        <span><input type="radio" name="hasPrograms" value="1" checked="checked" />&nbsp;Yes</span>
+                        <span style="margin-left:10px"><input type="radio" name="hasPrograms" value="0" />&nbsp;No</span>
+                    </div>
+                    <h2 style="margin-top:5px;">Non-Profit Organization Contact Info</h2>
+                    <div class="txt01"><label for="vcvsdv7">Email: </label></div>
+                    <input name="Email" type="text" maxlength="50" id="Email" class="inp001" style="width:600px;" value="<?php echo isset($this->Email) ? $this->Email : "" ?>" />
+                    <span class="test01">*</span>
+                    <div class="txt01"><label for="vcvsdv10">Website: </label></div>
+                    <input name="WebAddress" type="text" id="WebAddress" class="inp001" style="width:600px;" value="<?php echo isset($this->WebAddress) ? $this->WebAddress : "" ?>" />
+                    <div class="txt01"><label for="vcvsdv10">Administrator: </label></div>
+		    <span style="font-size:9px; color:#AAA;"><i>(Enter the email of a user who will be managing this organization, it can be your own)</i></span><br /><br />
+                    <input name="Administrator" type="text" id="Administrator" class="inp001" style="width:600px;" />
+                    <span class="test01">*</span><br><span style="width:600px; margin-left:200px; margin-top:-10px; color:gray; font-size:smaller;">Example: johnsmith@empowered.org</span>
+                    <div class="txt01"><label for="vcvsdv10">URL Name: </label></div>
+                    <span style="float:left; margin 8px 4px 0 0;">http://www.empowered.org/</span><input name="URLName" type="text" id="URLName" class="inp001" style="width:600px;" value="<?php echo isset($this->URLName) ? $this->URLName : "" ?>" />
+                    <br /><br />
+                    <img id="imgLogo" src="" style="border-width:0px;" />
+                    <div id="divLogoUploader" class="txt01">Logo:
+                        <input type="file" name="NetworkLogo" id="NetworkLogo" class="textfield" />
+                    </div>
+                    <br /><br />
+                    <input type="submit" class="btn btngreen" name="btnCreateNew" value="Create New" id="btnCreateNew" />
+                    <a class="btn btngreen" title="Back" href="/" >Back</a>
+                </div>
+            </form>
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>

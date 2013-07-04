@@ -1,0 +1,65 @@
+<? if (!isset($this->all)) { ?>
+<script>
+var attendees = false;
+var attendeeC = {
+    scrolling: 'yes',
+    width: 630,
+    height:500,
+    autoDimensions: false,
+    autoScale: false,
+    centerOnScroll: true,
+    showNavArrows: false
+};
+
+function toogleDesc(elem, id) {
+    $(elem).hide();
+    $("."+id).addClass('moreDesc');
+}
+
+$(function() {
+    $("#fancyAtt").click(function() {
+        if (!attendees) {
+            $.ajax({
+                url: "events/allattendees",
+                data: 'eventId=<?=$this->event->id?>',
+                success: function(data) {
+                    attendees = data;
+                    $.fancybox(attendees, attendeeC);
+                }
+            })
+        } else {
+            $.fancybox(attendees, attendeeC);
+        }
+    });
+
+});
+</script>
+<? } ?>
+
+<div class="box004">
+<div class="box004Content">
+    <span class="headignStyle04">Attendees<? if (!isset($this->all) && count($this->event->attendees) > 5) { ?> <span><a href="javascript:;" id="fancyAtt" style="float:right;">View All</a></span><? } ?></span>
+    <? if ($this->event->attendees) { ?>
+    <div class="clr"></div>
+    <? foreach($this->event->attendees as $k=>$attendee) { ?>
+    <div class="programBox">
+    <div class="memberImgStyle2"><img src="/profile/loadimage/?UserId=<?=$attendee->id?>" width="55" height="52" alt=" " /></div>
+    <span class="TextStyle06"><strong><?=$attendee->fullName?></strong></span>
+    <? if (isset($attendee->id)) { ?>
+    <div class="programText04" <?= empty($attendee->aboutMe) ? 'style="background:white"' : ''; ?>>
+        <?=substr($attendee->aboutMe,0,100)?>
+        <? if(strlen($attendee->aboutMe) > 100) { ?>
+        <a href="javascript:;" onclick="toogleDesc(this,'<?=$attendee->id?>')">read more</a>
+        <div class="hide <?=$attendee->id?>"><?=substr($attendee->aboutMe,100,strlen($attendee->aboutMe))?></div>
+        <? } ?>
+    </div>
+    <? } ?>
+    </div>
+    <? if (isset($this->all) && $k == 4) break; ?>
+    <? } ?>
+    <? } else { ?>
+    <p>No attendees found.</p>
+    <? } ?>
+    <div class="clr"></div>
+</div>
+</div>

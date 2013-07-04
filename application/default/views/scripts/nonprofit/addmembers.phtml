@@ -1,0 +1,111 @@
+<?php $this->placeholder('currenttab')->set('orgmembers'); ?>
+<script type="text/javascript">
+    function validateForm() {
+        var invalid_email = 0;
+        if ($('#contact_list').val() != '') {
+            var emails = $('#contact_list').val().split(",");
+            if (emails.length > 0 && jQuery.trim($('#contact_list').val()) != '') {
+                return true;
+            } else {
+                alert('Please enter an email address to continue');
+                return false;
+            }
+        } else if ($('#contact_list').val() == '' && $('#uploadExcel').val() == '') {
+            alert('Please enter email addresses into the textbox below or upload an excel file to continue');
+            return false;
+        }
+        return true;
+    }
+
+</script>
+<script type="text/javascript" src="https://api.cloudsponge.com/address_books.js"></script>
+<script type="text/javascript" charset="utf-8">
+var csPageOptions = {
+  domain_key:"KHKXHF2HRGM5ZSYAGSUC", 
+  textarea_id:"contact_list"
+};
+</script>
+<style type="text/css">
+    table tr th {
+        text-align:center;
+    }
+</style>
+
+<div class="wrapper">
+	<!-- org header -->
+	<?=$this->placeholder('header') ?>
+	<!-- // org header -->
+
+	<div class="BodyCon">
+
+		<?php if(isset($this->getstarted)) { ?>
+			<h2 style="font-size:14px; margin-left:35px;">
+                <div style="color:#A9A9A9; width:21%; float:left">Step 1. Structure & Details</div>
+                <div style="color:#A9A9A9; width:18%; float:left">Step 2. Add Admins</div>
+                <div style="color:#669933; width:19%; float:left">Step 3. Add Members</div>
+                <div style="color:#A9A9A9; width:23%; float:left">Step 4. Activate Fundraising</div>
+                <div style="color:#A9A9A9; width:19%; float:left">Step 5. Spread the Word</div>
+                <div class="clear"></div>
+            </h2>
+		<?php } else { ?>
+			<!-- breadcrumb -->
+			<?=$this->placeholder('breadcrumb') ?>
+			<!-- // breadcrumb -->
+			<div class="clr"></div>
+
+			<!-- tabs -->
+			<?=$this->placeholder('tabs') ?>
+			<!-- // tabs -->
+		<?php } ?>
+
+		<div class="mainC">
+			<div class="box05">
+				<div class="headingStyle02">Add Members</div>
+				<div class="programBox02">
+				Do you have a database, spreadsheet, or mailing list containing members of your organization?<br />Adding members here will allow you to interact and communicate with everyone in your organization, plus a few other cool features. These members will receive an email containing log in information (if necessary).<br /> Add your members now to take full advantage of Empowered.org's functionality. You can do so using either of the following two methods:<br /><strong>We will not spam your members</strong>
+        		<?php if ($this->sent) { ?>
+                    <div style="margin:5px 0px; padding:5px; border:1px solid #93C47D; background: #D9EAD3">The following emails have been added as members: <?=implode(', ', $this->emails) ?></div><br />
+                    <?php if (count($this->invalid_emails)) { ?>
+                    <div style="margin:5px 0px; padding:5px; border:1px solid #F00; background: #D9EAD3">The following are invalid email addresses: <?=implode(', ', $this->invalid_emails) ?></div><br />
+                    <?php } ?>
+        		<?php } ?>
+        		<form method="post" action="" enctype="multipart/form-data" onsubmit="return validateForm()">
+        			<input type="hidden" id="NetworkId" name="NetworkId" value="<?=$this->organization->id?>" />
+        			<br />
+        			<div style="float: left; width: 45%">
+                        <strong style="font-size:17px;">Enter by Email:</strong><br /><br /> Please type the email addresses you wish to add into the box below<br><br> You can also <a class="cs_import">import your contacts</a> from gmail, msn, yahoo, etc.
+        				<div class="clear" style="margin-bottom:8px;"></div>
+        				<textarea id="contact_list" name="emails" rows="8" cols="75" onkeydown="if (this.value != '' && $('#uploadExcel').val() != '') { $('#uploadExcel').val('') }" style="width:85%;"></textarea><br><br>
+        			</div>
+        			<div style="float: left; width: 3%; font-weight: bold; color: gray; font-size: 18px; padding: 0px 10px">
+        				Or
+        			</div>
+        			<div style="float: left; width: 45%">
+        				<strong style="font-size:17px;">Upload an Excel File:</strong><br><br>
+        				<span style="color:#F00;">Please select valid .xls files only.</span><br /><br />
+        				<span style="font-weight:bold">Select an excel file:&nbsp;</span>
+        				<input type="file" size="24" name="uploadExcel" id="uploadExcel" class="textfield" onchange="$('#contact_list').val('')" /><br>
+        				<div style="border:1px solid #dcbd00; background-color:#fff7c8; padding:10px; margin-top:8px;">You can import an existing list of members using an excel spreadsheet.<br /><br /> Please set up the columns in the following format:<br />Column 1 - First Name<br />Column 2 - Last Name<br />Column 3 - Email Address </div>
+        			</div>
+                    <div style="float: left; width: 100%; margin: 10px 0; border-top:1px solid #E5E5E5; padding-top:10px;">
+                        <br /><strong style="font-size:17px;">Include a Personal Message?</strong><br /><br />The message that you enter into this box will be included in the email sent to each member:<br /><br />
+                        <textarea name="message" rows="5" cols="90" style="width:60%;"></textarea>
+                    </div>
+        			<div style="float: left; width: 100%">
+        				<?php if(isset($this->getstarted) && !isset($this->sent)) { ?>
+        					<a class="btn btngreen" href="/<?=$this->organization->urlName?>/activate-fundraising?getstarted=yes">Skip</a>
+        				<?php } else if(!isset($this->getstarted)) { ?>
+        					<a class="btn btngreen" href="/<?=$this->organization->urlName?>/members">Back</a>
+        				<?php } ?>
+        				<input type="submit" value="Add Members" class="btn btngreen" />
+        				<?php if(isset($this->getstarted) && isset($this->sent)) { ?>
+        					<a class="btn btngreen" href="/<?=$this->organization->urlName?>/activate-fundraising?getstarted=yes">Continue</a>
+        				<?php } ?>
+        			</div>
+        		</form>
+        		</div>
+			</div>
+		</div>
+	<div class="clr"></div>
+	<div class="clr"></div>
+	</div>

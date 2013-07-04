@@ -1,0 +1,28 @@
+<?php $this->placeholder('files_list')->captureStart(); ?>
+
+        <?php if (count($this->files)) {
+        $file_icons = array('doc' => 'word_icon.png', 'docx' => 'word_icon.png', 'xls' => 'excel_icon.png', 'xlsx' => 'excel_icon.png', 'pdf' => 'pdf.png', 'ppt' => 'ppt_icon.png', 'pptx' => 'ppt_icon.png');
+        ?>
+        <div class="box02">
+          <div class="headingStyle01 rounded">Files (<?= count($this->files) ?>)</div>
+          <?php if ($this->isAdmin) { ?><a href="/<?=$this->urlName?>/manage-files?Prev=home" class="adminLink">Manage Files</a><? } ?>
+          <div class="box02Content">
+            <ul class="ulStyel02">
+            <?php foreach ($this->files as $file) { ?>
+              <li>
+                <div class="fileIcon">
+                  <img src="<?=$this->contentLocation?>public/images/<?=$file_icons[$file['Type']] ?>" />
+                </div>
+                <div class="fileName">
+                  <a href="<?=$this->contentLocation?>public/Files/<?=$file['SystemFileName'] ?>"><?=stripslashes($file['UploadedFileName']) ?></a>
+                </div>
+                <div class="spacer"></div>
+              </li>
+            <? } ?>
+            </ul>
+          </div>
+        </div>
+        <? } ?>
+
+<?php $this->placeholder('files_list')->captureEnd() ?>
+        

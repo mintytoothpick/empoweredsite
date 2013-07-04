@@ -1,0 +1,652 @@
+<?php
+if ($this->level == "group") {
+    $this->placeholder('currenttab')->set('active-campaigns');
+} else if ($this->level == "organization") {
+    $this->placeholder('currenttab')->set('campaigns');
+}
+if(isset($this->data['pDescription'])) {
+	$this->headMeta()->appendName('description', $this->data['pDescription']);
+} else {
+	$this->headMeta()->appendName('description', $this->data['Description']);
+}
+?>
+<link href="<?php echo $this->contentLocation ?>public/css/ui.css" rel="stylesheet" type="text/css"/>
+<script src="<?php echo $this->contentLocation ?>public/js/datepicker/ui.datepicker.js" type="text/javascript" language="javascript"></script>
+<script type="text/javascript">
+    $(function() {
+        // volunteer activities tab popup
+        $('#volunteers-tab').mouseover(function() {
+            $('#activities-popup').show();
+        });
+        $('#volunteers-tab').mouseout(function() {
+            $('#activities-popup').hide();
+        });
+        $('#activities-popup').mouseout(function() {
+            $('#activities-popup').hide();
+        });
+        // more tab popup
+        $('#more-tab').mouseover(function() {
+            $('#more-popup').show();
+        });
+        $('#more-tab').mouseout(function() {
+            $('#more-popup').hide();
+        });
+        $('#more-popup').mouseout(function() {
+            $('#more-popup').hide();
+        });
+    });
+
+    function joinGroup(GID, UID) {
+        $.post('/group/joinrequest', {GroupId: GID, UserId: UID}, function(data) {
+            if (data.search('participate') > -1) {
+                window.location.href = data;
+            } else {
+                alert(data);
+            }
+            $('#join-group').hide();
+        })
+    }
+
+    function saveInfo(field, value, form, required) {
+        if (value != "" && jQuery.trim($(value).val()) == '' && required) {
+            alert("Please specify the fundraising campaign "+field);
+            return false;
+        }
+        $.post('/fundraisingcampaign/saveinfo', $(form).serialize(), function(data) {
+            alert(data);
+            window.location.reload(true);
+        });
+        return false;
+    }
+    
+    function deleteCampaign(PID) {
+        if (confirm("Are you sure you want to delete the selected campaign?") == true) {
+            $.post('/fundraisingcampaign/delete', {ProjectId: PID, reload: 1}, function() {
+                alert("You have successfully deleted the selected campaign");
+                <?php if (isset($this->list)) { ?>
+                window.location.reload(true);
+                <?php } else if (!empty($this->data['GroupId']) || !empty($this->data['NetworkId'])){ ?>
+                window.location.href = '/<?php echo $this->data['URLName'] ?>/active-campaigns';
+                <?php } else { ?>
+                window.location.href = '/<?=$this->userNew->urlName?>';    
+                <?php } ?>
+            })
+        }
+    }
+
+    var counter = <?php echo count($this->suggested_donations) ?>;
+	<?php if(isset($this->data['ProjectId'])) { ?>
+    function validateForm() {
+        var validURLName = validateURLName('<?php echo $this->data['ProjectId'] ?>', jQuery.trim($('#URLName').val()));
+        if (jQuery.trim($('#Name').val()) == '') {
+            alert("Please specify the fundraising campaign title.");
+            return false;
+        }
+        if (jQuery.trim($('#Description').val()) == '') {
+            alert("Please specify the fundraising campaign's description.");
+            return false;
+        }
+        if (jQuery.trim($('#DonationGoal').val()) == '') {
+            alert("Please specify the fundraising campaign's donation goal.");
+            return false;
+        } else if (!isFloat($('#DonationGoal').val())) {
+            alert("Please specify a valid donation goal.");
+            return false;
+        }
+        if (jQuery.trim($('#EndDate').val()) == '') {
+            alert("Please specify the fundraising campaign's end date.");
+            return false;
+        }
+        if (validURLName != 'valid') {
+            alert(validURLName);
+            return false;
+        }
+        return true;
+    }
+	<?php } ?>
+    
+    function validateURLName(PID, URLName) {
+        $.post('/fundraisingcampaign/validateurlname', {URLName: URLName, ProjectId: PID}, function(data) {
+            return data;
+        })
+    }
+
+    $(function() {
+        $('#EndDate').datepicker({ changeMonth: true, changeYear: true });
+
+        $('#isfundraising01').click(function() {
+            if (document.getElementById("isfundraising01").checked == true) {
+                $('li.donationgoals').show();
+                document.getElementById("isfundraising02").checked = false;
+            }
+        })
+        $('.suggestedamount').keydown(function(e) {
+            var keycodes = new Array('48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '8', '13');
+            if (!keycodes.inArray(e.keyCode.toString())) {
+                return false;
+            }
+        })
+    })
+
+    function addAmount() {
+        var new_amount = '<li class="amount" id="sugamt_'+counter+'"><input type="text" maxlength="5" class="suggestedamount" name="suggestedamount[]" value="$" onfocus="this.value=\'\';"></li><li class="amtdes" id="sugdes_'+counter+'"><input type="text" class="suggestedamountdesc" name="suggestedamountdesc[]" value="Description" onfocus="this.value=\'\';"><a href="javascript:;" class="remove-amount" onclick="removeAmount('+counter+')">Remove</a></li>';
+        $('#suggested-amounts .amounts').append(new_amount);
+        counter ++;
+    }
+
+    function removeAmount(ctr) {
+        $('#sugamt_'+ctr).remove();
+        $('#sugdes_'+ctr).remove();
+        counter --;
+    }
+
+    function deleteProject(PID) {
+        if (confirm("Are you sure you want to delete this fundraising campaign?") == true) {
+            $.post('/project/delete', {ProjectId: PID, redirect: 0}, function(){
+                alert('This fundraising campaign has been successfully deleted');
+                <?php if (isset($this->list)) { ?>
+                window.location.reload(true);
+                <?php } else if (!empty($this->data['GroupId']) || !empty($this->data['NetworkId'])){ ?>
+                window.location.href = '/<?php echo $this->data['URLName'] ?>/active-campaigns';
+                <?php } else { ?>
+                window.location.href = '/<?=$this->userNew->urlName?>';    
+                <?php } ?>
+            });
+        }
+    }
+    
+
+</script>
+<style>
+    #ui-datepicker-div { font-size:11px }
+    .amount { float:left; width:10%; margin-right:5px; }
+    .amtdes { float:left; width:80%; }
+    .amount input { width:50px; margin-bottom:3px; }
+    .amtdes input { width:235px; margin-bottom:3px; margin-right:5px; }
+	.upload-box { width: 370px; left: 40%; right: 40%; top:25%; position: absolute; z-index: 999999!important; background-color:#ffffff; border:5px solid #e5e5e5; padding:10px 0 20px 0; -moz-border-radius:7px }
+</style>
+<link rel="stylesheet" href="<?php echo $this->contentLocation ?>public/css/scrollable-horizontal.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="<?php echo $this->contentLocation ?>public/css/navigation.css" type="text/css" media="screen" />
+<div>
+    <div id="mainco2">
+        <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+        <div class="block001">
+            <div class="blst001">
+                <div class="blst002" style="padding-top:6px;">
+                    <div class="MainBody">
+                            <?php 
+                            if ($this->level == "group") {
+                                include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/groupheader.php';
+                            } else if ($this->level == "organization") {
+                                include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/nonprofitheader.php';
+                            } else {
+                                include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/profileheader.php'; 
+                            } ?>
+                            <div class="TabbedPanelsContentGroup">
+                                <!-- FIRST TAB -->
+                                <div class="TabbedPanelsContent">
+
+                                </div>
+                                <!-- e o FIRST TAB -->
+
+                                <!-- SECOND TAB -->
+                                <div class="TabbedPanelsContent">
+                                    <div class="whiteBox" style="padding:7px; width: 1016px;">
+                                        <?php if (isset($this->list)) { ?>
+                                        <h3 style="margin:0; font-weight:bold; color:#669933; font-size:20px; margin:10px 0px 10px 10px;">Fundraising Campaigns</h3>
+                                        <style>
+                                            #activities-popup li {
+                                                background-color:#999898;
+                                            }
+                                            #activities-popup li:hover {
+                                                background-color:#e5e5e5;
+                                            }
+                                            #more-popup li {
+                                                background-color:#999898;
+                                            }
+                                            #more-popup li:hover {
+                                                background-color:#e5e5e5;
+                                            }
+                                            .left_side .calendar {
+                                                width:50px;
+                                                border:solid 2px #999898;
+                                                border-bottom:solid 6px #999898;
+                                                color:#ffffff;
+                                                font-weight:bold;
+                                                margin-right:40px;
+                                            }
+                                            .left_side .calendar .on-going {
+                                                width:50px;
+                                                border:solid 2px #669933;
+                                                border:solid 2px #669933; border-bottom:solid 6px #669933;
+                                                color:#ffffff;
+                                                font-weight:bold;
+                                                margin-right:40px;
+                                            }
+                                            #tabs {
+                                                margin: 0px 10px;
+                                                padding: 0;
+                                                float: left;
+                                                list-style: none;
+                                                height: 32px; /*--Set height of tabs--*/
+                                                border-bottom: 1px solid #999;
+                                                /* border-left: 1px solid #999; */
+                                                width: 98%;
+                                            }
+                                            #tabs li {
+                                                float: left;
+                                                margin: 0;
+                                                padding: 0;
+                                                height: 31px; /*--Subtract 1px from the height of the unordered list--*/
+                                                line-height: 31px; /*--Vertically aligns the text within the tab--*/
+                                                border: 1px solid #999;
+                                                margin-bottom: -1px; /*--Pull the list item down 1px--*/
+                                                overflow: hidden;
+                                                position: relative;
+                                                background: #e0e0e0;
+                                                margin-right:3px
+                                            }
+                                            #tabs li a {
+                                                text-decoration: none;
+                                                color: #000;
+                                                display: block;
+                                                font-size: 1.2em;
+                                                padding: 0 20px;
+                                                border: 1px solid #fff; /*--Gives the bevel look with a 1px white border inside the list item--*/
+                                                outline: none;
+                                            }
+                                            #tabs li a:hover {
+                                                background: #ccc;
+                                            }
+                                            html #tabs li.active, html #tabs li.active a:hover  { /*--Makes sure that the active tab does not listen to the hover properties--*/
+                                                background: #fff;
+                                                border-bottom: 1px solid #fff; /*--Makes the active tab look like it's connected with its content--*/
+                                            }
+                                            #tab_container {
+                                                /* border: 1px solid #999; */
+                                                border-top: none;
+                                                overflow: hidden;
+                                                clear: both;
+                                                float: left;
+                                                width: 98%;
+                                                background: #fff;
+                                                margin: 0px 10px;
+                                            }
+                                            .tab_content {
+                                                padding: 10px 0px;
+                                            }
+                                        </style>
+                                        <script>
+                                            $(document).ready(function() {
+                                                //On Click Event
+                                                $("ul.tabs li a").click(function() {
+                                                    window.location.href = $(this).attr("href");
+                                                });
+                                            });
+                                        </script>
+										<?php if($this->isAdmin) { ?>
+                                        <div style="margin-left:30px;">
+                                            <a href="/<?php echo $this->data['URLName'] ?>/create-fundraisingcampaign">+ Create a New Fundraising Campaign</a>
+                                        </div>
+										<?php } ?>
+                                        <ul id="tabs" style="margin-top:10px;">
+                                            <li class="<?php echo $this->list == 'active' ? "active" : "" ?>" style="margin-left:5px;"><a href="/<?php echo $this->data['URLName'] ?>/active-campaigns">Active</a></li>
+                                            <li class="<?php echo $this->list == 'inactive' ? "active" : "" ?>"><a href="/<?php echo $this->data['URLName'] ?>/inactive-campaigns">Inactive</a></li>
+                                        </ul>
+
+                                        <div id="tab_container">
+                                            <div id="tab1" class="tab_content">
+                                                    <?php if (count($this->fundraising_campaigns) > 0) { ?>
+                                                        <?php
+                                                        foreach ($this->fundraising_campaigns as $campaign) {
+                                                            $total_donation = 0;
+                                                            ?>
+                                                <div style="padding:8px 0px; margin:0px 10px; border-bottom:solid 1px #CCCCCC; height:40px">
+                                                    <div class="left_side" style="padding-left:18px; width:650px">
+                                                        <div style="float:left">
+                                                            <a style="font-weight:bold" href="/<?php echo $campaign['URLName'] ?>"><?php echo stripslashes($campaign['Name']) ?></a><br>
+                                                            <div style="margin-top:5px;">
+                                                            	Ends <?php echo date('M d, Y', strtotime($campaign['EndDate'])) ?>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="right_side">
+                                                        <?php if($this->isAdmin) { ?><span style="float:right"><a href="javascript:;" onclick="deleteCampaign('<?php echo $campaign['ProjectId']?>')"><img src="/public/images/icon_delete_grey.gif" width="10" height="10"></a></span><?php } ?>
+                                                    	<span> Fundraisers: <?php echo number_format($campaign['total_fundraisers'])?></span><br>
+                                                        <span> Donations: <?php echo $this->data['Currency'].number_format($campaign['total_donations'])?></span>
+                                                        <div class="clr"></div>
+                                                    </div>
+                                                </div>
+                                                        <?php } ?>
+                                                    <?php } else { ?>
+                                                <strong style="margin-left:10px; font-size:14px">There are no <?php echo $this->list ?> fundraising campaigns yet.</strong>
+                                                    <?php } ?>
+                                                <br><br>
+                                            </div>
+                                        </div>
+                                        <?php } else { ?>
+                                        <div id="activityDetail" class="activitydetail grayBox">
+                                            <?php if ($this->data): ?>
+                                            <script>
+                                                function hidePopup(box) {
+                                                    $('#popup-box').hide();
+                                                    $('#upload-logo-1').hide();
+                                                }
+                                            </script>
+                                            <style>
+                                                .upload-box { width: 370px; left: 40%; right: 40%; top:25%; position: absolute; z-index: 999999!important; background-color:#ffffff; border:5px solid #e5e5e5; padding:10px 0 20px 0; -moz-border-radius:7px }
+                                            </style>
+                                            <div id="upload-logo-1" class="upload-box" style="display:none;">
+                                                <form method="post" action="/fundraisingcampaign/editlogo" enctype="multipart/form-data" onsubmit="return validate('#NetworkLogo')">
+                                                    <div style="padding:10px; padding-top:0px">
+                                                        <h3 style="margin:auto; padding:5px 0px; color:#3366FF; margin-bottom:20px; font-size:15px; border-bottom:2px solid #e5e5e5">Upload Campaign Logo</h3>
+                                                        <span style="color:#F00;">Please select jpeg, gif and png files that are under 2MB in size.<br />After saving your changes, you will be asked to crop your campaign logo.</span><br /><br />
+                                                        <span style="font-weight:bold">Select an image:&nbsp;</span>
+                                                        <input type="hidden" id="action" name="action" value="upload" />
+                                                        <input type="hidden" name="ProjectId" value="<?php echo $this->data['ProjectId'] ?>" />
+                                                        <?php if (isset($this->media_src['MediaId']) && !empty($this->media_src['MediaId'])) { ?>
+                                                        <input type="hidden" name="MediaId" value="<?php echo $this->media_src['MediaId'] ?>" />
+                                                        <?php } ?>
+                                                        <input type="file" size="24" name="ProjectLogo" id="ProjectLogo" class="textfield" /><br>
+                                                        <input class="button" type="submit" value="Submit" style="float:right; margin-top:10px; margin-right:5px">
+                                                        <input class="button" type="button" value="Close" style="float:right; margin-top:10px; margin-right:5px" onclick="hidePopup()">
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div>
+                                                <div class="TextC" style="width: 590px;">
+			                                            <?php if(file_exists("/home/$this->envUsername/public_html/public/Media/full/".$this->media_src['SystemMediaName']) && !empty($this->media_src['SystemMediaName'])) { ?>
+		                                                	<img src="<?php echo $this->contentLocation ?>public/Media/full/<?php echo $this->media_src['SystemMediaName'] ?>" style="float:left; margin: 0 5px 5px 0; max-width:140px; max-height:140px;" alt="<?php echo $this->data['Name'] ?>" />
+		                                                <?php } ?>
+		                                            <h2 style="margin:10px 0; float:left;">
+		                                                <?php echo isset($this->level) && $this->level != 'user' ? stripslashes($this->data['Name']) : '' ?>
+		                                                <?php if ($this->isAdmin) { ?><br />
+															<ul id="tools-links">
+																<li><a href="javascript:;"><img src="/public/images/wrench.jpeg" style="border:1px solid #AAA;"></a>
+								                                	<ul style="font-size:12px; font-weight:normal;">
+								                                    	<li><a href="javascript:;" onclick="$('#display-field').toggle(); $('#edit-field').toggle(); $('#edit-link').toggle()"><img src="/public/images/edit.jpg" style="margin:3px 5px;"><span style="vertical-align:top;">Edit Details</span></a></li><br />
+                                                                                                        <li><a href="javascript:;" onclick="$('#upload-logo-1').show()"><img src="/public/images/changelogo.png" style="margin:3px 5px;"><span style="vertical-align:top; margin-right:15px;">Change Logo</span></a></li><br />
+								                                    	<li><a href="javascript:;" onclick="view_fundraisers.submit()"><img src="/public/images/people.png" style="margin:3px 5px;"><span style="vertical-align:top;margin-right:15px;">View People Fundraising</span></a></li><br />
+								                                        <li><a href="/<?php echo $this->data['pURLName'] ?>/add-fundraisers"><img src="/public/images/people.png" style="margin:3px 5px;"><span style="vertical-align:top;margin-right:15px;">Add New People Fundraising</span></a></li><br />
+								                                    	<li><a href="/<?php echo $this->data['pURLName']?>/email-fundraisers?Prev=campaign"><img src="/public/images/envelope.png" style="margin:3px 5px;"><span style="vertical-align:top;">Email People Fundraising</span></a></li><br />
+								                                    	<?php if ($this->data['isFundraising'] == 'Yes' || $this->data['isFundraising'] == 1) { ?><li><a href="/<?php echo $this->data['pURLName'] ?>/manage-donations"><img src="/public/images/dollarsign.png" style="margin:3px 5px;"><span style="vertical-align:top;">Donation Summary</span></a></li><br />
+								                                    	<li><a href="javascript:;" onclick="view_donations.submit()"><img src="/public/images/dollarsign.png" style="margin:3px 5px;"><span style="vertical-align:top;">View Donation History</span></a></li><br />
+								                                    	<li><a href="javascript:;" onclick="view_donors.submit()"><img src="/public/images/people.png" style="margin:3px 5px;"><span style="vertical-align:top;">View Donors</span></a></li><br /><?php } ?>
+								                                    	<li><a href="javascript:;" onclick="view_reports.submit()"><img src="/public/images/reports.png" style="margin:3px 5px;"><span style="vertical-align:top;">View Reports</span></a></li><br />
+								                                    	<li><a href="javascript:;" onclick="deleteProject('<?php echo $this->data['ProjectId'] ?>')"><img src="/public/images/delete.png" style="margin:3px 5px;"><span style="vertical-align:top;">Delete Campaign</span></a></li>
+		                                                                                                                <?php if(0) {//} (empty($this->data['GroupId'])) { ?>
+		                                                                                                                <li>
+		                                                                                                                    <a href="javascript:;" onclick="getstarted.submit()"><img src="/public/images/people.png" style="margin:3px 5px;"><span style="vertical-align:top;margin-right:15px;">Expand to Organization!</span></a>
+		                                                                                                                    <form name="getstarted" action="/getstarted" method="post">
+		                                                                                                                        <input type="hidden" name="_action" value="organization" />
+		                                                                                                                        <input type="hidden" name="assign_campaign" value="<?php echo $this->data['ProjectId'] ?>" />
+		                                                                                                                    </form>
+		                                                                                                                </li><br />
+		                                                                                                                <?php } ?>
+								                                	</ul>
+																</li>
+															</ul>
+															<form id="view_donors" name="view_donors" method="post" action="/<?php echo !empty($this->data['GroupId']) ? $this->data['URLName'] : (isset($this->network) ? $this->network['URLName'] : $this->data['pURLName']) ?>/donors?Prev=campaign" style="display:none;">
+		                                                        <input type="hidden" name="ProjectId" value="<?=$this->data['ProjectId']?>" />
+		                                                    </form>
+		                                                    <form id="view_fundraisers" name="view_fundraisers" method="post" action="/<?php echo !empty($this->data['GroupId']) ? $this->data['URLName'] : (isset($this->network) ? $this->network['URLName'] : $this->data['pURLName']) ?>/fundraisers?Prev=campaign" style="display:none;">
+		                                                        <input type="hidden" name="ProjectId" value="<?=$this->data['ProjectId']?>" />
+		                                                    </form>
+		                                                    <form id="view_reports" name="view_reports" method="post" action="/<?php echo !empty($this->data['GroupId']) ? $this->data['URLName'] : (isset($this->network) ? $this->network['URLName'] : $this->data['pURLName']) ?>/reports?Prev=campaign" style="display:none;">
+		                                                        <input type="hidden" name="activity_id" value="<?=$this->data['ProjectId']?>" />
+		                                                    </form>
+		                                                    <form id="view_donations" name="view_donations" method="post" action="/<?php echo !empty($this->data['GroupId']) ? $this->data['URLName'] : (isset($this->network) ? $this->network['URLName'] : $this->data['pURLName']) ?>/donations?Prev=campaign" style="display:none;">
+		                                                        <input type="hidden" name="ProjectId" value="<?=$this->data['ProjectId']?>" />
+		                                                    </form>
+		                                                <?php } ?>
+		                                            </h2>
+		                                            <div class="clear"></div>
+                                                    <div>
+                                                        <div id="display-field"  style="float:left;">
+                                                            <div class="TextStyle" style="width:68px; margin-top:5px; float:left;">
+                                                                Details:
+                                                            </div>
+                                                            <div class="clear"></div>
+                                                            <span id="proj-desc" style="color:#000"><?php echo stripslashes(nl2br($this->data['pDescription'])) ?><br/></span><br />
+															<div class="TextStyle">
+																End Date: 
+															</div><br />
+															<?php echo date('M d Y', strtotime($this->data['EndDate'])) ?>
+															<br /><br />
+															<strong>Donations: </strong>
+			                                                <br /><?php echo $this->data['Currency'].number_format($this->data['total_donations']) ?><br /><br />												
+															<div class="clr"></div>
+			                                                
+                                                        </div>
+                                                        <div id="edit-field" style="float:left; display: none; padding:5px; border:1px solid #000;">
+                                                            <form method="post" action="/fundraisingcampaign/edit" onsubmit="return validateForm()">
+                                                                <input type="hidden" name="ProjectId" value="<?php echo $this->data['ProjectId'] ?>" />
+                                                                <div>
+                                                                    <strong>Name:</strong><br />
+                                                                    <p>
+                                                                        <input id="Name" name="Name" value="<?php echo stripslashes($this->data['Name']) ?>" style="width: 293px; padding: 2px" />
+                                                                    </p>
+                                                                </div>
+                                                                <div style="margin-bottom:5px">
+                                                                    <strong>http://www.empowered.org/</strong><br>
+                                                                    <p>
+                                                                        <input id="URLName" name="URLName" value="<?php echo stripslashes($this->data['pURLName']) ?>" style="width: 293px; padding: 2px" />
+                                                                    </p>
+                                                                </div>
+                                                                <div style="margin-bottom:5px">
+                                                                    <strong>Details</strong><br>
+                                                                        <textarea style="font-size: 12px" name="Description" rows="10" cols="70" id="Description" onblur="return fnKeepWordLenTrack(this,3000);" onkeyup="return fnKeepWordLenTrack(this,3000);"><?php echo stripslashes($this->data['pDescription']) ?></textarea>
+                                                                </div>
+                                                                <div style="margin-bottom:5px">
+                                                                    <strong>Donation Goal: </strong><br>
+                                                                    <p>
+                                                                        <input class="input" name="DonationGoal" maxlength="7" type="text" id="DonationGoal" onblur="CheckValueLimit(this,'9000000');" value="<?php echo $this->data['DonationGoal'] ?>" />
+                                                                    </p>
+                                                                </div>
+                                                                <div style="margin-bottom:5px">
+                                                                    <strong>Suggested Amount: </strong><br>
+                                                                    <p style="color: #000; padding:0">
+                                                                        <ul style="list-style:none" id="suggested-amounts">
+                                                                            <div class="amounts">
+                                                                            <?php $ctr=0; foreach($this->suggested_donations as $suggested_donation) { ?>
+                                                                            <li class="amount" id="sugamt_<?php echo $ctr ?>">
+                                                                                <input type="text" maxlength="5" class="suggestedamount" name="suggestedamount[]" value="<?php echo $suggested_donation['Amount'] ?>" />
+                                                                            </li>
+                                                                            <li class="amtdes" id="sugdes_<?php echo $ctr ?>">
+                                                                                <input type="text" class="suggestedamountdesc" name="suggestedamountdesc[]" value="<?php echo $suggested_donation['Description'] ?>" />
+                                                                                <a href="javascript:;" class="remove-amount" onclick="removeAmount('<?php echo $ctr ?>')">Remove</a>
+                                                                            </li>
+                                                                            <?php $ctr++; } ?>
+                                                                            </div>
+                                                                            <div style="width:100%; float:left; margin-bottom:3px;"><a href="javascript:addAmount()">Add Amount</a></div>
+                                                                        </ul>
+                                                                    </p>
+                                                                </div>
+                                                                <div class="clear" style="margin-bottom: 5px"></div>
+                                                                <div style="margin-bottom:5px">
+                                                                    <strong>Fundraising Campaign Active Until:</strong><br>
+                                                                    <p>
+                                                                        <input style="cursor: pointer" class="text smaller" name="EndDate" type="text" maxlength="10" id="EndDate" value="<?php echo date('m/d/Y', strtotime($this->data['EndDate'])) ?>" />
+                                                                    </p>
+                                                                </div>
+                                                                <input type="submit" class="btn btngreen" name="btnSaveChanges" value="Save Changes" id="btnSaveChanges" />
+                                                                <a href="javascript:;" style="margin-left:5px;" onclick="$('#display-field').toggle(); $('#edit-field').toggle();  $('#edit-link').toggle()">Cancel</a>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                    <div class="clr"></div><br /><br />
+                                                </div>
+                                                <div class="box2" style="width: 320px; float:left; margin-left:20px;">
+													<?php if($this->is_fundraiser) { ?>
+														<div class="info-boxes" style="margin: 0 0 10px 0px; float:right; width:310px;">
+															Make sure to customize your <a href="/<?= $this->fundraiserURLName ?>/<?= $this->data['pURLName'] ?>">personal fundraising page</a>!
+														</div>
+													<?php } ?>
+	
+		                                            <?php if ($this->isAdmin) {
+			                                    		$tools_usage = 15;
+														if(empty($this->data['total_donations'])) {
+															$this->data['total_donations'] = 0;
+														}
+	                                            		if ($this->data['hasUploadedMembers']) $tools_usage += 30;
+	                                            		if ($this->data['hasSharedSocialNetworks']) $tools_usage += 30;
+	                                            		if ($this->data['total_donations'] >= $this->data['DonationGoal']) $tools_usage += 25; ?>
+		                                                <div class="info-boxes" style="margin: 0; width:310px;">
+															<strong>Your fundraising campaign is <?php if ($tools_usage < 100) { ?>almost complete!<?php } else { ?> fully customized!<?php } ?></strong>
+		                                            		<div class="clear" style="margin-bottom: 6px"></div>
+		                                            		<div class="progress_label"></div>
+		                                            		<div style="width: 270px!important" id="tools-progress" class="progress full progress-green"><span><b></b></span></div>
+		                                            		<script type="text/javascript">
+		                                                		Administry.progress("#tools-progress", <? echo intval($tools_usage) ?>, <? echo intval(100) ?>);
+		                                            		</script>
+	                                                        <?php if ($tools_usage < 100) { ?>
+			                                            		<div class="clear" style="margin-bottom: 6px"></div>
+		                                                    	Use any of the tools below to start raising more:<br><br />
+		                                                    	<?php if (!$this->data['hasUploadedMembers']) { ?>
+		                                                        	- <a href="/<?= $this->data['pURLName'] ?>/add-fundraisers">Add Fundraisers</a><br>
+		                                                    	<?php } ?>
+		                                                    	<?php if (!$this->data['hasSharedSocialNetworks']) { ?>
+		                                                        	- <a href="/<?= $this->data['pURLName'] ?>/share">Spread the word!</a><br>
+		                                                    	<?php } ?>
+		                                                    	<?php if ($this->data['total_donations'] < $this->data['DonationGoal']) { ?>
+		                                                        	- <a href="/<?= $this->data['pURLName'] ?>/donate">Increase your donations</a>
+		                                                    	<?php } ?>
+			                                                <?php } ?>
+			                                        		</div>
+		                                            <?php } ?>
+		                                            <div class="clear"></div>
+                                                    <table class="no-style">
+                                                        <tbody>
+                                                            <tr>
+                                                                        <?php if (date('Y-m-d', strtotime($this->data['EndDate'])) > date('Y-m-d') || $this->data['EndDate'] == '0000-00-00 00:00:00') { ?>
+                                                                <td style="vertical-align:bottom;"><a href="/<?php echo $this->data['pURLName'] ?>/donate" target="_blank" class="btnbig orange" style="padding: 0.5em 2em 0.55em;">DONATE</a></td>
+                                                                        <?php } ?>
+                                                                <td style="text-align:center">
+                                                                    <div class="progress_label">
+																		Donation<?php echo $this->data['total_donations'] > $this->data['DonationGoal'] ? "s" : " Goal" ?>: <?php echo $this->data['Currency'].number_format($this->data['total_donations']) ?>
+                                                                                <?php if ($this->data['DonationGoal'] > $this->data['total_donations']) :?>
+																					of <?php echo $this->data['Currency'].number_format($this->data['DonationGoal']) ?>
+                                                                                <?php endif;?>
+                                                                    </div>
+                                                                    <div id="progress4" class="progress full progress-green"><span><b></b></span></div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table><br />
+                                                    <script type="text/javascript">
+                                                        Administry.progress("#progress4", <? echo intval($this->data['total_donations']) ?>, <? echo intval($this->data['DonationGoal']) ?>);
+                                                    </script>
+                                                    <div class="clr"></div>
+                                                    <div class="addthis_toolbox addthis_default_style addthis_32x32_style">
+                                                        <div style="float:left; font-size:15px; font-weight:bold; margin-right:5px;">Share:</div>
+                                                        <a style="float:left" class="addthis_button_email" addthis:url="http://<?php echo $_SERVER['HTTP_HOST'] ?>/<?php echo $this->data['pURLName'] ?>" ></a>
+                                                        <a style="float:left" class="addthis_button_facebook" addthis:url="http://<?php echo $_SERVER['HTTP_HOST'] ?>/<?php echo $this->data['pURLName'] ?>"></a>
+                                                        <a style="float:left" class="addthis_button_twitter" addthis:url="http://<?php echo $_SERVER['HTTP_HOST'] ?>/<?php echo $this->data['pURLName'] ?>"></a>
+                                                    </div>
+                                                    <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4e319b9362855da9"></script>
+                                                </div>
+                                                <div class="clr"></div>
+
+                                                <strong class="bigText">People Fundraising (<?php echo count($this->fundraisers) ?>)</strong>
+                                                        <?php if (!$this->is_fundraiser && $this->isLoggedIn) { ?>
+                                                <a class="link_icon" href="/<?php echo $this->data['pURLName'] ?>/join">Fundraise for this campaign >>></a>
+                                                        <?php } else if (!$this->is_fundraiser && !$this->isLoggedIn) { ?>
+                                                <a class="link_icon" href="javascript:;" onclick="login(); $('campaign_id').val('<?php echo $this->data['ProjectId'] ?>')">Fundraise for this campaign >>></a>
+                                                            <?php } ?>
+                                                <ul class="Style02">
+                                                            <?php if (count($this->fundraisers)):?>
+                                                                <?php foreach ($this->fundraisers as $fundraiser) { ?>
+                                                    <li style="width:60px; height:65px;"><a href="/<?php echo $fundraiser['uURLName'] ?>" class="tooltip" title="<?php echo stripslashes($fundraiser['FullName']) ?>"><img src="/profile/loadimage/?UserId=<?php echo $fundraiser['uUserId'] ?>" alt="" width="53px" height="53px" class="BorderStyle" /></a></li>
+                                                                <?php } ?>
+                                                            <?php endif;?>
+                                                </ul>
+                                                <div class="clr"></div>
+                                            </div>
+                                                <?php endif;?>
+                                                <?php if (count($this->donationlist)) { ?>
+                                            <h3 style="color:#669933">Donors</h3>
+                                            <div>
+                                                <table class="table01" cellspacing="0" cellpadding="3" border="0" id="ctl00_ContentPHMain_grdDonationDetails" style="background-color:White;border-color:White;border-width:1px;border-style:None;width:550px;border-collapse:collapse;">
+                                                    <tr style="background-color:#f4f4f4;font-weight:bold;">
+                                                        <th scope="col">Name</th><th scope="col">Date</th><th scope="col">Amount</th><th scope="col">Comment</th>
+                                                    </tr>
+                                                            <?php $total_raised = 0; ?>
+                                                            <?php foreach ($this->donationlist as $donation) : ?>
+                                                                <?php $total_raised = $total_raised + $donation['DonationAmount']; ?>
+                                                    <tr style="color:Black;background-color:#F7F7F7;border-width:0px;">
+                                                        <td style="width:120px;"><?php if ($donation['SupporterName'] == '' || $donation['isAnonymous'] == 1) { echo 'Anonymous'; } else { echo stripslashes($donation['SupporterName']); }?></td>
+                                                        <td style="width:70px;"><?php echo date('M d, Y', strtotime($donation['CreatedOn'])) ?></td>
+                                                        <td style="width:70px;">
+                                                            <span id="lblDonationAmount"><?php echo $this->data['Currency'].number_format($donation['DonationAmount']) ?></span>
+                                                        </td>
+                                                        <td style="width:200px;">
+                                                                        <?php if($donation['TransactionSource'] != "Manual") { ?><span id="lblDonationComments"><?php echo stripslashes($donation['DonationComments']) ?></span><?php } ?>
+                                                        </td>
+                                                    </tr>
+                                                            <?php endforeach; ?>
+                                                </table>
+                                            </div>
+                                            <table cellpadding="0" cellspacing="0" border="0" width="550" class="table01">
+                                                <tr class="t1st3">
+                                                    <td class="t1st4">Total Raised Online: <span></span> <?php echo $this->data['Currency'].$total_raised ?></td>
+                                                </tr>
+                                            </table>
+                                                <?php } ?>
+                                            <?php if (count($this->photos)) { ?>
+                                            <script>
+                                                function togglePhotos() {
+                                                    if ($('#more-photos').html() == "Show All") {
+                                                        $('#more-photos').html("Show Less");
+                                                    } else {
+                                                        $('#more-photos').html("Show All");
+                                                    }
+                                                    $('.more-photos').toggle();
+                                                }
+                                            </script>
+                                            <div class="clear"></div>
+                                            <div style="width:100%; margin-top:25px; float:left">
+                                                <strong class="bigText" style="float:left">Photos (<?=count($this->photos)?>)</strong>
+                                            </div>
+                                            <div class="clear"></div>
+                                            <div style="width:100%; margin-top:10px">
+                                                <div id="activityPhoto">
+                                                    <?php $ctr = 0;
+                                                    foreach($this->photos as $gallery) {
+                                                        $ctr++;
+                                                        if(file_exists(realpath(dirname(__FILE__) . '/../../../../../')."/public/Photos/".$gallery['SystemMediaName']) && !empty($gallery['SystemMediaName'])) { ?>
+                                                            <a class="<?php echo $ctr > 7 ? "more-photos" : "" ?>" href="/<?php echo $this->data['pURLName'] ?>/view-photo/<?php echo $gallery['PhotoId']; ?>">
+                                                                <img class="BorderStyle photopeche" src="<?php echo $this->contentLocation ?>public/Photos/thumb/<?php echo $gallery['SystemMediaName'] ?>" style="margin: 5px; width:110px; height:110px;">
+                                                            </a>
+                                                    	<?php }
+                                                    } ?>
+                                                </div>
+                                            </div>
+                                            <div class="clear"></div>
+                                            <?php } ?>
+                                        </div>
+                                        <?php } ?>
+                                    </div>
+                                </div>
+                                <!-- e o SECOND TAB -->
+
+                                <!-- THIRD TAB -->
+                                <div class="TabbedPanelsContent">
+
+                                </div>
+                                <!-- e o THIRD TAB -->
+
+                                <!-- FOURTH TAB -->
+                                <div class="TabbedPanelsContent" >
+
+                                </div>
+                                <!-- e o FOURTH TAB -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </div>
+        <div class="block001f01"><div class="blst001"><div class="blst002"></div></div></div>
+    </div>
+</div>

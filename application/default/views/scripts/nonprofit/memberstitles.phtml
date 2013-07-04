@@ -1,0 +1,155 @@
+<script>
+function popupNew() {
+    $.fancybox($("#newTitleForm").html());
+    $("#fancybox-content .hiddenid").val("");
+}
+
+function saveTitle(edit) {
+    $.fancybox.showActivity();
+    data = {
+       OrgId: '<?=$this->organization->id?>',
+       Title: $("#fancybox-content .newtitle").val(),
+       Edit : false
+    };
+    if (edit) {
+        data['Edit'] = $("#fancybox-content .hiddenid").val();
+    }
+    $.post('/nonprofit/addnewmembertitle', data,
+    function(data) {
+        location.reload();
+    });
+}
+
+function editTitle(title,id) {
+    popupNew();
+    $("#fancybox-content .hiddenid").val(id);
+    $("#fancybox-content .newbtn").hide();
+    $("#fancybox-content .editbtn").show();
+    $("#fancybox-content .newtitle").val(title);
+}
+
+function deleteTitle(id, assigned) {
+    if (assigned > 0) {
+        alert('Please, change the assigned members to another title before deleting.');
+        return;
+    }
+    if (confirm('Are you sure you want to delete the title?')) {
+        $.post('/nonprofit/deletemembertitle', {id: id},
+        function(data) {
+            location.reload();
+        });
+    }
+}
+
+function removeTitle(memberId, titleId) {
+    if (confirm('Are you sure you want to remove the title for the selected member?')) {
+        $.post(
+            '/nonprofit/removemembertitle',
+            {MemberId: memberId},
+            function (data) {
+                showMembers(titleId, true);
+            }
+        );
+    }
+}
+
+function showMembers(id, refresh) {
+    if ($("#members_"+id).hasClass('hide')) {
+        $("#members_"+id).show();
+        $("#members_"+id).removeClass('hide');
+    } else {
+        $("#members_"+id).toggle();
+    }
+    if ($("#members_"+id+"_list").html() == "" || refresh) {
+        $.get(
+            '/nonprofit/listmemberstitle',
+            {TitleId: id},
+            function (data) {
+                var list = '';
+                if (data.length > 0) {
+                    for(var i=0;i<data.length;i++) {
+                        list += '<img src="/public/images/Bul/004.gif" style="margin-right:15px"/><b>'+data[i].fullName+'</b> - ('+data[i].chapterName+')';
+                        list += '<a href="javascript:void(0);" onclick="removeTitle(\''+data[i].id+'\',\''+id+'\')" class="right">Remove Title <img src="/public/images/cancel.png"></a><br />';
+                    }
+                } else {
+                    list = '<b>No members found with the title.</b>';
+                }
+                $("#members_"+id+"_list").html(list);
+            },
+            'json'
+        );
+    }
+}
+</script>
+
+<div class="wrapper">
+   <!-- org header -->
+  <?=$this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+
+    <!-- breadcrumb -->
+    <?=$this->placeholder('breadcrumb') ?>
+    <!-- // breadcrumb -->
+    <div class="clr"></div>
+
+    <!-- tabs -->
+    <?=$this->placeholder('tabs') ?>
+    <!-- // tabs -->
+
+    <div class="mainC">
+      <div class="box05">
+        <div class="headingStyle02">
+            Members Titles (<?=count($this->organization->memberTitles)?>)
+        </div>
+        <div class="tab-container">
+            <table cellpadding="5" cellspacing="0" width="100%">
+            <tr>
+                <td colspan="10" class="donation_tablehead">
+                    <div class="donation_navpage"></div>
+                </td>
+            </tr>
+            <tr>
+                <td class="do_col1">Member Title</td>
+                <td class="do_col2" align="center">Assigned Number</td>
+                <td class="do_col3" align="right">Action</td>
+            </tr>
+            <?php
+            if (count($this->titles) > 0) { foreach ($this->titles as $title) {?>
+            <tr>
+                <td class="xdo_col1"><?=$title->title ?></td>
+                <td class="xdo_col2" align="center"><?=$title->assignedCount?> <a href="javascript:void(0);" onclick="showMembers('<?=$title->id?>',false)">(View Members)</a></td>
+                <td class="xdo_col3" align="right"><a href="javascript:void(0);" onclick="editTitle('<?=$title->title?>','<?=$title->id?>');">Edit <img src="/public/images/changelogo.png" /></a> - <a href="javascript:void(0);" onclick="deleteTitle('<?=$title->id?>','<?=$title->assignedCount?>')">Delete <img src="/public/images/cancel.png"></a></td>
+            </tr>
+            <tr class="hide" id="members_<?=$title->id?>">
+                <td class="xdo_col1 xdo_col2 xdo_col3" colspan="3" id="members_<?=$title->id?>_list" style="padding-left: 25px"></td>
+            </tr>
+            <?php } } else { ?>
+            <tr><td class="xdo_col1 xdo_col3" colspan="3" align="center"><b>&nbsp;No records found.</b></td></tr>
+            <?php } ?>
+            </table>
+            <br /><a href="javascript:void(0);" class="btn btngreen" onclick="popupNew();">Create New Title</a>
+            <?= $this->paginationControl($this->titles, 'Sliding', 'nonprofit/new_page_selector.phtml', array('param' => 'page')); ?>
+            <br /><br />
+            <br /><br />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="clr"></div>
+  <div class="clr"></div>
+</div>
+
+
+
+<div class="hide" id="newTitleForm">
+<form name="newTitleFrm">
+    <input type="hidden" name="id" value="" class="hiddenid" />
+    <label>Title:</label>
+    <input type="text" name="title" class="newtitle" />
+    <a href="javascript:void(0);" class="btn btngreen newbtn" onclick="saveTitle(false);">Save</a><a href="javascript:void(0);" class="btn btngreen editbtn hide" onclick="saveTitle(true);">Save</a> <a href="javascript:void(0);" class="btn btngreen" onclick="$.fancybox.close();">Cancel</a>
+</form>
+</div>

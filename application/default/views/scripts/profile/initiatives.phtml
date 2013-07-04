@@ -1,0 +1,66 @@
+<div class="wrapper">
+  <!-- user header -->
+  <?php echo $this->placeholder('header') ?>
+  <!-- // user header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+      <!-- user tabs -->
+      <?php echo $this->placeholder('tabs') ?>
+      <!-- // user tabs -->
+
+    <div class="mainC02">
+    <div class="spacer"></div>
+    <div class="leftC">
+      <div class="leftMainBox BG01">
+        <!-- initiatives -->
+        <?php echo $this->render('profile/filter-initiatives.phtml'); ?>
+        <!-- //initiatives -->
+      </div>
+    </div>
+    <div class="rightC">
+        <div class="rightMainBox BG01">
+          <div class="box004">
+            <div class="headingStyle02"><?=stripslashes($this->project->name)?></div>
+            <div class="box004Content">
+              <div class="clr"></div>
+
+              <!-- right_bar -->
+              <?= $this->placeholder('right_bar'); ?>
+              <!-- //right_bar -->
+
+              <?php if(!empty($this->project->user_message)) { ?><p class="Text16"><strong><?=stripslashes($this->user->firstName)?>'s Message</strong><br />
+                <span class="Text14"><?=$this->project->user_message?></span></p><?php } ?>
+              <?php if(!empty($this->project->logo->systemMediaName)) { ?><p><img src="<?=$this->contentLocation?>public/Media/full/<?=$this->project->logo->systemMediaName?>" alt=" " class="imgstyle3" /></p><?php } ?>
+                <!-- survey check info-->
+                <?php if (isset($this->userNew) && $this->userNew->id == $this->user->id && $this->project->hasSurvey() && !is_null($this->project->getVolunteerByUser($this->userNew))) { ?><a href="/signup/editsurvey?ProjectId=<?=$this->project->id?>">Edit Survey Results</a><br /><?php } ?>
+                <!-- //survey check info -->
+                <?php if(isset($this->userNew) && $this->userNew->id == $this->user->id) { ?><a href="/<?=$this->userNew->urlName?>/<?=$this->project->urlName?>/donor-list">View Donation History</a><?php } ?>
+              <?php if($this->project->endDate != '0000-00-00 00:00:00') { ?><p><strong>End Date:</strong> <?=date('M d, Y h:i A', strtotime($this->project->endDate))?></p><?php } ?>
+              <p><strong><?= $this->project->type == 1 ? 'Fundraising Campaign' : 'Volunteer Activity'; ?> Description:</strong><br />
+              <?=stripslashes(nl2br($this->project->description))?></p>
+
+              <?php if(isset($this->organization)) { ?><p><strong>Affiliated Organization: <a href="/<?=$this->organization->urlName?>"><?=$this->organization->name?></a><br /></strong>
+                <?php if(isset($this->program)) { ?><strong>Program: <a href="/<?=$this->program->urlName?>"><?=$this->program->name?></a></strong><br /><?php } } ?>
+                <?php if(isset($this->group)) {  ?><strong>Group: <a href="/<?=$this->group->urlName?>"><?=$this->group->name?></a></strong></p><?php } ?>
+
+              <?php if(count($this->donations)) { ?>
+              <span class="headignStyle04">Supporter's Comments</span><!-- <a href="#" class="Text16">View All</a></span>-->
+                  <?php foreach($this->donations as $donation) { ?>
+
+                <p><strong><span class="Text14"><?= $donation->isAnonymous ? 'Anonymous' : $donation->supporterName?></span> donated <?=$this->project->currency.number_format($donation->amount)?></strong><br />
+                    <?php if(!empty($donation->comments)) { ?>saying: <?=stripslashes(nl2br($donation->comments))?><br /><?php } ?>
+                <!--<a href="#">Comment</a> <span class="color02">•--> <span class="color02"><?=date('M d, Y h:i A', strtotime($donation->createdOn))?></span></p>
+                <p>&nbsp;</p>
+                <div class="clr"></div>
+              <?php } } ?>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="clr"></div>
+  <div class="clr"></div>
+</div>

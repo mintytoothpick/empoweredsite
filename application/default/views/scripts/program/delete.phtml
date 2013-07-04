@@ -1,0 +1,48 @@
+<?php $this->headTitle("Empowered.org - Non Profit Management"); ?>
+<div>
+    <div id="mainco2">
+        <!-- block001 -->
+        <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+        <div class="block001">
+            <div class="blst001">
+                <div class="blst002">
+                    <div class="breadcr">
+                        <!-- share  -->
+			<div class="share">
+                            <!-- Share Button BEGIN -->
+                            <div class="addthis_toolbox addthis_default_style" style="float:right;">
+                                <div style="float:right;"><a class="addthis_button_email"></a>
+                                    <a class="addthis_button_facebook"></a>
+                                    <a class="addthis_button_twitter"></a></div><div style="float:right;padding-top:2px;">Share: </div>
+                            </div>
+                            <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4e319b9362855da9"></script>
+                            <!-- Share Button END -->
+                        </div>
+                        <!-- e o share -->
+                        <!--<span class="brst01">breadcrumbs</span>-->
+                        <div class="clear"></div>
+                    </div>
+                    <!-- main col - right col -->
+
+                    <!-- e o main col - right col -->
+
+                    <!-- main col - left col -->
+                    <div class="mainleft2">
+                        <h2>Do you want to delete "<?php echo $this->data['ProgramName'] ?>"?</h2>
+                        <form id="DeleteProgram" name="DeleteProgram" method="post" action="/program/delete">
+                            <input type="hidden" id="ProgramId" name="ProgramId" value="<?php echo $this->data['ProgramId'] ?>" />
+                            <input type="hidden" id="Type" name="Type" value="<?php echo $this->Type ?>" />
+                            <input type="submit" name="ctl00$ContentPHMain$btnYes" value="Yes" id="btnYes" />
+                            <input type="button" name="ctl00$ContentPHMain$btnNo" value="No" id="btnNo" onclick="location.href='/<?php echo $this->nonprofit_data['URLName'] ?>/<?php echo $this->data['URLName'] ?>';" />
+                        </form>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </div>
+        <div class="block001f01"><div class="blst001"><div class="blst002"></div></div></div>
+        <!-- e o block001 -->
+    </div>
+    <!-- e o main col -->
+    <div class="clear"></div>
+</div>

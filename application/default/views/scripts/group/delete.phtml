@@ -1,0 +1,26 @@
+<?php
+$this->headTitle("Empowered.org - Non Profit Management");
+$this->placeholder('tab')->set('group');
+if ($this->Prev == 'dashboard_groups') {
+    $link = "/profile/groups";
+} else {
+    $link = "/".$this->data['URLName'];
+}
+?>
+
+<div>
+	<div id="mainco2">
+	<div class="roundedbox">
+        <div class="MainBody">
+        	<h2>Do you want to delete "<?php echo $this->data['GroupName'] ?>"?</h2>
+            <form id="DeleteGroup" name="DeleteGroup" method="post" action="/group/delete">
+                <input type="hidden" id="GroupId" name="GroupId" value="<?php echo $this->data['GroupId'] ?>" />
+                <input type="hidden" id="Prev" name="Prev" value="<?php echo $this->Prev ?>" />
+                <input type="submit" name="btnYes" value="Yes" id="btnYes" />
+                <input type="button" name="btnNo" value="No" id="btnNo" onclick="location.href='<?php echo $link ?>';" />
+            </form>
+        </div>
+        <div class="clear"></div>
+ 	</div> 	
+ 	</div>
+</div>

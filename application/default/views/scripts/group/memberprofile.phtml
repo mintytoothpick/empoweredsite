@@ -1,0 +1,166 @@
+<script>
+$(function() {
+    //message group to user
+    $("#btnMsgUser").click(function() {
+        $(".msgToUser").show();
+        $(".msgResToUser").hide();
+        $.fancybox($("#msgToUser").html());
+    });
+});
+
+function sendMsgUsr() {
+    $.fancybox.showActivity();
+    var elems = $('.msgBoxToUser');
+    $.ajax({
+        url: "/<?=$this->user->urlName?>/contact-user",
+        type: 'POST',
+        data: 'message=' + elems[1].value,
+        dataType: 'json',
+        success: function(data){
+            if (data.ok) {
+                $.fancybox.hideActivity();
+                $(".msgToUser").hide();
+                $(".msgResToUser").show();
+            } else {
+                $.fancybox.hideActivity();
+            }
+        }
+    });
+}
+
+</script>
+
+<!-- Message Group Administrator -->
+<div id="msgToUser" style="display:none;">
+  <div class="msgToUser">
+    <p><strong>Send a message to the user:</strong></p>
+    <textarea rows="5" cols="50" class="msgBoxToUser"></textarea>
+    <div class="volunteerBtn02"><a href="javascript:;" onclick="sendMsgUsr()" id="btnSend">Send</a></div>
+  </div>
+  <div class="msgResToUser" style="display:none;">
+    <p><strong>Your message has been sent.</strong>.</p>
+    <div class="volunteerBtn02"><a href="javascript:;" onclick="$.fancybox.close()">Close</a></div>
+  </div>
+</div>
+<!-- //Message Group Administrator -->
+
+<div class="wrapper">
+  <!-- user header -->
+  <?php echo $this->placeholder('header') ?>
+  <!-- // user header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+    <!-- breadcrumb -->
+    <?php echo $this->placeholder('breadcrumb') ?>
+    <!-- // breadcrumb -->
+
+    <div class="clr"></div>
+
+    <!-- tabs -->
+    <?php echo $this->placeholder('tabs') ?>
+    <!-- // tabs -->
+
+
+    <div class="mainC02">
+      <div class="spacer"></div>
+
+
+
+        <div class="header02" style="width:900px;background: none;padding:0;">
+          <img src="/profile/loadimage?UserId=<?=$this->user->id?>" alt="" width="145" class="imgstyle5" />
+
+          <div class="TextBox4" style="width:450px">
+            <p><strong><span class="Text36"><?=stripslashes($this->user->fullName)?></span></strong> <span class="color02"><?= $this->user->location == 'Not Entered' ? '' : stripslashes($this->user->location); ?></span>
+            </p>
+            <p>
+              <?php if(!empty($this->user->aboutMe)) { ?>Passionate about: <span class="color02"><?=stripslashes(nl2br($this->user->aboutMe))?></span> <br /><?php } ?>
+              <? if (isset($this->userNew) && $this->userNew->id == $this->user->id) { ?>
+                <div class="volunteerBtn01" style="float:left; <?= $this->userNew->isActive ? 'margin-left:20px;' : ''?>"><a href="javascript:;" onclick="logout();">Sign Out</a></div>
+              <? } else if ($this->isLoggedIn) { ?>
+              <div class="volunteerBtn01"><a href="javascript:;" id="btnMsgUser">Message Me</a></div>
+              <? } else { ?>
+              <a style="cursor: pointer;" id="headerProfileLogin">Log in</a> to message to this user.
+              <? } ?>
+          </div>
+
+          <div class="TopBox4" style="margin-top: 0">
+            <div class="volunteerBtn01" style="margin-bottom:15px;"><a href="<? if ($this->refererUrl) { ?>/<?=$this->group->urlName?>/members<? } else { ?>javascript:history.go(-1);<? } ?>" style="width:206px">View All Members</a></div>
+            <div class="box001">
+              <div class="textSTyle01">
+                  <div class="spacer"></div>
+                  <?=$this->user->currency.number_format($this->user->raised)?><br />
+                  <?=number_format(count($this->user->initiatives))?><br />
+              </div>
+              <div class="textSTyle02">
+                  <p>Raised<br />
+                    Initiatives</p>
+              </div>
+            </div>
+          </div>
+          <div class="clr"></div>
+
+        </div>
+
+
+        <div class="spacer"></div>
+
+
+
+      <div class="rightMainBox BG01">
+          <div class="box004">
+            <div class="headingStyle02 full">Highlighted Initiative</div>
+            <div class="socailNetCon02">
+                <div class="socailNets NoMargin">
+                    <iframe src="http://www.facebook.com/widgets/like.php?href=http://<?=$_SERVER['HTTP_HOST'] ?>/<?=$this->user->urlName?>&amp;layout=button_count&amp;show_faces=true" scrolling="no" frameborder="0" style="border:none; height:28px; width:90px; float:left;"></iframe>
+                    <a class="addthis_button_facebook"></a>
+                    <a class="addthis_button_twitter"></a>
+                    <a class="addthis_button_email"></a>
+                </div>
+                <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4e319b9362855da9"></script>
+            </div>
+            <div class="box005Content">
+              <?php if(isset($this->project)) { ?>
+              <span class="TextStyle05"><a href="/<?=$this->project->urlName?>"><?=$this->project->name?></a></span>
+              <div class="clr"></div>
+
+              <!-- right_bar -->
+              <?= $this->placeholder('right_bar'); ?>
+              <!-- //right_bar -->
+
+              <div class="TextBox5">
+                <p><strong><?=$this->user->firstName?>'s Message</strong><br />
+                <div id="messageFund"><?=($this->project->user_message) ? stripslashes(nl2br($this->project->user_message->text)) : ''?></div>
+                 <?= isset($_SESSION['UserId']) && $this->user->id == $_SESSION['UserId'] ? '<a href="javascript:;" class="edit-info">Edit</a>' : ''; ?></p>
+              </div>
+              <?php if($this->project->logo) { ?><p><img src="<?=$this->contentLocation?>public/Media/full/<?=$this->project->logo->systemMediaName?>" width="288" height="162" alt=" " /></p><?php } ?>
+              <?php if(!empty($this->organization)) { ?><p><strong>Affiliated Organization: <a href="<?=$this->organization->urlName?>"><?=$this->organization->name?></a><br /></strong>
+                <?php if(!empty($this->program)) { ?><strong>Program: <a href="<?=$this->program->urlName?>"><?=$this->program->name?><br /></a></strong><?php } ?>
+                <?php if(!empty($this->group)) { ?><strong>Group: <a href="<?=$this->group->urlName?>"><?=$this->group->name?></a></strong><?php } ?>
+                      </p>
+              <?php } ?>
+              <p><strong><span class="Text14"><?= $this->project->type == 1 ? 'Fundraising Campaign' : 'Volunteer Activity'; ?> Description</span></strong><br />
+                <?=stripslashes(nl2br($this->project->description))?></p>
+              <div class="clr"></div>
+              <div class="clr"></div>
+              <?php } else { ?>
+              No initiatives found.
+              <?php } ?>
+          </div>
+
+        </div>
+        </div>
+
+        <!-- live feed -->
+        <? echo $this->render('profile/index-live-feed.phtml'); ?>
+        <!-- //live feed -->
+
+        <!-- live feed -->
+        <? echo $this->render('profile/filter-index-initiatives.phtml'); ?>
+        <!-- //live feed -->
+    </div>
+  </div>
+  <div class="clr"></div>
+  <div class="clr"></div>
+</div>

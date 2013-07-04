@@ -1,0 +1,302 @@
+<script type="text/javascript">
+    var ctr = 0;
+    $(function() {
+        $('.options').bind('click', function() {
+            var id = $(this).attr('id');
+            $('.options').each(function() {
+                if ($(this).attr('id') != id) {
+                    $(this).removeAttr('checked');
+                }
+            })
+            $('.field-list').each(function() {
+                $(this).hide();
+            })
+            if (id != 'org') {
+                $('#'+id+'-list').show();
+            }
+        })
+    })
+
+    function validateForm() {
+        var error = "";
+        if($('#programs').attr('checked')) {
+            var sel_act = 0;
+            $('#programs-list ul li input[type=checkbox]').each(function() {
+                if ($(this).attr('checked')) {
+                    sel_act++;
+                }
+            })
+            if (sel_act == 0) {
+                error += "Please select atleast one program.<br>";
+            }
+        }
+        if($('#groups').attr('checked')) {
+            var sel_act = 0;
+            $('#groups-list ul li input[type=checkbox]').each(function() {
+                if ($(this).attr('checked')) {
+                    sel_act++;
+                }
+            })
+            if (sel_act == 0) {
+                error += "Please select atleast one chapter.<br>";
+            }
+        }
+        if($('#activities').attr('checked')) {
+            var sel_act = 0;
+            $('#activities-list ul li input[type=checkbox]').each(function() {
+                if ($(this).attr('checked')) {
+                    sel_act++;
+                }
+            })
+            if (sel_act == 0) {
+                error += "Please select atleast one volunteer activity.<br>";
+            }
+        }
+        if($('#campaigns').attr('checked')) {
+            var sel_act = 0;
+            $('#campaigns-list ul li input[type=checkbox]').each(function() {
+                if ($(this).attr('checked')) {
+                    sel_act++;
+                }
+            })
+            if (sel_act == 0) {
+                error += "Please select atleast one fundraising campaign.<br>";
+            }
+        }
+        if (jQuery.trim($('#subject').val()) == "") {
+            error += "Please specify a subject.<br>";
+        }
+        if (jQuery.trim($('#message').val()) == "") {
+            error += "Please specify a message.<br>";
+        }
+
+        if (error == "") {
+            return true;
+        } else {
+            $('#error').html(error).show();
+            return false;
+        }
+    }
+
+    function addFromEmail() {
+        /*
+        var content = '<div id="sentFrom_'+ctr+'" style="margin-top:3px;"><input type="text" name="sentFrom[]" style="width:250px;" />&nbsp;&nbsp;<a href="javascript:removeFromMail('+ctr+')">Remove</a></div>';
+        $('#from-mail').append(content);
+        ctr++;
+        */
+       var error = "";
+       var emails = jQuery.trim($('#from_emails').val()).split(",");
+       if (emails.length > 0) {
+           for (var i = 0; i < emails.length; i++) {
+               if (!validateEmail(jQuery.trim(emails[i]))) {
+                   error = "Please specify a valid email address";
+                   break;
+               }
+           }
+       } else if (emails.length == 0 || jQuery.trim($('#from_emails').val()) == "") {
+           error = "Please specify atleast one email to continue.";
+       }
+       if (error == "") {
+           $.post("/group/sendemail", {NetworkId: $('#NetworkId').val(), FromEmails: $('#from_emails').val(), From: $('#sentFrom').val(), action: "Add Emails"}, function(data) {
+               $('#from-mail').hide();
+               $('#emails').html(data);
+               $('#sent-mail').show();
+           })
+       } else {
+           alert(error);
+       }
+       return false;
+    }
+
+    function removeFromMail(id) {
+        $('#sentFrom_'+id).remove();
+        ctr--;
+    }
+
+</script>
+<style type="text/css">
+    .send-mail .field-label {
+        float:left;
+        width:70px;
+        margin-top:15px;
+        line-height:24px;
+    }
+    .send-mail .field-input {
+        float:left;
+        width:760px;
+        margin-right:100px;
+        margin-top:15px;
+        line-height:24px;
+    }
+    .send-mail .field-input span {
+        margin-right:20px;
+    }
+    .send-mail .field-list {
+        float:left;
+        width:720px;
+        display:none;
+        margin-left:70px;
+        margin-right:280px;
+        margin-top:10px;
+        border:1px solid #e5e5e5;
+    }
+    .send-mail .field-list .leftCol {
+        float:left;
+        width:325px;
+        padding-right:15px;
+        line-height:22px;
+        border-right:1px solid #e5e5e5;
+    }
+    .send-mail .field-list .rightCol {
+        float:left;
+        width:325px;
+        padding-left:15px;
+        line-height:22px;
+    }
+
+	<?php if(isset($_REQUEST['ProgramId'])) { ?>
+	#programs-list {
+		display:block;
+	}
+	<?php } ?>
+</style>
+<div>
+    <div id="mainco2">
+        <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+        <div class="block001">
+            <div class="blst001">
+                <div class="blst002">
+                    <div class="MainBody">
+                            <?php include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/nonprofitheader.php'; ?>
+                            <div class="TabbedPanelsContentGroup">
+                                <!-- FIRST TAB -->
+                                <div class="TabbedPanelsContent">
+                                    <div class="Menu2Body">
+                                        <div class="whiteBox">
+                        <h1 style="color:#669933">Email Donors</h1>
+                        <div class="send-mail">
+                            <div id="error" style="border:2px solid #e5e5e5; color:red; padding:5px;width:760px; display:none"></div>
+                            <?php if ($this->sent) { ?>
+                            <div style="margin:5px 0px; padding:5px; border:1px solid #93C47D; background: #D9EAD3; width:760px;"><?php echo $this->message ?></div>
+                            <?php } ?>
+                            <form method="post" onsubmit="return validateForm()">
+                                <input type="hidden" id="NetworkId" name="NetworkId" value="<?php echo $this->network['NetworkId'] ?>" />
+                                <input type="hidden" id="action" name="action" value="Send Email" />
+                                <div class="field-label">
+                                    <strong>To:</strong>
+                                </div>
+                                <div class="field-input">
+                                    <span><input class="options" id="all-donors" type="radio" name="sendTo" value="All Donors" <?php echo isset($_REQUEST['ProgramId']) ? '' : 'checked'; ?> /> All Donors</span>
+                                    <?php if ($this->network['hasPrograms'] == 1) { ?>
+                                    <span><input class="options" id="programs" type="radio" name="sendTo" value="Program" <?php echo isset($_REQUEST['ProgramId']) ? 'checked' : ''; ?> /> Program Donors</span>
+                                    <?php } ?>
+                                    <?php if ($this->network['hasGroups'] == 1) { ?>
+                                    <span><input class="options" id="groups" type="radio" name="sendTo" value="Chapter" /> Chapter Donors</span>
+                                    <?php } ?>
+                                    <span><input class="options" id="activities" type="radio" name="sendTo" value="Activity" /> Activity Donors</span>
+                                    <span><input class="options" id="campaigns" type="radio" name="sendTo" value="Campaign" /> Campaign Donors</span>
+                                </div>
+                                <?php if ($this->network['hasPrograms'] == 1) { ?>
+                                <div id="programs-list" class="field-list">
+                                    <ul style="list-style:none; padding:10px; float:left">
+                                    <?php $ctr = 1; foreach($this->programs as $program) { ?>
+                                        <li class="<?php echo $ctr%2==1 ? "leftCol" : "rightCol" ?>">
+                                            <input type="checkbox" name="programs[]" value="<?php echo $program['ProgramId'] ?>" style="width:auto;" <?php echo isset($_REQUEST['ProgramId']) && $_REQUEST['ProgramId'] == $program['ProgramId'] ? 'checked' : ''; ?> />&nbsp;<?php echo stripslashes(strlen($program['ProgramName']) > 45 ? substr($program['ProgramName'], 0, 42)."..." : $program['ProgramName']) ?>
+                                        </li>
+                                    <?php $ctr++; } ?>
+                                    </ul>
+                                </div>
+                                <?php } ?>
+                                <?php if ($this->network['hasGroups'] == 1) { ?>
+                                <div id="groups-list" class="field-list">
+                                    <ul style="list-style:none; padding:10px; float:left">
+                                    <?php $ctr = 1; foreach($this->groups as $group) { ?>
+                                        <li class="<?php echo $ctr%2==1 ? "leftCol" : "rightCol" ?>">
+                                            <input type="checkbox" name="groups[]" value="<?php echo $group['GroupId'] ?>" style="width:auto;" />&nbsp;<?php echo stripslashes(strlen($group['GroupName']) > 45 ? substr($group['GroupName'], 0, 42)."..." : $group['GroupName']) ?>
+                                        </li>
+                                    <?php $ctr++; } ?>
+                                    </ul>
+                                </div>
+                                <?php } ?>
+                                <div id="activities-list" class="field-list">
+                                    <ul style="list-style:none; padding:10px; float:left">
+                                    <?php $ctr = 1; foreach($this->activities as $activity) { ?>
+                                        <li class="<?php echo $ctr%2==1 ? "leftCol" : "rightCol" ?>">
+                                            <input type="checkbox" name="activities[]" value="<?php echo $activity['ProjectId'] ?>" style="width:auto;" />&nbsp;<?php echo stripslashes(strlen($activity['Name']) > 45 ? substr($activity['Name'], 0, 42)."..." : $activity['Name']) ?>
+                                        </li>
+                                    <?php $ctr++; } ?>
+                                    </ul>
+                                </div>
+                                <div id="campaigns-list" class="field-list">
+                                    <ul style="list-style:none; padding:10px; float:left">
+                                    <?php $ctr = 1; foreach($this->campaigns as $activity) { ?>
+                                        <li class="<?php echo $ctr%2==1 ? "leftCol" : "rightCol" ?>">
+                                            <input type="checkbox" name="activities[]" value="<?php echo $activity['ProjectId'] ?>" style="width:auto;" />&nbsp;<?php echo stripslashes(strlen($activity['Name']) > 45 ? substr($activity['Name'], 0, 42)."..." : $activity['Name']) ?>
+                                        </li>
+                                    <?php $ctr++; } ?>
+                                    </ul>
+                                </div>
+                                <div class="field-label">
+                                    <strong>From:</strong>
+                                </div>
+                                <div class="field-input" id="from-mail">
+                                    <span>
+                                        <select id="sentFrom" name="sentFrom" style="font-size:14px;padding:2px 1px">
+                                            <option value="<?php echo $this->default_email ?>"><?php echo $this->default_email ?></option>
+                                            <?php foreach($this->emails as $email) { ?>
+                                            <option value="<?php echo $email['Email'] ?>"><?php echo $email['Email'] ?></option>
+                                            <?php } ?>
+                                        </select>
+                                    </span>
+                                    <a id="add-from" href="javascript:;" onclick="$('#add-from').hide(); $('#submit').hide(); $('#add-from-email').show();">Add From Email</a>
+                                    <div id="add-from-email" style="margin-top:10px; display:none">
+                                        <div style="background-color:yellow; padding-left:5px; margin:5px 0px; width:330px;">List emails you want to send "from" separated by commas</div>
+                                        <textarea id="from_emails" name="from_emails" style="width:500px; margin-bottom:8px;" rows="4" cols="40"></textarea><br>
+                                        <input type="button" class="btn btngreen" value="Add Emails" onclick="return addFromEmail()" />
+                                        <input type="button" class="btn btngreen" value="Cancel" onclick="$('#add-from').show(); $('#submit').show(); $('#add-from-email').hide();" />
+                                    </div>
+                                </div>
+                                <div class="field-input" id="sent-mail" style="display:none">
+                                    <div style="background-color:#D8DFEA; padding-left:5px; margin:5px 0px; width:700px;">An email has been sent to <span id="emails" style="margin-right:0px"></span>. Please click on the verification link in this email to add this email to your chapter's account.</div>
+                                </div>
+                                <div class="field-label">
+                                    <strong>Subject:</strong>
+                                </div>
+                                <div class="field-input">
+                                    <input style="width:380px;font-size:14px;padding:2px 1px" type="text" id="subject" name="subject" value="" />
+                                </div>
+                                <div class="field-label">
+                                    <strong>Message:</strong>
+                                </div>
+                                <div class="field-input">
+                                    <textarea id="message" name="message" cols="92" rows="10"></textarea>
+                                </div>
+                                <div id="submit" style="margin:10px 0px; width:700px; float:left">
+									<?php if(isset($_REQUEST['ProgramId'])) { ?>
+	                                <a class="btn btngreen" style="padding:3px 15px" href="javascript:;" onclick="view_donors.submit()">Back</a>
+									<?php } else { ?>
+                                    <a class="btn btngreen" style="padding:3px 15px" href="/<?php echo $this->network['URLName'] ?>/donors">Back</a>
+									<?php } ?>
+                                    <input type="submit" class="btn btngreen" value="Send" />
+                                </div>
+                            </form>
+							<?php if(isset($_REQUEST['ProgramId'])) { ?>
+								<form id="view_donors" name="view_donors" method="post" action="/<?php echo $this->network['URLName'] ?>/donors?Prev=program" style="display:none;">
+                                    <input type="hidden" name="ProgramId" value="<?=$_REQUEST['ProgramId']?>" />
+                                </form>
+							<?php } ?>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+		                        </div>
+		                    </div>
+		                </div>
+		                <div class="clear"></div>
+		            </div>
+		        </div>
+		    </div>
+		    <div class="block001f01"><div class="blst001"><div class="blst002"></div></div></div>
+		</div>
+

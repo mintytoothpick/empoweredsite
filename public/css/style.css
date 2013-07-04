@@ -1,0 +1,118 @@
+body {padding:12px 0 0 0; margin:0; font-family:Arial, Helvetica, sans-serif; color:#000; background:#fff;}
+
+h1, h2, h3 , h5, h6 {margin:0;}
+h1 { font-size:24px; line-height:26px; color:#ee620e; font-weight:normal;}
+h2 { font-size:21px; line-height:23px; font-weight:normal; padding:3px 12px 12px 12px}
+h4 { font-size:14px; line-height:16px; font-weight:normal; padding:0; margin:0}
+h5 { font-size:14px; line-height:16px; padding:0; margin:12px 0 6px 12px}
+
+
+img {border:0}
+
+a:link, a:visited {color:#0066bc}
+a:hover {color:#ee620e}
+
+form {margin:0; padding:0}
+input, select, textarea {font-family:Arial, Helvetica, sans-serif;}
+
+#navigation {border:1px solid #ddd; padding:7px; width:986px; font-size:12px; margin:0 0 12px 12px}
+#navigation a { font-size:14px; padding:0 10px; line-height:20px}
+#navigation a.currentStep { font-size:16px; padding:0 10px; line-height:20px; font-weight:bold}
+#navigation span { font-size:14px; padding:0 10px; line-height:20px; color:#999}
+
+#header {border:1px solid #ddd; padding:7px; width:986px; font-size:12px; margin:0 0 12px 12px}
+
+#header img { float:left; margin:0 7px 0 0}
+
+.left13 { float:left; width:326px; font-size:11px; background:#efefef; margin:0 0 12px 12px;} 
+.left23 { float:left; width:664px; font-size:11px; background:#efefef; margin:0 0 12px 12px;}
+.left12 { float:left; width:495px; font-size:11px; background:#efefef; margin:0 0 12px 12px} 
+.left11 { width:1001px;  font-size:11px; background:#efefef; margin:0 0 12px 12px} 
+
+ 
+.detailsItem {padding:0px 12px 7px 12px}
+
+.textItem {padding:0px 12px 7px 12px}
+ 
+.descriptionItem {padding:0px 12px 7px 12px}
+
+.photoItem { font-size:11px; padding:0px 12px 7px 12px}
+.photoItem img { float:left; margin:0 3px 0 0}
+
+.contactItem { font-size:11px; padding:0px 12px 7px 12px}
+.contactItem img { float:left; margin:0 12px 0 0}
+.contactItem .user01 { font-size:12px; font-weight:bold}
+.contacts p { margin:0; padding:0 0 7px 7px}
+
+.newsItem { font-size:11px; padding:0px 12px 7px 12px}
+.newsItem .user01 { font-size:12px; font-weight:bold}
+.newsItem ul li { font-size:11px; margin:0; padding:0}
+.news p.date01 { margin:0; padding:0; font-size:10px; color:#888}
+.news p.web01 { margin:0; padding:0 0 7px 0; font-size:10px;}
+
+.eventItem { font-size:11px; padding:0px 12px 7px 12px}
+.eventItem .user01 { font-size:12px; font-weight:bold}
+.eventItem ul li { font-size:11px; margin:0; padding:0}
+.events p.date01 { margin:0; padding:0; font-size:10px; font-weight:bold}
+.events p.date01 span {color:#888; font-weight:normal}
+.events p.web01 { margin:0; padding:0 0 7px 0; font-size:10px;}
+
+.statisticItem {padding:0px 12px 7px 12px}
+
+.fileItem { font-size:11px; padding:0px 12px 7px 12px}
+.fileItem .user02 { font-size:11px;}
+.files p.date01 { margin:0; padding:0; font-size:10px; color:#888}
+.files p.web01 { margin:0; padding:0 0 7px 0; font-size:10px;}
+
+
+
+.blogItem { font-size:11px; padding:0px 12px 7px 12px}
+.blogItem .user02 { font-size:11px;}
+.blog p.date01 { margin:0; padding:0; font-size:10px; color:#888}
+
+
+.brigadeItem { padding:0px 12px 24px 12px}
+.brigadeItemPhotosList { padding:12px 0 0 0}
+.brigadeItem a.img001 { float:left; margin:0 5px 0 0}
+.brigadeItem .link01 { text-align:right;}
+.brigades p.location { margin:0; padding:0 0 3px 0}
+.brigadeItemPhoto { width:33%; float:left; text-align:center}
+.brigadeItemPhoto img { text-align:center}
+
+
+.groupsItem { padding:0px 12px 24px 12px}
+.groupsItemPhotosList { padding:12px 0 0 0}
+.groupsItem a.img001 { float:left; margin:0 5px 0 0}
+.groupsItem .link01 { text-align:right;}
+.groups p.location { margin:0; padding:0 0 3px 0}
+.groupsItemPhoto { width:33%; float:left; text-align:center}
+.groupsItemPhoto img { text-align:center}
+
+.personalInformation {padding:0px 12px 7px 12px; background:#efefef; width:978px; margin:0 0 12px 12px; font-size:12px; }
+.personalInformation .name01 { font-size:14px; font-weight:bold}
+.personalInformation .email01 { padding:0 0 12px 0}
+.personalInformation h2 { padding:3px 12px 12px 0}
+.personalInformation .userPhoto { padding:0 12px 0 0; float:left}
+
+.messageForm { padding:0 0 12px 0}
+.messageForm textarea {  margin:0 0 0 12px; width:200px; display:block}
+.messageForm input {margin:7px 0 0 12px; float:none}
+
+.registration01 {border:1px solid #ddd; padding:7px; width:986px; font-size:12px; margin:0 0 12px 12px}
+.registration01 p { padding:0 0 12px 12px}
+.registration01 td { vertical-align:top}
+
+.linkButton { font-size:15px; font-weight:bold}
+
+.administer { float:right; width:250px;  text-align:right;}
+
+.administer select { width:160px; margin:3px 0 0 0}
+
+.bookm { float:right; width:250px;  text-align:right; height:30px}
+#header .bookm img {float:none; display:inline}
+
+.spacer01 { height:12px; background:#fff}
+.clear { clear:both; height:1px; overflow:hidden; }
+
+
+

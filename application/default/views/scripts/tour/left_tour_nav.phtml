@@ -1,0 +1,33 @@
+<?php $this->placeholder('left_tour_nav')->captureStart();
+$activePage  = $this->activePage;
+$activeClass = ' class="active"';
+?>
+<div class="JoinBtn"><a href="/getstarted">Join Now &gt;</a></div>
+<div class="leftSiderBar">
+  <span class="leftSiderBarHeading">Tour</span>
+  <ul class="leftSiderBarStyle01">
+    <li class="solutions02"><a href="/tour/custom-solutions" <?=($activePage=='solutions') ? $activeClass :''; ?> title="Tour: Custom Solutions">Custom Solutions</a></li>
+    <li class="fundraising02"><a href="/tour/fundraising-campaigns" <?=($activePage=='campaigns') ? $activeClass :''; ?> title="Tour: Fundraising Campaigns">Fundraising Campaigns</a></li>
+    <li class="volunteer02"><a href="/tour/volunteer-activities" <?=($activePage=='activities') ? $activeClass :''; ?> title="Tour: Volunteer Activities">Volunteer Activities</a></li>
+    <li class="events"><a href="/tour/events" <?=($activePage=='events') ? $activeClass :''; ?> title="Tour: Events">Events</a></li>
+    <li class="management"><a href="/tour/management" <?=($activePage=='management') ? $activeClass :''; ?> title="Tour: Management">Management</a></li>
+    <li class="chapter"><a href="/tour/chapter-management" <?=($activePage=='chapter') ? $activeClass :''; ?> title="Tour: Chapter Management">Chapter Management</a></li>
+  </ul>
+  <div class="seprator"></div>
+  <span class="leftSiderBarHeading">Benefits</span>
+  <ul class="leftSiderBarStyle01">
+    <li><a href="/benefits" <?=($activePage=='grow') ? $activeClass :''; ?> title="Benefits: Grow">Grow</a></li>
+    <li><a href="/benefits/efficient" <?=($activePage=='efficient') ? $activeClass :''; ?> title="Benefits: Efficient">Increase Efficiency</a></li>
+    <li><a href="/benefits/save" <?=($activePage=='save') ? $activeClass :''; ?> title="Benefits: Save">Save</a></li>
+    <li><a href="/benefits/why-were-different" <?=($activePage=='why') ? $activeClass :''; ?> title="Benefits: Why We're Different">Why We're Different</a></li>
+    <li><a href="/benefits/pricing" <?=($activePage=='pricing') ? $activeClass :''; ?> title="Benefits: Pricing">Pricing</a></li>
+  </ul>
+  <div class="seprator"></div>
+  <span class="leftSiderBarHeading"> About Us</span>
+  <ul class="leftSiderBarStyle01">
+    <li><a href="/about-us" <?=($activePage=='story') ? $activeClass :''; ?> title="About Us: Our Story">Our Story</a></li>
+    <li><a href="/who-we-help" <?=($activePage=='who') ? $activeClass :''; ?> title="About Us: Who We Help">Who We Help</a></li>
+    <li><a href="/impact" <?=($activePage=='impact') ? $activeClass :''; ?> title="About Us: Impact">Impact</a></li>
+  </ul>
+</div>
+<?php $this->placeholder('left_tour_nav')->captureEnd() ?>

@@ -1,0 +1,86 @@
+<script>
+_gaq.push(['_trackEvent', 'Initiative', 'Donate', 'Donation']);
+</script>
+
+<div class="wrapper">
+    <!-- org header -->
+    <?=$this->placeholder('header') ?>
+    <!-- // org header -->
+
+    <div class="BodyCon">
+
+        <!-- breadcrumb -->
+        <?=$this->placeholder('breadcrumb') ?>
+        <!-- // breadcrumb -->
+        <div class="clr"></div>
+
+        <!-- tabs -->
+        <?=$this->placeholder('tabs') ?>
+        <!-- // tabs -->
+        <script>
+            function streamPublish(name, description, hrefTitle, hrefLink, userPrompt, projectLogo){
+              FB.ui({ method : 'feed',
+                message: userPrompt,
+                link   :  hrefLink,
+                caption:  hrefTitle,
+                picture: projectLogo
+              });
+             }
+            function inviteDonors() {
+                FB.login( function() {
+                    FB.ui({
+                        method : 'apprequests',
+                        message: 'I donated to <?php echo $this->project->name; ?>. Please support the cause with a donation!',
+                    }, function(response) {
+                        if(response) {
+                          jQuery.each(response.to, function(index, fbid) {
+                              FB.api('/' + fbid + '/feed', 'post', {
+                                message: 'I donated to <?php echo $this->project->name; ?>. Please support the cause with a donation!',
+                                link: 'http://<?php echo $_SERVER['HTTP_HOST']; ?>/<?php echo $this->project->urlName; ?>',
+                              });
+                          } );
+
+                          // Delete request. We don't want it.
+                          FB.api(response.request, 'delete');
+                        }
+
+                        // Facebook Connect
+                        $.ajax({
+                            url: '/social/facebookconnect',
+                            xhrFields: {
+                                withCredentials: true    // Prevents session lost during call.
+                            },
+                        });
+                    });
+                }, {scope: 'email,publish_stream,publish_actions'});
+            }
+        </script>
+
+        <div class="mainC02">
+            <div class="box05 BG01">
+                <div class="headingStyle02">Donation Successful</div>
+                <p style="margin-left:20px">
+                Thank you! Your donation has been accepted. You will be receiving an email with your donation receipt.<br /><br />
+                <? if ($this->donation) { ?>
+                <strong>Donation details:</strong><br />
+                Recipient: <?=$this->donation->organization->name?><br />
+                In support of: <?=$this->donation->destination?><br />
+                Amount: <?=$this->donation->project->currency.number_format($this->paymentAmount, 2)?><br />
+                Donation #: <?=$this->donation->transactionId?><br />
+                Date of Donation: <?=date('m/d/Y', strtotime($this->donation->createdOn))?><br /><br />
+                <? } ?>
+                </p>
+                <h3 style="margin-left:20px">Help them raise more money!</h3>
+                <p style="margin-left:20px">
+                1: <a href="javascript:;" onclick="streamPublish('<?= $this->project->name?>', '<?= $this->project->description?>', '<?= $this->project->name ?>', '<?= 'http://'.$_SERVER['HTTP_HOST'].'/'.$this->project->urlName?>', 'I just donated to this awesome activity!', '<?= 'http://'.$_SERVER['HTTP_HOST'].'/public/Media/full/'.$this->project->urlName.'-logo.jpg' ?>')">Post to Facebook!</a><br /><br />
+                2: <a href="javascript:;" onclick="inviteDonors()">Ask select facebook friends to make a donation</a>
+                </p>
+                <div class="clear"></div><br />
+                <center><a href="/<?=$this->project->urlName?>" class="btn btngreen">Continue</a></center>
+                <div class="clear"></div><br />
+            </div>
+            </div>
+        </div>
+    <div class="clr"></div>
+    <div class="clr"></div>
+</div>

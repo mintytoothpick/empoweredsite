@@ -1,0 +1,265 @@
+<?php
+$this->placeholder('currenttab')->set('orggroups');
+$_REQUEST['URLName'] = $this->network['URLName'];
+if (isset($this->program)) {
+    $_REQUEST['URLName'] .= "/".$this->program['URLName'];
+}
+$_REQUEST['page'] = 'groups';
+$this->headMeta()->appendName('description', stripslashes($this->network['AboutUs']));
+?>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("ul.tabs").tabs("div.panes > div");
+        $(".navmenu-h li").hover(
+            function() { $(this).addClass("iehover"); },
+            function() { $(this).removeClass("iehover"); }
+        );
+    })
+
+    function joinOrganization(NID, UID) {
+        $.post('/nonprofit/joinrequest', {NetworkId: NID, UserId: UID}, function(data) {
+            alert(data);
+            $('#join-org').hide();
+        })
+    }
+
+    function loadGroups(url) {
+        window.location.href = '/<?php echo $this->network['URLName'] ?>/'+url+'/groups';
+    }
+
+    function deleteGroup(GID) {
+        if (confirm("Are you sure you want to delete the selected group?") == true) {
+            $.post('/group/delete', {GroupId: GID, reload : 0}, function() {
+                alert("You have successfully deleted the selected group");
+                window.location.reload(true);
+            })
+        }
+    }
+</script>
+<style type="text/css">
+    .search-column {
+        width:650px;
+        margin-top:10px;
+    }
+    .search-column .results-header {
+        padding-bottom:5px;
+        border-bottom:1px solid #e5e5e5;
+    }
+
+    .item .logo {
+        width:110px;
+        float:left;
+        margin-right:10px;
+        min-height:60px!important;
+    }
+    .item .info {
+        float:left;
+        width:730px;
+    }
+    .item .logo img {
+        height:60px;
+        width:90px;
+        float:left;
+    }
+    .item {
+        padding-bottom:8px;
+        margin-bottom:10px;
+        border-bottom:1px solid #e5e5e5;
+    }
+    .item .info a.name {
+        color:#669933;
+        font-size:13px;
+    }
+</style>
+<link rel="stylesheet" href="<?php echo $this->contentLocation ?>public/css/scrollable-horizontal.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="<?php echo $this->contentLocation ?>public/css/navigation.css" type="text/css" media="screen" />
+
+<div>
+    <div id="mainco2">
+        <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+        <div class="block001">
+            <div class="blst001">
+                <div class="blst002">
+                    <div class="MainBody">
+                            <?php include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/nonprofitheader.php'; ?>
+                            <div class="TabbedPanelsContentGroup">
+                                <!-- FIRST TAB -->
+                                <div class="TabbedPanelsContent" style="display:none">
+
+                                </div>
+                                <!-- e o FIRST TAB -->
+
+                                <!-- SECOND TAB -->
+                                <div class="TabbedPanelsContent">
+                                    <div class="Menu2Body">
+                                        <div class="whiteBox">
+                                            <div class="article01" style="margin:10px 0; padding-bottom:20px; border-bottom: 1px solid #E5E5E5">
+                                                <span style="font-size:24px; color:#693; margin-top:16px;">Groups (<?php echo $this->group_count ?>)</span>
+                                                <div style="float: right">
+                                                    <form method="post">
+                                                        <div style="float: right">
+                                                            <strong style="float: left; padding: 5px 0">Search Chapter:&nbsp;</strong>
+                                                            <input type="text" name="search_text" style="width:250px; border:2px solid #528D19; border-right: none; padding:2px; float: left" />
+                                                            <input type="submit" value="" style="background: url('/public/images/search.gif') no-repeat 0 0 transparent; border: 2px solid #528D19; height: 24px; margin-left: -2px; padding: 2px; width: 23px; border-left: none;">
+                                                        </div>
+                                                        <?php if ($this->network['hasPrograms'] == 1) { ?>
+                                                        <div style="float: right">
+                                                            <strong style="padding: 5px 0">Program: </strong>
+                                                            <select onchange="loadGroups(this.value)" style="padding: 2px 2px 2px 0">
+                                                                <option value="">All</option>
+                                                                <?php foreach($this->programs as $program) { ?>
+                                                                <option value="<?php echo $program['URLName'] ?>" <?php echo isset($this->program) && $this->program['URLName'] == $program['URLName'] ? "selected" : "" ?>><?php echo stripslashes($program['ProgramName']) ?></option>
+                                                                <?php } ?>
+                                                            </select>&nbsp;&nbsp;
+                                                        </div>
+                                                        <?php } ?>
+                                                    </form>
+                                                </div>
+                                                <?php if ($this->isAdmin) { ?>
+                                                <a href="/<?php echo $this->network['URLName'] ?>/create-group">+ Create a new <?=strtolower($this->organization->groupNamingSingular)?></a>
+                                                <?php } ?>
+                                                <div class="clear" style="margin-bottom:10px"></div>
+                                            </div>
+                                        <?php if (count($this->groups) > 0) { ?>
+                                        <?php foreach($this->groups as $group) {
+                                            $media = $this->sitemedia->getSiteMediaById($group['LogoMediaId']);
+                                            $media_image = $media['SystemMediaName'];
+                                            $media_caption = $media['Caption'];
+                                            $locationInfo = $this->contact_info->generateLocation($group['GroupId']);
+                                            $members = count($this->group_members->getGroupMembers($group['GroupId']));
+                                            $group['Description'] = str_replace(array("\\", "\\'"), array("", "'"), stripslashes($group['Description']));
+                                        ?>
+                                        <div class="item" style="width:950px">
+                                            <div class="logo">
+                                                <?php if(file_exists("/home/$this->envUsername/public_html/public/Media/$media_image") && trim($media_image) != '') : ?>
+                                                    <center><a href="/<?php echo $group['URLName'] ?>"><img src="<?php echo $this->contentLocation ?>public/Media/<?php echo $media_image ?>" alt="<?php echo $media_caption ?>" /></a></center>
+                                                <?php endif;?>
+                                            </div>
+                                            <div class="info">
+                                                <?php if($this->isAdmin) { ?><span style="float:right"><a href="javascript:;" onclick="deleteGroup('<?php echo $group['GroupId']?>')"><img src="/public/images/icon_delete_grey.gif" width="10" height="10"></a></span><?php } ?>
+                                                <h4><a class="name" href="/<?php echo $group['gURLName'] ?>"><?php echo stripslashes($group['GroupName']) ?></a></h4>
+                                                <div class="site-desc">
+                                                    <?php if (!empty($locationInfo)) { ?>
+                                                    Location: <?php echo stripslashes($locationInfo) ?><br/>
+                                                    <?php } ?>
+                                                    <?php if ($members > 0) { ?>
+                                                    <a href="/<?php echo $group['gURLName'] ?>/members"><?php echo $members ?> Members</a><br/>
+                                                    <?php } ?>
+                                                    <div id="divLessContent<?php echo $group['GroupId'] ?>" style="display:inline;">
+                                                        <span ><?php echo (strlen($group['Description']) > 130 ? stripslashes(substr($group['Description'], 0, 130))."..." : stripslashes($group['Description'])) ?></span>
+                                                        <?php echo (strlen($group['Description']) > 130 ? '<a href="javascript:ShowHide(\'divLessContent'.$group['GroupId'].'\',\'divMoreContent'.$group['GroupId'].'\');">Read More</a>' : "") ?>
+                                                    </div>
+                                                    <?php if (strlen($group['Description']) > 130) { ?>
+                                                        <div id="divMoreContent<?php echo $group['GroupId'] ?>" style="display:none;">
+                                                            <span><?php echo stripslashes($group['Description']) ?></span>
+                                                            <a href="javascript:ShowHide('divMoreContent<?php echo $group['GroupId'] ?>','divLessContent<?php echo $group['GroupId'] ?>')">Read Less</a>
+                                                        </div>
+                                                    <?php } ?>
+                                                </div>
+                                            </div>
+                                            <div class="clear"></div>
+                                        </div>
+                                        <?php } ?>
+                                        <?= $this->paginationControl($this->groups, 'Sliding', 'nonprofit/page_selector_1.phtml', array('param' => 'page')); ?>
+                                        <?php } else { ?>
+                                            There are currently no groups for this organization.
+                                        <?php } ?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- e o SECOND TAB -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </div>
+        <div class="block001f01"><div class="blst001"><div class="blst002"></div></div></div>
+    </div>
+</div>
+<style>
+#programs-popup li {
+    background-color:#C1DBDB;
+}
+#programs-popup li:hover {
+    background-color:#999898;
+}
+.SubTabbedPanels {
+    margin: 0px;
+    padding: 0px;
+    float: left;
+    clear: none;
+    width: 100%; /* IE Hack to force proper layout when preceded by a paragraph. (hasLayout Bug)*/
+}
+
+.SubTabbedPanelsTabGroup {
+    margin: 0px;
+    padding: 0px;
+}
+
+.SubTabbedPanelsTab {
+    background:#999898;
+    font-weight:bold;
+    position: relative;
+    margin:0 5px 0 0;
+    float: left;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    cursor: pointer;
+    color:#FFFFFF;
+    cursor:pointer;
+    font-size:12px;
+    font-weight:bold;
+    line-height:25px;
+    list-style:none outside none;
+    text-align:center;
+    background-color:#aaaaaa;
+    width:120px;
+    -moz-border-radius: 5px 5px 0 0;
+    -webkit-border-radius: 5px 5px 0 0;
+    -khtml-border-radius: 5px 5px 0 0;
+}
+
+.SubTabbedPanelsTabHover {
+    background-color: #c1dada;
+    color:#333;
+    outline:none;
+}
+
+.SubTabbedPanelsTabSelected {
+    background-color: #c1dada;
+    color:#555;
+    outline:none;
+}
+
+.SubTabbedPanelsTab .wht {
+    color:#FFFFFF;
+}
+
+.SubTabbedPanelsContentGroup {
+    clear: both;
+    background-color: #EEE;
+}
+
+.SubTabbedPanelsContent {
+    background-color:#EFEFEF;
+    margin-bottom:10px; padding:20px; width:656px;
+    -moz-border-radius: 5px 5px 5px 5px;
+}
+
+.SubTabbedPanelsContentVisible {
+
+}
+
+.SubTabbedPanelsTabGroup .current {
+    color: #000000;
+    background-color:#efefef;
+    display:block;
+
+    -moz-border-radius: 5px 5px 0 0;
+    -webkit-border-radius: 5px 5px 0 0;
+    -khtml-border-radius: 5px 5px 0 0;
+}
+.SubTabbedPanelsContent .TopBox { width:636px; }
+</style>

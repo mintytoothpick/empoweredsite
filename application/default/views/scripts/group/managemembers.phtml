@@ -1,0 +1,265 @@
+<?php $this->headTitle("Empowered.org : world's largest student-led global health and sustainable development organization");
+$group_media = $this->sitemedia->getSiteMediaBySiteId($this->data['GroupId']);
+$contactinfo = $this->contactinfo->getContactInfo($this->data['GroupId'], 'All');
+if (!empty($this->data['BannerMediaId'])) {
+	$group_banner = $this->sitemedia->getSiteMediaById($this->data['BannerMediaId']);
+}
+?>
+<script type="text/javascript">
+    $(function() {
+        $('#members tr td a.new-title-link').each(function() {
+            $(this).bind('click', function() {
+                var id = $(this).attr('id').replace('add_title_link', '');
+                var content = '<input class="new-title" type="text" id="new_title_'+id+'" name="new_title_'+id+'" onblur="checkTitle('+id+')" />';
+                $(this).hide();
+                $('#add_title_'+id).append(content);
+                $('#new_title_'+id).focus();
+            })
+            
+        })
+
+        $('#members tr td a.edit-title-link').each(function() {
+            $(this).bind('click', function() {
+                var id = $(this).attr('id').replace('edit_title_link', '');
+                var title = $('.edit-title-'+id).html();
+                var content = '<input class="edit-title" type="text" id="edit_title_'+id+'" name="edit_title_'+id+'" value="'+title+'" onblur="checkTitle('+id+')" />';
+                $('#edit_curr_title_'+id).append(content);
+                $('#edit_title_'+id).focus();
+                $('.edit-title-'+id).hide();
+                $('#delete_title_link'+id).hide();
+                $(this).hide();
+            })
+        })
+        
+        $('#members tr td a.delete-title-link').each(function() {
+            $(this).bind('click', function() {
+                var id = $(this).attr('id').replace('delete_title_link', '');
+                var content = '<input type="hidden" name="delete_tile[]" value="'+id+'" />';
+                $('#edit_curr_title_'+id).append(content);
+                $('.edit-title-'+id).addClass('strike');
+                $('#edit_title_link'+id).hide();
+            })
+        })
+        
+        /*
+        $('#members tr td span input.new-title').each(function() {
+            $(this).bind('blur', function() {
+                alert($(this));
+                if ($(this).val() == '') {
+                    var id = $(this).attr('id').replace('new_title_', '');
+                    $(this).remove();
+                    $('#add_title_link'+id).show();
+                }
+            })
+        })
+        */
+        $('#membership_requests tr td input[type=checkbox]').each(function() {
+            $(this).bind('click', function() {
+                if ($(this).attr('name') == "accept_request[]") {
+                    var id = $(this).attr('id').replace('accept_', '');
+                    if ($(this).attr('checked')) {
+                        $('#deny_'+id).removeAttr('checked');
+                    }
+                } else {
+                    var id = $(this).attr('id').replace('deny_', '');
+                    if ($(this).attr('checked')) {
+                        $('#accept_'+id).removeAttr('checked');
+                    }
+                }
+            })
+        })
+    })
+    function checkTitle(id) {
+        if (jQuery.trim($('#new_title_'+id).val()) == "") {
+            $('#new_title_'+id).remove();
+            $('#add_title_link'+id).show();
+        }
+    }
+</script>
+<style type="text/css">
+    table tr th {
+        text-align:center;
+    }
+    .strike { text-decoration:line-through }
+</style>
+
+<div>
+    <div id="mainco2">
+        <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+        <div class="block001">
+            <div class="blst001">
+                <div class="blst002">
+					<div class="MainBody">
+						<?php $is_image_exists = file_exists("/home/$this->envUsername/public_html/public/Media/full/".$group_media['SystemMediaName']); ?>
+						<?php if($is_image_exists && trim($group_media['SystemMediaName']) != '' && !isset($group_banner)) { ?>
+							<div class="logo2"><img src="<?php echo $this->contentLocation ?>public/Media/full/<?php echo $group_media['SystemMediaName'] ?>" style="width:141px;height:70px; border-width:0px;" /></div>
+						<?php } else if (isset($group_banner)) { ?>
+							<center><img src="/public/Photos/banner/<?php echo $group_banner['SystemMediaName'] ?>" style="max-height:100px; max-width:1045px;" /></center>
+							<div class="clear"></div>
+						<?php } ?>
+						<div style="float:left; <?php echo $is_image_exists ? 'width:870px' : 'width:100%' ?>">
+							<?php if (empty($this->data['BannerMediaId'])) { ?>
+								<h1 style="font-size:27px; line-height:27px; float:left"><?php echo stripslashes($this->data['GroupName']) ?></h1>
+							<?php } ?>
+							<div class="clear"></div>
+						</div>
+						<div id="TabbedPanels1" class="TabbedPanels">
+							<?php include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/groupheader.php'; ?>
+							<div class="TabbedPanelsContentGroup">
+								<div class="TabbedPanelsContent">
+									<div id='whiteBox' class="whiteBox">
+            <h2>Manage All Members</h2>
+            <div>
+                <div>
+                    <form id="members" method="post" action="/<?php echo $this->data['URLName'] ?>/manage-members">
+                        <input type="hidden" id="GroupId" name="GroupId" value="<?php echo $this->data['GroupId'] ?>" />
+                        <strong style="margin-bottom:3px; font-size:15px">Member Requests</strong><br>
+                        <table id="membership_requests" cellspacing="0" cellpadding="3" border="0" style="border:1px solid #E7E7FF;width:100%; border-collapse:collapse;">
+                            <tr style="color:#FFFFFF;background-color:#333333;font-weight:bold;height:25px;">
+                                <th scope="col" style="text-align:left">&nbsp;&nbsp;Name</th>
+                                <th scope="col" style="text-align:left">&nbsp;&nbsp;Email</th>
+                                <th scope="col">Accept</th>
+                                <th scope="col">Deny</th>
+                            </tr>
+                            <?php if (count($this->membership_requests)) { ?>
+                            <?php $ctr=0; foreach ($this->membership_requests as $membership) { ?>
+                            <tr style="background-color:<?php echo $ctr%2 == 1 ? "#e7e7e9" : "white" ?>;">
+                                <td>
+                                    &nbsp;&nbsp;<?php echo stripslashes($membership['FullName']) ?>
+                                </td>
+                                <td>
+                                    &nbsp;&nbsp;<?php echo stripslashes($membership['Email']) ?>
+                                </td>
+                                <td align="center">
+                                    <input id="accept_<?php echo $membership['MembershipRequestId'] ?>" type="checkbox" name="accept_request[]" value="<?php echo $membership['MembershipRequestId'] ?>" />
+                                </td>
+                                <td align="center">
+                                    <input id="deny_<?php echo $membership['MembershipRequestId'] ?>" type="checkbox" name="deny_request[]" value="<?php echo $membership['MembershipRequestId'] ?>" />
+                                </td>
+                            </tr>
+                            <? $ctr++;} ?>
+                            <?php } else { ?>
+                            <tr>
+                                <td colspan="4">&nbsp;&nbsp;None</td>
+                            </tr>
+                            <?php } ?>
+                        </table>
+                        <br /><br />
+                        <strong style="margin-bottom:3px; font-size:15px">Active Members</strong><br>
+                        <table id="members" cellspacing="0" cellpadding="3" border="0" style="border:1px solid #E7E7FF;width:100%; border-collapse:collapse;">
+                            <tr style="color:#FFFFFF;background-color:#333333;font-weight:bold;height:25px;">
+                                <th scope="col" style="text-align:left">&nbsp;&nbsp;Members</th>
+                                <th scope="col" style="text-align:left">&nbsp;&nbsp;Email</th>
+                                <th scope="col">Leadership Title</th>
+                                <th scope="col">Group Admin</th>
+                                <th scope="col">Joined Group</th>
+                                <th scope="col">Delete</th>
+                            </tr>
+                            <?php if (count($this->members)) { ?>
+                            <?php $ctr=0; foreach ($this->members as $member) { ?>
+                            <tr style="background-color:<?php echo $ctr%2 == 1 ? "#e7e7e9" : "white" ?>;">
+                                <td>
+                                    <input type="hidden" id="MemberId" name="MemberId[]" value="<?php echo $member['MemberId'] ?>" />
+                                    &nbsp;&nbsp;<?php echo stripslashes($member['FullName']) ?>
+                                </td>
+                                <td>
+                                    &nbsp;&nbsp;<?php echo $member['Email'] ?>
+                                </td>
+                                <td style="text-align:center">
+                                    <?php if (!empty($member['Title'])) { ?>
+                                    <span class="edit-title-<?php echo $member['MemberId'] ?>" style="padding:0 4px;"><?php echo trim(stripslashes($member['Title'])) ?></span>
+                                    <span id="edit_curr_title_<?php echo $member['MemberId'] ?>" class="hidden">
+                                    </span>
+                                    <a class="edit-title-link" id="edit_title_link<?php echo $member['MemberId'] ?>" href="javascript:;">
+                                        <img src="/public/images/icon_edit.jpg" width="16" height="16">
+                                    </a>&nbsp;
+                                    <a class="delete-title-link" id="delete_title_link<?php echo $member['MemberId'] ?>" href="javascript:;">
+                                        <img src="/public/images/icon_delete.gif" width="16" height="16">
+                                    </a>
+                                    <?php } else { ?>
+                                    <span id="add_title_<?php echo $member['MemberId'] ?>">
+                                        <a class="new-title-link" id="add_title_link<?php echo $member['MemberId'] ?>" href="javascript:;">Add</a>
+                                    </span>
+                                    <?php } ?>
+                                </td>
+                                <td style="text-align:center">
+                                    <input id="is_admin_<?php echo $member['MemberId'] ?>" type="checkbox" name="is_admin[]" value="<?php echo $member['MemberId'] ?>" <?php echo $member['isAdmin'] == 1 ? "checked" : "" ?> />
+                                </td>
+                                <td style="text-align:center">
+                                    &nbsp;&nbsp;<?php echo date('M d, Y', strtotime($member['JoinedOn'])) ?>
+                                </td>
+                                <td style="text-align:center">
+                                    <input id="delete_<?php echo $member['MemberId'] ?>" type="checkbox" name="delete_member[]" value="<?php echo $member['MemberId'] ?>" />
+                                </td>
+                            </tr>
+                            <? $ctr++;} ?>
+                            <?php } else { ?>
+                            <tr>
+                                <td colspan="6">&nbsp;&nbsp;None</td>
+                            </tr>
+                            <?php } ?>
+                        </table>
+                        <br /><br />
+                        <strong style="margin-bottom:3px; font-size:15px">Denied/Deleted Members</strong><br>
+                        <table id="deleted-denied" cellspacing="0" cellpadding="3" border="0" style="border:1px solid #E7E7FF;width:100%; border-collapse:collapse;">
+                            <tr style="color:#FFFFFF;background-color:#333333;font-weight:bold;height:25px;">
+                                <th scope="col" style="text-align:left">&nbsp;&nbsp;Name</th>
+                                <th scope="col" style="text-align:left">&nbsp;&nbsp;Email</th>
+                                <th scope="col" style="text-align:center">Undo Deny</th>
+                            </tr>
+                            <?php if (count($this->deleted_members) || count($this->denied_membership_requests)) { ?>
+                            <?php $ctr=0; foreach ($this->deleted_members as $member) { ?>
+                            <tr style="background-color:<?php echo $ctr%2 == 1 ? "#e7e7e9" : "white" ?>;">
+                                <td>
+                                    &nbsp;&nbsp;<?php echo stripslashes($member['FullName']) ?>
+                                </td>
+                                <td>
+                                    &nbsp;&nbsp;<?php echo stripslashes($member['Email']) ?>
+                                </td>
+                                <td align="center">
+                                    &nbsp;<input type="checkbox" id="undo_delete_<?php echo $member['MemberId'] ?>" name="undo_delete[]" value="<?php echo $member['MemberId'] ?>" />
+                                </td>
+                            </tr>
+                            <? $ctr++;} ?>
+                            <?php $ctr=0; foreach ($this->denied_membership_requests as $member) { ?>
+                            <tr style="background-color:<?php echo $ctr%2 == 1 ? "#e7e7e9" : "white" ?>;">
+                                <td>
+                                    &nbsp;&nbsp;<?php echo stripslashes($member['FullName']) ?>
+                                </td>
+                                <td>
+                                    &nbsp;&nbsp;<?php echo stripslashes($member['Email']) ?>
+                                </td>
+                                <td align="center">
+                                    <input type="checkbox" id="undo_deny_<?php echo $member['MembershipRequestId'] ?>" name="undo_deny[]" value="<?php echo $member['MembershipRequestId'] ?>" />
+                                </td>
+                            </tr>
+                            <? $ctr++;} ?>
+                            <?php } else { ?>
+                            <tr>
+                                <td colspan="3">&nbsp;&nbsp;None</td>
+                            </tr>
+                            <?php } ?>
+                        </table>
+                        <br /><br />
+                        <div style="float:right">
+                        <a href="/<?php echo $this->data['URLName'] ?>/members" class="btn btngreen" style="padding:3px 15px;">Back</a>
+                        <?php if (count($this->members) > 0 || count($this->membership_requests) || count($this->deleted_members) > 0 || count($this->denied_membership_requests) > 0) { ?>
+                            <input type="submit" class="btn btngreen" value="Update" />
+                        <?php } ?>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+							</div>
+						</div>
+					</div>
+				<div class="clear"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+<div class="block001f01"><div class="blst001"><div class="blst002"></div></div>
+

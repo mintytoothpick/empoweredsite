@@ -1,0 +1,108 @@
+<? if ($this->showAll) {
+    $actWall = $this->group->activityWall;
+} else {
+    $actWall = $this->group->activityWall_5;
+}
+if (count($actWall) > 0 ) {
+  foreach($actWall as $activity) {
+    $text = '';
+    if($activity->type == 'Uploads') {
+        if($activity->entity) {
+            $text = 'Uploaded a photo for <a href="/'.$activity->entity->urlName.'/photos">'.$activity->entity->name.'</a>';
+        } else {
+            $text = 'Uploaded a photo';
+        }
+    } else if($activity->type == 'Events') {
+        if (isset($activity->entity)) {
+            $text = 'Created the event: <a href="/'.$this->group->urlName.'/events?EventId='.$activity->entity->id.'">'.$activity->entity->title.'</a>';
+        } else {
+            $text = 'Created an event';
+        }
+    } else if($activity->type == 'File Added') {
+        //$Files =  new Brigade_Db_Table_Files();
+        //$file =  $Files->loadInfo($activity['Details']);
+        //if($activity->totalCount > 1) {
+            $text = 'Uploaded '.$activity->totalCount.' new files';
+        //} else {
+        //    $text = 'Uploaded the file: '.$file['UploadedFileName'];
+        //}
+    } else if($activity->type == 'User Donation') {
+        if($activity->recipient) {
+            if($activity->createdById == $activity->recipientId) {
+                $text = 'Made a '.$this->group->currency.number_format($activity->details).' donation to <a href="/'.$activity->entity->urlName.'">'.$activity->entity->name.'</a>';
+            } else {
+                $text = 'Made a donation to <a href="/'.$activity->entity->urlName.'">'.$activity->entity->name.'</a> on behalf of ' . $this->urlHelper()->userUrl($activity->recipient);
+            }
+        } else {
+            $text = 'Made a donation.';
+        }
+    } else if($activity->type == 'Guest Donation') {
+        if($activity->recipient) {
+            $text = 'Made a donation to <a href="/'.$activity->entity->urlName.'">'.$activity->entity->name.'</a> on behalf of ' . $this->urlHelper()->userUrl($activity->recipient);
+        } else {
+            $text = 'Made a donation.';
+        }
+    } else if($activity->type == 'Wall Post') {
+        $text = $activity->details;
+    } else if($activity->type == 'Campaign Added') {
+        if($activity->entity) {
+            $text = 'Created the fundraising campaign: <a href="/'.$activity->entity->urlName.'">'.$activity->entity->name.'</a>';
+        } else {
+            $text = 'Created a fundraising campaign';
+        }
+    } else if($activity->type == 'Brigade Added') {
+        $initiative = Project::get($activity->siteId);
+        if ($initiative) {
+            $text = 'Created the volunteer activity: <a href="/'.$initiative->urlName.'">'.$initiative->name.'</a>';
+        } else {
+            $text = 'Created a volunteer activity';
+        }
+    } else if($activity->type == 'Joined Brigade') {
+        $initiative = Project::get($activity->siteId);
+        if ($initiative) {
+            $text = 'Joined the initiative: <a href="/'.$initiative->urlName.'">'.$initiative->name.'</a>';
+        }
+    } else if($activity->type == 'Group Updated') {
+        $text = 'Updated the chapter information';
+    } else if($activity->type == 'Group Member Joined') {
+        $text = 'Became a new chapter member!';
+    } else {
+        $text = $activity->type;
+    }
+?>
+
+  <div class="memberCon01">
+    <? if($activity->type != 'Guest Donation') { ?>
+    <div class="memberImgStyle2"><img src="/profile/loadimage/?UserId=<?= $activity->createdById ?>" width="55" height="52" alt=" " /></div>
+    <div class="memberText"> <span class="headignStyle03"><?=$this->urlHelper()->userUrl($activity->user)?></span><br />
+    <? } else { ?>
+    <div class="memberImgStyle2"><img src="/public/images/ico/people.jpg" width="55" height="52" alt=" " /></div>
+    <div class="memberText"> <span class="headignStyle03">Guest User</span><br />
+    <? } ?>
+      <p><?= $text ?><br />
+      <? if($this->isLoggedIn) { ?><a href="javascript:;" onclick="showCommentBox('<?=$activity->id?>');">Comment</a> • <? } ?><span class="color02"><?= date('M d, Y', strtotime($activity->date)) ?></span></p>
+    </div>
+  </div>
+
+  <? if (count($activity->comments) > 0) { ?>
+  <? foreach($activity->comments as $comment) { ?>
+  <div class="greyBox3">
+    <div class="memberImgStyle2"><img src="/profile/loadimage/?UserId=<?= $comment->commentedById ?>" width="36" height="34" alt=" " /></div>
+    <strong><span class="Text14"><?=$this->urlHelper()->userUrl($comment->user)?></span></strong>
+    <br /><?= stripslashes($comment->text) ?><br />
+    <span class="color02"><?= date('M d, Y', strtotime($comment->date)) ?></span>
+  </div>
+  <? } ?>
+  <? } ?>
+
+  <? if($this->isLoggedIn) { ?>
+  <div class="greyBox3 hidden comment-<?= $activity->id ?>">
+    <textarea  rows="5" style="width:98%"></textarea>
+    <div class="clear" style="margin-bottom:3px;"></div>
+    <a class="btn btngreen" href="javascript:;" onclick="postActivityComment('<?= $activity->id ?>')">Share</a>
+  </div>
+  <? } ?>
+
+<?} } else { ?>
+There has been no recent activity from <?=$this->group->name?>
+<? } ?>

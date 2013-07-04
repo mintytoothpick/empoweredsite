@@ -1,0 +1,122 @@
+<? if (isset($_SESSION['awaitingAcceptance']) && $this->user->id == $this->userNew->id) {
+  $affilName = $_SESSION['awaitingAcceptance'];
+  unset($_SESSION['awaitingAcceptance']); ?>
+<script>
+  $(document).ready(function(){
+    alert("Your request to join <?=$affilName?> is pending. Please wait to be accepted by an admin");
+  )};
+</script>
+<? } ?>
+<? if ($this->isLoggedIn && $this->user->id == $this->userNew->id) { ?>
+<script>
+
+$(function() {
+    $("a.edit-info").click(function() {
+        $.fancybox($("#editInfoBox").html());
+        $("#fancybox-content textarea.txtAreaComment").val($("#messageFund").html().replace(/<br>/gim, ''));
+    });
+});
+
+function edit() {
+    $("#fancybox-content a.btnSend").hide();
+    $.fancybox.showActivity();
+    $.ajax({
+        url: "/<?=$this->user->urlName?>/editmessage",
+        data: 'message=' + $("#fancybox-content textarea.txtAreaComment").val(),
+        dataType: 'json',
+        type: 'POST',
+        success: function(data){
+            if (data.ok) {
+                $.fancybox.hideActivity();
+                $("#messageFund").html($("#fancybox-content textarea.txtAreaComment").val()
+                                       .replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1<br />$2'));
+                $.fancybox.close();
+            } else {
+                alert("An error occured, try again later please.");
+                $.fancybox.hideActivity();
+                $("#fancybox-content a.btnSend").show();
+            }
+        }
+    });
+}
+</script>
+
+<div id="editInfoBox" class="hide">
+<h3>Edit Message</h3>
+<textarea rows="5" cols="50" class="txtAreaComment"></textarea>
+    <div class="volunteerBtn02"><a href="javascript:;" onclick="edit()" class="btnSend">Send</a></div>
+</div>
+<? } ?>
+
+<div class="wrapper">
+  <!-- user header -->
+  <?php echo $this->placeholder('header') ?>
+  <!-- // user header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+      <!-- user tabs -->
+      <?php echo $this->placeholder('tabs') ?>
+      <!-- // user tabs -->
+
+    <div class="mainC02">
+    <div class="spacer"></div>
+      <div class="rightMainBox BG01">
+          <div class="box004">
+            <div class="headingStyle02 full">Highlighted Initiative</div>
+            <div class="socailNetCon02">
+                <?php if(isset($this->project)) { ?>
+                <div class="socailNets NoMargin">
+                    <iframe src="http://www.facebook.com/widgets/like.php?href=http://<?=$_SERVER['HTTP_HOST'] ?>/<?=$this->urlShare?>&amp;layout=button_count&amp;show_faces=true" scrolling="no" frameborder="0" style="border:none; height:28px; width:90px; float:left;"></iframe>
+                    <a class="addthis_button_facebook" addthis:url="http://<?=$_SERVER['HTTP_HOST'] ?>/<?=$this->urlShare?>"></a>
+                    <a class="addthis_button_twitter" addthis:url="http://<?=$_SERVER['HTTP_HOST'] ?>/<?=$this->urlShare?>"></a>
+                    <a class="addthis_button_email" addthis:url="http://<?=$_SERVER['HTTP_HOST'] ?>/<?=$this->urlShare?>"></a>
+                </div>
+                <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4e319b9362855da9"></script>
+                <?php } ?>
+            </div>
+            <div class="box005Content">
+              <?php if(isset($this->project)) { ?>
+              <span class="TextStyle05"><a href="/<?=$this->project->urlName?>"><?=$this->project->name?></a></span>
+              <div class="clr"></div>
+
+              <!-- right_bar -->
+              <?= $this->placeholder('right_bar'); ?>
+              <!-- //right_bar -->
+
+              <div class="TextBox5">
+                <p><strong><?=$this->user->firstName?>'s Message</strong><br />
+                <div id="messageFund"><?=($this->project->user_message) ? stripslashes(nl2br($this->project->user_message->text)) : ''?></div>
+                 <?= isset($_SESSION['UserId']) && $this->user->id == $_SESSION['UserId'] ? '<a href="javascript:;" class="edit-info">Edit</a>' : ''; ?></p>
+              </div>
+              <?php if($this->project->logo) { ?><p><img src="<?=$this->contentLocation?>public/Media/full/<?=$this->project->logo->systemMediaName?>" width="288" height="162" alt=" " /></p><?php } ?>
+              <?php if(!empty($this->organization)) { ?><p><strong>Affiliated Organization: <a href="<?=$this->organization->urlName?>"><?=$this->organization->name?></a><br /></strong>
+                <?php if(!empty($this->program)) { ?><strong>Program: <a href="<?=$this->program->urlName?>"><?=$this->program->name?><br /></a></strong><?php } ?>
+                <?php if(!empty($this->group)) { ?><strong>Group: <a href="<?=$this->group->urlName?>"><?=$this->group->name?></a></strong><?php } ?>
+                      </p>
+              <?php } ?>
+              <p><strong><span class="Text14"><?= $this->project->type == 1 ? 'Fundraising Campaign' : 'Volunteer Activity'; ?> Description</span></strong><br />
+                <?=stripslashes(nl2br($this->project->description))?></p>
+              <div class="clr"></div>
+              <div class="clr"></div>
+              <?php } else { ?>
+              No initiatives found.
+              <?php } ?>
+          </div>
+
+        </div>
+        </div>
+
+        <!-- live feed -->
+        <? echo $this->render('profile/index-live-feed.phtml'); ?>
+        <!-- //live feed -->
+
+        <!-- live feed -->
+        <? echo $this->render('profile/filter-index-initiatives.phtml'); ?>
+        <!-- //live feed -->
+    </div>
+  </div>
+  <div class="clr"></div>
+  <div class="clr"></div>
+</div>

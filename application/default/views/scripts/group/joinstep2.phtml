@@ -1,0 +1,92 @@
+<?php $this->headTitle("Register with Empowered.org"); ?>
+<script>
+    function validateForm() {
+        var error = "";
+        if (jQuery.trim($('#upload').val()) != "") {
+            var image = $('#upload').val().split(".");
+            var accepted_files = new Array("jpeg", "jpg", "JPG", "JPEG");
+            var extension = image[image.length-1].toLowerCase();
+            if (!accepted_files.inArray(extension)) {
+                error += "Please select jpeg files only.";
+            }
+        }
+        if (error != "") {
+            $('#error').html(error).show();
+            return false;
+        } else {
+            return true;
+        }
+    }
+</script>
+    <div id="centred">
+        <!-- main col - 100% width -->
+        <div id="mainco2">
+            <!-- block001 -->
+            <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+            <div class="block001">
+                <div class="blst001">
+                    <div class="blst002 hsp" style="background-color:#fff; <?php echo isset($this->error_message) ? "min-height:440px;" : "" ?>">
+                        <h1 style="font-size:20px">Hi <?php echo $this->userInfo['FirstName'] ?>! Set your Profile</h1>
+                        <div class="clear1"></div><br><br>
+                        <!-- register form -->
+                        <?php // echo $this->registerForm; ?>
+                        <form id="basicinfo" enctype="multipart/form-data" action="/group/joinstep2/<?php echo $this->GroupId ?>/<?php echo $this->UserId ?>" method="post" onsubmit="return validateForm();">
+                            <input type="hidden" id="UserId" name="UserId" value="<?php echo $this->UserId ?>" />
+                            <input type="hidden" id="GroupId" name="GroupId" value="<?php echo $this->GroupId ?>" />
+                            <div style="width:100%">
+                                <div id="error" style="border: solid 2px #e3e3e3; color: red; padding: 4px; padding-right:20px; width: 400px; margin-bottom:20px; display:none"></div>
+                                <?php if (isset($this->error_message)) : ?>
+                                <div style="border: solid 2px #e3e3e3; color: red; padding: 4px; padding-right:20px; width: 400px; margin-bottom:20px;">
+                                    <?php echo $this->error_message ?>
+                                </div>
+                                <br>
+                                <?php endif; ?>
+                                <div class="form02" style="float:left; width:300px; padding-top:0px; padding-right:20px">
+                                    <div style="margin-left:20px;">
+                                        <div style="padding:3px; margin-top:-5px; font-size:13px; font-weight:bold; padding-right:10px; padding-bottom:3px; border-bottom:3px solid #e5e5e5; margin-bottom:5px; width:255px">Profile Picture <a style="font-size:15px; float:right; margin-left:15px; display:none" href="javascript:;" onclick="$('#upload').trigger('click')">Upload a Photo</a></div>
+                                        <img id="ctl00_ContentPHMain_imgUser" src="/public/images/Pictures/person_icon.png" width="270px" style="border-width:0px; display: block; margin-bottom: 3px" />
+                                        <input type="file" name="upload" id="upload" size="35" class="textfield" />
+                                    </div>
+                                </div>
+                                <div class="form02" style="float:left; margin-left:10px; width:480px; padding-top:0px; padding-left:40px; border-left:2px solid#e5e5e5">
+                                    <label for="txt001" style="font-weight:bold; font-size:15px">What are you passionate about?</label>
+                                    <textarea style="width:350px" name="passion" rows="3" cols="30" id="passion"><?php echo isset($this->passion) ? $this->passion : "" ?></textarea>
+                                    <div style="padding:10px 0px; margin-bottom:5px">
+                                        <label for="gender01" style="margin-top:4px; font-weight:bold; font-size:15px">Gender: </label>
+                                        <span style="margin-left:20px"><input type="radio" id="gender01" name="gender" value="1">&nbsp;Male</span>
+                                        <span style="margin-left:20px"><input type="radio" id="gender02" name="gender" value="2">&nbsp;Female</span>
+                                    </div>
+                                    <div style="margin-bottom:15px">
+                                        <label for="loc001" style="font-weight:bold; font-size:15px">Location: </label>
+                                        <input style="width:280px" name="location" type="text" id="location" class="textfield" value="<?php echo isset($this->location) ? $this->location : "" ?>" />
+                                    </div>
+                                    <div>
+                                        <label for="loc001" style="font-weight:bold; font-size:15px">Empowered Web Address: </label>
+										<div class="clear"></div>
+                                        <span style="float:left; margin:6px 4px 0 0;">www.empowered.org/</span><input style="width:280px; margin-bottom:0px; float:left;" name="URLName" type="text" id="URLName" class="textfield" value="<?php echo isset($this->URLName) ? $this->URLName : "" ?>" onfocus="if (this.value == 'www.empowered.org/') { this.value='' }" />
+                                        <div class="clear"></div>
+										<span style="font-size:11px; color:#AAA;"><i>(Your unique profile link)</i></span>
+                                    </div><br>
+				</div>
+				<div class="clear"></div><br />
+                                <div style="width:700px">
+                                    <input style="float:right" type="submit" name="btnSignUp" value="Save & Continue" id="ctl00_ContentPHMain_btnSignUp" class="btn btngreen" />
+				    <input style="float:right" type="submit" name="btnSignUp" value="Skip" id="ctl00_ContentPHMain_btnSignUp" class="btn btngreen" />
+                                </div>
+                            </div>
+                        </form>
+                        <!-- e o login form -->
+                    </div>
+                </div>
+            </div>
+            <div class="block001f01">
+                <div class="blst001">
+                    <div class="blst002"></div>
+                </div>
+            </div>
+            <span id="ctl00_ContentPHMain_lblErrorMsg" class="divError"></span>
+            <!-- e o block001 -->
+        </div>
+        <!-- e o main col -->
+        <div class="clear"></div>
+    </div>

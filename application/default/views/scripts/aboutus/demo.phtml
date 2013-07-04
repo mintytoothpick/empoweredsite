@@ -1,0 +1,31 @@
+<?php
+$this->headTitle("Empowered.org : world's largest student-led global health and sustainable development organization");
+?>
+<style>
+    .TextBox { border: none; width: 740px }
+    #footermenu a, #copyrights { font-size: 11px }
+    #copyrights span { margin-top: -5px }
+</style>
+<div class="container" style="margin-top: -10px">
+    <div class="MainBody">
+        <div class="MainBodyTop"></div>
+        <div class="MainBodyContents">
+            <div class="leftC" style="margin-right: 40px">
+                <?php echo $this->placeholder('aboutus_nav'); ?>
+            </div>
+            <div class="rightC">
+                <span class="Heading01">Demo</span>
+                <img src="<?php echo $this->contentLocation ?>public/images/marketing/demo.jpg" usemap="#map"/><br /><br />
+                <span class="Heading02">
+                    To see the administrative back-end, please <a href="/contactus">click here</a>
+                </span>
+                <map name="map">
+                    <area shape="rect" coords="0,30,350,234" href="http://www.empowered.org/global-brigades-ireland" alt="Sun">
+                    <area shape="rect" coords="378,30,724,234" href="http://www.empowered.org/global-voluntours" alt="Mercury">
+                </map>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>
+<div class="clear" style="margin-bottom:5px;"></div>

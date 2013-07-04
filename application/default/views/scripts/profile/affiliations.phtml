@@ -1,0 +1,160 @@
+<script>
+function searchAffiliation() {
+  var search_text = $('#search_text').val();
+  window.location.href = '/<?=$this->affiliation->urlName?>/search?search_text=' + search_text;
+}
+
+<?php if (!$this->is_member && $this->isLoggedIn) {?>
+function joinOrganization(NID, UID) {
+    $.post('/nonprofit/joinrequest', {NetworkId: NID, UserId: UID}, function(data) {
+        if(data == 'affiliate') {
+          window.location.href = "/<?=$this->affiliation->urlName?>/affiliate";
+        } else {
+          alert(data);
+          window.location.reload(true);
+        }
+    });
+}
+
+function joinGroup(GID, UID) {
+    $.post('/group/joinrequest', {GroupId: GID, UserId: UID}, function(data) {
+      if(data == 'participate') {
+        alert("Congratulations! You have joined <?=$this->affiliation->name?>");
+        window.location.href = '/<?=$this->affiliation->urlName?>/participate';
+      } else {
+        alert(data);
+        window.location.reload(true);
+      }
+    })
+}
+<?php } ?>
+
+</script>
+<div class="wrapper">
+  <!-- user header -->
+  <?php echo $this->placeholder('header') ?>
+  <!-- // user header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+      <!-- user tabs -->
+      <?php echo $this->placeholder('tabs') ?>
+      <!-- // user tabs -->
+
+    <div class="mainC02">
+    <div class="spacer"></div>
+    <div class="leftC">
+      <div class="leftMainBox BG01">
+        <div class="box002 noMB">
+          <div class="headingStyle01 BG02">My Affiliations</div>
+        </div>
+        <?php foreach($this->user->affiliationsOrganization as $affiliation) { ?>
+        <a href="/<?=$this->user->urlName?>/affiliations/<?=$affiliation->urlName?>"><div class="leftBox02 <?= $affiliation->id == $this->affiliation->id ? 'border01' : ''; ?>"><?php if(!empty($affiliation->logo->systemMediaName)) { ?><img src="<?=$this->contentLocation?>public/Media/full/<?=$affiliation->logo->systemMediaName?>" width="92" height="37" alt=" " /><?php } ?>
+          <p class="Style03">Organization:<br /><?=$affiliation->name?><br />
+        </div></a>
+        <?php } ?>
+        <?php foreach($this->user->affiliationsGroup as $affiliation) { ?>
+        <a href="/<?=$this->user->urlName?>/affiliations/<?=$affiliation->urlName?>"><div class="leftBox02 <?= $affiliation->id == $this->affiliation->id ? 'border01' : ''; ?>"><?php if(!empty($affiliation->logo->systemMediaName)) { ?><img src="<?=$this->contentLocation?>public/Media/full/<?=$affiliation->logo->systemMediaName?>" width="92" height="37" alt=" " /><?php } ?>
+          <p class="Style03">Chapter:<br /><?=$affiliation->name?><br /></p>
+        </div></a>
+        <?php } ?>
+      </div>
+    </div>
+    <div class="rightC">
+        <div class="rightMainBox BG01">
+          <div class="box004">
+            <a href="/<?=$this->affiliation->urlName?>"><div class="headingStyle02"><?=$this->affiliation->name?></div></a>
+            <div class="box004Content">
+              <div class="clr"></div>
+              <?php if(isset($this->affiliation->isActive) && !$this->affiliation->isActive) { ?><div class="errorBox">This chapter has not been activated yet and may not actually be associated with this organization.</div><?php } ?>
+              <?php $logoExists = false; if(isset($this->affiliation->logo->systemMediaName) && file_exists("/home/$this->envUsername/public_html/public/Media/full/".$this->affiliation->logo->systemMediaName)) { $logoExists = true; ?>
+                <p><img src="<?=$this->contentLocation?>public/Media/full/<?=$this->affiliation->logo->systemMediaName?>" alt=" " class="imgstyle3" style="max-width:300px;height:80px;" /></p>
+                <div class="spacer"></div>
+              <?php } ?>
+              <div class="goal-greyC" <?= $logoExists ? 'style="margin-top:-120px;"' : '' ?>>
+                <p>
+                  <?php if(!empty($this->affiliation->contact->website)) { ?><strong>Website:</strong> <a href="<?=$this->affiliation->contact->website?>"><?=$this->affiliation->contact->website?></a><br /><?php } ?>
+                  <?php if(!empty($this->affiliation->contact->phone)) { ?><strong>Phone:</strong> <?=$this->affiliation->contact->phone?><?php } ?>
+                </p>
+                <p><strong>Search this <?= isset($this->affiliation->hasGroups) ? 'Organization' : 'Chapter'; ?></strong></p>
+                <form onsubmit="searchAffiliation(); return false;">
+                  <input id="search_text" name="search_text" type="text" class="textField13" />
+                </form>
+              </div>
+              <p class="Text16">
+                <? if(!isset($this->affiliation->hasGroups)) { ?>
+                  Organization: <a href="/<?=$this->affiliation->organization->urlName?>"><?=$this->affiliation->organization->name?></a><br />
+                  <?php if(!empty($this->affiliation->programId)) { ?>Program: <a href="/<?=$this->affiliation->program->urlName?>"><?=$this->affiliation->program->name?></a><br /><?php } ?>
+                <br /><?php } ?>
+                <strong>About Us</strong><br />
+                <?=stripslashes(nl2br($this->affiliation->description))?><br />
+              </p>
+              <div class="startCBtn <?= $this->is_member ? 'disabled-button' : ''; ?>" style="margin:0 30px 15px 0;"><a href="<?=$this->joinlink?>">Become&nbsp;a&nbsp;Member</a></div>
+              <?php if(isset($this->affiliation->hasGroups)) { ?>
+                <?php if(count($this->affiliation->groups)) { ?><div class="startCBtn" style="margin:0 30px 15px 0;"><a href="/<?= $this->affiliation->urlName?>/chapters">View Chapters</a></div><?php } ?>
+                <?php if ($this->affiliation->isOpen) { ?><div class="startCBtn" style="margin:0 30px 15px 0;"><a href="<?= $this->isLoggedIn ? '/'.$this->affiliation->urlName.'/create-group' : 'javascript:;" class="joinS' ?>">Start a Chapter</a></div><? } ?>
+              <?php } ?>
+              <div class="spacer"></div>
+              <span style="float:left;line-height:32px; vertical-align:middle; padding-right:8px">View Upcoming:</span>
+              <div class="startCBtn <?= !count($this->affiliation->activities_upcoming) ? 'disabled-button' : '' ?>" style="margin:0 8px 15px 0;"><a href="<?= count($this->affiliation->activities) ? '/'.$this->affiliation->urlName.'/upcoming-activities' : '#' ?>">Volunteer Activities</a></div>
+              <div class="startCBtn <?= !count($this->affiliation->campaigns_upcoming) ? 'disabled-button' : '' ?>" style="margin:0 8px 15px 0;"><a href="<?= count($this->affiliation->campaigns) ? '/'.$this->affiliation->urlName.'/active-campaigns' : '#' ?>">Fundraising Campaigns</a></div>
+              <div class="startCBtn <?= !count($this->affiliation->events_upcoming) ? 'disabled-button' : '' ?>" style="margin:0 8px 15px 0;"><a href="<?= count($this->affiliation->events) ? '/'.$this->affiliation->urlName.'/upcoming-events' : '#' ?>">Events</a></div>
+              <div class="spacer"></div>
+
+              <?php if(isset($this->affiliation->hasPrograms)) { // using to differentiate between organizations and groups?>
+
+                <?php if(count($this->affiliation->programs)) {  // list organization's programs if they exist?>
+                <div class="headingStyle02">Programs <a href="/<?=$this->affiliation->urlName?>/programs" class="Text16 float-right">View All</a></div>
+                <?php $ctr = 1; foreach($this->affiliation->programs as $program) { ?>
+                <div class="programBox">
+                  <div class="programImg program01"></div>
+                  <div class="programText"><?=stripslashes(nl2br($program->description))?></div>
+                  <div class="programGroup">
+                    <a href="/<?=$program->urlName?>/chapters"><div class="group"><span class="text19"><?=number_format(count($program->groups))?></span>
+                      <div class="clr"></div>Chapters</div></a>
+                    <a href="/<?=$program->urlName?>/active-campaigns"><div class="group"><span class="text19"><?=number_format(count($program->campaigns))?></span><br />
+                      Fundraising<br />Campaigns</div></a>
+                    <a href="/<?=$program->urlName?>/upcoming-activities"><div class="group noMR"><span class="text19"><?=number_format(count($program->activities))?></span><br />
+                      Volunteer<br />Activities</div></a>
+                  </div>
+                </div>
+                <?php $ctr++; if($ctr > 10) break; } ?>
+                <div class="spacer"></div><div class="spacer"></div>
+                <?php } ?>
+
+              <?php } else { ?>
+
+                <?php if(count($this->affiliation->upcomingInitiatives)) { ?>
+                  <div class="headingStyle02">Upcoming Initiatives</div>
+                  <?php $ctr = 1; foreach($this->affiliation->upcomingInitiatives as $initiative) { ?>
+                    <div class="programBox">
+                      <div class="programImg program01"></div>
+                      <div class="programText"><a href="/<?=$initiative->urlName?>"><?=stripslashes($initiative->name)?></a><br /><?=$initiative->description?></div>
+                      <div class="programGroup">
+                        <div class="volunteerBtn02">
+                          <?php if($this->isLoggedIn) { ?>
+                            <a href="/<?=$initiative->urlName?>/<?= $initiative->type == 1 ? 'join' : 'signup';?>">
+                          <?php } else { ?>
+                            <a href="javascript:;" class="join">
+                          <?php } ?>
+                          Volunteer</a>
+                        </div>
+                        <div class="volunteerBtn02">
+                          <a style="margin-top:2px;" href="/<?=$initiative->urlName?>/donate">Donate</a>
+                        </div>
+                      </div>
+                    </div>
+                  <?php $ctr++; if($ctr > 10) break; } ?>
+                <?php } ?>
+
+              <?php } ?>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="clr"></div>
+  <div class="clr"></div>
+</div>

@@ -1,0 +1,322 @@
+@CHARSET "UTF-8";/*
+	root element for the scrollable.
+	when scrolling occurs this element stays still.
+*/
+.scrollable {
+	/* required settings */
+	position:relative;
+	overflow:hidden;
+	width: 890px;
+	height:115px;
+
+	/* custom decorations 
+	border:1px solid #ccc;
+	background:url(/img/global/gradient/h300.png) repeat-x;*/
+}
+
+/*
+	root element for scrollable items. Must be absolutely positioned
+	and it should have a extremely large width to accomodate scrollable items.
+	it's enough that you set the width and height for the root element and
+	not for this element.
+*/
+.scrollable .items {
+	/* this cannot be too large */
+	width:20000em;
+	position:absolute;
+	clear:both;
+}
+
+.items div {
+	float:left;
+	width:890px;
+}
+
+.scrollable .items .item, .scrollable .items .itemphoto{
+	/*width:100px;  before*/
+	width:140px;
+	padding:2px;
+	color:#fff;
+	font-size:10px;
+	background-color:#999898;
+	float:left;
+	margin:0 5px 0 15px;
+	text-align:center;
+	padding:8px;
+	line-height:12px;
+	cursor:pointer;
+	height:95px;
+}
+
+/* single scrollable item */
+.scrollable img {
+	background-color:#999898;
+	width:100px;
+	height:65px;
+	margin-bottom:4px;
+}
+
+/* active item */
+.scrollable .active {
+	border:2px solid #669933;
+	position:relative;
+	cursor:default;
+	background-color:#669933 !important;
+}
+
+/*---BUTTONS-----*/
+/* this makes it possible to add next button beside scrollable */
+.scrollable {
+	float:left;	
+}
+
+/* prev, next, prevPage and nextPage buttons */
+a.browse {
+	background:url(../images/hori_large.png) no-repeat;
+	display:block;
+	width:30px;
+	height:30px;
+	float:left;
+	margin:20px -10px 0px 10px;
+	cursor:pointer;
+	font-size:1px;
+}
+
+/* right */
+a.right 		{ background-position: 0 -30px; clear:right; margin-right: 0px;}
+a.right:hover 	{ background-position:-30px -30px; }
+a.right:active 	{ background-position:-60px -30px; } 
+
+
+/* left */
+a.left			{ margin-left: 0px; } 
+a.left:hover  	{ background-position:-30px 0; }
+a.left:active  	{ background-position:-60px 0; }
+
+/* disabled navigational button */
+a.disabled {
+	visibility:hidden !important;		
+}
+
+/*** SCROLLABLE2 **/
+.scrollable2 {
+	/* required settings */
+	position:relative;
+	overflow:hidden;
+	width: 630px;
+	height:120px;
+}
+
+.scrollable2 .items {
+	/* this cannot be too large */
+	width:20000em;
+	position:absolute;
+	clear:both;
+}
+
+.scrollable2 .items div {
+	float:left;
+	width:630px;
+}
+
+.scrollable2 .items .item{
+	width:100px;
+	padding:2px;
+	color:#fff;
+	font-size:10px;
+	background-color:#999898;
+	float:left;
+	margin:0 5px 0 10px;
+	text-align:center;
+	padding:8px;
+	line-height:12px;
+	cursor:pointer;
+	height:95px;
+}
+
+.scrollable2 img {
+	background-color:#999898;
+	width:100px;
+	height:65px;
+	margin-bottom:4px;
+}
+
+/* active item */
+.scrollable2 .active {
+	border:2px solid #669933;
+	position:relative;
+	cursor:default;
+	background-color:#669933 !important;
+}
+.scrollable2 {
+	float:left;	
+}
+/* prev, next, prevPage and nextPage buttons */
+#orgprograms a.browse {
+	background:url(../images/hori_large.png) no-repeat;
+	display:block;
+	width:30px;
+	height:30px;
+	float:left;
+	margin:25px -5px 0px 5px;
+	cursor:pointer;
+	font-size:1px;
+}
+
+/* right */
+#orgprograms a.right 		{ background-position: 0 -30px; clear:right; margin-right: 0px;}
+#orgprograms a.right:hover 	{ background-position:-30px -30px; }
+#orgprograms a.right:active 	{ background-position:-60px -30px; } 
+
+
+/* left */
+#orgprograms a.left			{ margin-left: 0px; } 
+#orgprograms a.left:hover  	{ background-position:-30px 0; }
+#orgprograms a.left:active  	{ background-position:-60px 0; }
+
+/* disabled navigational button */
+#orgprograms a.disabled {
+	visibility:hidden !important;		
+}
+
+/*** SCROLLABLE3 **/
+.scrollable3 {
+	/* required settings */
+	position:relative;
+	overflow:hidden;
+	width: 950px;
+	height:120px;
+}
+
+.scrollable3 .items {
+	/* this cannot be too large */
+	width:20000em;
+	position:absolute;
+	clear:both;
+}
+.scrollable3 .items div {
+	float:left;
+	width:950px;
+}
+
+.scrollable3 .items .itemdetail{
+	width:100px;
+	padding:2px;
+	color:#fff;
+	font-size:10px;
+	background-color:#999898;
+	float:left;
+	margin:0 10px 0 10px;
+	text-align:center;
+	padding:8px;
+	line-height:12px;
+	cursor:pointer;
+	height:95px;
+}
+
+.scrollable3 img {
+	background-color:#999898;
+	width:100px;
+	height:65px;
+	margin-bottom:4px;
+}
+
+/* active item */
+.scrollable3 .active {
+	border:2px solid #669933;
+	position:relative;
+	cursor:default;
+	background-color:#669933 !important;
+}
+.scrollable3 {
+	float:left;	
+}
+/* prev, next, prevPage and nextPage buttons */
+#volprograms a.browse {
+	background:url(../images/hori_large.png) no-repeat;
+	display:block;
+	width:30px;
+	height:30px;
+	float:left;
+	margin:25px -3px 0px 3px;
+	cursor:pointer;
+	font-size:1px;
+}
+
+/* right */
+#volprograms a.right 		{ background-position: 0 -30px; clear:right; margin-right: 0px;}
+#volprograms a.right:hover 	{ background-position:-30px -30px; }
+#volprograms a.right:active 	{ background-position:-60px -30px; } 
+
+
+/* left */
+#volprograms a.left			{ margin-left: 0px; } 
+#volprograms a.left:hover  	{ background-position:-30px 0; }
+#volprograms a.left:active  	{ background-position:-60px 0; }
+
+/* disabled navigational button */
+#volprograms a.disabled {
+	visibility:hidden !important;		
+}
+
+/**
+ *	New design for the scrollable. make the image smaller
+**/
+
+.scrollable4 {
+	/* required settings */
+	position:relative;
+	overflow:hidden;
+	width: 880px;
+	height:75px;
+	float:left;
+	margin-left:10px;
+}
+
+.scrollable4 .items {
+	/* this cannot be too large */
+	width:20000em;
+	position:absolute;
+	clear:both;
+}
+
+.scrollable4 .items div {
+	float:left;
+	width:890px;
+}
+
+.scrollable4 .items .item, .scrollable4 .items .itemphoto{
+	width:202px;
+	padding:2px;
+	color:#fff;
+	font-size:12px;
+	background-color:#999898;
+	float:left;
+	margin:0 5px 0 5px;
+	text-align:center;
+	padding:3px;
+	line-height:16px;
+	cursor:pointer;
+}
+
+/* single scrollable item */
+.scrollable4 img, .scrollable4 span {
+	background-color:#999898;
+	width:100px;
+	height:65px;
+}
+
+/* active item */
+.scrollable4 .active {
+	position:relative;
+	cursor:default;
+	background-color:#C1DBDB !important;
+        color:#000;
+}
+.scrollable4 .active span {
+	background-color:#C1DBDB !important;
+        color:#000;
+}
+.scrollable4 .firstimage {
+	margin-left:15px !important;
+	}

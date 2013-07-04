@@ -1,0 +1,62 @@
+<?php
+$this->headTitle("Empowered.org - Upload Photos");
+$this->placeholder('tab')->set('Organization');
+?>
+<script type="text/javascript" language="javascript">
+    function validate() {
+        if (jQuery.trim($('#upload').val()) == '') {
+            alert("Please select an image to upload.");
+            return false;
+        } else {
+            var image = $('#upload').val().split(".");
+            var accepted_files = new Array("jpeg", "jpg", "png", "gif");
+            var extension = image[image.length-1].toLowerCase();
+            if (!accepted_files.inArray(extension)) {
+                alert("Please select jpeg, png or gif files only.");
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
+<?php if ($this->link) { ?>
+    $(function() {
+        alert('You have sucessfully uploaded a photo.')
+        window.opener.parent.location.href = '<?php echo $this->link ?>';
+        self.close();
+    })
+<?php } ?>
+</script>
+<div>
+    <div id="mainco2">
+        <div class="roundedbox">
+            <h2>Upload Photos</h2>
+            <div>
+                <form id="uploadphoto" method="post" action="/file/gallery/?ProjectId=<?php echo $this->SiteId ?>" enctype="multipart/form-data" onsubmit="return validate()">
+                    <input type="hidden" id="SiteId" name="SiteId" value="<?php echo $this->SiteId; ?>" />
+                    <?php if (isset($this->error)) { ?>
+                    <div style="border:2px solid silver; padding:5px; color:red; width:500px;"><?php echo $this->error ?></div>
+                    <?php } ?>
+                    <?php if (isset($this->uploadedimage)) { ?>
+                    <div style="border:2px solid silver; padding:5px; color:green; width:500px;">You have successfully uploaded a photo.</div>
+                    <br>
+                    <img src="<?php echo $this->uploadedimage ?>">
+                    <br><br>
+                    <?php } ?>
+                    <div>
+                        <strong>Upload Photo: </strong><br>
+                        <input type="file" name="upload" id="upload" class="textfield" />
+                    </div>
+                    <br>
+                    <div>
+                        <strong>Description: </strong><br>
+                        <textarea name="Comment" cols="50" rows="3"></textarea>
+                    </div>
+                    <br>
+                    <input type="submit" name="submit" value="Upload" class="button" />
+                </form>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>

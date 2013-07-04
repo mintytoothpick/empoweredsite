@@ -1,0 +1,67 @@
+<?php $this->headTitle("Empowered.org - Crop Your Image"); ?>
+<script type="text/javascript" src="<?php echo $this->contentLocation ?>public/js/jquery.Jcrop.js"></script>
+<link rel="stylesheet" href="<?php echo $this->contentLocation ?>public/css/jquery.Jcrop.css" type="text/css" />
+<script language="Javascript">
+
+    $(function(){
+        $('#cropbox').Jcrop({
+            aspectRatio: 1,
+            onSelect: updateCoords,
+            allowResize: false,
+            //allowSelect: false,
+            setSelect: [ 0, 0, 100, 100 ],
+            boxWidth: 0
+        });
+    });
+
+    function updateCoords(c)
+    {
+        $('#x').val(c.x);
+        $('#y').val(c.y);
+        $('#w').val(c.w);
+        $('#h').val(c.h);
+    };
+
+    function checkCoords()
+    {
+        if (parseInt($('#w').val())) return true;
+        alert('Please select a crop region then press submit.');
+        return false;
+    };
+</script>
+<div>
+    <div id="centred">
+        <!-- main col - 100% width -->
+        <div id="mainco2">
+            <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+            <div class="block001">
+                <div class="blst001">
+                    <div class="blst002 hsp">
+                        <h1>Upload Profile Picture</h1>
+                        <div style="border:2px solid silver; margin-bottom:20px; color:green; padding: 5px; width:300px; <?php echo isset($this->message) ? "" : "display:none" ?>"><?php echo $this->message ?></div>
+                        <div style="border:2px solid silver; margin-bottom:20px; color:red; padding: 5px; width:300px; <?php echo isset($this->error) ? "" : "display:none" ?>"><?php echo $this->error ?></div>
+                        <!-- upload photo form -->
+                        <img src="/public/tmp/resized_pic.jpg" id="cropbox" />
+                        <form method="post" onsubmit="return checkCoords();">
+                            <input type="hidden" id="action" name="action" value="crop_image" />
+                            <input type="hidden" id="UserId" name="UserId" value="<?php echo $this->UserId ?>" />
+                            <input type="hidden" id="GroupId" name="GroupId" value="<?php echo $this->GroupId ?>" />
+                            <input type="hidden" id="x" name="x" />
+                            <input type="hidden" id="y" name="y" />
+                            <input type="hidden" id="w" name="w" />
+                            <input type="hidden" id="h" name="h" />
+                            <br>
+                            <input type="submit" value="Crop Image" class="btn btngreen" />
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="block001f01"><div class="blst001"><div class="blst002"></div></div></div>
+            <!-- e o block001 -->
+        </div>
+        <!-- e o main col -->
+        <span id="ctl00_ContentPHMain_lblError"></span>
+        <div class="clear"></div>
+    </div>
+</div>
+

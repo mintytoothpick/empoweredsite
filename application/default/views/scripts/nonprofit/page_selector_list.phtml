@@ -1,0 +1,58 @@
+<?php
+$params = "";
+if(isset($_REQUEST['ProgramId']) && !empty($_REQUEST['ProgramId'])) {
+    $params .= "ProgramId=".$_REQUEST['ProgramId']."&";
+}
+if(isset($_REQUEST['GroupId']) && !empty($_REQUEST['GroupId'])) {
+    $params .= "GroupId=".$_REQUEST['GroupId']."&";
+}
+if(isset($_REQUEST['ProjectId']) && !empty($_REQUEST['ProjectId'])) {
+    $params .= "ProjectId=".$_REQUEST['ProjectId']."&";
+}
+if(isset($_REQUEST['search_text']) && !empty($_REQUEST['search_text'])) {
+    $params .= "search_text=".$_REQUEST['search_text']."&";
+}
+if(isset($_REQUEST['FromDate']) && !empty($_REQUEST['FromDate'])) {
+    $params .= "FromDate=".$_REQUEST['FromDate']."&";
+}
+if(isset($_REQUEST['ToDate']) && !empty($_REQUEST['ToDate'])) {
+    $params .= "ToDate=".$_REQUEST['ToDate']."&";
+}
+if(isset($_REQUEST['limit'])) {
+    $params .= "limit=".$_REQUEST['limit']."&";
+}
+?>
+<?php if ($this->pageCount > 1): ?>
+<center>
+<div class="paginationControl">
+<!-- Previous page link -->
+<?php if (isset($this->previous)): ?>
+  <a href="/nonprofit/list?<?=$params?>page=<?php echo $this->previous; ?>">
+    &laquo; Previous
+  </a>&nbsp;&nbsp;
+<?php else: ?>
+  <span class="disabled">&laquo; Previous</span>&nbsp;&nbsp;
+<?php endif; ?>
+
+<!-- Numbered page links -->
+<?php foreach ($this->pagesInRange as $page): ?>
+    <?php if ($page != $this->current): ?>
+        <a href="/nonprofit/list?<?=$params?>page=<?php echo $page; ?>">
+            <?php echo $page; ?>
+        </a><?php echo (count($this->pagesInRange) != $page ? " |" : "") ?>
+    <?php else: ?>
+        <?php echo $page.(count($this->pagesInRange) != $page ? " |" : ""); ?>
+    <?php endif; ?>
+<?php endforeach; ?>
+
+<!-- Next page link -->
+<?php if (isset($this->next)): ?>
+  <a href="/nonprofit/list?<?=$params?>page=<?php echo $this->next; ?>">
+    Next &raquo;
+  </a>
+<?php else: ?>
+  <span class="disabled">Next &raquo;</span>
+<?php endif; ?>
+</div>
+</center>
+<?php endif; ?>

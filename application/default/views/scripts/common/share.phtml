@@ -1,0 +1,78 @@
+<script type="text/javascript">
+    function share() {
+        var checked = false;
+        if (document.getElementById('fb-share').checked == true) {
+            $("#share-fb").click();
+            checked = true;
+        }
+        if (document.getElementById('email-share').checked == true) {
+            $('.addthis_button_email').click();
+            $('#at_msg').val($("#share-content").val());
+            checked = true;
+        }
+        if (!checked) {
+            alert('Please select Facebook and or email to share your post.')
+            return false;
+        } else {
+            $('#current-links').hide();
+            $('#continue-links').show();            
+        }
+        return true;
+    }
+
+$(function(){
+
+    $('#at16ptx').click(function() {
+        if ($('#at_success').html().search('Message sent!') > 0) {
+            window.location.href = "/<?php echo $this->campaignInfo['pURLName'] ?>";
+        }
+    })
+    
+    var addthis_share = { email_vars: { notes: $('#share-content').val() } }
+	
+    $("#fb_share_link").click(function() {
+        $("#share-fb").click();        
+    });
+
+    $("#email_link").click(function() {
+        setTimeout("$('#at_msg').val($('#share-content').val());", 200);        
+    });
+});
+
+</script>
+
+<form method="post" action="">
+ 
+    <textarea id="share-content" cols="40" rows="4" style="width: 495px"><?= $this->message ?></textarea><br>
+    <br>
+    <span style="font-weight: bold">Link to your <?= $this->type ?>: </span>
+    <a href="<?= $this->shareUrl ?>"><?=$this->shareUrl ?></a><br />
+    <div class="addthis_toolbox addthis_default_style addthis_32x32_style">
+    <span style="float: left; margin-right: 20px"><br />
+	    <input type="checkbox" id="fb-share" style="float: left; margin-top: 10px;" checked="checked" />
+	    <a style="float: left" id="fb_share_link" title="Send to Facebook" href="#">
+	        <span class="at300bs at15nc at15t_facebook">
+	            <span class="at_a11y">Share on facebook</span>
+	        </span>
+	    </a> 
+	    <a id="share-fb" name="fb_share" type="icon" style="display: none" share_url="<?= $this->shareUrl ?>"></a>
+	    <script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" type="text/javascript"></script>
+	</span> 
+    <span style="float: left"><br />
+	    <input type="checkbox" id="email-share"	style="float: left; margin-top: 10px;" checked="checked" />
+	    <a	style="float: left" id="email_link" class="addthis_button_email" addthis:url="<?= $this->shareUrl ?>"></a>
+    </span>
+    </div>
+<script type="text/javascript"
+	src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4e319b9362855da9"></script>
+<div class="clear"></div>
+<br />
+<div style="width: 500px"><span id="current-links"> <input type="button"
+	value="Share" class="btn btngreen" onclick="return share()" /> <a
+	href="<?=$this->shareUrl?>"
+	style="font-weight: bold; font-size: 15px; margin-top: 5px; margin-right: 10px">Skip</a>
+</span> <span id="continue-links" style="display: none"> <a
+	class="btn btngreen" href="<?=$this->shareUrl?>"
+	style="float: right; margin-top: 5px; padding: 3px 15px">Continue</a> </span>
+</div>
+</form>

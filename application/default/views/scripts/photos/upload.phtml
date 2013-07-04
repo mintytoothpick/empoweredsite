@@ -1,0 +1,154 @@
+<?php $this->placeholder('upload_photos')->captureStart(); ?>
+<?php $this->headTitle("Empowered.org - Upload a Photo"); ?>
+<script type="text/javascript" language="javascript">
+    function val() {		
+        if (document.getElementById("Albumfilter").value == 0){
+            alert("Please select Album.");
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    function validate2() {
+        var accepted_files = new Array("jpeg", "gif", "png", "jpg", "JPG", "JPEG");
+        for(i = 1; i <= counter; i++){
+            var nameid='#attachment'+i;
+            if (jQuery.trim($(nameid).val()) == '') {
+                alert("Please select an image to upload.");
+                return false;
+            } else {
+                var image = $(nameid).val().split(".");
+                image=image[image.length-1].toString();
+                for ( var i = 0, length = accepted_files.length; i < length; i++ ) {
+                    var bar=accepted_files[i].toString();
+                    if ( bar === image ) {
+                        return val();
+                    }
+                }
+                alert("Please select jpeg, gif and png files only.");
+                return false;
+            }
+        }
+    }
+    
+    var counter = 1;
+    function uploadPhotos() {
+        if ($('#ProjectId').val() == "" || $('#ProjectId').val() == 0) {
+            alert(counter + "Please select an album for your photos.");
+            return false;
+        } else if (jQuery.trim($('#attachment-1').val()) == '') {
+            alert("Please select an image to upload.");
+            return false;
+        } else { 
+            var format_problem = false;
+            
+            for( var num = 1; num <= counter; num++) {         
+                var image = $('#attachment-' + num).val().split(".");
+                var accepted_files = new Array("jpeg", "gif", "png", "jpg", "JPG", "JPEG");
+                bad_format = true;
+
+                image=image[image.length-1].toString();
+
+                for ( var i = 0, length = accepted_files.length; i < length; i++ ) {
+                    var bar=accepted_files[i].toString();
+                    if ( bar === image ) {
+                        bad_format = false;
+                        break;
+                    }
+                    
+                }
+                if(bad_format){
+                    format_problem = true;
+                    var image_num = num;
+                }
+            }
+            if(!format_problem) {
+/*                $.ajax({
+                    type: 'POST',
+                    url: "/photos/upload",
+                    data: $('#uploadphoto').serialize(),
+                    success: function(data) {
+                        if(data == 'no photos were uploaded') {
+                            alert(data);
+                        } else {
+                            window.location.href = data;
+                        }
+                    }
+                }) */
+                return true;
+            } else {
+                alert("Image #" + image_num +" has a bad format.");
+                return false;
+            }
+        }        
+    }
+
+    function addPhotos() {
+        counter++;
+        var new_photo = '<div><input class="photo-1" type="file" name="attachment-'+counter+'" id="attachment-'+counter+'" onchange="toggleMoreLink()" />&nbsp;&nbsp;<a class="desc-'+counter+'" href="javascript:;" onclick="toggleComment(\'.comment-'+counter+'\', \'.desc-'+counter+'\')">Add Description</a></div>';
+        new_photo += '<div class="comment-'+counter+' hidden" style="margin-top:5px; margin-bottom:10px"><textarea id="comments-'+counter+'" name="Comments['+counter+']" rows="2" cols="53" style="font-size: 12px;"></textarea><div>';
+        $('#photos').append(new_photo);
+        $('#total_uploads').val(counter);
+    }
+
+    function toggleMoreLink() {
+        if ($('#moreUploadsLink').hasClass('hidden')) {
+            $('#moreUploadsLink').removeClass('hidden')
+        }
+    }
+
+    function toggleComment(div, btn) {
+        $(div).toggle();
+        $(btn).toggle();
+    }
+</script>
+
+<div id="uploadPhotosBox" style="display:none;">
+    <div id="mainco2">
+        <div class="roundedbox">
+            <h2>Upload Photos</h2>            
+            <div>
+				<span style="color:#F00;">Please select jpeg, gif and png files that are under 2MB in size.</span><br /><br />
+                <?php if (isset($this->uploadedimage)) { ?>
+                <div style="border:2px solid silver; padding:5px; color:green; width:350px;">You have successfully uploaded <?php echo count($this->uploadedimage).(count($this->uploadedimage) > 1 ? ' photos' : ' photo') ?>.</div><br />
+                <?php foreach($this->uploadedimage as $image) { ?>
+                    <img src="<?php echo $image ?>">
+                <?php } ?>
+                <br /><br />
+                <?php } ?>
+
+                <form id="uploadphoto" action="/<?php echo $this->URLName ?>/upload-photos" method="post" enctype="multipart/form-data" onsubmit="return uploadPhotos();">
+                    <div style="float: left; margin-right: 10px; margin-top: -23px; width:100%; margin-bottom:10px;">
+                        <?php if (count($this->albums)) { ?>
+                        <div style="float:left; width:100%; margin-top:20px; display:block">
+                            <strong style="display:block">Associated Initiative:</strong>
+                            <select id="ProjectId" name="ProjectId" style="padding:2px; margin-top:3px">
+                                <option selected value="0">Please select an Album</option>
+                                <?php foreach ($this->albums as $album) { ?>
+                                <option value="<?php echo $album['ProjectId'] ?>" <?= $this->SiteId == $album['ProjectId'] ? 'selected' : ''; ?>><?php echo stripslashes($album['AlbumName']) ?></option>
+                                <?php } ?>
+                            </select><br>
+                        </div>
+                        <div class="clear"></div>
+                        <?php } else { ?>
+                        <input type="hidden" id="Albumfilter" name="Albumfilter" value="1" />
+                        <input type="hidden" id="SiteId" name="SiteId" value="<?php echo $this->SiteId ?>" />	
+                        <?php }?>
+                    </div>
+                    <div id="photos" class="multfile" style="float:left; width:100%">
+                        <div><input class="photo-1" type="file" name="attachment-1" id="attachment-1" onchange="toggleMoreLink()" />&nbsp;&nbsp;<a class="desc-1" href="javascript:;" onclick="toggleComment('.comment-1', '.desc-1')">Add Description</a></div>
+                        <div class="comment-1 hidden" style="margin-top:5px; margin-bottom:10px">
+                            <textarea id="comments-1" name="Comments[1]" rows="2" cols="53" style="font-size: 12px;"></textarea>
+                        </div>
+                    </div>
+                    <div id="moreUploadsLink" class="hidden" style="float:left; width:100%"><a href="javascript:;" onclick="addPhotos()">Attach another File</a></div>
+                    <input type="hidden" id="total_uploads" name="total_uploads" value="1" />
+                    <input type="submit" name="submit" value="Upload" class="button" />
+                </form>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>
+<?php $this->placeholder('upload_photos')->captureEnd(); ?>

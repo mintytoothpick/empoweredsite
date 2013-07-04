@@ -1,0 +1,19 @@
+<?php if ($this->pageCount > 1): ?>
+<center>
+    <div class="paginationControl dataTables_paginate paging_two_button" style="width:62px">
+        <!-- Previous page link -->
+            <?php if (isset($this->previous)): ?>
+        <a title="Previous" class="paginate_enabled_previous" href="/profile/groups?page=<?php echo $this->previous; ?><?php echo isset($_REQUEST['ProgramId']) ? "&ProgramId=".$_REQUEST['ProgramId'] : "" ?><?php echo isset($_REQUEST['show']) ? "&show=".$_REQUEST['show'] : "" ?>"></a>
+            <?php else: ?>
+        <div class="disabled paginate_disabled_previous"></div>
+            <?php endif; ?>
+
+        <!-- Next page link -->
+            <?php if (isset($this->next)): ?>
+        <a title="Next" class="paginate_enabled_next" href="/profile/groups?page=<?php echo $this->next; ?><?php echo isset($_REQUEST['ProgramId']) ? "&ProgramId=".$_REQUEST['ProgramId'] : "" ?><?php echo isset($_REQUEST['show']) ? "&show=".$_REQUEST['show'] : "" ?>"></a>
+            <?php else: ?>
+        <div class="disabled paginate_disabled_next"></div>
+            <?php endif; ?>
+    </div>
+</center>
+<?php endif; ?>

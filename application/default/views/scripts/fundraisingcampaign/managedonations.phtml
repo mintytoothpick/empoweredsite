@@ -1,0 +1,162 @@
+<?php
+if ($this->level == "group") {
+    $this->placeholder('currenttab')->set('active-campaigns');
+} else if ($this->level == "organization") {
+    $this->placeholder('currenttab')->set('campaigns');
+}
+?>
+<script type="text/javascript">
+    function validate() {
+        varfundraiser_id = '';
+        var curr_goal = 0;
+        var new_goal = 0;
+        var ctr = 1;
+        var error = 0;
+        $('#donations tr td input').each(function(){
+            if ($(this).attr('type') == 'hidden' && $(this).attr('name').search('VolunteerId') > -1) {
+               fundraiser_id = $(this).val();
+            } else if ($(this).attr('type') == 'hidden' && $(this).attr('name').search('currgoal') > -1) {
+                curr_goal = $(this).val();
+            } else if ($(this).attr('type') == 'text' && $(this).attr('name').search('newgoal') > -1) {
+                new_goal = $(this).val();
+            }
+            if (ctr == 3) {
+                if (jQuery.trim(new_goal) != "") {
+                    if (Number(curr_goal) > Number(new_goal) || !isFloat(new_goal)) {
+                        error++;
+                    }
+                }
+                ctr = 0;
+            }
+            ctr++;
+        })
+        if (error > 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    function updateGoals() {
+        if (validate()) {
+            var fundraiser_id = '';
+            var curr_goal = 0;
+            var new_goal = 0;
+            var ctr = 1;
+            var updated = 0;
+            $('#donations tr td input').each(function(){
+                if ($(this).attr('type') == 'hidden' && $(this).attr('name').search('VolunteerId') > -1) {
+                   fundraiser_id = $(this).val();
+                } else if ($(this).attr('type') == 'hidden' && $(this).attr('name').search('currgoal') > -1) {
+                    curr_goal = $(this).val();
+                } else if ($(this).attr('type') == 'text' && $(this).attr('name').search('newgoal') > -1) {
+                    new_goal = $(this).val();
+                }
+                if (ctr == 3) {
+                    if (curr_goal < new_goal) {
+                        updated++;
+                        $.post('/fundraisingcampaign/updategoal', {VolunteerId:fundraiser_id, NewGoal: new_goal});
+                    }
+                    ctr = 0;
+                }
+                ctr++;
+            })
+            if (updated > 0) {
+                alert("Changes have been saved successfully.")
+            }
+            return true;
+        } else {
+            alert('Please specify a valid amount and must be greater than the current donation goal.')
+            return false;
+        }
+    }
+    function generateReports() {
+        $.post('/fundraisingcampaign/generatereport', {ProjectId: $('#ProjectId').val()});
+        return false;
+    }
+    function isFloat(value) {
+        if(value == ""){
+            return false;
+        }
+        value = value.replace(/,/, '.');
+        if(parseFloat(value) != (value*1)) {
+            return false;
+        }
+        return true;
+    }
+</script>
+<div class="wrapper">
+   <!-- org header -->
+  <?php echo $this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+
+    <?php if ($this->level == "group" || $this->level == "organization") { ?>
+
+      <!-- breadcrumb -->
+      <?php echo $this->placeholder('breadcrumb') ?>
+      <!-- // breadcrumb -->
+      <div class="clr"></div>
+
+      <!-- tabs -->
+      <?php echo $this->placeholder('tabs') ?>
+      <!-- // tabs -->
+
+    <?php } else {
+      include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/profileheader.php';
+    } ?>
+
+    <div class="mainC">
+      <div class="box05">
+        <div class="headingStyle02">
+            Donation Summary<?php echo isset($this->level) && $this->level != 'user' ? " - ".stripslashes($this->project->name) : '' ?>
+        </div>
+        <div>
+            <table id="donations" cellspacing="0" cellpadding="3" border="0" style="width:100%; border-collapse:collapse;">
+                <tr style="color:#F7F7F7;background-color:#000;font-weight:bold;height:25px;">
+                    <th scope="col">Fundraiser</th>
+                    <th scope="col">Amount Raised</th>
+                </tr>
+                <?php
+                if (count($this->volunteers) > 0) {
+                    $ctr = $total_raised = $total_goal = 0;
+                    foreach ($this->volunteers as $volunteer) {
+                        $total_raised += number_format(round($volunteer->raised));
+                        $total_goal   += number_format(round($volunteer->userDonationGoal));
+                        ?>
+                <tr style="background-color:<?php echo $ctr%2 == 1 ? "#e7e7e9" : "white" ?>;border-bottom:1px solid #E7E7FF;<?php if($volunteer->isDeleted) { echo "color:#F00;"; $delMSG = 1; } ?>">
+                    <td style="border-right:1px solid silver;border-left:1px solid silver;width:200px">
+                        <input type="hidden" id="VolunteerId_<?php echo $volunteer->id ?>" name="VolunteerId_<?php echo $volunteer->id ?>" value="<?php echo $volunteer->id ?>" />
+                        &nbsp;<a href="/<?php echo $volunteer->urlName ?>"><?php echo stripslashes($volunteer->user->fullName) ?></a>
+                    </td>
+                    <td style="text-align:right; width:110px; border-right:1px solid silver;"><?php echo number_format(round($volunteer->raised)) ?>&nbsp;&nbsp;</td>
+                </tr>
+                        <?php $ctr++;?>
+                    <?php } ?>
+                <tr style="background-color:<?php echo $ctr%2 == 1 ? "#e7e7e9" : "white" ?>; border:none; line-height:20px;">
+                    <td style="text-align:left; border-right:1px solid silver;border-left:1px solid silver;font-weight:bold;border-bottom:1px solid #E7E7FF;">&nbsp;General Donations</td>
+                    <td style="text-align:right; border-right:1px solid silver;border-left:1px solid silver;font-weight:bold;border-bottom:1px solid #E7E7FF;"><?php echo number_format(round($this->general_donations)) ?>&nbsp;&nbsp;</td>
+                </tr>
+                <?php $ctr++; $total_raised += $this->general_donations; $total_goal += $this->project->donationGoal; ?>
+                <tr style="background-color:<?php echo $ctr%2 == 1 ? "#e7e7e9" : "white" ?>; border:none; line-height:20px;">
+                    <td style="text-align:left; border-right:1px solid silver;border-left:1px solid silver;font-weight:bold;border-bottom:1px solid #E7E7FF;">&nbsp;Total Donations</td>
+                    <td style="text-align:right; border-right:1px solid silver;border-left:1px solid silver;font-weight:bold;border-bottom:1px solid #E7E7FF;"><?php echo number_format(round($total_raised)) ?>&nbsp;&nbsp;</td>
+                </tr>
+        <?php } else { ?>
+                <tr><td colspan="4"><b>&nbsp;No records found.</b></td></tr>
+                <?php } ?>
+            </table>
+            <br /><br />
+            <div id="divUpdateDesc">
+                <a class="btn btngreen" style="float:right; padding:3px 15px;" title="Donations Detail" href="/<?=$this->project->urlName?>/donations">Donations Detail</a>
+                <a class="btn btngreen" title="Back" href="/<?=$this->project->urlName?>" >Back</a>
+            </div>
+        </div>
+        <div class="clear"></div>
+        </div>
+    </div>
+    <div class="clr"></div>
+    <div class="clr"></div>
+</div>

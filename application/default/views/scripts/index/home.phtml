@@ -1,0 +1,576 @@
+<?php $this->headTitle("Empowered.org:  Empowering groups of volunteers to create social change"); ?>
+<script src="//cdn.optimizely.com/js/8371972.js"></script>
+<script type="text/javascript">
+    var current_bubble = 1;
+    function showVolunteers(div, link) {
+        if (div.search('all') > -1) {
+            $(div.replace('all', 'less')).hide();
+            $(link.replace('Less', 'More')).hide();
+        } else {
+            $(div.replace('less', 'all')).hide();
+            $(link.replace('More', 'Less')).hide();
+        }
+        $(div).show();
+        $(link).show();
+    }
+
+    $(function() {
+        $('.bullets span').bind('click', function() {
+            var id = $(this).attr('id');
+            $('.bullets span').each(function() {
+                $(this).removeClass('active');
+            })
+            $(this).addClass('active');
+            $('.bubble-quote').each(function() {
+                $(this).hide();
+            })
+            $('.quoted-by').each(function() {
+                $(this).hide();
+            })
+            $('.quote-'+id).show();
+            current_bubble = Number(id);
+        })
+    })
+    function next() {
+	if(current_bubble < 3) {
+            current_bubble++;
+            $('#'+current_bubble).click();
+	}
+    }
+    function prev() {
+	if(current_bubble > 1) {
+            current_bubble--;
+            $('#'+current_bubble).click();
+	}
+    }
+
+    function beginSearch1() {
+        var srch_txt = $('#searchfield1').val().toString();
+        srch_txt = srch_txt.replace(/'/g, '');
+        srch_txt = srch_txt.replace(/"/g, "");
+        window.location.href = '/search?utm_campaign=Internal&utm_medium=Search&utm_source='+srch_txt+'&search_text='+srch_txt;
+    }
+</script>
+<link rel="stylesheet" href="/public/css/photogallery.css" type="text/css" media="screen" />
+<style type="text/css">
+    .bst07 { width:60px; }
+    .bst07-data { margin-left:8px; }
+	.alignleft { float:left; margin: 5px 10px 5px 0; padding:5px; }
+	.alignright { float:right; margin: 5px 0 5px 10px; padding:5px; }
+</style>
+
+<style>
+    .banner { background-image: url(<?php echo $this->contentLocation ?>public/images/NewHomePage2/banner-bg.gif); width: 1064px; padding: 20px; padding-bottom: 0 }
+    .pbanner-icon { float:left; width:35px; margin-right:10px; }
+    .pbanner-icon img { height:30px; }
+    .pbanner-text { float:left; font-size:15px; margin-top:7px; }
+    .pbanner-text a { font-weight:bold; }
+    a.button-orange {
+        background-color:#ffa200;
+        background-image:url(<?php echo $this->contentLocation ?>public/images/NewHomePage/arrow.png);
+        background-repeat:no-repeat;
+        background-position:92%;
+        color:#fff;
+        padding:5px 10px;
+        font-weight:bold;
+        -moz-border-radius:10px;
+        -webkit-border-radius: 10px;
+        -khtml-border-radius: 10px;
+    }
+    a.button-orange:hover { color:#fff; text-decoration:none; }
+    .banner2 span { color:#989898; font-size:18px; font-weight:bold; }
+    .banner2 img { width:65px; margin-bottom:5px; }
+    .banner2 { height:75px }
+    .banner3 {
+        -moz-border-radius: 5px;
+        -webkit-border-radius: 5px;
+        -khtml-border-radius: 5px;
+        -moz-box-shadow:0 0 3px #AAAAAA;
+        background-color:#FFFFFF;
+        border:1px solid #FFFFFF;
+        height:140px;
+        margin-bottom:5px;
+        padding:5px 0px 5px 25px;
+        width:1079px;
+        font-size:16px;
+        font-weight:bold;
+    }
+    .banner3 .box { float:left; background-color:#c0dad9; padding:3px 6px; border:none; margin-right:10px; width:120px; }
+    .banner3 .box { float:left; padding:3px 6px; border:none; margin-right:10px; width:120px; }
+    .box-text { float:left; color:#989898; padding:3px 6px; }
+    .right-panel-1 { list-style:none; padding:0px 5px }
+    .right-panel-1 li { width:210px; padding: 15px 8px; float:left; height:80px }
+    .right-panel-1 li img { width:40px; height:40px; float:left; margin-right:8px; }
+    .right-panel-1 li { font-weight:bold; }
+    .right-panel-1 li .title { font-size:18px; padding:3px 0px; }
+    .right-panel-1 li .desc { font-size:12px; font-weight:normal; float:left; margin-top:5px; }
+    #mainco3 .block001 .blst002 { min-height:205px }
+    .bubble-quote {
+        background:url(<?php echo $this->contentLocation ?>public/images/NewHomePage/quote_bubble.png) repeat;
+        width:270px;
+        padding:0 20px;
+        font-size:19px;
+        font-family:"New Century Schoolbook", serif;
+        font-style:italic;
+        line-height:25px;
+        font-weight:500;
+    }
+    .bullets { color:#989898; font-weight:bold; float:right; font-size:30px; cursor:pointer  }
+    .bullets .active { color:#000 }
+    .featured-groups { list-style:none; width:665px; }
+    .featured-groups li { padding:15px 10px; -moz-border-radius:7px; -webkit-border-radius: 7px; -khtml-border-radius: 7px; background-color:#eaeaea; margin-bottom:10px; float:left; width:645px }
+    .featured-groups .left-col { width:515px; float:left; border-right:1px solid #000; margin-right:15px; margin-left:7px; }
+    .featured-groups .left-col .logo { width:140px; float:left; margin-right:8px }
+    .featured-groups .left-col .logo img { padding:2px; background-color:#333333; float:left; width:140px; height:70px; }
+    .featured-groups .left-col .details { width:350px; float:left; padding:5px; }
+    .featured-groups .right-col { width:100px; float:left; }
+    .featured-groups .right-col .logo { width:60px; float:left; margin-right:8px }
+    .featured-groups .right-col .logo img { background-color:#333333; float:left; width:70px; height:70px; }
+    .numbers span { margin:auto; padding:0 20px; }
+    .livefeed { list-style:none; margin-top:10px; float:left; padding:0px; }
+    .livefeed .left-col { color:#669933; padding:10px 5px; -moz-border-radius:5px; -webkit-border-radius: 5px; -khtml-border-radius: 5px; background-color:#eaeaea; margin-bottom:5px; float:left; width:38px; height:15px; margin-right:5px; font-weight:bold; text-align:center }
+    .livefeed .right-col { float:left; width:257px; font-size:12px; }
+    .volunteers { list-style:none }
+    .volunteers li { padding:2px; float:left; width:100px }
+    .hidden { display:none }
+    .benefits li { width: 292px; border-radius: 5px; padding: 10px 20px; float: left; margin-right: 20px; margin-bottom: 20px; background-color: #e6f7e8; height: 120px }
+    .benefits a { color:#000; text-decoration:none; }
+    .benefits a:hover { text-decoration:none; }
+    .live-feed a { color: #333333 }
+    li.new-banner { width: 100%; float: left; font-size: 22px; font-weight: bold; line-height: 20px; color: #000; padding: 4px; line-height: 35px; text-align: left }
+    li.new-banner img { float: left; margin-right: 10px }
+    .banner2 div { width: 110px }
+    .slideshow { padding: 3px; margin: auto }
+    .slide-buttons { padding: 0 10px; background: url(<?php echo $this->contentLocation ?>public/images/NewHomePage2/scroll.png) no-repeat; width: 11px; cursor: pointer; }
+    .slideshow span.active { background: url(<?php echo $this->contentLocation ?>public/images/NewHomePage2/scrollactive.png) no-repeat; width: 11px; }
+    .text-messages { font-size: 12px; text-align: left; font-weight: bold; color: #58585a; }
+    #slide-holder { width: 342px; height: 210px; margin: auto }
+    .prev-slide { padding: 5px 6px; background: url(<?php echo $this->contentLocation ?>public/images/NewHomePage2/left-arrow.gif) no-repeat; width: 11px; height: 20px; cursor: pointer; display: inline; float: left; margin-top: 100px }
+    .next-slide { padding: 5px 6px; background: url(<?php echo $this->contentLocation ?>public/images/NewHomePage2/right-arrow.gif) no-repeat; width: 11px; height: 20px; cursor: pointer; display: inline; float: left; margin-top: 100px }
+    .slide-1 { background: url(<?php echo $this->contentLocation ?>public/images/NewHomePage2/Slide1.png) no-repeat; }
+    .slide-2 { background: url(<?php echo $this->contentLocation ?>public/images/NewHomePage2/Slide2.png) no-repeat; }
+    .slide-3 { background: url(<?php echo $this->contentLocation ?>public/images/NewHomePage2/Slide3.png) no-repeat; }
+    .slide-4 { background: url(<?php echo $this->contentLocation ?>public/images/NewHomePage2/Slide4.png) no-repeat; }
+    .slide-5 { background: url(<?php echo $this->contentLocation ?>public/images/NewHomePage2/Slide5.png) no-repeat; }
+</style>
+<script>
+    var next = 1;
+    var intervalID;
+    $(function() {
+        intervalID = window.setInterval(autoPlay, 4000);
+    })
+    var current_playing = 1;
+    function autoPlay() {
+        $('.slideshow > span').removeClass('active');
+        $('#button-'+current_playing).addClass('active');
+        $('#slide-holder').attr('class', 'slide-'+current_playing);
+        $('.text-messages > span').hide();
+        $('#slide-'+current_playing).show();
+        $('#text-'+current_playing).show();
+        $('.new-banner').css('color', '#000');
+        $('#new-banner-'+current_playing).css('color', '#693');
+        if (current_playing < 5) {
+            current_playing++;
+        } else {
+            current_playing = 1;
+        }
+    }
+    $(function() {
+        $('.slide-buttons').bind('click', function() {
+            $('.slideshow > span').removeClass('active');
+            $(this).addClass('active');
+            var id = $(this).attr('id').replace('button-', '');
+            $('#slide-holder').attr('class', 'slide-'+id);
+            $('.text-messages > span').hide();
+            $('#slide-'+id).show();
+            $('#text-'+id).show();
+            $('.new-banner').css('color', '#000');
+            $('#new-banner-'+id).css('color', '#693');
+            /*
+            if (Number(id) > 1) {
+                $('.prev-slide').show();
+            } else {
+                $('.prev-slide').hide();
+            }
+            if (Number(id) < 5) {
+                $('.next-slide').show();
+            } else {
+                $('.next-slide').hide();
+            }
+            */
+           if (intervalID != null) {
+               clearInterval(intervalID);
+           }
+        })
+    })
+    
+    $(function() {
+        $('#slide-holder').bind('click', function() {
+            var id = $(this).attr('class').replace('slide-', '');
+            if(id == 1) {
+                var top = (screen.height/2)-274;
+                $('.popup-box').toggle().css('top', top);
+                $('#popup-overlay').toggle();
+            }
+        })
+    })
+    
+    function nextSlide() {
+        if (next < 5) {
+            var active = $('.slideshow > span.active').attr('id').replace('button-', '');
+            $('#button-'+(Number(active) + 1)).click()
+            next++;
+        } else {
+            //clearInterval(intervalID);
+            $('#button-1').click()
+            next = 1;
+        }
+    }
+    
+    function prevSlide() {
+        if (next < 5) {
+            var active = $('.slideshow > span.active').attr('id').replace('button-', '');
+            $('#button-'+(Number(active) - 1)).click()
+            next--;
+        } else {
+            $('#button-5').click()
+            next = 5;
+        }
+    }
+</script>
+<style>
+    .popup-box { left: 25%; right: 25%; top:20%; position: absolute; z-index: 999999!important; background-color:#ffffff; border:5px solid #e5e5e5; padding:10px 0 20px 0; -moz-border-radius:7px }
+    #popup-overlay {
+        background: url(<?php echo $this->contentLocation ?>public/images/bg-overlay.png);
+        height:100%;
+        position:fixed;
+        display:block;
+        left:0;
+        top:0;
+        width:100%!important;
+        z-index:998;
+        display:none;
+    }
+</style>
+<!-- Include the VideoJS Library -->
+<script src="/public/js/video.js" type="text/javascript" charset="utf-8"></script>
+ 
+<script type="text/javascript">
+   // Must come after the video.js library
+ 
+   // Add VideoJS to all video tags on the page when the DOM is ready
+   //VideoJS.setupAllWhenReady();
+ 
+   /* ============= OR ============ */
+ 
+   // Setup and store a reference to the player(s).
+   // Must happen after the DOM is loaded
+   // You can use any library's DOM Ready method instead of VideoJS.DOMReady
+ 
+   VideoJS.DOMReady(function(){
+       // Using the video's ID or element
+       var myPlayer = VideoJS.setup("video_1");
+ 
+       // OR using an array of video elements/IDs
+       // Note: It returns an array of players
+       //var myManyPlayers = VideoJS.setup(["example_video_1"]);
+ 
+       // OR all videos on the page
+       //var myManyPlayers = VideoJS.setup("All");
+ 
+       // After you have references to your players you can...(example)
+       myPlayer.play(); // Starts playing the video for this player.
+   });
+ 
+   /* ========= SETTING OPTIONS ========= */
+ 
+   // Set options when setting up the videos. The defaults are shown here.
+ 
+   VideoJS.setupAllWhenReady({
+       controlsBelow: false, // Display control bar below video instead of in front of
+       controlsHiding: false, // Hide controls when mouse is not over the video
+       defaultVolume: 0.85, // Will be overridden by user's last volume if available
+       flashVersion: 9, // Required flash version for fallback
+       linksHiding: false // Hide download links when video is supported
+   });
+ 
+   // Or as the second option of VideoJS.setup
+ 
+   /*
+ VideoJS.DOMReady(function(){
+   var myPlayer = VideoJS.setup("example_video_1", {
+     // Same options
+   });
+ });
+    */
+ 
+</script>
+ 
+<!-- Include the VideoJS Stylesheet -->
+<link rel="stylesheet" href="/public/css/video-js.css" type="text/css" media="screen" title="Video JS">
+
+<div id="popup-overlay"></div>
+<div class="popup-box" style="padding: 30px 20px; display:none; width:574px; height:370px;">
+	<!-- Begin VideoJS -->
+    <?php
+    $server = $_SERVER['HTTP_HOST'];
+    $video_path = "http://$server/public/videos/EmpVidFINAL.m4v";
+    ?>
+    <div class="video-js-box" style="margin-top:0px; position:absolute">
+        <!-- Using the Video for Everybody Embed Code http://camendesign.com/code/video_for_everybody -->
+        <video id="video_1" class="video-js" width="574" height="348" controls poster="http://cdn.empowered.org/public/images/NewHomePage/video.png">
+            <!-- Flash Fallback. Use any flash video player here. Make sure to keep the vjs-flash-fallback class. -->
+            <object class="vjs-flash-fallback" width="574" height="348" type="application/x-shockwave-flash" data="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf">
+                <param name="movie" value="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf" />
+                <param name="allowfullscreen" value="true" />
+                                     <param name="wmode" value="transparent">
+                <param name="flashvars" value='config={"playlist":["http://cdn.empowered.org/public/images/NewHomePage/video.png", {"url": "<?php echo $video_path ?>","autoPlay":false, "autoBuffering":true}]}' />
+                <!-- Image Fallback. Typically the same as the poster image. -->
+                <img src="http://cdn.empowered.org/public/images/NewHomePage/video.png" width="574" height="348" alt="Poster Image" title="No video playback capabilities." />
+            </object>
+        </video>
+    </div>
+	<div class="clear" style="margin-bottom:350px;"></div>
+	<a class="btn btngreen" style="float:right;" href="javascript:;" onclick="$('#popup-overlay').hide(); $('.popup-box').hide();">Close</a>
+    <!-- End VideoJS -->
+</div>
+
+<div>
+    <!-- banner -->
+    <div class="banner" style="background:#FFF;">
+        <div style="float: left; width: 580px; margin-right: 20px">
+            <img src="<?php echo $this->contentLocation ?>public/images/NewHomePage2/manage.gif" style="margin: auto; float: left" />
+            <div style="width: 100%; float: left; margin-top: 20px">
+                <ul style="list-style: none; margin-left: 40px; float: left;color:#000;">
+                    <li id="new-banner-2" class="new-banner" onclick="$('#button-2').click()" style="cursor: pointer">
+                        <img src="<?php echo $this->contentLocation ?>public/images/NewHomePage2/fund.png" /> Fundraising
+                    </li>
+                    <li id="new-banner-3" class="new-banner" onclick="$('#button-3').click()" style="cursor: pointer">
+                        <img src="<?php echo $this->contentLocation ?>public/images/NewHomePage2/volunteer.png" /> Volunteer Activities
+                    </li>
+                    <li id="new-banner-4" class="new-banner" onclick="$('#button-4').click()" style="cursor: pointer">
+                        <img src="<?php echo $this->contentLocation ?>public/images/NewHomePage2/events.png" /> Events
+                    </li>
+                    <li id="new-banner-5" class="new-banner" onclick="$('#button-5').click()" style="cursor: pointer">
+                        <img src="<?php echo $this->contentLocation ?>public/images/NewHomePage2/chaptersmngt.png" /> Chapter Management
+                    </li>
+                    <li class="new-banner">
+                        <div class="clear" style="margin-bottom: 10px"></div>
+                        <a href="/benefits"><img src="<?php echo $this->contentLocation ?>public/images/NewHomePage2/take-tour.gif" /></a>
+                        <a href="/getstarted"><img src="<?php echo $this->contentLocation ?>public/images/NewHomePage2/getstarted.gif" /></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div style="float: left">
+            <center>
+            <div class="prev-slide" style="" onclick="prevSlide()"></div>
+            <div class="slide-1" id="slide-holder" style="width:400px; height:260px; float: left">
+                
+            </div>
+            <div class="next-slide" onclick="nextSlide()"></div>
+            </center>
+            <div class="clear"></div>
+            <div style="float: left; width: 100%" class="slideshow">
+                <span class="slide-buttons active" id="button-1"></span>
+                <span class="slide-buttons" id="button-2"></span>
+                <span class="slide-buttons" id="button-3"></span>
+                <span class="slide-buttons" id="button-4"></span>
+                <span class="slide-buttons" id="button-5"></span>
+            </div>
+            <div class="text-messages" style="width:410px;margin-left:30px;">
+                <span id="text-1" style="margin-top: 45px;">
+                    <strong style="font-size: 16px">&nbsp;</strong>
+                    <div class="clear" style="margin-bottom: 7px"></div>
+					Empowered's easy-to-use online tools help you fundraise, build awareness, manage volunteers - and reach your full potential.</span>
+                <span id="text-2" style="display: none;">
+                    <strong style="font-size: 16px;">Get More Out of Your Fundraising Campaigns</strong>
+                    <div class="clear" style="margin-bottom: 7px"></div>
+                    Give your supporters the power to create personal campaigns to their networks with the most up-to-date social media tools. Receive their donations instantly with detailed reports for each transaction.</span>
+                <span id="text-3" style="display: none;">
+                    <strong style="font-size: 16px">Exponentially Grow Your Member Base</strong>
+                    <div class="clear" style="margin-bottom: 7px"></div>
+                    Mobilize your members through unlimited volunteer activities, optional fundraising goals, and coordination tools (file-sharing, online newsletters, surveys and more)</span>
+                <span id="text-4" style="display: none;">
+                    <strong style="font-size: 16px">Take Your Events to the Next Level</strong>
+                    <div class="clear" style="margin-bottom: 7px"></div>
+                    Create unlimited events, manage registration, track RSVPs, sell tickets - all on the same platform you fundraise and recruit volunteers.
+                </span>
+                <span id="text-5" style="display: none;">
+                    <strong style="font-size: 16px">Empower Multiple Chapters to Create Change</strong>
+                    <div class="clear" style="margin-bottom: 7px"></div>
+                    Multi-chapter organizations can organize and manage each individual chapter's volunteers and donors, while still being tied to your national organization. When you are ready to scale, just flip the switch.</span>
+            </div>
+        </div>
+    </div>
+    <!--  end of banner -->
+    <style>
+        .servicetrip { background: url(<?php echo $this->contentLocation ?>public/images/NewHomePage2/servicetrip.png) no-repeat center; width: 100px!important; height: 60px!important }
+        #servicetrip:hover { background: url(<?php echo $this->contentLocation ?>public/images/NewHomePage2/servicetripactive.png) no-repeat center; width: 100px!important; height: 60px!important; }
+        .community { background: url(<?php echo $this->contentLocation ?>public/images/NewHomePage2/community.png) no-repeat center; width: 100px!important; height: 60px!important }
+        #community:hover { background: url(<?php echo $this->contentLocation ?>public/images/NewHomePage2/communityactive.png) no-repeat center; width: 100px!important; height: 60px!important; }
+        .walk { background: url(<?php echo $this->contentLocation ?>public/images/NewHomePage2/walk.png) no-repeat center; width: 100px!important; height: 60px!important }
+        #walk:hover { background: url(<?php echo $this->contentLocation ?>public/images/NewHomePage2/walkactive.png) no-repeat center; width: 100px!important; height: 60px!important; }
+        .aluminetwork { background: url(<?php echo $this->contentLocation ?>public/images/NewHomePage2/aluminetwork.png) no-repeat center; width: 100px!important; height: 60px!important }
+        #aluminetwork:hover { background: url(<?php echo $this->contentLocation ?>public/images/NewHomePage2/aluminetworkactive.png) no-repeat center; width: 100px!important; height: 60px!important; }
+        .politic { background: url(<?php echo $this->contentLocation ?>public/images/NewHomePage2/politic.png) no-repeat center; width: 100px!important; height: 60px!important }
+        #politic:hover { background: url(<?php echo $this->contentLocation ?>public/images/NewHomePage2/politicactive.png) no-repeat center; width: 100px!important; height: 60px!important; }
+        .chapters { background: url(<?php echo $this->contentLocation ?>public/images/NewHomePage2/chapters.png) no-repeat center; width: 100px!important; height: 60px!important }
+        #chapters:hover { background: url(<?php echo $this->contentLocation ?>public/images/NewHomePage2/chaptersactive.png) no-repeat center; width: 100px!important; height: 60px!important; }
+    </style>
+    <div class="banner2" style="padding: 20px 25px; height: 80px;">
+        <div style="width:380px; text-align:left;padding-top:26px; color:#999; font-size:20px; font-weight: bold">Empowered.org is designed for</div>
+        <div><a href="/who-we-help?tab=servicetrips" style="font-size: 11px; color: #999"><div id="servicetrip" class="servicetrip" alt="Service Trips"></div><br/>Service Trips</a></div>
+        <div><a href="/who-we-help?tab=communityprojects" style="font-size: 11px; color: #999"><div id="community" class="community" alt="Community"></div><br/>Community</a></div>
+        <div><a href="/who-we-help?tab=runwalks" style="font-size: 11px; color: #999"><div id="walk" class="walk" alt="Run - Walks"></div><br/>Run - Walks</a></div>
+        <div><a href="/who-we-help?tab=servicetrips" style="font-size: 11px; color: #999"><div id="aluminetwork" class="aluminetwork" alt="Alumni Networks"></div><br/>Alumni Networks</a></div>
+        <div><a href="/who-we-help?tab=servicetrips" style="font-size: 11px; color: #999"><div id="politic" class="politic" alt="Political Campaigns"></div><br/>Political Campaigns</a></div>
+        <div><a href="/who-we-help?tab=chapters" style="font-size: 11px; color: #999"><div id="chapters" class="chapters" alt="Your Chapters"></div><br/>Your Chapters</a></div>
+    </div>
+    <div class="banner2" style="padding: 15px 25px; height: 45px;">
+        <div style="width:100%;">
+            <span style="color:#999; font-size:20px; font-weight: bold; float: left; padding-top:9px;">Looking for a Group or Volunteer?</span>
+            <form action="/search?utm_campaign=Internal&utm_medium=Search&utm_source=" method="post" onsubmit="beginSearch1(); return false">
+            <div class="search" style="float: right; margin:0; width: auto;">
+                <input type="text" id="search_text" name="search_text" value="" style="width:550px; border:3px solid #6d9c10; padding:3px; float: left; color: gray; font-size: 26px; height: 32px; background:url(/public/images/NewHomePage/search.gif) 98% 50% no-repeat ;" />
+                <input type="submit" value="" style="display: none">
+            </div>
+            </form>
+        </div>
+    </div>
+    <div class="banner3" style="float: left; padding: 0; height: auto; width: 100%; padding-bottom: 20px">
+        <div style="background: #b4e356; color: #333333; padding: 10px 30px; font-size: 30px; border-radius: 5px 5px 12px 12px; float: left; width: 1046px">
+            Benefits
+        </div>
+        <div class="clear" style="margin-bottom: 7px"></div>
+        <div style="padding: 10px 25px">
+            <ul style="list-style: none" class="benefits">
+	            <a href="/benefits"><li style="background: url(/public/images/NewHomePage/envelope.gif) no-repeat #e6f7e8 right">
+                    <strong style="font-size: 22px">
+                    Grow Your<br>
+                    Chapter Base
+                    </strong><br>
+                    <span style="font-weight: normal; font-size: 17px">
+                    Connect all your current groups to your organization and easily add new groups as the form.<br /><br />
+                    </span>
+                </li><a/>
+                <a href="/benefits"><li style="background: url(/public/images/NewHomePage/hand.gif) no-repeat #e6f7e8 right">
+                    <strong style="font-size: 22px">
+                    Raise More<br>
+                    Support
+                    </strong><br>
+                    <span style="font-weight: normal; font-size: 17px">
+                    Give your volunteers and donors the
+                    ability to create personal fundraising
+                    pages to fundraise directly for
+                    your cause
+                    </span>
+                </li></a>
+                <a href="/benefits"><li style="background: url(/public/images/NewHomePage/group.gif) no-repeat #e6f7e8 right; margin-right: 0">
+                    <strong style="font-size: 22px">
+                    For Groups of<br>
+                    All Sizes
+                    </strong><br>
+                    <span style="font-weight: normal; font-size: 17px">
+                    Whether you're a small group or
+                    a multi-faceted organization, our
+                    community gives you the tools
+                    to make your life easier.
+                    </span>
+                </li></a>
+                <a href="/benefits"><li style="background: url(/public/images/NewHomePage/folder.gif) no-repeat #e6f7e8 right">
+                    <strong style="font-size: 22px">
+                    Get<br>
+                    Organized
+                    </strong><br>
+                    <span style="font-weight: normal; font-size: 17px">
+                    Store all your information online, keep
+                    track of volunteers and donors easily,
+                    and stay current with everything your
+                    group does.
+                    </span>
+                </li></a>
+                <a href="/benefits"><li style="background: url(/public/images/NewHomePage/screen.gif) no-repeat #e6f7e8 right">
+                    <strong style="font-size: 22px">
+                    Create an<br>
+                    Online Buzz
+                    </strong><br>
+                    <span style="font-weight: normal; font-size: 17px">
+                    Help your group go viral by connecting
+                    to sites like Facebook and Twitter,
+                    to take full advantage of the social
+                    media world.
+                    </span>
+                </li></a>
+                <a href="/benefits"><li style="background: url(/public/images/NewHomePage/lock.gif) no-repeat #e6f7e8 right; margin-right: 0">
+                    <strong style="font-size: 22px">
+                    Safe &<br>
+                    Secure
+                    </strong><br>
+                    <span style="font-weight: normal; font-size: 17px">
+                    We adhere to the extensive
+                    security standards of PayPal, Google
+                    Checkout, and AlertPay. Your donation
+                    is 100% secure.
+                    </span>
+                </li></a>
+            </ul>
+        </div>
+    </div>
+
+    <div style="width: 100%; float: left">
+        <div class="banner3 live-feed" style="width: 544px; float: left; margin-right: 10px; padding: 0; height: auto">
+            <div style="background: #b4e356; color: #333333; padding: 10px 30px; font-size: 30px; border-radius: 5px 5px 12px 12px; float: left; width: 484px">
+                Live Feed
+            </div>
+            <div style="padding: 20px 40px; float: left; width: 426px; font-size: 15px; font-weight: normal">
+                <ul style="list-style: none; float: left; padding-bottom: 0">
+                <?php
+                foreach($this->donations_feed as $feed) {
+                ?>
+                    <li style="width: 70px; float: left">
+                        <img src="/public/images/NewHomePage/dollar.gif">
+                    </li>
+                    <li style="width: 356px; float: left">
+                        <span style="float: left"><?php echo ($feed['isAnonymous'] == 1 || trim($feed['SupporterName']) == '') ? "Anonymous " : strip_tags(stripslashes($feed['SupporterName'])) ?> donated $<?php echo number_format($feed['DonationAmount']) ?> to <a style="font-weight:bold" href="<?php echo $feed['URLName'] ?>"><?php echo strip_tags(stripslashes($feed['Name'])) ?></a> <?php echo $this->DateFormat->getDateFormat($feed['DonationDate']) ?></span>
+                    </li>
+                    <div class="clear"></div>
+                <?php } ?>
+                </ul>
+                <div class="clear"></div>
+            </div>
+        </div>
+        <div class="banner3" style="width: 545px; float: left; padding: 0; height: auto;">
+            <div style="background: #b4e356; color: #333333; padding: 10px 30px; font-size: 30px; border-radius: 5px 5px 12px 12px; float: left; width: 485px">
+                Impact Made
+            </div>
+            <div style="padding: 20px 40px; float: left; width: 426px; padding-bottom: 12px">
+                <div style="float: left; width: 426px">
+                    <div style="padding: 10px; font-size: 38px; font-weight: bold; background-color: #c0dad9; border-radius: 7px; width: 60%; float: left; text-align: right">
+                        $<?php echo number_format($this->donationManage->getTotalDonations(), 2) ?>
+                    </div>
+                    <div style="font-size: 24px; float: left; margin-left: 5px; margin-top: 15px">Raised</div>
+                </div>
+                <div class="clear" style="margin-bottom: 7px"></div>
+                <div style="float: left; width: 426px">
+                    <div style="padding: 10px; font-size: 38px; font-weight: bold; background-color: #c0dad9; border-radius: 7px; width: 60%; float: left; text-align: right">
+                        <?php echo number_format(($this->donationManage->getTotalDonors()+$this->volunteers->getTotalVolunteers())) ?>
+                    </div>
+                    <div style="font-size: 24px; float: left; margin-left: 5px; margin-top: 15px">Supporters</div>
+                </div>
+                <div class="clear" style="margin-bottom: 7px"></div>
+                <div class="box-1">
+                    <span style="float:left; margin:3px 0 0 3px;">
+                        <div style="width: 125px; height: 25px; overflow: hidden; position: relative;"><iframe src="http://www.facebook.com/plugins/likebox.php?id=138381956207609&amp;width=292&amp;connections=0&amp;stream=false&amp;header=false&amp;height=255" scrolling="no" frameborder="0" style="position: absolute; top: -30px; left: -60px;border:none; overflow:hidden; width:292px; height:255px;" allowTransparency="true"></iframe></div>&nbsp;
+                    </span>
+                    <div style="text-align:right; font-size:5em; color:#eaeaea; margin-top:-38px; font-family:Arial, serif; float: right; margin-right: -50px">Join</div>
+                </div>
+                <div style="width:550px; float:right">
+                    <div style="text-align:right; font-size:5.1em; color:#eaeaea; margin-top:-39px; font-family:Arial, serif; margin-right: -83px">the Movement</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="clear"></div>
+</div>

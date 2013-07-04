@@ -1,0 +1,41 @@
+<?php $this->placeholder('progress_bar')->captureStart() ?>
+<?php if ($this->toolsUsage < 100) { ?>
+<div class="info-boxes" style="margin:10px 0 10px 0; width:244px;">
+<div class="progress_label"></div>
+<div id="progress4" class="progress progress-green"><span><b></b></span></div>
+<script type="text/javascript">Administry.progress("#progress4", <?= intval($this->toolsUsage) ?>, <?= intval(100) ?>);</script>
+<div class="clear" style="margin-bottom:6px;"></div>
+<br />
+<a href="#" onclick="showAdminVideo(); return false;">Watch Administrator Video</a>
+<br /><br />
+Add:<br />
+<?php if (!($this->isImageExists && !empty($this->siteMedia['SystemMediaName']))) { ?>
+    - <a class="uploadLogo" href="javascript:;">Logo</a> <br >
+<?php }
+if (!(isset($this->siteBanner) && !empty($this->siteBanner['SystemMediaName']))) { ?>
+    - <a class="uploadBanner" href="javascript:;">Banner</a> <br >
+<?php }
+if (!$this->organization->hasUploadedMembers) { ?>
+    - <a href="/<?= $this->organization->urlName?>/add-members">Members</a> <br>
+<?php }
+if (!$this->organization->hasSharedSocialNetworks) { ?>
+    - <a href="/<?= $this->organization->urlName?>/share">Spread the word!</a> <br>
+<?php }
+if ($this->organization->hasPrograms && !count($this->organization->programs)) { ?>
+    - <a href="/<?= $this->organization->urlName?>/create-program">Program</a> <br />
+<?php }
+if ($this->organization->hasGroups && !count($this->organization->groups)) { ?>
+    - <a href="/<?= $this->organization->urlName?>/create-group">Chapter</a> <br />
+<?php }
+if (!count($this->organization->activities)) { ?>
+    - <a href="/<?= $this->organization->urlName?>/create-activity">Volunteer Activity</a> <br />
+<?php }
+if(!count($this->organization->campaigns) && ($this->organization->googleId || $this->organization->paypalId)) { ?>
+    - <a href="/<?= $this->organization->urlName?>/create-campaign">Fundraising Campaign</a> <br />
+<?php }
+if(!count($this->organization->events)) { ?>
+    - <a href="/<?= $this->organization->urlName?>/create-event">Event</a>
+<?php } ?>
+</div>
+<?php } ?>
+<?php $this->placeholder('progress_bar')->captureEnd() ?>

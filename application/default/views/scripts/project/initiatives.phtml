@@ -1,0 +1,65 @@
+<? if (!isset($this->filter)) { ?>
+<script>
+function filterInitiatives() {
+    $("#loading").show();
+    $("#contentInitiatives").html('');
+    $.ajax({
+        url: "project/filterinitiatives",
+        data: 'projectId=<?=$this->project->id?>&type=' + $('#typeInitiative').val() + '&status=' + $('#statusInitiative').val(),
+        success: function(data) {
+            $("#contentInitiatives").html(data);
+            $("#loading").hide();
+        }
+    });
+}
+$(function() {
+    $('#typeInitiative, #statusInitiative').change(function(){
+        filterInitiatives();
+    });
+});
+</script>
+
+<div class="box002 noMB">
+  <div class="headingStyle01 BG02 rounded">All Initiatives</div>
+  <div class="box002Content">
+    <div class="filterBy03">
+      <span>Filter By:</span>
+      <select id="typeInitiative" class="dropDown01">
+        <option value="all">All</option>
+        <option value="0" <?=($this->project->type == 0 ) ? 'selected' : '';?>>Volunteer Activities</option>
+        <option value="1" <?=($this->project->type == 1 ) ? 'selected' : '';?>>Fundraising Campaign</option>
+      </select>
+    </div>
+    <div class="filterBy03">
+      <span>Sort By:</span>
+      <select id="statusInitiative" class="dropDown01">
+        <option value="all">All</option>
+        <option value="upcoming" <?=($this->pStatus == 'upcoming') ? 'selected':''?>>Upcoming</option>
+        <option value="completed" <?=($this->pStatus == 'completed') ? 'selected':''?>>Completed</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<div id="loading" class="hide"><div class="box002Content">Loading initiatives ...</div></div>
+<div id="contentInitiatives">
+<? } ?>
+<? if(count($this->initiatives) > 0) {
+foreach($this->initiatives as $initiative) { ?>
+<div class="leftBox <?=($initiative->id == $this->project->id) ? 'border01' : ''?>">
+<?
+if ($initiative->type == 0) {
+    $typeCss  = 'month';
+    $typeName = 'Volunteer Activity';
+} else {
+    $typeCss  = 'dollar';
+    $typeName = 'Fundraising Campaign';
+}
+?>
+<a href="/<?=$initiative->urlName?>"><div class="<?=$typeCss?> NoMarginTop"><?php if($this->project->type == 0) { ?><strong><span class="color01"><?= date('M', strtotime($initiative->startDate)); ?></span></strong><?php } ?><br /><?= date('d', strtotime($initiative->startDate)); ?></div>
+<p class="Style03"><?=$typeName?>:<br /><?=stripslashes($initiative->name)?><br /></p></a>
+</div>
+<? } } else { ?>
+<div class="box002Content"><p>No initiatives found.</p></div>
+<? } ?>
+<? if (!isset($this->filter)) { ?></div><? } ?>

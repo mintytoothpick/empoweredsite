@@ -1,0 +1,107 @@
+<?php $this->placeholder('right_bar')->captureStart();
+if (!empty($this->project)) {
+    if ($this->project->isUpcoming()) {
+        $hideButtons = false;
+        $str = '<strong><span class="Text36">'.$this->daysToGo.'</span></strong> Days to Go';
+    } else if ($this->project->isInProgress()) {
+        $str = 'In Progress';
+        $hideButtons = false;
+    } else {
+        $hideButtons = true;
+        $str = 'Completed, Thank You!';
+    }
+    $this->isFinished = $this->project->isFinished();
+    if ($this->isFinished) {
+        $this->render('profile/popup_project_donate.phtml');
+        $this->render('profile/popup_project_volunteer.phtml');
+    }
+?>
+
+<div class="goal-greyC">
+  <?php if($this->project->isFundraising == 1 || $this->project->isFundraising == "Yes") { ?>
+  <div class="greyBox2">
+    <center><strong><span class="text19"><?=$this->project->currency.number_format((isset($this->userProjectRaised)) ? $this->userProjectRaised : $this->project->raised)?></span></strong> of <?=$this->project->currency.number_format((isset($this->userProjectGoal)) ? $this->userProjectGoal : $this->project->donationGoal)?></center>
+    <div class="goal-grey">
+      <div class="goal-green" style="width:<?=$this->percentajeDonation?>%"></div>
+      <div class="numberBar"><?=$this->percentajeDonation?>% of goal</div>
+    </div>
+    <div class="clr"></div>
+
+    <div class="donateBtn2">
+        <?php
+            $url = '/'. $this->project->urlName . '/donate';
+            if ($this->project->bluePayId > 0 && Zend_Registry::get('configuration')->bluepay->ssl) {
+                $url = 'https://' . $_SERVER['HTTP_HOST'] . $url;
+            }
+        ?>
+        <a onclick="$(document).trigger('showProjectDonateModal', ['<?=$url?>', <?= $this->isFinished ? "true":"false" ?> ]);" href="#">Donate</a>
+    </div>
+
+  </div>
+  <?php } ?>
+  <div class="days-go">
+    <?=$str?>
+  </div>
+  <div class="greyBox2">
+    <center><strong><span class="text19"><?=number_format($this->project->volunteerGoal)?></span></strong> <?= $this->project->type == 1 ? 'fundraisers' : 'volunteers';?> needed</center>
+    <div class="goal-grey">
+      <div class="goal-green" style="width:<?=$this->percentajeVolunteer?>%"></div>
+      <div class="numberBar"><?=$this->percentajeVolunteer?>% of goal</div>
+    </div>
+    <div class="clr"></div>
+      <?php
+        $isVolunteer = false;
+        $waitingAppr = false;
+        $volunteer   = false;
+        $volWaiting  = false;
+        if ($this->isLoggedIn) {
+            $volunteer  = $this->project->getVolunteerByUser($this->userNew, true);
+            $volWaiting = $this->project->getVolunteerByUser($this->userNew, false);
+            if ($volWaiting && !$volWaiting->isDeleted && !$volWaiting->isDenied &&
+                !$volWaiting->isActive && $volWaiting->documentsSigned) {
+                $volWaiting = false;
+            }
+        }
+        if (!empty($volunteer) && empty($volWaiting)) {
+          $isVolunteer = true;
+        }
+        if($this->isLoggedIn) {
+          if (!empty($volWaiting)) {
+              $waitingAppr = true;
+        ?>
+            <div class="volunteerBtn02 disabled-button">
+            <a href="javascript:;">
+        <? }else if(!$isVolunteer) { ?>
+            <div class="volunteerBtn02">
+            <?php $this->volunteerUrl =  '/'. $this->project->urlName . '/' . (($this->project->type == 1) ? 'join' : 'signup') ; ?>
+            <a onclick="$(document).trigger('showProjectVolunteerModal', ['<?= $this->volunteerUrl ?>', <?= $this->isFinished ? "true":"false" ?> ]);" href="javascript:void(0);">
+        <?php } else if($isVolunteer) { ?>
+            <div class="volunteerBtn02">
+            <a onclick="$(document).trigger('showVolFundsCancel', ['/<?=$this->project->urlName?>/stopvolunteering'])" href="javascript:void(0);" class="stopVolunteerAction">
+        <? } ?>
+      <?php } else { ?>
+      <div class="volunteerBtn02">
+        <a href="javascript:;" class="join">
+      <?php }
+      if ($this->isLoggedIn && $isVolunteer) { ?>
+      Stop Volunteering
+      <? } else if ($waitingAppr) { ?>
+      Waiting Approval
+      <? } else { ?>
+      <?= $this->project->type == 1 ? 'Fundraise' : 'Volunteer';?> With Us
+      <? } ?>
+      </a>
+    </div>
+  </div>
+  <div class="spacer"></div>
+</div>
+
+<?php
+    if ($this->isLoggedIn && isset($isVolunteer) && $isVolunteer) {
+        $this->render('project/popup_project_stop_volunteer.phtml');
+        echo $this->placeholder('popup_project_stop_volunteer');
+    }
+    echo $this->placeholder('popup_project_donate');
+    echo $this->placeholder('popup_project_volunteer');
+}
+$this->placeholder('right_bar')->captureEnd(); ?>

@@ -1,0 +1,441 @@
+<?php
+
+/**
+ * ResponsehandlerController - The Responsehandler controller class
+ *
+ * @author
+ * @version
+ */
+require_once 'Zend/Controller/Action.php';
+require_once 'Brigade/Db/Table/ProjectDonations.php';
+require_once 'Brigade/Db/Table/Users.php';
+require_once 'Brigade/Db/Table/Brigades.php';
+require_once 'Brigade/Db/Table/ReceiptMessages.php';
+require_once 'Brigade/Db/Table/GoogleCheckoutAccounts.php';
+require_once 'Brigade/Db/Table/EventTicketsPurchased.php';
+require_once 'Mailer.php';
+
+class Responsehandler[checkoutID]Controller extends Zend_Controller_Action {
+
+    protected $_http;
+    protected $merchantID;
+    protected $merchantKey;
+    protected $server_type = 'Production'; // change this to anything other than 'sandbox' to go live
+    protected $currency;
+    protected $Gresponse;
+    protected $Grequest;
+
+    public function init() {
+        
+    }
+
+    /**
+     * The default action - show the home page
+     */
+    public function indexAction() {
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender();
+        $ProjectDonations = new Brigade_Db_Table_ProjectDonations();
+        // include all the required files
+        $auth = $this->authenticate([checkoutID]);
+        $root = $auth['root'];
+        $data = $auth['data'];
+        switch ($root) {
+            case 'new-order-notification':
+                $transaction_id = $data[$root]['google-order-number']['VALUE'];
+                $items = $this->get_arr_result($data[$root]['shopping-cart']['items']['item']);
+                foreach ($items as $item) {
+                    // update donation
+                    $ProjectDonationId = $item['merchant-item-id']['VALUE'];
+                    if ($ProjectDonations->isProjectDonationIdExists($ProjectDonationId)) {
+                        $ProjectDonations->editProjectDonationInfo($ProjectDonationId, array(
+                            'TransactionId' => $transaction_id,
+                            'OrderStatusId' => 1,
+                            'SupporterName' => $data[$root]['buyer-billing-address']['contact-name']['VALUE'],
+                            'SupporterEmail' => $data[$root]['buyer-billing-address']['email']['VALUE'],
+                            'ModifiedOn' => date('Y-m-d H:i:s')
+                        ));
+                    } else {
+                        $TicketsPurchased = new Brigade_Db_Table_EventTicketsPurchased();
+                        $TicketsPurchased->updateTicket($ProjectDonationId, array(
+                            'TransactionId' => $transaction_id,
+                            'OrderStatusId' => 1,
+                            'BuyerName' => $data[$root]['buyer-billing-address']['contact-name']['VALUE'],
+                            'BuyerEmail' => $data[$root]['buyer-billing-address']['email']['VALUE'],
+                        ));
+                    }
+                }
+                $Gresponse->SendAck();
+                break;
+            case 'order-state-change-notification':
+                $new_financial_state = $data[$root]['new-financial-order-state']['VALUE'];
+                $new_fulfillment_order = $data[$root]['new-fulfillment-order-state']['VALUE'];
+                switch ($new_financial_state) {
+                    case 'REVIEWING':
+                        // do something here…
+                        break;
+                    case 'CHARGEABLE':
+                        $Grequest->SendProcessOrder($data[$root]['google-order-number']['VALUE']);
+                        $Grequest->SendChargeOrder($data[$root]['google-order-number']['VALUE'], '');
+                        break;
+                    case 'CHARGING':
+                        // do something here…
+                        break;
+                    case 'CHARGED':
+                        // update the donation OrderStatusId to 2
+                        $transaction_id = $data[$root]['google-order-number']['VALUE'];
+                        if ($ProjectDonations->isTransactionIdExists($transaction_id)) {
+                            $transaction_id = $data[$root]['google-order-number']['VALUE'];
+                            $ProjectDonations->updateOrderStatus($transaction_id, array(
+                                'OrderStatusId' => 2,
+                                'ModifiedOn' => date('Y-m-d H:i:s')
+                            ));
+
+                            $donationInfo = $ProjectDonations->getInfoByTransactionId($transaction_id);
+                            extract($donationInfo);
+                            $Brigades = new Brigade_Db_Table_Brigades();
+                            $brigadeTree = $Brigades->loadBrigadeTreeInfo($ProjectId);
+                            $brigadeInfo = $Brigades->loadInfoBasic($ProjectId);
+                            if (trim($VolunteerId) != '') {
+                                $Users = new Brigade_Db_Table_Users();
+                                $userInfo = $Users->findBy($VolunteerId);
+                                $behalfOfUser = ' on behalf of ' . $userInfo['Full Name'];
+                                $shareLink = "http://www.empowered.org/" . $userInfo['URLName'] . "/" . $brigadeInfo['pURLName'] . "?utm_campaign=DonationReceipt&utm_medium=Email&utm_source=UserAction";
+
+                                // add activity feed for user donations
+                                if ($donationInfo['DonorUserId'] != '00000000-0000-0000-0000-000000000000' && !empty($donationInfo['DonorUserId'])) {
+                                    $SiteActivities = new Brigade_Db_Table_SiteActivities();
+                                    $SiteActivities->addSiteActivity(array(
+                                        'SiteId' => $donationInfo['ProjectId'],
+                                        'ActivityType' => 'User Donation',
+                                        'CreatedBy' => $donationInfo['VolunteerId'],
+                                        'ActivityDate' => $donationInfo['CreatedOn'],
+                                        'Details' => $donationInfo['DonationAmount'],
+                                        'Recipient' => $donationInfo['DonorUserId']
+                                    ));
+                                }
+                            } else {
+                                $behalfOfUser = '';
+                                $shareLink = "http://www.empowered.org/" . $brigadeInfo['pURLName'] . "?utm_campaign=DonationReceipt&utm_medium=Email&utm_source=UserAction";
+                                $SiteActivities = new Brigade_Db_Table_SiteActivities();
+                                $SiteActivities->addSiteActivity(array(
+                                            'SiteId'       => $donationInfo['ProjectId'],
+                                            'ActivityType' => 'User Donation',
+                                            'CreatedBy'    => null,
+                                            'ActivityDate' => $donationInfo['CreatedOn'],
+                                            'Details'      => $donationInfo['DonationAmount'],
+                                            'Recipient'    => $donationInfo['DonorUserId']
+                                            ), true);
+                            }
+                            $ReceiptMessages = new Brigade_Db_Table_ReceiptMessages();
+                            if (empty($brigadeInfo['NetworkId'])) {
+                                $organization = $brigadeInfo['Name'];
+                                $NPMessage = '';
+                            } else {
+                                $organization = $treeInfo['NetworkName'];
+                                $NPMessage = $ReceiptMessages->getMessage($treeInfo['NetworkId']);
+                            }
+                            if ($NPMessage != '') {
+                                $NPMessage .= '<br /><br />';
+                            }
+
+                            $currencyType = $brigadeInfo['pCurrency'];
+                            $message = "Dear $SupporterName,<br /><br />
+                                            Thank you for your donation to $organization$behalfOfUser. You donation details are as follows:<br /><br />
+                                            Here are your donation details:<br />
+                                            Recipient: $organization<br />
+                                            Amount: $currencyType" . number_format($DonationAmount, 2) . "<br />
+                                            Donation #: $TransactionId<br /><br />
+                                            Know someone who would love to help? Share this cause with family and friends by sending them this link: $shareLink<br /><br />
+                                            $NPMessage
+                                            Regards,<br />
+                                            $organization";
+                            if (!$donationInfo['isReceiptSent']) {
+                                if ($SupporterEmail != '') {
+                                    $Mailer = new Mailer();
+                                    $Mailer->sendDonationReceipt($SupporterEmail, $message);
+                                } else {
+                                    $Grequest->SendBuyerMessage($data[$root]['google-order-number']['VALUE'], $message, true);
+                                }
+                                // set isReceiptSent = 1 so that the receipts wont be sent many times
+                                $where = $ProjectDonations->getAdapter()->quoteInto('TransactionId = ?', $TransactionId);
+                                $ProjectDonations->update(array('isReceiptSent' => 1), $where);
+                            }
+                        } else {
+                            $TicketsPurchased = new Brigade_Db_Table_EventTicketsPurchased();
+                            $TicketsPurchased->updateTicketByTransactionId($transaction_id, array('OrderStatusId' => 2));
+                        }
+                        break;
+                    case 'PAYMENT_DECLINED':
+                        // update the donation OrderStatusId to 4
+                        $transaction_id = $data[$root]['google-order-number']['VALUE'];
+                        if ($ProjectDonations->isTransactionIdExists($transaction_id)) {
+                            $ProjectDonations->updateOrderStatus($transaction_id, array(
+                                'OrderStatusId' => 4,
+                                'XmlResponse' => (string) $auth['xmlResponse'],
+                                'ModifiedOn' => date('Y-m-d H:i:s')
+                            ));
+                            $message = "Your donation of $DonationAmount to $recipient has been declined by Google Checkout. The transaction ID for this donation was $TransactionID. Please try making this donation again.";
+                            $Grequest->SendBuyerMessage($data[$root]['google-order-number']['VALUE'], $message, true);
+                        } else {
+                            $TicketsPurchased = new Brigade_Db_Table_EventTicketsPurchased();
+                            $TicketsPurchased->updateTicketByTransactionId($transaction_id, array(
+                                'OrderStatusId' => 4,
+                                'XmlResponse' => (string) $auth['xmlResponse'],
+                            ));
+                        }
+                        break;
+                    case 'CANCELLED':
+                        // update the donation OrderStatusId to 3
+                        $transaction_id = $data[$root]['google-order-number']['VALUE'];
+                        if ($ProjectDonations->isTransactionIdExists($transaction_id)) {
+                            $ProjectDonations->updateOrderStatus($transaction_id, array(
+                                'OrderStatusId' => 3,
+                                'XmlResponse' => (string) $auth['xmlResponse'],
+                                'ModifiedOn' => date('Y-m-d H:i:s')
+                            ));
+                            $donationInfo = $ProjectDonations->getInfoByTransactionId($transaction_id);
+                            extract($donationInfo);
+                            if (trim($VolunteerId) != '') {
+                                $Users = new Brigade_Db_Table_Users();
+                                $userInfo = $Users->findBy($VolunteerId);
+                                $recipient = $userInfo['FirstName'] . " " . $userInfo['LastName'];
+                                $message = "A donation of $DonationAmount to you has been cancelled by donor.";
+                                //$sent = $MailChimp->sendDonationCancellation($userInfo['Email'], $message);
+                            }
+                            $message = "Your donation of $DonationAmount to $recipient has been cancelled. The transaction ID for this donation was $TransactionID. Please try making this donation again.";
+                            $Grequest->SendBuyerMessage($data[$root]['google-order-number']['VALUE'], $message, true);
+                        } else {
+                            $TicketsPurchased = new Brigade_Db_Table_EventTicketsPurchased();
+                            $TicketsPurchased->updateTicketByTransactionId($transaction_id, array(
+                                'OrderStatusId' => 3,
+                                'XmlResponse' => (string) $auth['xmlResponse'],
+                            ));
+                        }
+                        break;
+                    case 'CANCELLED_BY_GOOGLE':
+                        // update the donation OrderStatusId to 3
+                        $transaction_id = $data[$root]['google-order-number']['VALUE'];
+                        if ($ProjectDonations->isTransactionIdExists($transaction_id)) {
+                            $ProjectDonations->updateOrderStatus($transaction_id, array(
+                                'OrderStatusId' => 3,
+                                'XmlResponse' => (string) $auth['xmlResponse'],
+                                'ModifiedOn' => date('Y-m-d H:i:s')
+                            ));
+                            $donationInfo = $ProjectDonations->getInfoByTransactionId($transaction_id);
+                            extract($donationInfo);
+                            if (trim($VolunteerId) != '') {
+                                $Users = new Brigade_Db_Table_Users();
+                                $userInfo = $Users->findBy($VolunteerId);
+                                $recipient = $userInfo['FirstName'] . " " . $userInfo['LastName'];
+                                $message = "A donation of $DonationAmount to you has been cancelled by Google Checkout.";
+                                //$sent = $MailChimp->sendDonationCancellation($userInfo['Email'], $message, true);
+                            }
+                            // send notification to donor
+                            $message = "Your donation of $DonationAmount to $recipient has been cancelled by Google Checkout. The transaction ID for this donation was $TransactionID. Please try making this donation again.";
+                            $Grequest->SendBuyerMessage($data[$root]['google-order-number']['VALUE'], $message, true);
+                        } else {
+                            $TicketsPurchased = new Brigade_Db_Table_EventTicketsPurchased();
+                            $TicketsPurchased->updateTicketByTransactionId($transaction_id, array(
+                                'OrderStatusId' => 3,
+                                'XmlResponse' => (string) $auth['xmlResponse'],
+                            ));
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                switch ($new_fulfillment_order) {
+                    case 'NEW':
+                        // do something here…
+                        break;
+                    case 'PROCESSING':
+                        // do something here…
+                        break;
+                    case 'DELIVERED':
+                        // do something here…
+                        break;
+                    case 'WILL_NOT_DELIVER':
+                        // do something here…
+                        break;
+                    default:
+                        // do something here…
+                        break;
+                }
+                $Gresponse->SendAck();
+                break;
+            case 'chargeback-amount-notification':
+                $transaction_id = $data[$root]['google-order-number']['VALUE'];
+                $chargeback_amount = $data[$root]['total-chargeback-amount']['VALUE'];
+                if ($ProjectDonations->isTransactionIdExists($transaction_id)) {
+                    $donation_info = $ProjectDonations->getInfoByTransactionId($transaction_id);
+                    // add activity feed for user donations
+                    if (!empty($donation_info['$VolunteerId']) && $donation_info['DonorUserId'] != '00000000-0000-0000-0000-000000000000' && !empty($donation_info['DonorUserId'])) {
+                        $SiteActivities = new Brigade_Db_Table_SiteActivities();
+                        $SiteActivities->addSiteActivity(array(
+                            'SiteId' => $donation_info['ProjectId'],
+                            'ActivityType' => 'User Donation Chargeback',
+                            'CreatedBy' => $donation_info['VolunteerId'],
+                            'ActivityDate' => $donationInfo['CreatedOn'],
+                            'Details' => $donation_info['DonationAmount'],
+                            'Recipient' => $donation_info['DonorUserId']
+                        ));
+                    }
+                    // add new donation record with a (-) DonationAmount value
+                    $ProjectDonations->addProjectDonation(array(
+                        'ProjectId' => $donation_info['ProjectId'],
+                        'VolunteerId' => $donation_info['VolunteerId'],
+                        'DonationAmount' => -$chargeback_amount,
+                        'DonorUserId' => $donation_info['DonorUserId'],
+                        'DonationComments' => $donation_info['DonationComments'],
+                        'OrderStatusId' => 2,
+                        'TransactionSource' => "Google Checkout",
+                        'TransactionId' => $transaction_id,
+                        'SupporterName' => $donation_info['SupporterName'],
+                        'SupporterEmail' => $donation_info['SupporterEmail'],
+                        'CreatedOn' => date('Y-m-d H:i:s')
+                    ));
+                    $Gresponse->SendAck();
+                } else {
+                    $TicketsPurchased = new Brigade_Db_Table_EventTicketsPurchased();
+                    $eventInfo = $TicketsPurchased->getInfoByTransactionId($transaction_id);
+                    $TicketPurchaseId = $TicketsPurchased->AddTicketPurchased(array(
+                                'EventId' => $eventInfo['EventId'],
+                                'GroupId' => $eventInfo['GroupId'],
+                                'TotalAmount' => -$chargeback_amount,
+                                'BuyerUserId' => $eventInfo['BuyerUserId'],
+                                'OrderStatusId' => 2,
+                                'TransactionSource' => "Google Checkout",
+                                'TransactionId' => $transaction_id,
+                                'BuyerName' => $eventInfo['BuyerName'],
+                                'BuyerEmail' => $eventInfo['BuyerEmail'],
+                            ));
+                }
+                break;
+            case 'refund-amount-notification':
+                $transaction_id = $data[$root]['google-order-number']['VALUE'];
+                $refund_amount = $data[$root]['latest-refund-amount']['VALUE'];
+                if ($ProjectDonations->isTransactionIdExists($transaction_id)) {
+                    $donation_info = $ProjectDonations->getInfoByTransactionId($transaction_id);
+                    // add activity feed for user donations
+                    if (!empty($donation_info['$VolunteerId']) && $donation_info['DonorUserId'] != '00000000-0000-0000-0000-000000000000' && !empty($donation_info['DonorUserId'])) {
+                        $SiteActivities = new Brigade_Db_Table_SiteActivities();
+                        $SiteActivities->addSiteActivity(array(
+                            'SiteId' => $donation_info['ProjectId'],
+                            'ActivityType' => 'User Donation Refunded',
+                            'CreatedBy' => $donation_info['VolunteerId'],
+                            'ActivityDate' => $donationInfo['CreatedOn'],
+                            'Details' => $donation_info['DonationAmount'],
+                            'Recipient' => $donation_info['DonorUserId']
+                        ));
+                    }
+                    // add new donation record with a (-) DonationAmount value
+                    $ProjectDonationId = $ProjectDonations->addProjectDonation(array(
+                                'ProjectId' => $donation_info['ProjectId'],
+                                'VolunteerId' => $donation_info['VolunteerId'],
+                                'DonationAmount' => -$refund_amount,
+                                'DonorUserId' => $donation_info['DonorUserId'],
+                                'DonationComments' => $donation_info['DonationComments'],
+                                'OrderStatusId' => 2,
+                                'TransactionSource' => "Google Checkout",
+                                'TransactionId' => $transaction_id,
+                                'SupporterName' => $donation_info['SupporterName'],
+                                'SupporterEmail' => $donation_info['SupporterEmail'],
+                                'CreatedOn' => date('Y-m-d H:i:s')
+                            ));
+                    $donationInfo = $ProjectDonations->getInfoByTransactionId($transaction_id);
+                    extract($donationInfo);
+                    if (trim($VolunteerId) != '') {
+                        $Users = new Brigade_Db_Table_Users();
+                        $userInfo = $Users->findBy($VolunteerId);
+                        $recipient = $userInfo['FirstName'] . " " . $userInfo['LastName'];
+                        $message = "A donation of $DonationAmount to you has been refunded by donor.";
+                        //$sent = $MailChimp->sendDonationRefund($userInfo['Email'], $message);
+                    }
+                } else {
+                    $TicketsPurchased = new Brigade_Db_Table_EventTicketsPurchased();
+                    $eventInfo = $TicketsPurchased->getInfoByTransactionId($transaction_id);
+                    $TicketPurchaseId = $TicketsPurchased->AddTicketPurchased(array(
+                                'EventId' => $eventInfo['EventId'],
+                                'GroupId' => $eventInfo['GroupId'],
+                                'TotalAmount' => -$refund_amount,
+                                'BuyerUserId' => $eventInfo['BuyerUserId'],
+                                'OrderStatusId' => 2,
+                                'TransactionSource' => "Google Checkout",
+                                'TransactionId' => $transaction_id,
+                                'BuyerName' => $eventInfo['BuyerName'],
+                                'BuyerEmail' => $eventInfo['BuyerEmail'],
+                            ));
+                }
+                $Gresponse->SendAck();
+                break;
+            default:
+                // do something here…
+                $Gresponse->SendBadRequestStatus('Invalid or not supported Message');
+                break;
+        }
+    }
+
+    private function get_arr_result($child_node) {
+        $result = array();
+        if (isset($child_node)) {
+            if ($this->is_associative_array($child_node)) {
+                $result[] = $child_node;
+            } else {
+                foreach ($child_node as $curr_node) {
+                    $result[] = $curr_node;
+                }
+            }
+        }
+        return $result;
+    }
+
+    private function is_associative_array($var) {
+
+        return is_array($var) && !is_numeric(implode('', array_keys($var)));
+    }
+
+    private function authenticate($GoogleCheckoutAccountId) {
+        include('GoogleCheckout/googlecart.php');
+        include('GoogleCheckout/googleitem.php');
+        include('GoogleCheckout/googleshipping.php');
+        include('GoogleCheckout/googletax.php');
+        include('GoogleCheckout/googleresponse.php');
+        include('GoogleCheckout/googlerequest.php');
+
+        // get Google Checkout Account credentials
+        $GoogleCheckoutAccounts = new Brigade_Db_Table_GoogleCheckoutAccounts();
+        $GC_account = $GoogleCheckoutAccounts->loadInfo($GoogleCheckoutAccountId);
+        $merchant_id = $GC_account['GoogleMerchantID'];
+        $merchant_key = $GC_account['GoogleMerchantKey'];
+        $currency = $GC_account['CurrencyType'];
+
+        $Gresponse = new GoogleResponse($merchant_id, $merchant_key);
+        $Grequest = new GoogleRequest($merchant_id, $merchant_key, $this->server_type, $currency);
+        // retrieve the XML sent in the HTTP POST request to the ResponseHandler
+        $xml_response = isset($HTTP_RAW_POST_DATA) ?
+                $HTTP_RAW_POST_DATA : file_get_contents("php://input");
+        if (get_magic_quotes_gpc()) {
+            $xml_response = stripslashes($xml_response);
+        }
+        list($root, $data) = $Gresponse->GetParsedXML($xml_response);
+        $Gresponse->SetMerchantAuthentication($merchant_id, $merchant_key);
+        $headers = array();
+        $headers[] = "Authorization: Basic " . base64_encode($merchant_id . ':' . $merchant_key);
+        $headers[] = "Content-Type: application/xml; charset=UTF-8";
+        $headers[] = "Accept: application/xml; charset=UTF-8";
+        $headers['Authorization'] = "Basic " . base64_encode($merchant_id . ':' . $merchant_key);
+        $status = $Gresponse->HttpAuthentication($headers);
+
+        return array('status' => $status, 'root' => $root, 'data' => $data, 'xmlResponse' => $xml_response);
+    }
+
+    public function preDispatch() {
+        if ($this->_helper->authUser->isLoggedIn()) {
+            $this->_helper->layout->setLayout('main');
+        }
+        list($usec, $sec) = explode(" ", microtime());
+        $this->view->starttime = (double) $sec + (double) $usec;
+    }
+
+}

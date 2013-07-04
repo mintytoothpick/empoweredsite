@@ -1,0 +1,188 @@
+<?php $this->placeholder('currenttab')->set('photos'); ?>
+<script type="text/javascript" language="javascript">
+    function setfilter(ProjectId){
+        var GroupId = '<?php echo $this->GroupId ?>';
+        $('#dataform').load('/photos/showa/'+GroupId+'/'+ProjectId);
+    }
+    
+    function deletePhoto() {
+        var deleted = 0;
+        $('#media-list tr td input[type=checkbox]').each(function(){
+            var chkbox = $(this).attr('name');
+            var media_id = chkbox.split('_');
+            if (document.getElementById(chkbox).checked == true) {
+                $.post('/photos/deletephoto', {PhotoId: media_id[1], SystemMediaName: $('#SystemMediaName').val(), SiteId: $('#SiteId').val(), Type: $('#Type').val()});
+                deleted++;
+            }
+        });
+        if (deleted > 0) {
+            alert("Photo(s) has been successfully deleted.");           
+            window.location.reload(true);
+        } else {
+            alert("Please select a record(s) to be deleted.")
+            return false;
+        }
+    }
+    
+    function setPrimary(mediaID, PID) {
+        $.post('/photos/setprimary', {PhotoId: mediaID, ProjectId: PID}, function() {
+            alert('Photo has been set as Album Cover.');
+            window.location.reload(true);
+        });
+        
+    }
+    function val() {       	
+        if (document.getElementById("Albumfilter").value ==0){
+            alert("Please select Album.");
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
+    
+    function setsiteid(Val) {        
+        var objHidden = document.getElementById("SiteId");
+        objHidden.value = Val.value;
+    }
+    
+    function validate() {	
+        /*alert(upload_number);*/
+        if ($('#Albumfilter').val() == -1) {
+            alert("Please select an album.");
+            return false;
+        }
+        if (jQuery.trim($('#attachment1').val()) == '') {
+            alert("Please select an image to upload.");
+            return false;
+        } else {            
+            var image = $('#attachment1').val().split(".");
+            var accepted_files = new Array("jpeg", "jpg", "JPG", "JPEG", "gif", "png");
+            image=image[image.length-1].toString().toLowerCase();
+            
+            for ( var i = 0, length = accepted_files.length; i < length; i++ ) {
+                var bar=accepted_files[i].toString();
+                if ( bar === image ) {
+                    return val();
+                }
+            }
+            alert("Please select jpg, png, & gif files only.");
+            return false;
+        }        
+    }
+    
+    function openWindow(pageURL, title, w, h) {
+        var left = (screen.width/2)-(w/2);
+        var top = (screen.height/2)-(h/2);
+        var targetWin = window.open(pageURL, title, toolbar='no', directories='no', status='no', menubar='no', scrollbars='yes', resizable='no', copyhistory='no', width='+w+', height='+h+', top='+top+', left='+left+');
+    }
+</script>
+<style type="text/css">
+    .tblHeader {
+        color: #F7F7F7;
+        background-color: #000;
+        font-weight: bold;
+    }
+        
+    .tblHeader th {
+        text-align: center;
+    }
+        
+    #media-list tr td {
+        padding: 2px;
+    }
+        
+    #media-list {
+        width: 100%;
+        border: 1px solid #E7E7FF;
+        border-collapse: collapse;
+    }
+</style>
+
+<div>
+	<div id="mainco2">
+		<div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+		<div class="block001">
+			<div class="blst001">
+				<div class="blst002">
+					<div class="MainBody">
+                                                <?php include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/groupheader.php'; ?>
+							<div class="TabbedPanelsContentGroup">
+								<div class="TabbedPanelsContent">
+									<div id='whiteBox' class="whiteBox">
+									<h2>Manage All Photos
+										<?php if (count($this->album)) { ?>
+											<div style="float:right">
+												<strong style="color:#000; font-size:14px;">Filter By Album:</strong>&nbsp;<select id="Albumfil" style="padding: 2px" onchange="setfilter(this.value);">
+													<option selected value="-1">All</option>
+													<?php foreach ($this->album as $list) { ?>
+														<option value="<?php echo $list['ProjectId'] ?>" <?php if(isset($this->ProjectId) && $this->ProjectId == $list['ProjectId']) { echo 'selected'; } ?>><?php echo stripslashes($list['AlbumName']) ?></option>
+														<?php } ?>
+													</select>
+												</div>
+												<?php } ?>
+											</h2>
+											<div id="dataform">
+												<table id="media-list" cellspacing="3" cellpadding="3" border="0">
+													<tr class="tblHeader" style="background-color:#333">
+														<th scope="col" style="width:20px;">&nbsp;</th>
+														<th scope="col">Image</th>
+														<th scope="col">Album</th>
+														<th scope="col">Added By</th>
+														<th scope="col">Date Added</th>
+														<th scope="col" style="width: 90px;">Album Cover?</th>
+													</tr>
+													<?php if (count($this->photos)) { ?>
+														<?php $ctr = 0; foreach($this->photos as $media) { ?>
+															<tr style="background-color:<?php echo $ctr%2 == 1 ? "#e7e7e9" : "white" ?>;">
+																<td>
+																	<input type="hidden" id="PhotoId" name="PhotoId" value="<?php echo $media['PhotoId'] ?>" />
+																	<input type="hidden" id="SystemMediaName" name="SystemMediaName" value="<?php echo strtolower($media['SystemMediaName']) ?>" />
+																	<input id="delete_<?php echo $media['PhotoId'] ?>" type="checkbox" name="delete_<?php echo $media['PhotoId'] ?>" />
+																</td>
+																<td style="padding:5px;" align="center"><a href="/<?php echo $media['pURLName'] ?>/view-photo/<?php echo $media['PhotoId'] ?>"><img src="<?php echo $this->contentLocation ?>public/Photos/<?php echo $media['SystemMediaName'] ?>" height="50" width="100" /></a></td>
+																<td style="text-align: center;"><a href="/<?php echo $media['pURLName'] ?>/show-photos"><?php echo stripslashes($media['Name']) ?></a></td>
+																<td style="text-align: center;"><a href='/<?php echo $media['Uploader'] ?>' target="_blank"><?php echo stripslashes($media['FullName']) ?></a></td>
+																<td style="text-align: center;"><?php echo date('Y-m-d', strtotime($media['DateAdded'])) ?></td>
+																<td align="center">
+																	<?php if ($media['isAlbumCover'] == 1) { ?> Yes
+																		<?php } else { ?> <a href="javascript:;" onclick="setPrimary('<?php echo $media['PhotoId'] ?>', '<?php echo $media['ProjectId'] ?>')">Set as Album Cover</a> <?php } ?>
+																		</td>
+																	</tr>
+																	<?php $ctr++; } ?>
+																	<?php } else { ?>
+																		<tr>
+																			<td colspan="6" style="font-size:13px; margin-bottom:5px; height:25px;"><span style="font-size:13px;">There are no pictures for this group yet! Use the upload button below to add a photo.</span></td>
+																		</tr>
+																		<?php } ?>
+																		<tr>
+																			<td colspan="6">
+																				<a class="btn btngreen" title="Back" href="/<?php echo $this->URLName ?>/<?php echo isset($this->ProjectId) ? 'show-photos' : 'photos' ?>">Back</a>
+																				<?php if (count($this->photos)) { ?>
+																					<input type="button" class="btn btngreen" name="delete" value="Delete" onclick="return deletePhoto()" />
+																					<?php } ?>
+																					<a id="btngreen1" class="btn btngreen" title="Upload" href="javascript:;" onclick="openWindow('/<?php echo stripslashes($this->URLName) ?>/upload-photos', 'Upload Photo', '600','400')">Upload</a>
+																				</td>
+																			</tr>
+																		</table>
+																		<br />
+																		<div class="clear"></div>
+																		<input type="hidden" id="UserId" name="UserId" value="<?php echo $this->UserId ?>" />
+																		<input type="hidden" id="ProjectId" name="ProjectId" value="<?php echo $this->ProjectId ?>">
+																		<input type="hidden" id="Type" name="Type" value="<?php echo $this->Type ?>" />
+																		<input type="hidden" id="GroupId" name="GroupId" value="<?php echo $this->GroupId ?>" /> <br />
+																		<div id="form"></div>
+																		<div class="clear"></div>
+																	</div>
+																</div>
+															</div>
+							</div>
+						</div>
+					</div>
+				<div class="clear"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+<div class="block001f01"><div class="blst001"><div class="blst002"></div></div>
+													

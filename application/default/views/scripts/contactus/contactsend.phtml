@@ -1,0 +1,47 @@
+<?php
+$this->headTitle("Empowered.org : Get Started");
+?>
+<script>
+    $(function() {
+        $("#getstarted").validate({
+            rules: {
+                organization: "required",
+                name:"required",
+                email:  {
+                    required: true,
+                    email: true
+                },
+                phone: "required"
+            }
+        });
+    });
+</script>
+<style>
+    form.contact label.error {
+        text-align:left;
+        display:block;
+        width: 350px;
+        clear:both;
+        color:red;
+        padding-left: 215px;
+        margin-top:2px;
+    }
+</style>
+<div class="container" style="margin-top: -10px">
+    <div class="MainBody">
+        <div class="MainBodyTop"></div>
+        <div class="MainBodyContents">
+            <div class="leftC" style="margin-right: 40px">
+                <?php echo $this->placeholder('aboutus_nav'); ?>
+            </div>
+            <div class="rightC">
+                <span class="Heading01">Get Started Form</span>
+                <p class="Text15">
+                    Thanks! Your request has been sent.
+                </p>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>
+<div class="clear" style="margin-bottom:5px;"></div>

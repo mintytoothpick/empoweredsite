@@ -1,0 +1,490 @@
+<?php $this->headTitle("Empowered.org - Create Volunteer Activity"); ?>
+
+<script type='text/javascript'>
+    var start_date;
+
+    function CreateBrigade() {
+        $('#CreateBrigade').submit();
+    }
+
+    $(function() {
+        $('#StartDate').datepicker({ changeMonth: true, changeYear: true })
+                       .change(function(){
+                           $(this).focus();
+                       });
+        $('#StartTime').calendricalTime();
+        $('#EndDate').datepicker({ changeMonth: true, changeYear: true })
+                     .change(function(){
+                         $(this).focus();
+                     });
+        $('#EndTime').calendricalTime();
+
+        $('#isfundraising01').click(function() {
+            if (document.getElementById("isfundraising01").checked == true) {
+                $('li.donationgoals').show();
+                document.getElementById("isfundraising02").checked = false;
+            }
+        });
+
+        $('#isfundraising02').click(function() {
+            if (document.getElementById("isfundraising02").checked == true) {
+                $('li.donationgoals').hide();
+                document.getElementById("isfundraising01").checked = false;
+            }
+        });
+
+        $('#VolunteerGoal').keydown(function(e) {
+            var keycodes = new Array('48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '8', '13');
+            if (!keycodes.inArray(e.keyCode.toString())) {
+                return false;
+            }
+        });
+
+        $('#DonationGoal').keydown(function(e) {
+            var keycodes = new Array('48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '8', '13');
+            if (!keycodes.inArray(e.keyCode.toString())) {
+                return false;
+            }
+        });
+
+        $('#VolunteerMinimumGoal').keydown(function(e) {
+            var keycodes = new Array('48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '8', '13');
+            if (!keycodes.inArray(e.keyCode.toString())) {
+                return false;
+            }
+        });
+
+        $('ul li.desc input[type=radio]').bind('click', function() {
+            var id = $(this).attr('class');
+            $('.info-forms').each(function() {
+                $(this).hide();
+            })
+            $('#'+id).show();
+        })
+        $('#fundraising-opt span input[type=radio]').bind('click', function() {
+            if ($(this).val() == 'Yes') {
+                $('#Fundraising-Details').show();
+            } else {
+                $('#Fundraising-Details').hide();
+            }
+        });
+
+        //form contact validate
+        $("#CreateBrigade").validate({
+            onfocusout: function(element) { this.element(element); },
+            errorPlacement: function(error, element) {
+                if (element.attr("name") == "ProjectLogo") {
+                    error.insertAfter("#add-photo-pop");
+                } else if (element.attr("name") == "StartDate") {
+                    $('#liStartDate').append(error);
+                } else if (element.attr("name") == "EndDate") {
+                    $('#liEndTime').append(error);
+                } else if (element.attr("name") == "isFundraising") {
+                    $('#liFundraising').append(error);
+                } else if (element.attr("name") == "PercentageFee"){
+                    $('#PassFeesDiv').append(error);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            rules: {
+                ProjectLogo: {
+                    accept: "jpeg|jpg|png|gif"
+                },
+                Name: 'required',
+                Description: 'required',
+                isFundraising: 'required',
+                /*StartDate: {
+                    dateFormat: true,
+                    dateGT: '<?php echo date('m/d/Y', time()) ?>'
+                },*/
+                <?php if ($this->data['GoogleCheckoutAccountId'] == 0 && $this->data['PaypalAccountId'] == 0) { ?>
+                payment_method: {
+                    required: '#isfundraising01:checked'
+                }
+                /* MerchantID: {
+                    required: '#Google-Checkout:checked'
+                },
+                paypalEmail: {
+                    email: true
+                },
+                PercentageFee: {
+                    required: true,
+                    number: true
+                }, 
+                VolunteerGoal: {
+                    required: true,
+                    number: true,
+                    max: 100000
+                }*/
+                <? } ?>
+            },
+            messages: {
+                ProjectLogo: {
+                    accept: '<br/>Please upload pictures in jpeg, png and gif format only.'
+                },
+                Name: '<br/><br/>Please specify the title of the volunteer activity.',
+                Description: "<br/><br/>Please specify the volunteer activity's description.",
+                isFundraising: '<br/><br/>Please choose to enable or disable fundraising.',
+                StartDate: {
+                    dateFormat: '<br/><br/>Please specify a valid start date.',
+                },
+                <?php if ($this->data['GoogleCheckoutAccountId'] == 0 && $this->data['PaypalAccountId'] == 0) { ?>
+                payment_method: '<br/><br/>Please select your desired payment processor.',
+                /* MerchantID: {
+                    required: 'Please specify your Google Checkout Merchant ID.'
+                },
+                MerchantKey: {
+                    required: 'Please specify your Google Checkout Merchant Key.'
+                },
+                paypalEmail: {
+                    email: 'Please specify a valid email address.'
+                }, 
+                VolunteerGoal: {
+                    required: 'Please specify the needed volunteers.',
+                    number: 'Please specify a valid number for needed volunteers.',
+                    max: 'Volunteer goal must be less than 100,000.'
+                }*/
+                <? } ?>
+            },
+            /*submitHandler: function(form) {
+                $.get(
+                    '/profile/validateuseremail', 
+                    {email: jQuery.trim($('#Administrator').val())}, 
+                    function(data) {
+                        CreateBrigade();
+                    }
+                );
+            } */
+        });
+    });
+
+    // enable end time inputs
+    function addEndTime() {
+        $('#endTimeLnk').hide();
+        $('.enddate').show();
+        $('#EndDate').val($('#StartDate').val());
+        $('#EndTime').val($('#StartTime').val()); 
+        $('#with-end-date').val('1');
+        $('#EndDate').rules("add", {
+            required: true,
+            dateTimeGT: $('#StartDate'),
+            messages: {
+                required: 'Please specify end date.',
+                dateTimeGT: 'End date must be greater than start date.'
+            }
+        });
+        $('#EndTime').rules("add", {
+            required: true,
+            messages: {
+                required: 'Please specify end time.'
+            }
+        });
+
+        $("#EndTime, #StartTime, #StartDate").each(function(){
+        	    $(this).focusout(function(){
+        	    	   $("#EndDate").valid();
+        	    });
+        });
+    }
+
+    function updateTotalBill() {
+		if(jQuery.trim($('#PercentageFee').val()).match(/^\d*(\.\d{1, 2})?$/) && $('#PercentageFee').val() >= 0 && $('#PercentageFee').val() != '') {
+
+			var percent = Number($('#PercentageFee').val());
+			if ($('#PercentageFee').length > 0) {
+				$('#transfee').html(Number($('#PercentageFee').val()));
+			} else {
+				$('#transfee').html(Number(0));
+			}
+			$('#FeeExplanation').show();
+		}
+    }
+
+</script>
+<style type="text/css">
+    .success { color:green }
+    .hidden { display:none }
+    .indicator { margin:auto; font-size:20px; text-align:center; font-weight:bold; border-bottom:1px solid #e5e5e5; width:640px; padding-bottom:5px;  }
+    .indicator span { color:#999898; margin-right:10px }
+    .indicator span.active { color:#669933; }
+    .indicator span.last { margin-right:5px }
+    .details { margin:5px 0px; margin-left:20px; }
+    .options { font-weight:bold; font-size:17px; }
+    .icons { width:190px; float:left }
+    .desc, .desc ul { width:435px; margin-left:15px; float:left }
+    #paypal-info { width:100%; float:left; margin-left:15px; margin-top:-10px; margin-bottom:15px; }
+    #paypal-info div { margin-bottom:3px }
+    #paypal-info div span { font-weight:bold; }
+    #paypal-info div input { padding:1px; width:220px }
+    #googlecheckout-info { width:100%; float:left; margin-left:15px; margin-top:-10px; margin-bottom:15px; }
+    #googlecheckout-info div { margin-bottom:3px }
+    #googlecheckout-info div span { font-weight:bold; }
+    #googlecheckout-info div input { padding:1px; width:220px }
+    #googlecheckout-info div select { padding:1px; width:70px; }
+    .popup-box { width: 650px; left: 30%; right: 30%; top:25%; position: fixed; z-index: 999999!important; background-color:#ffffff; border:5px solid #e5e5e5; padding:10px 0 20px 0; -moz-border-radius:5px; margin:auto }
+    #popup-overlay {
+        background: url(<?php echo $this->contentLocation ?>public/images/bg-overlay.png);
+        height:100%;
+        position:fixed;
+        display:block;
+        left:0;
+        top:0;
+        width:100%!important;
+        z-index:998;
+        display:none;
+    }
+    .right {float:right;}
+	label.error {color:red; padding-bottom:7px;font-weight:normal;display:block;margin-top:5px;}
+    .inpSmall{width:95px;}
+	label.error {color:red; padding-bottom:7px;font-weight:normal;}
+</style>
+<div class="paypal-find-out-more popup-box hidden" style="margin-bottom:15px; margin-left:15px; padding:10px; font-size:14px">
+    <div>
+        <a href="https://www.paypal.com/" target="_blank">Paypal</a> is a secure online payment method, which allows you to pay or get paid quickly and easily without sharing any of your financial information.<br><br>
+        Pricing: This depends on the country. Current fees:<br><br>
+    </div>
+    <ul style="list-style:square; margin-left:35px;">
+        <li>Between 1.9 - 2.9% of the transaction value + $0.30 in the US or</li>
+        <li>up to 3.4% of the transaction value + £0.20 in the UK</li>
+    </ul>
+    <div>
+        To receive payments you can use any e-mail address. In order to access collected funds you will need to <a href="https://www.paypal.com/" target="_blank">create a PayPal account</a> with the same e-mail address.
+        PayPal accepts: all major credit and debit cards as well as bank transfers and direct debit. Your members can also pay using their PayPal account balance.<br><br>
+        You can often use your PayPal account balance to purchase from other websites.
+    </div>
+    <br><button class="btn btngreen right" onclick="$('.paypal-find-out-more').hide(); $('#popup-overlay').hide()">Close</button>
+</div>
+<div id="popup-overlay"></div>
+<div>
+    <div id="mainco2">
+        <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+        <div class="block001">
+            <div class="blst001">
+                <div class="blst002">
+                    <div class="MainBody">
+                        <h2 style="font-size:14px">
+                            <div style="color:#669933; width:19%; float:left">Step 1. Activity Details</div>
+                            <div style="color:#A9A9A9; width:19%; float:left">Step 2. Add Volunteers</div>
+                            <div style="color:#A9A9A9; width:19%; float:left">Step 3. Spread the Word</div>
+                            <div class="clear"></div>
+                        </h2>
+                        <div id="TabbedPanels1" class="TabbedPanels">
+                            <div class="TabbedPanelsContentGroup">
+                                <div class="TabbedPanelsContent">
+                                    <div id='whiteBox' class="whiteBox">
+                                        <a id="top" href="#top" style="text-decoration:none">&nbsp;</a>
+                                        <form name="CreateBrigade" method="post" enctype="multipart/form-data" id="CreateBrigade">
+                                            <?php if ($this->data['GoogleCheckoutAccountId'] > 0 || $this->data['PaypalAccountId'] > 0) { ?>
+                                            <input type="hidden" name="Currency" value="<?php echo $this->data['Currency'] ?>" />
+                                            <input type="hidden" name="GoogleCheckoutAccountId" value="<?php echo $this->data['GoogleCheckoutAccountId'] ?>" />
+                                            <input type="hidden" name="PaypalAccountId" value="<?php echo $this->data['PaypalAccountId'] ?>" />
+                                            <?php } ?>
+                                            <input type="hidden" id="with-end-date" name="with_end_date" value="0" />
+                                            <input type="hidden" id="with-street-address" name="with_street_address" value="0" />
+                                            <style>
+                                                .field-label { float:left; font-weight:bold; color:#000; width:200px; margin-bottom:15px;}
+                                                .field-input { float:left; width:455px; margin-bottom:15px; }
+                                                .field-input .input { width:300px; }
+                                                /*.field-input input { padding:1px; }*/
+                                                .field-input .date { width:95px; }
+                                                .hidden { display:none }
+                                                .popup-box { width: 370px; left: 40%; right: 40%; top:25%; position: absolute; z-index: 999999!important; background-color:#ffffff; border:5px solid #e5e5e5; padding:10px 0 20px 0; -moz-border-radius:7px }
+                                                .calendricalTimePopup { width:98px }
+                                                #ui-datepicker-div { font-size:11px }
+                                            </style>
+                                            <ul style="list-style:none; padding-bottom:0px">
+                                                <li style="width:180px; float:left; margin-right:20px; margin-left:5px">
+                                                    <div style=" background-color:#BDD1DE; width:105px; height:80px; padding:20px 35px; margin:0px;">
+                                                        <div style="border:2px solid rgb(255, 255, 255); width: 100px; height: 75px; margin:0px;">
+                                                            <img src="<?php echo $this->contentLocation ?>public/images/addphoto.jpeg" style="width:100px; height:75px;" />
+                                                        </div>
+                                                    </div>
+                                                    <div style="width:180px; float:left; margin:0px; padding:10px">
+	                                                    <input type="file" size="12" name="ProjectLogo" id="ProjectLogo" class="textfield" /><br>
+                                                    </div>
+                                                </li>
+                                                <li style="border-left:1px solid #e5e5e5; width:725px; float:left; padding-left:20px">
+                                                    <h1 style="font-weight:bold">Create Volunteer Activity</h1>
+                                                    <div id="message" class="error" style="width:500px; border:2px solid #e3e3e3; margin-bottom:15px; padding:5px; <?php if(!$this->message) { echo "display:none;"; } ?>"><?php if(isset($this->message)) { echo $this->message; } ?></div>
+                                                    <ul style="list-style:none; padding-bottom:0px; margin-bottom:0px">
+                                                        <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Title:</li>
+                                                        <li class="field-input">
+                                                            <input name="Name" type="text" maxlength="50" id="Name" class="input" value="<?php echo isset($this->Name) ? $this->Name : "" ?>" />
+                                                        </li>
+                                                        <div class="clear"></div>
+                                                        <li class="field-label">When?</li>
+                                                        <li class="field-input" id="liStartDate">
+                                                            <input style="cursor: pointer" class="text smaller" name="StartDate" type="text" maxlength="10" id="StartDate" value="" />
+                                                            <input style="margin-left:10px" class="inpSmall" name="StartTime" type="text" maxlength="10" id="StartTime" value="" onkeypress="return false" />
+                                                            <a style="margin-left:10px" href="javascript:;" onclick="addEndTime();" id="endTimeLnk">Add End Time</a> <br />
+                                                        </li>
+                                                        <div class="clear"></div>
+                                                        <li class="field-label hidden enddate">End Time:</li>
+                                                        <li class="field-input hidden enddate" id="liEndTime">
+                                                            <input style="cursor: pointer" class="text smaller" name="EndDate" type="text" maxlength="10" id="EndDate" value="" />
+                                                            <input class="inpSmall" style="margin-left:10px" name="EndTime" type="text" maxlength="10" id="EndTime" value="" onkeypress="return false" />
+                                                        </li>
+                                                        <div class="clear"></div>
+                                                        <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Description: </li>
+                                                        <li class="field-input">
+                                                            <textarea class="input" name="Description" rows="3" cols="20" id="Description" onblur="return fnKeepWordLenTrack(this,3000);" onkeyup="return fnKeepWordLenTrack(this,3000);"><?php echo isset($this->Description) ? $this->Description : "" ?></textarea>
+                                                        </li>
+                                                        <div class="clear"></div>
+                                                        <li class="field-label adrress" style="margin-top:-10px"><?php if ($this->NetworkId == 'DAF7E701-4143-4636-B3A9-CB9469D44178' || $this->NetworkId == '547086E0-5456-4631-AB2A-BA781E7DB9A7' || $this->NetworkId == 'DB04F20F-59FE-468F-8E55-AD75F60FB0CB' || $this->NetworkId == '7D428431-A7C7-4DF6-A667-F9207E14674E' || $this->NetworkId == '47866989-6380-445C-95C0-827E55ACA9CB') { ?><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span><?php } ?>&nbsp;</li>
+                                                        <li class="field-input adrress" style="margin-top:-10px">
+                                                            <a href="javascript:;" onclick="$('.adrress').hide(); $('.locationbox').show();">Add Location</a>
+                                                        </li>
+                                                        <div class="clear"></div>
+                                                        <li class="field-label locationbox" style="display:none;">Street Address:</li>
+                                                        <li class="field-input locationbox" style="display:none;">
+                                                            <input name="Location" type="text" maxlength="100" id="Location" class="input" value="" />
+                                                        </li>
+                                                        <div class="clear"></div>
+                                                        <li class="field-label locationbox" style="display:none;"><?php if ($this->NetworkId == 'DAF7E701-4143-4636-B3A9-CB9469D44178' || $this->NetworkId == '547086E0-5456-4631-AB2A-BA781E7DB9A7' || $this->NetworkId == 'DB04F20F-59FE-468F-8E55-AD75F60FB0CB' || $this->NetworkId == '7D428431-A7C7-4DF6-A667-F9207E14674E' || $this->NetworkId == '47866989-6380-445C-95C0-827E55ACA9CB') { ?><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span><?php } ?>Country:</li>
+                                                        <li class="field-input locationbox" style="display:none;">
+                                                            <select type="text" name="CountryId" id="CountryId" style="width:300px" onchange="populateLocation('state', this.value); $('#Country').val(this.options[this.selectedIndex].text); populateLocation('city', 0);">
+                                                                <option value="0" selected>All</option>
+                                                                <?php foreach($this->country_list as $country) { ?>
+                                                                <option value="<?php echo $country['CountryId'] ?>"><?php echo $country['Country'] ?></option>
+                                                                <?php } ?>
+                                                            </select>
+                                                            <input type="text" id="Country" name="Country" value="<?php $this->contact['Country'] ?>" style="display:none;"/>
+                                                        </li>
+                                                        <div class="clear"></div>
+                                                        <li class="field-label locationbox" style="display:none;">Region:</li>
+                                                        <li class="field-input locationbox" style="display:none;" id="state-list">
+                                                            <select type="text" name="RegionId" id="RegionId" style="width:300px" onchange="populateLocation('city', this.value); $('#Region').val(this.options[this.selectedIndex].text);">
+                                                                <option value="0" selected>All</option>
+                                                            </select>
+                                                            <input type="text" id="Region" name="Region" value="<?php $this->contact['Region'] ?>" style="display:none;"/>
+                                                        </li>
+                                                        <div class="clear"></div>
+                                                        <li class="field-label locationbox" style="display:none;">City:</li>
+                                                        <li class="field-input locationbox" style="display:none;" id="city-list">
+                                                            <select type="text" name="CityId" id="CityId" style="width:300px" onchange="$('#City').val(this.options[this.selectedIndex].text);">
+                                                                <option value="0" selected>All</option>
+                                                            </select>
+                                                            <input type="text" id="City" name="City" value="<?php $this->contact['City'] ?>" style="display:none;"/>
+                                                        </li>
+                                                        <div class="clear"></div>
+                                                        <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Volunteers Needed:</li>
+                                                        <li class="field-input">
+                                                            <input class="input" name="VolunteerGoal" maxlength="4" type="text" id="VolunteerGoal" onblur="CheckValueLimit(this,'1000');" value="<?php echo isset($this->VolunteerGoal) ? $this->VolunteerGoal : "0" ?>" /><a href="javascript:;" class="tooltip" title="Select the number of volunteers that you are hoping will participate in this activity"> ?</a>
+                                                        </li>
+                                                        <div class="clear"></div>
+                                                        <li class="field-label" style="margin-bottom:15px">&nbsp;</li>
+                                                        <li class="field-input" style="margin-bottom:15px">
+                                                            <span><input type="checkbox" id="Status" name="Status" value="Open" checked>&nbsp;Volunteers can join without being accepted by an admin</span><a href="javascript:;" class="tooltip" title="If you uncheck this box, volunteers must be approved before they are admitted into the activity."> ?</a>
+                                                        </li>
+                                                        <div class="clear" style="margin-bottom:20px; border-bottom:1px solid #E5E5E5;"></div>
+                                                        <li class="field-label"><span style="color:#F00;font-size:16px;font-weight:bold;margin-top:4px;">* </span>Enable Fundraising?</li>
+                                                        <li class="field-input" id="liFundraising">
+                                                            <span><input type="radio" id="isfundraising01" name="isFundraising" value="Yes" onclick="$('.donationgoals').show(); <?php if ($this->data['GoogleCheckoutAccountId'] == 0 && $this->data['PaypalAccountId'] == 0) { ?>$('#enable-fundraising').show();<?php } ?>">&nbsp;Yes</span>
+                                                            <span style="margin-left:10px"><input type="radio" id="isfundraising02" name="isFundraising" value="No" onclick="$('.donationgoals').hide(); <?php if ($this->data['GoogleCheckoutAccountId'] == 0 && $this->data['PaypalAccountId'] == 0) { ?>$('#enable-fundraising').hide();<?php } ?>">&nbsp;No</span>
+                                                        </li>
+														<div class="clear"></div>
+                                                        <li class="field-label hidden donationgoals">General Donation Goal:</li>
+                                                        <li class="field-input hidden donationgoals">
+                                                            <input class="input" name="DonationGoal" type="text" maxlength="6" id="DonationGoal" onblur="CheckValueLimit(this,'999999'); $('#GoalExplanation').show();" value="<?php echo isset($this->DonationGoal) ? $this->DonationGoal : "0" ?>" />
+                                                        </li>
+                                                        <div class="clear"></div>
+                                                        <li class="field-label hidden donationgoals">Default Volunteer Donation Goal:</li>
+                                                        <li class="field-input hidden donationgoals">
+                                                            <input class="input" name="VolunteerMinimumGoal" maxlength="5" type="text" id="VolunteerMinimumGoal" onblur="CheckValueLimit(this,'99999'); $('#GoalExplanation').show();" value="<?php echo isset($this->VolunteerMinimumGoal) ? $this->VolunteerMinimumGoal : "0" ?>" />
+                                                        </li>
+														<div id="GoalExplanation" class="info-boxes hidden">
+															The total donation goal for the activity will be calculated in the following way:<br /><strong>General Donation Goal + (# of Active Volunteers x Default Volunteer Donation Goal)</strong>
+														</div>
+                                                        <div class="clear"></div>
+                                                        <li class="hidden" id="enable-fundraising" style="float: left; width: 100%; <?php if ($this->data['GoogleCheckoutAccountId'] > 0 || $this->data['PaypalAccountId'] > 0) { ?>display: none<?php } ?>">
+                                                            <?php if ($this->data['GoogleCheckoutAccountId'] == 0 && $this->data['PaypalAccountId'] == 0) { ?>
+																<div class="clear" style="margin-bottom:20px; border-bottom:1px solid #E5E5E5;"></div>
+										                        <strong style="font-size:18px; color:#669933">Online Fundraising Just Became Free!</strong><br /><br />
+										                        <span style="line-height:18px; font-size:15px;">
+										                            Empowered.org makes it possible for you to pass your online, merchant and credit card fees off to <br /> donors during checkout. To keep Empowered alive, this includes a 1.5% contribution to help maintain <br /> the site. This process ensures that Empowered will never have any set up costs or monthly fees... EVER!
+										                        </span><br /><br />
+																<div class="info-boxes" style="margin-left:0; width:680px; line-height:16px;">
+																	<strong style="font-size:14px;">How it works:</strong><br />
+																	<div class="details">
+																		&bull; All money fundraised on Empowered goes <strong>directly</strong> to your Paypal account which ensures a safe and secure transaction. *Paypal charges between 1.9-2.9% for credit card donations.
+																	</div>
+																	<div class="details">
+																		&bull; You decide whether it is mandatory or optional to have your donors cover these online transaction costs. You can set the exact percentage you want.
+																	</div>
+																	<div class="details">
+																		&bull; If the donor pays for your transaction costs, Empowered.org will charge your merchant processor an additional 1.5% to keep the site alive.  If the donor does not, the 1.5% is waived.
+																	</div>
+																	<div class="details">
+																		&bull; The donor is made aware of the total contribution they are making in both the checkout process and email receipt.
+																	</div>
+																</div>
+																<div class="clear"></div>
+	
+                                                            <br><span style="font-weight:bold;text-decoration:underline;margin-bottom:12px;">Select your Fundraising Processor</span>
+                                                            <ul style="list-style:none; width:700px; margin-top: 5px">
+                                                                <li class="icons"><img src="<?php echo $this->contentLocation ?>public/images/paypal.png" width="150" height="75" alt=""></li>
+                                                                <li class="desc">
+                                                                    <input class="paypal-info" style="margin-left:-2px" type="radio" name="payment_method" value="Paypal" id="Paypal" checked> <strong>Collect payments using Paypal</strong>
+                                                                    <ul style="list-style:disc">
+                                                                        <li>Accept payment via credit/debit cards and Paypal accounts</li>
+                                                                        <li>Paypal charges up to 2.9% + $0.30 per transaction</li>
+                                                                        <li>
+                                                                            Start collecting payments immediately!<br>
+                                                                            <a href="javascript:;" onclick="$('#popup-overlay').show(); $('.paypal-find-out-more').show()" style="text-decoration:underline">Find out more about Paypal</a> or <a href="https://www.paypal.com/" target="_blank" style="text-decoration:underline">learn more at Paypal.com</a>
+                                                                        </li>
+                                                                    </ul>
+                                                                    <div class="info-forms" id="paypal-info">
+                                                                        <div><span style="margin-right:5px; margin-bottom:5px">Paypal Email:</span><input type="text" id="paypalEmail" name="paypalEmail" value=""></div>
+                                                                        <span style="margin-right:29px">Currency:</span>
+                                                                        <select id="paypalCurrency" name="paypalCurrency">
+                                                                            <option value="USD">USD</option>
+                                                                            <option value="GBP">GBP</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </li>
+                                                            </ul>
+                                                            <div class="clear"></div>
+                                                            <span style="font-weight:bold;text-decoration:underline;margin-bottom:12px;">Pass your transaction fees to donors</span>
+                                                            <div style="margin-bottom:25px;" id="nonprofit-option">
+                                                                <strong style="margin-left:20px">Would you like to allow donor's to cover your transaction fees?</strong>
+                                                                <span style="margin:0 20px"><input type="radio" name="allowPercentageFee" value="mandatory" id="pass_donations_2" onclick="$('#PassFeesDiv').show();" />&nbsp;Mandatory</span>
+                                                                <span style="margin:0 20px 0 0"><input type="radio" name="allowPercentageFee" value="optional" id="pass_donations_1" onclick="$('#PassFeesDiv').show();" />&nbsp;Optional</span>
+									                            <div class="info-boxes" style="width: auto">
+									                            If you select mandatory the percentage you elect below will automatically be added to all donations you collect in <br />
+									                            addition to a 1.5% Empowered contribution.  If you select optional and the donor opts out during checkout, you will <br />
+									                            have to pay the Paypal fee, and Empowered will not receive its 1.5% contribution.
+									                            </div>
+									                            <div class="clear"></div>
+                                                                <div id="PassFeesDiv" style="display:none;">
+                                                                    <div class="clear" style="margin-bottom:16px;"></div>
+                                                                    <span style="margin-left:20px">What percentage would you like added: </span>
+                                                                    <input type="text" name="PercentageFee" id="PercentageFee" value="" onblur="updateTotalBill();" />%
+                                                                </div>
+																<div class="info-boxes" id="FeeExplanation" style="display:none;">
+																	If your donor chooses not to opt out, then their total total donation will be:<br />The original donation amount <strong>+ <span id="transfee"></span>%</strong> (to cover your merchant costs) <strong>+ 1.5%</strong> (for Empowered.org)
+																</div>
+																<div class="clear"></div>
+                                                            </div>
+                                                            <?php } ?>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                            <div style="margin-left:220px; margin-top:15px; float:left; width:100%; margin-bottom:20px">
+                                                <a class="btn btngreen" title="Back" href="<?php echo isset($_SESSION['getstarted']) ? '/getstarted' : '/profile/campaigns' ?>">Back</a>
+                                                <input type="submit" class="btn btngreen" name="btnCreateNew" value="Create New" id="btnCreateNew" />
+                                            </div>
+                                        </form>
+                                        <div class="clear"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="block001f01"><div class="blst001"><div class="blst002"></div></div>

@@ -1,0 +1,21 @@
+<?php $this->placeholder('tabs')->captureStart();
+$curTab  = $this->currentTab;
+$cssCurr = 'class="current"';
+?>
+<div id="tabs">
+  <ul>
+    <li><a href="/<?=$this->user->urlName?>" <?=($curTab=='home') ? $cssCurr :''; ?>>Home</a></li>
+    <?php if(count($this->user->initiatives)) { ?><li><a href="/<?=$this->user->urlName?>/initiatives" <?=($curTab=='initiatives') ? $cssCurr :''; ?>>Initiatives</a></li><?php } ?>
+    <?php if(count($this->user->affiliationsOrganization) || count($this->user->affiliationsGroup)) { ?><li><a href="/<?=$this->user->urlName?>/affiliations" <?=($curTab=='affiliations') ? $cssCurr :''; ?>>Affiliations</a></li><?php } ?>
+    <?php if(count($this->user->events)) { ?><li><a href="/<?=$this->user->urlName?>/events" <?=($curTab=='events') ? $cssCurr :''; ?>>Events</a></li><?php } ?>
+    <?php if(count($this->user->initiatives)) { ?><li><a href="/<?=$this->user->urlName?>/photos" <?=($curTab=='photos') ? $cssCurr :''; ?>>Photos</a></li><?php } ?>
+  </ul>
+  
+    <form action="/search?utm_campaign=Internal&utm_medium=Search&utm_source=" method="post" onsubmit="beginSearch(); return false">
+    <div class="topbar_search" style="float:right;display:block;margin-right:20px;background-color: #fff">
+        <input name="search_text" type="text" class="searchbox" id="searchfield" />
+        <input type="submit" value="" class="go" />
+    </div>
+    </form>
+</div>
+<?php $this->placeholder('tabs')->captureEnd() ?>

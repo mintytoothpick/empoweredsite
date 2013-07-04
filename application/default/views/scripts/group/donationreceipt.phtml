@@ -1,0 +1,64 @@
+<?php $this->headTitle($this->data['GroupName']);
+$group_media = $this->sitemedia->getSiteMediaById($this->data['LogoMediaId']);
+$contactinfo = $this->contactinfo->getContactInfo($this->data['GroupId'], 'All');
+if (!empty($this->data['BannerMediaId'])) {
+	$group_banner = $this->sitemedia->getSiteMediaById($this->data['BannerMediaId']);
+}
+$this->placeholder('currenttab')->set('grouphome');
+?>
+<div>
+    <div id="mainco2">
+        <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+        <div class="block001">
+            <div class="blst001">
+                <div class="blst002">
+                    <div class="MainBody">
+						<?php $is_image_exists = file_exists("/home/$this->envUsername/public_html/public/Media/full/".$group_media['SystemMediaName']); ?>
+						<?php if($is_image_exists && trim($group_media['SystemMediaName']) != '' && !isset($group_banner)) { ?>
+							<div class="logo2"><img src="<?php echo $this->contentLocation ?>public/Media/full/<?php echo $group_media['SystemMediaName'] ?>" style="width:141px;height:70px; border-width:0px;" /></div>
+						<?php } else if (isset($group_banner)) { ?>
+							<center><img src="/public/Photos/banner/<?php echo $group_banner['SystemMediaName'] ?>" style="max-height:100px; max-width:1045px;" /></center>
+							<div class="clear"></div>
+						<?php } ?>
+						<div style="float:left; <?php echo $is_image_exists ? 'width:870px' : 'width:100%' ?>">
+							<?php if (empty($this->data['BannerMediaId'])) { ?>
+								<h1 style="font-size:27px; line-height:27px; float:left;"><?php echo stripslashes($this->data['GroupName']) ?></h1>
+								<?php if($this->progOrg['NetworkId'] != '2A3801E4-203D-11E0-92E6-0025900034B2') { ?><div class="clear" style="margin-bottom:8px;"></div><span style="font-size:14px; color:#693;">Affiliated Organization: <a href="/<?php echo $this->progOrg['URLName'] ?>"><?php echo $this->progOrg['NetworkName'] ?></a></span><span style="font-size:14px; color:#693;margin-left:30px;">Affiliated Program: <a href="/<?php echo $this->progOrg['URLName'] ?>/<?php echo $this->progOrg['pURLName'] ?>"><?php echo $this->progOrg['ProgramName'] ?></a></span><div class="clear" style="margin-bottom:8px;"></div><?php } ?>
+							<?php } ?>
+							<div class="clear"></div>
+						</div>
+						<div id="TabbedPanels1" class="TabbedPanels">
+							<?php include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/groupheader.php'; ?>
+							<div class="TabbedPanelsContentGroup">
+								<div class="TabbedPanelsContent" style="background:#FFF;">
+									<div id='whiteBox' class="whiteBox">
+                        <h2 style="color:#669933">Customize Your Donation Receipts</h2><div style="border:1px solid #dcbd00; background-color:#fff7c8; padding:10px; margin-top:8px;">Below is an example of your customizable, Empowered.org donation receipt. Variable text is highlighted in yellow; text that is only displayed when applicable is contained in brackets (i.e., [ ]).</div><br /><br />
+						Dear <span style="background:yellow;">%Donor-Name%</span>,<br /><br />
+						Thank you for your donation to <span style="background:yellow;">%Organization-Name%</span> [on behalf of <span style="background:yellow;">%Volunteer-or-Funraiser-Name%</span>]. Your donation details are as follows:<br /><br />
+						Recipient: <?php echo $this->data['GroupName'] ?><br />
+						Amount: <span style="background:yellow;">%Donation-Amount%</span><br />
+						Donation #: <span style="background:yellow;">%Donation-Number%</span><br /><br />
+						Know someone who would love to help? Share this cause with family and friends by sending them this link: <span style="background:yellow;">%Link-to-Campaign-or-Activity%</span><br /><br /><br />
+						<form method="post" action="/group/donationreceipt">
+							<input type="hidden" name="SiteId" id="SiteId" value="<?php echo $this->data['GroupId'] ?>">
+							<input type="hidden" name="GroupId" id="GroupId" value="<?php echo $this->data['GroupId'] ?>">							
+							<textarea id="Message" name="Message" rows="10" <?php echo $this->message == '' ? 'style="color:#888;width:80%;" onclick="this.value=\'\'; $(this).css(\'color\', \'#000\');"' : 'style="width:80%;"' ?>><?php echo $this->message == '' ? 'Place your customized message into this box. You may use HTML to include logos and make other customizations that you want to include.' : $this->message; ?></textarea>
+                        	<div class="clear"></div><br /><br />
+							Regards,<br />
+							<?php echo $this->data['GroupName'] ?>
+							<br /><br />
+							<a class="btn btngreen" href="/<?php echo $this->data['URLName'] ?>">Back</a>
+							<input type="submit" value="Save" class="btn btngreen" />
+						</form>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+								</div>
+							</div>
+						<div class="clear"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		<div class="block001f01"><div class="blst001"><div class="blst002"></div></div>

@@ -1,0 +1,90 @@
+<?php $this->headTitle("Register with Empowered.org"); ?>
+<script type='text/javascript' src='<?php echo $this->contentLocation ?>public/js/CalendarControl.js'></script>
+<link rel="stylesheet" href="<?php echo $this->contentLocation ?>public/css/CalendarControl.css" type="text/css" media="screen" />
+<style>
+    #birthdate {
+        background: url(<?php echo $this->contentLocation ?>public/images/Pictures/003.gif) no-repeat right;
+        width: 110px;
+    }
+</style>
+
+    <div id="centred">
+        <!-- main col - 100% width -->
+        <div id="mainco2">
+            <!-- block001 -->
+            <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+            <div class="block001">
+                <div class="blst001">
+                    <div class="blst002 hsp" style="background-color:#fff; <?php echo count($this->error_message) > 0 ? "min-height:".(420+(count($this->error_message)*20))."px;" : "" ?>">
+                        <h1 style="float:left; margin-right:20px;">Register</h1> <div style="margin-top:13px; float:left; margin-right:25px;">OR</div> <div style="float:left; margin-top:10px"><a href="<?php echo $this->loginUrl; ?>"><img src="<?php echo $this->contentLocation ?>public/images/facebook3.png"></a></div>
+                        <div class="clear1"></div><br><br>
+                        <!-- register form -->
+                        <?php // echo $this->registerForm; ?>
+                        <form id="basicinfo" enctype="multipart/form-data" action="/profile/register" method="post" onsubmit="return validateForm()">
+                            <div style="width:100%">
+                                <?php if (count($this->error_message) > 0) : ?>
+                                <div style="border: solid 2px #e3e3e3; color: red; padding: 4px; padding-right:20px; width: 400px; margin-bottom:20px;">
+                                    <?php foreach ($this->error_message as $error) : ?>
+                                        <?php echo $error.'<br>'?>
+                                    <?php endforeach; ?>
+                                </div>
+                                <br>
+                                <?php endif; ?>
+                                <div class="form01" style="width:230px; float:left; border-right: 2px solid #e3e3e3; margin-right:20px;">
+                                    <h1 style="font-size:medium; font-weight:bold; padding:0px; margin-top:-40px;">Required Information</h1>
+                                    <div style="margin-left:20px;">
+                                        <label for="fname001">First Name: </label> <input name="firstname" type="text" maxlength="13" id="firstname" class="textfield" value="<?php echo isset($this->firstname) ? $this->firstname : "" ?>" />
+                                        <label for="lname001">Last Name: </label> <input name="lastname" type="text" maxlength="13" id="lastname" class="textfield" value="<?php echo isset($this->lastname) ? $this->lastname : "" ?>" />
+                                        <label for="email001">Email: </label> <input name="email" type="text" id="email" class="textfield" value="<?php echo isset($this->email) ? $this->email : "" ?>" />
+                                        <label for="pwd004">Password (min 6 characters): </label> <input name="password" type="password" id="password" class="textfield" value="<?php echo isset($this->password) ? $this->password : "" ?>" />
+                                        <label for="pwd004">Confirm Password: </label> <input name="confirmpassword" type="password" id="confirmpassword" class="textfield" value="<?php echo isset($this->password) ? $this->password : "" ?>" />
+                                        <!-- <label for="bd001">Birth Date (MM/DD/YYYY): </label><br>
+                                        <input type="text" name="month" maxlength="2" size="1" style="text-align:center; margin-top:3px;" value="<?php echo isset($this->month) ? $this->month : "" ?>">&nbsp;/&nbsp;<input type="text" name="day" maxlength="2" size="1" style="text-align:center" value="<?php echo isset($this->day) ? $this->day : "" ?>">&nbsp;/&nbsp;<input type="text" name="year" maxlength="4" size="3" style="text-align:center" value="<?php echo isset($this->year) ? $this->year : "" ?>"> -->
+                                        <!--<input type="text" name="birthdate" id="birthdate" value="<?php echo isset($this->birthdate) ? $this->birthdate : "" ?>" class="textfield" onclick="showCalendarControl(document.getElementById('birthdate'))" style="background-color:#fff; border:1px solid #aaaaaa;" readonly>-->
+                                        <br><br>
+                                    </div>
+                                </div>
+                                <div class="form03" style="float:left; width:230px;">
+                                    <h1 style="font-size:medium; font-weight:bold; padding:0px; margin-top:-18px;">Information about Yourself</h1>
+                                    <div style="margin-left:20px;">
+                                        <div style="padding:3px; margin-top:-5px;">Profile Picture</div>
+                                        <img id="ctl00_ContentPHMain_imgUser" src="<?php echo $this->contentLocation ?>public/images/Pictures/005.jpg" style="border-width:0px; display: block; margin-bottom: 3px" />
+                                        <input type="file" name="upload" id="upload" class="textfield" />
+                                    </div>
+                                </div>
+                                <div class="form02" style="float:left; margin-left:20px; width:480px; margin-top:-5px;">
+                                    <label for="txt001">What are you passionate about?</label>
+                                    <textarea name="passion" rows="3" cols="30" id="passion"><?php echo isset($this->passion) ? $this->passion : "" ?></textarea>
+                                    <label for="gender01">Gender: </label>
+                                    <select name="gender" id="gender">
+                                        <option selected="selected" value="0">Select Gender</option>
+                                        <option value="1" <?php echo $this->gender == 1 ? "selected" : "" ?>>Male</option>
+                                        <option value="2" <?php echo $this->gender == 2 ? "selected" : "" ?>>Female</option>
+                                    </select>
+                                    <label for="loc001" >Location: </label>
+                                    <input name="location" type="text" id="location" class="textfield" value="<?php echo isset($this->location) ? $this->location : "" ?>" /><br />
+                                    <label for="loc001" style="margin-top:4px;" >Custom Empowered Web Address: </label>
+				    <div class="clear"></div>
+                                    <span style="float:left;margin:8px 3px 0px 0px;">http://www.empowered.org/ </span><input name="URLName" type="text" style="float:left;" id="URLName" class="textfield" value="<?php echo isset($this->URLName) ? $this->URLName : "" ?>" />
+				    <br /><br /><br />
+				</div>
+				<div class="clear"></div><br />
+				By clicking "SIGN UP" or "Login with Facebook", you signify that you agree to the Empowered.org Privacy Policy and Terms & Conditions<br />
+                                <input type="submit" name="ctl00$ContentPHMain$btnSignUp" value="Sign up" id="ctl00_ContentPHMain_btnSignUp" class="button" />
+                            </div>
+                        </form>
+                        <!-- e o login form -->
+                    </div>
+                </div>
+            </div>
+            <div class="block001f01">
+                <div class="blst001">
+                    <div class="blst002"></div>
+                </div>
+            </div>
+            <span id="ctl00_ContentPHMain_lblErrorMsg" class="divError"></span>
+            <!-- e o block001 -->
+        </div>
+        <!-- e o main col -->
+        <div class="clear"></div>
+    </div>

@@ -1,0 +1,156 @@
+<?php $this->placeholder('paymentform')->captureStart() ?>
+<script type="text/javascript">
+    function validateAmount(amount){
+        <?php if($this->project->allowPercentageFee == 'optional' && ($this->project->paypalId || $this->project->percentageFee)) { ?>
+            if (!$('#coverTransFee1').attr('checked') && !$('#coverTransFee2').attr('checked')) {
+                alert("Please select if you want to cover the transaction fee or not.");
+                return false;
+            }
+        <?php } ?>
+        if(amount.value.match( /^[0-9]+(\.([0-9]+))?$/) && amount.value <= 25000 && isFloat(amount.value)){
+            alert("You are being redirected to Google Checkout, please fill in your credit card info there for your donations.");
+            return true;
+        }else{
+            alert('You must enter a valid donation.');
+            amount.focus();
+            return false;
+        }
+    }
+    function validateForm(alertMsg) {
+        $('#error').html('').hide();
+        var error = '';
+        var amount = $('#item_price_1').val();
+        var percent = Number($('#PercentageFee').val());
+
+        if(!($('#item_price_1').val() >= 1)) {
+            error = "The amount should be greater than $1.<br>";
+        }
+
+        if(!$('#rdoName').is(':checked') && !$('#rdoVolunteer').is(':checked')) {
+            error += "Please select your donation's destination";
+        }
+        if($('#rdoVolunteer').is(':checked') && $('#volunteers').val() == 'none') {
+            error += "Please select which volunteer should receive your donation.<br>";
+        }
+        <?php if($this->project->allowPercentageFee == 'optional' && ($this->project->paypalId || $this->project->percentageFee)) { ?>
+            if (!$('#coverTransFee1').attr('checked') && !$('#coverTransFee2').attr('checked')) {
+                error += "Please select if you want to cover the transaction fee or not.";
+            }
+        <?php } ?>
+        if (error != '') {
+            $('#error').html(error).show();
+            return false;
+        } else {
+            _gaq.push(['_trackEvent', 'Initiative', 'Donate', 'Donation']);
+
+            FB.api(
+                '/me/<?php echo $this->fbAppNamespace ?>:donate?initiative=http://<?php echo $_SERVER['HTTP_HOST']; ?>/<?php echo $this->project->urlName ?>',
+                'post'
+            );
+            if (alertMsg) {
+                alert("You are being redirected to Google Checkout, please fill in your credit card info there for your donations.");
+            }
+            return true;
+        }
+    }
+<?php if ($this->isAdmin && ($this->isNetworkAdmin || $this->isGlobAdmin)) { ?>
+    function manualEntry() {
+        if (!isFloat($('#item_price_1').val())) {
+            alert('Please enter a valid donation amount.');
+            return false;
+        } else {
+            $.post('/donation/manualentry', {ProjectId: $('#ProjectId').val(), VolunteerId: $('#VolunteerId').val(), DonationAmount: $('#item_price_1').val(), DonationComments: $('#DonationComments').val()}, function(data) {
+                alert(data);
+                $('#item_price_1').val('');
+                $('#DonationComments').val('');
+                window.location.reload(true);
+            });
+        }
+    }
+<? } ?>
+</script>
+<form action="/donation/newdonation" id="BB_BuyButtonForm" method="post" name="BB_BuyButtonForm" onSubmit="return validateForm(true);">
+    <?php if (isset($this->organization) && $this->organization->hasGiftAid()) { ?><input type="hidden" name="giftAidId" id="giftAidId" value=""/><?php } ?>
+    <input type="hidden" id="ProjectId" name="ProjectId" value="<?=$this->project->id ?>" />
+    <input type="hidden" id="VolunteerId" name="VolunteerId" value="<?=$this->UserId != '' ? $this->UserId : '' ?>" />
+    <input id="item_name_1" name="item_name_1" type="hidden" value="Your donation is being processed"/>
+    <input name="item_description_1" type="hidden" value="A receipt will be emailed to you after processing your donation to <?=$this->project->name ?>.
+        <?php if($this->project->googleId == "3") { echo " Please address any concerns to sfpgrants@serviceforpeace.org"; }
+                else if($this->project->googleId == "4") { echo " Please address any concerns to volunteer@amizade.org"; }
+                else if($this->project->googleId == "5") { echo " Please address any concerns to trips@volunteerhonduras.org"; }
+                else if($this->project->googleId == "1") { echo " Please address any concerns to accounting@globalbrigades.org"; } ?>"/>
+    <input name="item_quantity_1" type="hidden" value="1"/>
+    <input name="item_currency_1" type="hidden" value="USD"/>
+    <input name="item_is_modifiable_1" type="hidden" value="true"/>
+    <input name="item_min_price_1" type="hidden" value="0.01"/>
+    <input name="item_max_price_1" type="hidden" value="25000.0"/>
+    <input name="_charset_" type="hidden" value="utf-8"/>
+    <input type="hidden" id="editCartURI" name="editCartURI" value="<?=$_SERVER['REQUEST_URI'] ?>" />
+    <input type="hidden" id="pURLName" name="pURLName" value="<?=$this->project->urlName; ?>" />
+
+    <?php if($this->project->allowPercentageFee != 'no') { ?>
+    <input type="hidden" id="PercentageFee" name="PercentageFee" value="<?=$this->project->percentageFee ?>" />
+    <?php } ?>
+    <p>Please enter any amount you wish to donate:</p>
+    <p><strong><?=$this->project->currency ?></strong><input id="item_price_1" name="item_price_1" onfocus="this.style.color='black'; this.value='';" onblur="validateDonationAmount($(this).val());" size="11" style="color:grey;" type="text" value="Enter Amount" /></p>
+    <?php if($this->project->allowPercentageFee == 'mandatory' && $this->project->percentageFee) { ?>
+    <h2>Transaction Fees</h2>
+    <input type="hidden" name="coverTransFee" value="1" />
+    <input type="hidden" name="allowPercentageFee" value="mandatory" />
+    <input type="hidden" name="PercentageFee" value="<?=$this->project->percentageFee ?>" />
+    <p style="padding-bottom:0px">
+        <?php if($this->project->googleId == 1 || $this->project->googleId == 2) { ?>
+        Thank you for contributing an extra <?=$this->project->percentageFee?>% to cover credit card and transaction costs so our communities receive the full benefit of your donation.<br />
+        <?php } else { ?>
+        Thank you for contributing <?=$this->project->percentageFee ?>% of your donation to cover the online credit card and transaction fees; this ensures 100% of your donation goes to its purpose.<br />
+        <?php } ?>
+    </p>
+    <br><span id="transfee" style="font-weight: bold; display: none">An additional amount of <?=$this->project->currency ?><span id="trans-fee"></span> will be added to your total donation.</span>
+    <div class="clear"></div><br />
+    <?php } else if($this->project->allowPercentageFee == 'optional' && $this->project->percentageFee) {  ?>
+    <h2>Transaction Fees</h2>
+    <input type="hidden" name="allowPercentageFee" value="optional" />
+    <input type="hidden" name="PercentageFee" value="<?=$this->project->percentageFee ?>" />
+    <p style="padding-bottom:0px">
+        <?php if($this->project->googleId == 1 || $this->project->googleId == 2) { ?>
+        Would you help us by contributing an extra <?=$this->project->percentageFee?>% to cover credit card and transaction costs so our communities receive the full benefit of your donation?<br />
+        <?php } else { ?>
+        Thank you for contributing an extra <?=$this->project->percentageFee?>% to cover any credit card and transaction costs, so 100% of your donation can go towards its purpose.<br />
+        <?php } ?>
+        <span><input type="radio" id="coverTransFee1" name="coverTransFee" value="1" checked /> Yes</span>
+        <span style="margin-left: 15px"><input type="radio" id="coverTransFee2" name="coverTransFee" value="0" /> No</span>
+        <div style="display:none;" id="feebox" class="errorBox" style="">Please reconsider making this extra contribution. These small amounts compounded over all supporters can make up nearly half of our total administrative budget. These savings help fund our supplemental community projects voted on by the Campus Chairpeople. To learn more about how Global Brigades budgets, please contact admin@globalbrigades.org. Regardless of this extra contribution, we certainly appreciate your support!</div>
+        <span id="transfee" style="font-weight: bold; display: none"><br>By selecting yes, an additional amount of <?=$this->project->currency ?><span id="trans-fee"></span> will be added to your total donation to cover online transaction costs and ensure 100% of your donation is received.</span>
+        <div class="clear"></div>
+    </p>
+    <div class="clear"></div>
+    <?php } ?>
+    <h2>Comment</h2>
+    <p>Leave a comment?<br />
+        <textarea name="DonationComments" rows="3" cols="70" id="DonationComments"></textarea><br />
+        Your message will be displayed on the group's (& volunteer's) pages</p>
+    <p><input type="checkbox" id="isAnonymous" name="isAnonymous">&nbsp;Set name to anonymous?</p>
+    <br><div style="padding:10px;"><b>Attn: </b>You will need a Google account to successfully make transactions via Google Wallet. If you already have a Gmail account, you can use this email address and password when checking out. Otherwise, you'll need to create a username and password for Google that you will use each time you make transactions.</div>
+    <?php if($this->project->googleId == "1") { ?>
+        <div style="padding:10px; color:#F00;">Please note! Donations made via Google Wallet will show up on your credit card statement as: Google*GlobalBrigades.</div><br />
+    <?php } ?>
+    <div class="box14">
+        <?php if (!isset($this->project->organization) && $this->project->organization->hasGiftAid()) { ?>
+        <a href="javascript:;" onclick="giftAid();"><img src="https://sandbox.google.com/checkout/buttons/donateNow.gif?merchant_id=<?=$this->merchant_id ?>&amp;w=115&amp;h=50&amp;style=white&amp;variant=text&amp;loc=en_US" border="0"></a>
+        <? } else { ?>
+        <input id="btnGCheckout" alt="Donate" src="https://sandbox.google.com/checkout/buttons/donateNow.gif?merchant_id=<?=$this->merchant_id ?>&amp;w=115&amp;h=50&amp;style=white&amp;variant=text&amp;loc=en_US" type="image" />
+        <? } ?>
+        <?php if ($this->isAdmin && ($this->isNetworkAdmin || $this->isGlobAdmin)) { ?>
+        <input type="button" id="ManualEntry" name="ManualEntry" value="Manual Entry" style="vertical-align:top; margin-top:5px; margin-left:15px;" onclick="return manualEntry()">
+        <?php } ?>
+    </div>
+    <span style="color:#F00;"><br />
+      <?php if(isset($this->project->organization->nonProfitId)) { echo $this->project->organization->name; ?>
+        is a registered Non-Profit Organization (ID:
+        <?php echo $this->project->group->organization->nonProfitId.')'; } ?>
+      </span>
+    <?php if($this->project->googleId == "1") { ?>
+    <p><a href="/donation/refund" target="_blank">Refund Policy</a></p>
+    <?php } ?>
+</form>
+<?php $this->placeholder('paymentform')->captureEnd() ?>

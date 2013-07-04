@@ -1,0 +1,163 @@
+<?php  $this->headTitle("Empowered.org - Crop Your Image"); ?>
+<script type="text/javascript" src="<?php echo $this->contentLocation ?>public/js/jquery.Jcrop.js"></script>
+<link rel="stylesheet" href="<?php echo $this->contentLocation ?>public/css/jquery.Jcrop.css" type="text/css" />
+<script language="Javascript">
+    var isValid = false;
+    $(function(){
+        $('#cropbox').Jcrop({
+            //aspectRatio: 2/1,
+            onSelect: updateCoords,
+	    onChange: updateCoords,
+            allowResize: true
+            //allowSelect: false,
+            //setSelect: [ 0, 0, 140, 70 ]
+            //boxWidth: 0
+        });
+    });
+
+    function updateCoords(c) {
+        $('#x').val(c.x);
+        $('#y').val(c.y);
+        $('#w').val(c.w);
+        $('#h').val(c.h);
+    };
+
+    function checkCoords() {
+        if (!isValid) {
+            if (parseInt($('#w').val())) {
+                <?php if (isset($this->getstarted) || isset($this->upgradeOrg)) { ?>
+                    showPrompt();
+                    return false;
+                <?php } ?>
+            } else {
+                <?php if (!$this->preview_image) { ?>
+                alert('Please select a crop region then press submit.');
+                return false;
+                <?php } else if ($this->preview_image) { ?>
+                    if ($('#preview').val() == 1 && !parseInt($('#w').val())) {
+                        alert('Please select a crop region then press submit.');
+                        return false;
+                    } else {
+                        return true;
+                    }
+                <?php } ?>
+            }
+        } else {
+            return true;
+        }
+    };
+    
+    function showPrompt() {
+        var top = (screen.height/3);
+        $('.popup-box').toggle().css('top', top);
+        $('#popup-overlay').toggle();
+    }
+    
+    function next(create_again) {
+        $('#create_again').val(create_again);
+        showPrompt();
+        isValid = true;
+        $('#CropLogo').submit();
+    }
+
+    function hidePopup() {
+        $('#popup-overlay2').hide();
+        $('#preview-logo').hide();
+    }
+</script>
+<style>
+    .popup-box { width: 250px; left: 40%; right: 40%; top:auto; position: absolute; z-index: 999999!important; background-color:#ffffff; border:5px solid #e5e5e5; padding:10px 0 20px 0; -moz-border-radius:7px }
+    .preview-box { width: 370px; left: 35%; right: 35%; top:25%; position: absolute; z-index: 999999!important; background-color:#ffffff; border:5px solid #e5e5e5; padding:10px 0 20px 0; -moz-border-radius:7px }
+    #popup-overlay, #popup-overlay2 {
+        background: url(<?php echo $this->contentLocation ?>public/images/bg-overlay.png);
+        height:100%;
+        position:fixed;
+        display:block;
+        left:0;
+        top:0;
+        width:100%!important;
+        z-index:998;
+        display:none;
+    }
+</style>
+<div id="popup-overlay"></div>
+<div class="popup-box" style="padding: 30px 20px; display: none">
+    Would you like to create another program?<br><br><br>
+    <center>
+        <a class="btn btngreen" href="javascript:;" onclick="next(1)">Yes</a>
+        &nbsp;&nbsp;
+        <a class="btn btngreen" href="javascript:;" onclick="next(0)">No</a>
+    </center>
+</div>
+<div>
+    <div id="centred">
+        <!-- main col - 100% width -->
+        <div id="mainco2">
+            <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+            <div class="block001">
+                <div class="blst001">
+                    <div class="blst002 hsp">
+						<?php if(isset($this->getstarted)) { ?>
+			            <h2 style="font-size:14px">
+			                <div style="color:#669933; width:21%; float:left">Step 1. Structure & Details</div>
+			                <div style="color:#A9A9A9; width:18%; float:left">Step 2. Add Admins</div>
+			                <div style="color:#A9A9A9; width:19%; float:left">Step 3. Add Members</div>
+			                <div style="color:#A9A9A9; width:23%; float:left">Step 4. Activate Fundraising</div>
+			                <div style="color:#A9A9A9; width:19%; float:left">Step 5. Spread the Word</div>
+			                <div class="clear"></div>
+			            </h2>
+						<?php } ?>
+	
+                        <h1 style="margin:10px 0;font-size:27px;">Crop Your Program's Logo</h1>
+                        <div style="border:2px solid silver; margin-bottom:20px; color:green; padding: 5px; width:300px; <?php echo isset($this->message) ? "" : "display:none" ?>"><?php echo $this->message ?></div>
+                        <div style="border:2px solid silver; margin-bottom:20px; color:red; padding: 5px; width:300px; <?php echo isset($this->error) ? "" : "display:none" ?>"><?php echo $this->error ?></div>
+                        <!-- upload photo form -->
+                        <img src="/public/tmp/tmp_<?php echo $this->ProgramId.".jpg" ?>" id="cropbox" />
+						<div class="clear"></div>
+						<div class="info-boxes" style="margin-left:0;width:auto;">Drag your mouse over the region that you want to use for your logo. <br /> You can get a sneak peek of the logo by clicking on <strong>Preview</strong>. </div>
+						<div class="clear"></div>
+
+                        <form id="CropLogo" name="CropLogo" method="post" onsubmit="return checkCoords();">
+                            <?php if ($this->preview_image) { ?>
+                            <div id="popup-overlay2" style="display:block"></div>
+                            <div class="clear" style="margin-bottom: 10px"></div>
+                            <div id="preview-logo" class="preview-box">
+                                <div style="padding:10px; padding-top:0px">
+                                    <h3 style="margin:auto; padding:5px 0px; color:#3366FF; margin-bottom:20px; font-size:15px; border-bottom:2px solid #e5e5e5">Cropped Image Preview</h3>
+                                    <img src="/public/Media/full/<?php echo $this->image_preview ?>.jpg" id="cropbox" style="border:1px solid #999;" />
+                                    <div class="clear"></div>
+                                    <div style="margin-top:10px;">
+                                        <input class="btn btngreen" type="button" value="Re-crop" onclick="hidePopup()" />
+                                        <input class="btn btngreen" type="submit" value="Accept" />
+                                    </div>
+                                </div>
+                            </div>
+                            <?php } ?>
+                            <input type="hidden" id="preview" name="preview" value="0" />
+                            <input type="hidden" id="ProgramId" name="ProgramId" value="<?php echo $this->ProgramId ?>" />
+                            <?php if (isset($this->getstarted) || isset($this->upgradeOrg)) { ?>
+                            <input type="hidden" id="create_again" name="create_again" value="" />
+                                <?php if (isset($this->getstarted)) { ?>
+                                <input type="hidden" id="getstarted" name="getstarted" value="1" />
+                                <?php } ?>
+                            <?php } ?>
+                            <input type="hidden" name="crop_image" value="1" />
+                            <input type="hidden" id="x" name="x" />
+                            <input type="hidden" id="y" name="y" />
+                            <input type="hidden" id="w" name="w" />
+                            <input type="hidden" id="h" name="h" />
+                            <br>
+                            <input type="submit" value="Preview" class="btn btngreen" onclick="$('#preview').val(1)" />
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="block001f01"><div class="blst001"><div class="blst002"></div></div></div>
+            <!-- e o block001 -->
+        </div>
+        <!-- e o main col -->
+        <span id="ctl00_ContentPHMain_lblError"></span>
+        <div class="clear"></div>
+    </div>
+</div>
+

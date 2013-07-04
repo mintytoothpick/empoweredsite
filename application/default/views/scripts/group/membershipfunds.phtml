@@ -1,0 +1,136 @@
+<? if (($this->chapMembership - $this->fundsTransfered) > 0) { ?>
+<script>
+function showManualPopup() {
+    $.fancybox($("#manualTransfer").html());
+    $("#fancybox-content form.frmTransfer").validate({
+        onfocusout: function(element) { this.element(element); },
+        submitHandler: function(form) {
+            $.fancybox.showActivity();
+            $('input.btnSubmit').hide();
+            $('#fancybox-content .errorMsg').hide();
+            $.post('/<?=$this->group->urlName?>/membershiptransfer',
+                $("#fancybox-content form.frmTransfer").serialize(),
+                function(data) {
+                    if ($.trim(data) == 'success') {
+                        document.location.reload();
+                    } else {
+                        $.fancybox.hideActivity();
+                        $('input.btnSubmit').show();
+                        $('#fancybox-content .errorMsg').show().html(data);
+                    }
+                }
+            );
+        }
+    });
+}
+</script>
+
+<!-- popup to transfer funds -->
+<div class="hide" id="manualTransfer">
+<h2>Manual Transfer</h2>
+<form name="frmTransfer" class="frmTransfer">
+  <label><b>Destination:</b></label><br />
+  <select name="projectId" class="required">
+      <option value="">Select initiaitve destination ...</option>
+      <? foreach ($this->group->initiatives as $initiative) { ?>
+        <option value="<?=$initiative->id?>"><?=$initiative->name?></option>
+      <? } ?>
+  </select>
+  <div class="clear"></div>
+  <label><b>Amount</b></label><br />
+  <?=$this->group->currency?><input type="text" name="amountTransfer" class="required numeric"/>
+  <div class="clear"></div>
+  <div class="errorMsg hide" style="color:red;"></div>
+  <div class="clear"></div><br />
+  <input type="submit" class="btn btngreen btnSubmit" value="Transfer" />
+  <input type="button" class="btn btngreen" value="Cancel" onclick="$.fancybox.close();"/>
+</form>
+</div>
+<? } ?>
+<div class="wrapper">
+   <!-- org header -->
+  <?=$this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+
+    <!-- breadcrumb -->
+    <?=$this->placeholder('breadcrumb') ?>
+    <!-- // breadcrumb -->
+    <div class="clr"></div>
+
+    <!-- tabs -->
+    <?=$this->placeholder('tabs') ?>
+    <!-- // tabs -->
+
+    <div class="mainC">
+      <div class="box05">
+        <div class="headingStyle02">
+            <?=$this->group->name?> - Transfer Membership Donations
+        </div>
+        <div class="tab-container">
+            <div id="filter" style="margin: 0 10px 0 10px;">
+                <div class="headLbl right"><span>Available to Transfer:</span> <?=$this->group->currency?><?=number_format($this->chapMembership - $this->fundsTransfered)?></div>
+                <div class="headLbl"><span>Total Membership Raised:</span> <?=$this->group->currency?><?=number_format($this->totalMembership)?></div>
+                <div class="headLbl"><span>Total Chapter Raised (Membership):</span> <?=$this->group->currency?><?=number_format($this->chapMembership)?></div>
+            </div>
+            <? if (($this->chapMembership - $this->fundsTransfered) > 0) { ?>
+            <div class="right"><input type="button" class="btn btngreen" onclick="showManualPopup()" value="Transfer"/></div>
+            <? } ?>
+            <div class="clr"></div><br />
+            <h2>List of Transfers</h2>
+            <table cellpadding="5" cellspacing="0" width="100%">
+                <tr>
+                    <td colspan="10" class="donation_tablehead">
+                        <div class="donation_navpage"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="do_col1">Initiative Destination</td>
+                    <td class="do_col2" align="center">Amount Transfered</td>
+                    <td class="do_col3" align="center" width="60">&nbsp;</td>
+                </tr>
+                <?php
+                if (count($this->funds) > 0) { foreach ($this->funds as $fund) {?>
+                <tr>
+                    <td class="xdo_col1"><a href="/<?=$fund->project->urlName ?>" target="_blank"><?=stripslashes($fund->project->name) ?></a></td>
+                    <td class="xdo_col2" align="center"><?=$fund->group->currency?><?= number_format($fund->amount,2) ?></td>
+                    <td class="xdo_col3"><a href="javascript:;" onclick="$('#details_<?=$fund->id?>').toggle();">[details]</a></td>
+                </tr>
+                <tr class="hide" id="details_<?=$fund->id?>" cellpadding="0" cellspacing="0" bgcolor="#FFF">
+                    <td class="xdo_col1 xdo_col3" colspan="4" cellpadding="0" cellspacing="0">
+                        <? if (count($fund->transfers) > 0) { ?>
+                        <table width="100%" style="margin:0;" border="0">
+                            <tr>
+                                <td width="160" align="center"><b>Transfer Date</b></td>
+                                <td align="center"><b>Transfer Amount</b></td>
+                                <td width="150" align="center"><b>Made By</b></td>
+                            </tr>
+                            <? foreach ($fund->transfers as $trans) { ?>
+                            <tr>
+                                <td align="center"><?=$trans->createdOn?></td>
+                                <td align="center"><?=$fund->group->currency?><?=number_format($trans->amount,2)?></td>
+                                <td align="center"><?=$trans->createdBy->fullName?></td>
+                            </tr>
+                            <? } ?>
+                        </table>
+                        <? } else { ?>
+                        No transfers details found.
+                        <? } ?>
+                    </td>
+                </tr>
+                <?php } } else { ?>
+                <tr><td class="xdo_col1 xdo_col3" colspan="4" align="center"><b>&nbsp;No records found.</b></td></tr>
+                <?php } ?>
+            </table>
+            <?= $this->paginationControl($this->funds, 'Sliding', 'nonprofit/new_page_selector.phtml', array('param' => 'page')); ?>
+            <br /><br />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="clr"></div>
+  <div class="clr"></div>
+</div>

@@ -1,0 +1,489 @@
+<?php $this->placeholder('paymentform')->captureStart();
+$disableEcheck = false;
+$enableCheck   = false;
+if (isset($this->enableEcheck)) {
+    $disableEcheck = !$this->enableEcheck;
+}
+if (in_array($this->project->organizationId,
+    Zend_Registry::get('configuration')->bluepay->noEchecks->toArray())) {
+    $disableEcheck = true;
+    $enableCheck   = true;
+}
+
+if (in_array($this->project->organizationId,
+    Zend_Registry::get('configuration')->bluepay->noEchecksAndCheck->toArray())) {
+    $disableEcheck = true;
+    $enableCheck   = false;
+}
+?>
+<script>
+<!--
+$(function() {
+
+<?php
+/**
+ * Remove https for other links.
+ */
+if (Zend_Registry::get('configuration')->bluepay->ssl) { ?>
+    $("a[href!='javascript:;']").each(function (i,v) {
+        if ($(this).attr('href') && $(this).attr('href').indexOf('http:') == -1) {
+            $(this).attr('href', 'http://' + document.location.hostname + $(this).attr('href'));
+        }
+    });
+<?php } ?>
+
+    $('#volunteers, #rdoName, #fundraisers').change(function() {
+        if ($('#VolunteerId').val() != 'none') {
+            $('#VolunteerId').rules("remove");
+        }
+    });
+
+    $("#formDonate").validate({
+        onfocusout: function(element) { this.element(element); },
+        submitHandler: function(form) {
+            if (validDestination(false)) {
+                $("#btnSub").hide();
+                $("#loading").show();
+                $("#errorInfo").html('').hide();
+                $.ajax({
+                    type: "POST",
+                    url: "/donation/bluepay",
+                    data: $("#formDonate").serialize(),
+                    dataType: "json",
+                    timeout: 60000,
+                    success: function(data) {
+                        if (data['status'] == 'ok') {
+                            location.href = '/donation/processbluepay?ProjectId=<?=$this->project->id?>&dId='+data['donationId']+'&pA='+data['payAmount'];
+                        } else {
+                            $("#errorInfo").html(data['msg']).show();
+                            if (data['donationId']) {
+                                $("#DonationId").val(data['donationId']);
+                            }
+                            $("#btnSub").show();
+                            $("#loading").hide();
+                        }
+                    },
+                    error: function(request, status, err) {
+                        if(status == "timeout") {
+                            alert('Error timeout, please try again later.');
+                            $("#btnSub").show();
+                            $("#loading").hide();
+                        }
+                    }
+                });
+            }
+        }
+    });
+<? if (!isset($this->suggested_donations)) { ?>
+    $('#donationAmount').rules("add",{
+        required: true,
+        min: 1
+    });
+    $('#donationAmount').change(function() {
+        updateAmounts();
+    });
+    $('#donationAmount').focusout(function() {
+        updateAmounts();
+    });
+<? } else { ?>
+    $('#donationAmount').rules("add",{
+        required: function() {
+            return ($('.suggested_donations:checked').length == 0)
+        },
+        min: 1,
+        messages: {
+            required: "Please select a valid donation amount"
+        }
+    });
+    $('#donationAmount').change(function() {
+        $('.suggested_donations:checked').attr('checked', false);
+        $('#amntSelected').val(0);
+        updateAmounts();
+    });
+    $('#donationAmount').focusout(function() {
+        updateAmounts();
+    });
+    $('.suggested_donations').change(function() {
+        $('#donationAmount').val('');
+        $('#amntSelected').val($('.suggested_donations:checked').val());
+        $('label[for="donationAmount"]').hide();
+        updateAmounts()
+    });
+<? } ?>
+    $("#volunteers").change(function(){
+        $("#errorDest").html("");
+    });
+    $("#rdoName").click(function(){
+        $("#errorDest").html("");
+    });
+
+});
+
+<?php
+$manual = false;
+if ($this->isLoggedIn) {
+$manual = in_array(
+                $this->userNew->id,
+                Zend_Registry::get('configuration')->user->manualDonation->toArray()
+          );
+$manual = ($manual && ($this->isAdmin && ($this->isNetworkAdmin || $this->isGlobAdmin)));
+}
+if ($manual) { ?>
+function manualEntry() {
+    $('#donationAmount').rules("remove");
+<? if (!isset($this->suggested_donations)) { ?>
+    $('#donationAmount').rules("add",{
+        required: true,
+        number: true
+    });
+<? } else { ?>
+    $('#donationAmount').rules("add",{
+        required: function() {
+            return ($('.suggested_donations:checked').length == 0)
+        },
+        number: true,
+        messages: {
+            required: "Please select a valid donation amount"
+        }
+    });
+<? } ?>
+    validDestination(true);
+    if ($("#formDonate").valid() && validDestination(true)) {
+        if (confirm('You are going to perform a manual donation, do you want to continue?')) {
+            updateAmounts();
+            $("#btnsSelect").hide();
+            $(".echeckInfo").hide();
+            $(".cardInfo").hide();
+            $("#buttonsFinish").hide();
+            $.post('/donation/manualentry', {
+                    ProjectId: $('#ProjectId').val(),
+                    VolunteerId: $('#VolunteerId').val(),
+                    DonationAmount: Number($('.totalAmntNoFee').html()),
+                    DonationComments: $('#DonationComments').val()
+                },
+                function(data) {
+                    alert(data);
+                    location.href = 'http://' + document.location.hostname + '/<?=$this->project->urlName?>';
+                }
+            );
+        }
+    }
+}
+<? } ?>
+
+function changeVal(obj) {
+    obj.style.color='black';
+    if (obj.value=='Enter Amount')obj.value='';
+}
+
+function creditCardPayment() {
+    cleanValidations();
+    validDestination(false);
+    if ($("#formDonate").valid() && validDestination(false)) {
+        addCommonValidation();
+        $("#btnsSelect").hide();
+        $(".cardInfo").show();
+        $(".echeckInfo").hide();
+        $("#buttonsFinish").show();
+        $("#typePayment").val('card');
+        //new validations
+        $('#cardNumber').rules("add",{
+            required:true,
+            creditcard: true,
+            notAmex: true
+        });
+        $('#validationCode').rules("add",{
+            required: true,
+            rangelength: [2,4]
+        });
+        $('#cardExpYear').rules("add",{
+            required: true,
+            creditCardExpDate: {
+                month: "#cardExpMonth",
+                year: "#cardExpYear"
+            }
+        });
+        updateAmounts();
+<? if (!empty($this->project->program) && $this->project->program->hasSupporters && $this->enableSupporter) { ?>
+        openSupportersPopup();
+<? } ?>
+    } else {
+        $("#btnsSelect").show();
+        $(".cardInfo").hide();
+        $(".echeckInfo").hide();
+        $("#buttonsFinish").hide();
+    }
+}
+
+function echeckPayment() {
+<?php if (!$disableEcheck) { ?>
+    cleanValidations();
+    validDestination(false);
+    if ($("#formDonate").valid() && validDestination(false)) {
+        addCommonValidation()
+        $("#btnsSelect").hide();
+        $(".cardInfo").hide();
+        $(".echeckInfo").show();
+        $("#buttonsFinish").show();
+        $("#typePayment").val('check');
+        //new validations
+        $("#checkBankRoutingNumber").rules("add",{
+            required: true
+        });
+        $("#checkAccountNumber").rules("add",{
+            required: true
+        });
+        $("#checkBankRoutingNumber2").rules("add",{
+            required: true,
+            equalTo: "#checkBankRoutingNumber",
+            messages: {
+                required: "Retype routing number.",
+                equalTo: "Retype routing number."
+            }
+        });
+        $("#checkAccountNumber2").rules("add",{
+            required: true,
+            equalTo: "#checkAccountNumber",
+            messages: {
+                required: "Retype account number.",
+                equalTo: "Retype account number."
+            }
+        });
+<? if ($this->project->program && $this->project->program->hasSupporters && $this->enableSupporter) { ?>
+        openSupportersPopup();
+<? } ?>
+    } else {
+        $("#btnsSelect").show();
+        $(".cardInfo").hide();
+        $(".echeckInfo").hide();
+        $("#buttonsFinish").hide();
+    }
+<? } else if ($enableCheck) { ?>
+$.fancybox('<p>Please make donation checks out to "Global Brigades (Canada)"'+
+           ' and note volunteer name and university in memo.<br /> Please also include'+
+           ' your name and email address if you would an electronic tax receipt'+
+           ' for your donation. Send check to: <br />'+
+           'Global Brigades <br />1099 E. Champlain Dr., Suite A176<br />'+
+           'Fresno, CA 93720.</p>');
+<? } ?>
+}
+
+function updateAmounts() {
+    var part1;
+    var amountNoFee = 0;
+    if ($(".suggested_donations:checked").length > 0) {
+        amountNoFee = Number($(".suggested_donations:checked").val());
+    } else {
+        amountNoFee = Number($("#donationAmount").val());
+    }
+
+    part1 = amountNoFee*Number(<?=$this->project->percentageFee?>);
+    var result = (part1/100) + amountNoFee;
+    $(".totalAmnt").html(result.toFixed(2));
+    $(".totalAmntNoFee").html(amountNoFee);
+}
+
+function addCommonValidation() {
+    $('#firstName').rules("add",{ required: true });
+    $('#lastName').rules("add",{ required: true });
+    $('#street').rules("add",{ required: true });
+    $('#email').rules("add",{
+        required: true,
+        email: true
+    });
+    $('#phone').rules("add",{ required: true });
+
+}
+
+function cleanValidations() {
+    $('#firstName').rules("remove");
+    $('#lastName').rules("remove");
+    $('#street').rules("remove");
+    $('#email').rules("remove");
+    $('#phone').rules("remove");
+    $('#cardNumber').rules("remove");
+    $('#validationCode').rules("remove");
+    $('#cardExpYear').rules("remove");
+<?php if (!$disableEcheck) { ?>
+    $("#checkBankRoutingNumber").rules("remove");
+    $("#checkBankRoutingNumber2").rules("remove");
+    $("#checkAccountNumber").rules("remove");
+    $("#checkAccountNumber2").rules("remove");
+<? } ?>
+<? if (!isset($this->suggested_donations)) { ?>
+    $('#donationAmount').rules("add",{
+        required: true,
+        min: 1
+    });
+<? } else { ?>
+    $('#donationAmount').rules("add",{
+        required: function() {
+            return ($('.suggested_donations:checked').length == 0)
+        },
+        min: 1,
+        messages: {
+            required: "Please select a valid donation amount"
+        }
+    });
+<? } ?>
+}
+
+function showConfirmBox() {
+<? if (!($this->project->program && $this->project->program->hasSupporters && $this->enableSupporter)) { ?>
+    if ($("#typePayment").val() == 'check' && $("#formDonate").valid() && validDestination(true)) {
+        $.fancybox('<h2>Donation Information</h2>' +
+                   '<p>Please, before we send your donation payment, confirm the following information:</p>' +
+                   '<ul class="confirmBox">'+
+                   '<li><label>First Name</label> '+$("#firstName").val()+'</li>'+
+                   '<li><label>Last Name</label> '+$("#lastName").val()+'</li>'+
+                   '<li><label>Street Address</label> '+$("#street").val()+'</li>'+
+                   '<li><label>Phone</label> '+$("#phone").val()+'</li>'+
+                   '<li><label>Email</label> '+$("#email").val()+'</li>'+
+                   '<li><label>Routing Number</label> '+$("#checkBankRoutingNumber").val()+'</li>'+
+                   '<li><label>Account Number</label> '+$("#checkAccountNumber").val()+'</li>'+
+                   '</ul><div class="clear"></div><br />'+
+                   '<div class="volunteerBtn03"><a href="javascript:void();" onclick="$.fancybox.close()">Cancel</a></div>'+
+                   '<div class="volunteerBtn03"><a href="javascript:void();" onclick="$.fancybox.close();$(\'#formDonate\').submit();">Confirm</a></div>');
+    } else if ($("#formDonate").valid() && validDestination(true)) {
+        $('#formDonate').submit();
+    }
+<? } else { ?>
+    if ($("#formDonate").valid() && validDestination(true)) {
+        $('#formDonate').submit();
+    }
+<? } ?>
+}
+
+function validDestination(manual) {
+    var valid = true;
+    if ((($("#rdoVolunteer:checked").length == 1 && $("#volunteers").val() != 'none') ||
+        ($("#rdoFundraiser:checked").length == 1 && $("#fundraisers").val() != 'none')
+        ) || $("#rdoName:checked").length == 1) {
+        $("#errorDest").html("");
+    } else {
+        $("#errorDest").html("<label class='error'>Please select your donation's destination.</label>");
+        valid = false;
+    }
+<? if (isset($this->suggested_donations)) { ?>
+    if (Number($('#amntSelected').val()) < 1 && Number($('#donationAmount').val()) < 1 && !manual) {
+        valid = false;
+        $("#errorDonationAmnt").html('<label class="error">Please select a valid donation amount</label>');
+    } else {
+        $("#errorDonationAmnt").html('');
+    }
+<? } ?>
+    return valid;
+}
+-->
+</script>
+<style>
+fieldset {float:left;widht:450px;border:0;}
+fieldset.left {padding:0 20px 0 0;margin-right:7px;border-right:1px solid #CCC;}
+fieldset label {display:block;float:left;width:150px;clear:both;}
+fieldset.echeckInfo label {width:195px;}
+fieldset input {display:block; width:240px;}
+fieldset input.dateInp {width:50px;float:left;}
+label.error {color:red; margin-top: 0; display: block;width:400px}
+fieldset label.error {padding-left:150px;width:200px;margin-bottom:5px;}
+fieldset.echeckInfo label.error {padding-left:195px;width:155px;}
+#btnsSelect span {float:left;font-weight:bold;font-size:13px;margin:6px 10px 0 0;}
+.big {font-size: 16px;}
+.color b {color: #693;}
+ul.confirmBox {margin: 0;padding 0;}
+ul.confirmBox li {list-style: none;padding 0;}
+ul.confirmBox li label {font-weight: bold; display:block;float:left;width:150px;clear:both;}
+</style>
+
+<form action="/donation/bluepay" method="post" id="formDonate" autocomplete="off">
+    <input type="hidden" id="ProjectId" name="ProjectId" value="<?=$this->project->id?>" />
+    <input type="hidden" id="DonationId" name="DonationId" value="" />
+    <input type="hidden" id="VolunteerId" name="VolunteerId" value="none" />
+    <input type="hidden" value="null" name="typePayment" id="typePayment" />
+    <? if (!isset($this->suggested_donations)) { ?>
+    <input type="hidden" id="amntSelected" name="amntSelected" />
+    <p style="padding-bottom:0px">Please enter any amount you wish to donate:</p>
+    <? } else { ?>
+    <div id="suggested-donations">
+    <?php foreach($this->suggested_donations as $suggested_amount) { ?>
+    <input style="margin-bottom:5px;" type="radio" class="suggested_donations" name="donationAmountRadio" value="<?php echo number_format($suggested_amount['Amount']) ?>">&nbsp;<span style="margin-right:10px;">$<?php echo number_format($suggested_amount['Amount']) ?></span><?php echo $suggested_amount['Description'] ?><br>
+    <?php } ?>
+    </div>
+    <? } ?>
+    <p>
+        <strong><?=$this->project->currency ?></strong>
+        <input id="donationAmount" name="donationAmount" <? if (!isset($this->suggested_donations)) { ?>onfocus="changeVal(this)" style="color:grey;"<? } ?> size="11" type="text" <? if (!isset($this->suggested_donations)) { ?>value="Enter Amount"<? } ?> />
+    </p>
+    <div id="errorDonationAmnt"></div>
+
+    <h2>Comment</h2>
+    <p>Leave a comment?<br />Your message will be displayed on the group's (& volunteer's) pages</p>
+    <textarea name="DonationComments" rows="3" cols="70" id="DonationComments"></textarea><br />
+
+    <input type="checkbox" value="1" name="isAnonymous" />Make my donation anonymous<br /><br />
+
+    <div id="btnsSelect">
+        <span>Donate with</span>
+        <div class="volunteerBtn03"><a onclick="creditCardPayment()" href="javascript:;">Credit Card</a></div>
+        <?php if (!$disableEcheck || $enableCheck ) { ?>
+        <span>or</span>
+        <div class="volunteerBtn03"><a onclick="echeckPayment()" href="javascript:;"><?php if (!$disableEcheck) { ?>E-Check<? } else if ($enableCheck) { ?>Check<? } ?></a></div>
+        <? } ?>
+        <?php if ($manual) { ?>
+        <input type="button" id="ManualEntry" name="ManualEntry" value="Manual Entry" style="vertical-align:top; margin-top:5px; margin-left:15px;" onclick="return manualEntry()">
+        <?php } ?>
+    </div>
+
+    <div id="errorInfo" class="errorBox hide"></div>
+
+    <!-- credit card-->
+    <div class="hide cardInfo">
+        <h2>Credit Card - Transaction Fees</h2>
+        <p>To cover online credit card and transaction costs, <?=($this->project->percentageFee) ?>% is automatically added to your donation.
+        To remove this added contribution, select the "e-check" option above or provide a physical check to your chapter president made out to Global Brigades USA.
+        This ensures 100% of your donation goes toward our mission and the communities we serve. We appreciate your understanding and support.</p>
+        <p><span class="big color"><b>Total Donation Amount:</b> <?=$this->project->currency ?><span class="totalAmnt"></span></span> (<?=$this->project->currency ?><span class="totalAmntNoFee"></span> + <?=$this->project->percentageFee?>% fee)  <?php if (!$disableEcheck) { ?><a onclick="echeckPayment()" href="javascript:;" class="btn btngreen">Change to E-Check</a><? } ?></p>
+    </div>
+    <!--//credit card-->
+
+<?php if (!$disableEcheck) { ?>
+    <!-- echeck -->
+    <div class="hide echeckInfo">
+        <h2>E-Check Transaction</h2>
+        <a onclick="creditCardPayment()" href="javascript:;" class="btn btngreen">Change to Credit Card</a><br />
+        <p>The donation will be directly debited from your bank account.</p>
+        <p><span class="big color"><b>Total Amount:</b> <?=$this->project->currency ?><span class="totalAmntNoFee"></span> </span></p>
+    </div>
+    <!--//echeck -->
+<? } ?>
+
+    <!--supporters total -->
+    <div id="supporterResult" class="hide big color"><b>Supporter Selected Payment:</b> <span class="supporterSelected"></span> <a href="javascript:void(0);" class="small" onclick="changeSupportersSelection()">Change Amount</a> - <a href="javascript:void(0);" class="small" onclick="removeSupportersSelection()">Delete</a></div>
+    <!--//supporters total -->
+
+    <h3 class="hide cardInfo">Credit Card Information</h3>
+    <h3 class="hide echeckInfo">E-Check Information</h3>
+
+    <div id="buttonsFinish" class="hide">
+    <?=$this->placeholder('bluepayform_cc');?>
+<?php if (!$disableEcheck) { ?>
+    <fieldset class="echeckInfo">
+        <label>Routing Number:</label><input type="text" name="checkBankRoutingNumber" id="checkBankRoutingNumber" class="small"/>
+        <label>Retype Routing Number:</label><input type="text" name="checkBankRoutingNumber2" id="checkBankRoutingNumber2" class="small"/>
+        <label>Account Number:</label><input type="text" name="checkAccountNumber" id="checkAccountNumber" class="small"/>
+        <label>Retype Account Number:</label><input type="text" name="checkAccountNumber2" id="checkAccountNumber2" class="small"/>
+        <br /><div class="right"><strong>E-Check Example</strong></div><br />
+        <img src="/public/images/echeck.gif" width="350" />
+    </fieldset>
+<? } ?>
+    <div class="clear"></div><br />
+    <div class="donateBtn2" id="btnSub">
+        <a onclick="showConfirmBox();" href="javascript:;">Donate</a>
+    </div>
+    <div id="loading" class="hide"><center>Please wait. Validating information ...</center></div>
+    </div>
+    <img src="/public/images/bluepay.gif" class="right" width="200px"/>
+    <div class="clear"></div><br />
+
+    <?=$this->placeholder('become_supporter');?>
+</form>
+<?php $this->placeholder('paymentform')->captureEnd() ?>

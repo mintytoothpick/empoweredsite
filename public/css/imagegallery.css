@@ -1,0 +1,88 @@
+/*  
+JAVASCRIPT IMAGE GALLERY W/ mootools
+Description: STYLE SHEET FOR IMAGE GALLERY
+Version: 1.0
+Author: Devin Ross
+Author URI: http://tutorialdog.com
+*/
+
+#img_gallery{ margin:50px auto; width:500px; }
+#img_gallery a{ outline:none; border:none; }
+#img_gallery a img{border:none;}
+
+/* --- IMAGE STAGE */
+#fullimg{
+	width:500px;
+	overflow:hidden;
+	height:380px;
+}
+#fullimg img{ width:500px; }
+#fullimg p, #fullimg span{
+	position:absolute;
+	background:black;
+	opacity:.5;
+	color:white;
+	margin:0px;
+	width:500px;
+	padding:6px;
+	font-size:11px;
+	font-family:Arial, Helvetica, sans-serif;
+}
+
+/* --- SLIDER --- */
+#img_gallery #wrapper{
+	overflow:hidden;
+	padding:4px 2px;
+	width: 330px;
+	float:left;
+	height:50px;
+	background-color:#181818;
+	position: relative;
+
+}
+
+#items{
+	margin:0px 0px;
+	padding:0px;
+	list-style:none;
+	width:50000px;
+	position: relative;
+	letter-spacing:0em;
+}
+#items li{
+	float:left;
+	list-style:none;
+	margin-right:2px;
+}
+#items .thumb{	
+	cursor:pointer;
+	margin:0px;
+	padding:0px;
+}
+#items .large{
+	display:none;
+	position:absolute;
+}
+#fullimg .loading{
+	width: 24px;
+	height: 24px;
+}
+#fullimg .thumb{display:none;}
+
+#items .item  p, #items .item  span{
+	display:none;
+	text-indent: -2000em;
+}
+#moveleft, #moveright{
+	margin:0px;
+	height:58px;
+	color: white;
+	width: 16px;
+	text-indent: -2000em;
+	text-decoration: none;
+	z-index: 1000; 
+	display:block;
+	cursor: pointer;
+	float:left;
+}
+

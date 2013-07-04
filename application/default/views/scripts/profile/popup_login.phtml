@@ -1,0 +1,83 @@
+<?php $this->placeholder('popup_user')->captureStart(); ?>
+<? if (!$this->isLoggedIn) { ?>
+
+<!-- popup - login -->
+<div id="loginFcyBx" style="display:none">
+<div class="fcybxLogin">
+  <div class="fbLogin" onclick="facebookLogin();return false;">
+    <img src="/public/images/fb_login.png" alt="Login with Facebook" />
+  </div>
+  
+  <div class="fbLoginError hide">
+  	User not found.
+  	<br />
+  	Are you already a registered user?
+  	<small>(You can login with email and connect your Facebook account on your profile page)</small>
+  	<br />
+  	<h2>LogIn with email</h2>
+  </div>
+  
+  <h2 class="loginTitle">LogIn</h2>
+  
+  <div class="errorMsg hide"></div>
+  <form class="frmLogin" action="">
+    <fieldset>
+      <label>Email</label> <input type="text" class="required email" name="email"/>
+      <label>Password</label> <input type="password" class="required" name="password"/>
+      <div class="clr"></div>
+      <div class="remember"><input type="checkbox" name="remember" value="1" class="rem" checked="checked" /> <label for="remember">Remember Me</label></div>
+      <div class="forgot"><a href="/profile/forgotpassword">Forgot password?</a></div>
+      <div class="clr"></div>
+      <input type="submit" value="Submit" class="btnSubmit box">
+    </fieldset>
+  </form>
+  
+  <div class="extra-fb-register-button hide">
+  	  <h2>Or register</h2>
+      <div onclick="facebookConnect();return false;" style="cursor:pointer;">
+        <img src="/public/images/fb_signup.png" alt="Signup with Facebook" />
+      </div>
+  </div>
+</div>
+</div>
+<!-- //popup - login -->
+
+<!-- popup - registration -->
+<div id="registerFcyBx" style="display:none">
+<div class="fcybxLogin">
+  <h2>Join</h2>
+  <div onclick="facebookConnect();return false;" style="cursor:pointer;">
+    <img src="/public/images/fb_signup.png" alt="Signup with Facebook" />
+  </div>
+  
+  <div class="registerToggler">
+  	<a href="#" onclick="$('.frmRegister').show('fast'); $(this).hide(); return false;">Sign up with email address</a>
+  </div>
+  
+  <div class="errorMsg hide"></div>
+  <div class="login">
+  	Already a member? <a href="javascript:;" class="login">Login</a>
+  </div>
+  
+  <form class="frmRegister">
+    <fieldset>
+      <label>First Name</label> <input type="text" name="firstName" class="required" />
+      <label>Last Name</label> <input type="text" name="lastName" class="required" />
+      <label>Email</label> <input type="text" name="mail" class="required email firstMail" />
+      <label>Re-Enter Email</label> <input name="re-mail" type="text" class="required email" equalTo="#fancybox-content input.firstMail" />
+      <label>Password</label> <input type="password" class="required" name="passwd" />
+      <input type="hidden" id="registerProjectId" name="ProjectId" value="<?= isset($this->project) ? $this->project->id : ''; ?>" />
+      <input type="hidden" id="registerGroupId" name="GroupId" value="<?= isset($this->group) ? $this->group->id : (isset($this->affiliation) && isset($this->affiliation->organizationId) ? $this->affiliation->id : ''); ?>" />
+      <input type="hidden" name="ProgramId" value="<?=isset($this->program) ? $this->program->id : '' ?>" />
+      <input type="hidden" name="NetworkId" value="<?=isset($this->organization) ? $this->organization->id : (isset($this->affiliation) && !isset($this->affiliation->organizationId) ? $this->affiliation->id : ''); ?>" />
+      <input type="hidden" id="registerNewChapter" name="StartChapter" value="" />
+      <div class="clr"></div>
+      <span>By joining, you are agreeing to the<br /> <a href="/termsandcondition" title="Terms of Service" target="_blank">Terms of Service</a> and the <a href="/privacypolicy" title="Privacy Policy" target="_blank">Privacy Policy</a></span>
+      <div class="btnLeft"><input class="btnSubmit box" type="submit" value="Sign Up" /></div>
+    </fieldset>
+  </form>
+</div>
+</div>
+<!--  popup - registration -->
+<? } ?>
+<?php $this->placeholder('popup_user')->captureEnd() ?>

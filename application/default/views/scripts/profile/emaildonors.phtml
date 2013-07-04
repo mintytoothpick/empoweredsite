@@ -1,0 +1,148 @@
+<?php
+$this->headTitle("Empowered.org - Email Donors");
+?>
+<script type="text/javascript">
+    var ctr = 0;
+    $(function() {
+        $('#all-donors').bind('click', function() {
+            $('#donors-list ul li input[type=checkbox]').each(function() {
+                $(this).attr('checked', 'checked');
+                $(this).attr('disabled', 'disabled');
+            })
+        })
+        $('#specific-donors').bind('click', function() {
+            $('#donors-list ul li input[type=checkbox]').each(function() {
+                $(this).removeAttr('checked');
+                $(this).attr('disabled', '');
+            })
+        })
+    })
+
+    function validateForm() {
+        var error = "";
+        if($('#specific-donors').attr('checked')) {
+            var sel_act = 0;
+            $('#donors-list ul li input[type=checkbox]').each(function() {
+                if ($(this).attr('checked')) {
+                    sel_act++;
+                }
+            })
+            if (sel_act == 0) {
+                error += "Please select atleast one donor.<br>";
+            }
+        }
+        if (jQuery.trim($('#subject').val()) == "") {
+            error += "Please specify a subject.<br>";
+        }
+        if (jQuery.trim($('#message').val()) == "") {
+            error += "Please specify a message.<br>";
+        }
+
+        if (error == "") {
+            return true;
+        } else {
+            $('#error').html(error).show();
+            return false;
+        }
+    }
+</script>
+<style type="text/css">
+    .send-mail .field-label {
+        float:left;
+        width:70px;
+        margin-top:15px;
+        line-height:24px;
+    }
+    .send-mail .field-input {
+        float:left;
+        width:860px;
+        margin-right:100px;
+        margin-top:15px;
+        line-height:24px;
+    }
+    .send-mail .field-input span {
+        margin-right:20px;
+    }
+    .send-mail .field-list {
+        float:left;
+        width:720px;
+        margin-left:70px;
+        margin-right:280px;
+        margin-top:10px;
+        border:1px solid #e5e5e5;
+    }
+    .send-mail .field-list .leftCol {
+        float:left;
+        width:325px;
+        padding-right:15px;
+        line-height:22px;
+        border-right:1px solid #e5e5e5;
+    }
+    .send-mail .field-list .rightCol {
+        float:left;
+        width:325px;
+        padding-left:15px;
+        line-height:22px;
+    }
+</style>
+<div>
+    <div id="mainco2">
+        <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+        <div class="block001">
+            <div class="blst001">
+                <div class="blst002">
+                    <div class="MainBody">
+                        <h1 style="color:#669933">Email Donors</h1>
+                        <div class="send-mail">
+                            <div id="error" style="border:2px solid #e5e5e5; color:red; padding:5px;width:760px; display:none"></div>
+                            <?php if ($this->sent) { ?>
+                            <div style="margin:5px 0px; padding:5px; border:1px solid #93C47D; background: #D9EAD3; width:760px;"><?php echo $this->message ?></div>
+                            <?php } ?>
+                            <form method="post" action="" onsubmit="return validateForm()">
+                                <input type="hidden" id="ProjectId" name="ProjectId" value="<?php echo $this->ProjectId ?>" />
+                                <div class="field-label">
+                                    <strong>To:</strong>
+                                </div>
+                                <div class="field-input">
+                                    <span><input id="all-donors" type="radio" name="sendTo" value="All" /> All Donors</span>
+                                    <span><input id="specific-donors" type="radio" name="sendTo" value="Specific" /> Specific Donors</span>
+                                </div>
+                                <div id="donors-list" class="field-list">
+                                    <ul style="list-style:none; padding:10px; float:left">
+                                    <?php $ctr = 1; foreach($this->donors as $donor) { ?>
+                                        <li class="<?php echo $ctr%2==1 ? "leftCol" : "rightCol" ?>">
+                                            <input type="checkbox" name="donors[]" value="<?php echo $donor['SupporterEmail'] ?>" style="width:auto; line-height:14px;" />&nbsp;<?php echo strlen(stripslashes($donor['SupporterName'])) > 20 ? substr(stripslashes($donor['SupporterName']), 0, 20)."..." : stripslashes($donor['SupporterName']) ?><br><span style="color:#a5a5a5"><?php echo (strlen($donor['SupporterEmail']) > 20 &&  strlen($donor['SupporterName']) > 20) ? substr($donor['SupporterEmail'], 0, 20)."..." : (trim($donor['SupporterEmail']) != "" ? $donor['SupporterEmail'] : "email not provided") ?></span><br><span style="color:#a5a5a5"><?php echo $this->data['Currency'].number_format(isset($donor['Donation']) ? $donor['Donation'] : $donor['total_donation']) ?> Donated</span>
+                                        </li>
+                                    <?php $ctr++; } ?>
+                                    </ul>
+                                </div>
+                                <div class="field-label">
+                                    <strong>Subject:</strong>
+                                </div>
+                                <div class="field-input">
+                                    <input style="width:380px;font-size:14px;padding:2px 1px" type="text" id="subject" name="subject" value="" />
+                                </div>
+                                <div class="field-label">
+                                    <strong>Message:</strong>
+                                </div>
+                                <div class="field-input">
+                                    <textarea id="message" name="message" cols="92" rows="10"></textarea>
+                                </div>
+                                <div id="submit" style="margin:10px 0px;margin-left:70px; width:700px; float:left">
+                                    <?php if (isset($this->level)) { ?>
+                                    <a class="btn btngreen" style="padding:3px 15px" href="/<?php echo $this->data['URLName'] ?>">Back</a>
+                                    <?php } else { ?>
+                                    <a class="btn btngreen" style="padding:3px 15px" href="/<?=$this->userNew->urlName?>">Back</a>
+                                    <?php } ?>
+                                    <input type="submit" class="btn btngreen" value="Send" />
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </div>
+        <div class="block001f01"><div class="blst001"><div class="blst002"></div></div></div>
+    </div>
+</div>

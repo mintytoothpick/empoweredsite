@@ -1,0 +1,612 @@
+<script>
+function showDetails(id) {
+    $("#details-"+id).show();
+    $("#btnHide-"+id).show();
+    $("#btnShow-"+id).hide();
+}
+
+function hideDetails(id) {
+    $("#details-"+id).hide();
+    $("#btnHide-"+id).hide();
+    $("#btnShow-"+id).show();
+}
+
+function searchOrganization() {
+    var srch_txt = $('#search_text').val().toString();
+    srch_txt = srch_txt.replace(/'/g, '');
+    srch_txt = srch_txt.replace(/"/g, "");
+    if(srch_txt != '') {
+        window.location.href = "/<?= $this->organization->urlName?>/search?&search_text="+srch_txt;
+    } else {
+        alert('please enter your search criteria.');
+    }
+}
+
+<?php if ($this->isAdmin) { ?>
+
+function closeAdminVideo() {
+    $('#popup-overlay').hide();
+    $('.popup-box').hide();
+
+    var video = document.getElementsByTagName("video")[0]
+    if( video.pause ) {
+        video.pause();
+    }
+}
+
+function showAdminVideo() {
+    var top = (screen.height/2)-274;
+    $('.popup-box').toggle().css('top', top);
+    $('#popup-overlay').toggle('fast', function() {
+        var video = document.getElementsByTagName("video")[0]
+        if( video.play ) {
+            video.play();
+        }
+    });
+}
+
+var corn = '10px';
+$(function() {
+    $('#bodyBack').val(rgb2hex($('body').css('background-color')));
+    $('#bodyBack').miniColors({
+        change: function(hex, rgb) {
+            styleBodyBack(hex);
+        }
+    });
+    $('#tabBack').val(rgb2hex($('#tabs ul li a:hover, #tabs ul li a.current').css('background-color')));
+    $('#tabBack').miniColors({
+        change: function(hex, rgb) {
+            styleTabBack(hex);
+        }
+    });
+    $('#linkCol').val(rgb2hex($('a.adminLink').css('color')));
+    $('#linkCol').miniColors({
+        change: function(hex, rgb) {
+            styleLinkColor(hex);
+        }
+    });
+    $('#titleBack').val(rgb2hex($('.headingStyle02, .headingStyle01, .box01').css('background-color')));
+    $('#titleBack').miniColors({
+        change: function(hex, rgb) {
+            styleTitleBack(hex);
+        }
+    });
+    $('#titleCol').val(rgb2hex($('.headingStyle02, .headingStyle01, .box01, .textSTyle01, .textSTyle02').css('color')));
+    $('#titleCol').miniColors({
+        change: function(hex, rgb) {
+            styleTitleCol(hex);
+        }
+    });
+    $('#roundedCorners').change(function() {
+        if ($('#roundedCorners').attr('checked') === false) {
+            corn = '0px';
+        } else {
+            corn = '10px';
+        }
+        $('.rounded').css('-moz-border-radius', corn);
+        $('.rounded').css('-webkit-border-radius', corn);
+        $('.rounded').css('border-bottom-left-radius', corn);
+        $('.rounded').css('border-bottom-right-radius', corn);
+        $('.rounded').css('border-top-left-radius', corn);
+        $('.rounded').css('border-top-right-radius', corn);
+        $('#tabs ul li a:hover, #tabs ul li a.current').css('-webkit-border-radius', corn+' '+corn+' 0 0;');
+        $('#tabs ul li a:hover, #tabs ul li a.current').css('border-top-left-radius', corn);
+        $('#tabs ul li a:hover, #tabs ul li a.current').css('border-top-right-radius', corn);
+        $('.BodyCon').css('border-bottom-left-radius', corn);
+        $('.BodyCon').css('border-bottom-right-radius', corn);
+        $('.mainC02').css('border-bottom-left-radius', corn);
+        $('.mainC02').css('border-bottom-right-radius', corn);
+        $('.breadcrumbCon ul li').css('border-bottom-right-radius', corn);
+        $('.breadcrumbCon ul li').css('border-top-right-radius', corn);
+        $('.leftMainBox, .rightMainBox').css('border-bottom-left-radius', corn);
+        $('.leftMainBox, .rightMainBox').css('border-bottom-right-radius', corn);
+    });
+    if ($('.rounded').css('border-top-right-radius') != '10px') {
+        $('#roundedCorners').attr('checked', false);
+        corn = '0px';
+    }
+
+    <?php
+    if(!empty($this->showAdminVideo)) {
+        echo 'showAdminVideo();';
+    }
+    ?>
+});
+
+function rgb2hex(rgb) {
+     if (  rgb.search("rgb") == -1 ) {
+          return rgb;
+     } else {
+          rgb = rgb.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))?\)$/);
+          function hex(x) {
+               return ("0" + parseInt(x).toString(16)).slice(-2);
+          }
+          return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+     }
+}
+
+function styleBodyBack(hex) {
+    $('body').css('background-color', hex);
+    $('#bodyBack').miniColors('value', hex);
+}
+
+function styleTabBack(hex) {
+    $('#tabs ul li a:hover, #tabs ul li a.current').css('background-color', hex);
+    $('.mainC02').css('border-color', hex);
+    $('#tabBack').miniColors('value', hex);
+}
+
+function styleLinkColor(hex) {
+    $('a, a:hover').css('color', hex);
+    $('#tabs ul li a').css('color', 'black');
+    $('#tabs ul li a:hover, #tabs ul li a.current').css('color', '#ffffff');
+    $('.startCBtn a').css('color', '#FFF');
+    $('#linkCol').miniColors('value', hex);
+}
+
+function styleTitleBack(hex) {
+    $('#titleBack').miniColors('value', hex);
+    $('.headingStyle02, .headingStyle01, .box01, .box001, .BG02').css('background-color', hex+' !important');
+}
+
+function styleTitleCol(hex) {
+    $('.headingStyle02, .headingStyle01, .box01, .textSTyle01, .textSTyle02').css('color', hex);
+    $('#titleCol').miniColors('value', hex);
+}
+
+function editStyle() {
+    $("#styleEdit").show();
+}
+
+function saveStyles() {
+    var css = 'body {background-color: '+$('#bodyBack').val()+'} \n\r';
+    css += '#tabs ul li a:hover, #tabs ul li a.current {background-color: '+$('#tabBack').val()+'} \n\r';
+    css += '.mainC, .mainC02 {border-color: '+$('#tabBack').val()+'} \n\r';
+    css += 'a, a:hover {color: '+$('#linkCol').val()+'} \n\r';
+    css += '.headingStyle02, .headingStyle01, .box01, .box001, .BG02 {background-color: '+$('#titleBack').val()+' !important;} \n\r';
+    css += '.headingStyle02, .headingStyle01, .box01, .textSTyle01, .textSTyle02, .headingStyle02 a {color: '+$('#titleCol').val()+'} \n\r'
+    //corner
+    css += '.rounded {-moz-border-radius: '+corn+'; -webkit-border-radius: '+corn+';border-bottom-left-radius:'+corn;
+    css += 'border-bottom-right-radius: '+corn+'border-top-left-radius:'+corn+'border-top-right-radius:'+corn+'} \n\r';
+    css += '#tabs ul li a:hover, #tabs ul li a.current{ -webkit-border-radius:'+corn+' '+corn+' 0 0;} \n\r';
+    css += '#tabs ul li a:hover, #tabs ul li a.current{ border-top-left-radius:'+ corn+'} \n\r';
+    css += '#tabs ul li a:hover, #tabs ul li a.current{ border-top-right-radius:'+ corn+'} \n\r';
+    css += '.BodyCon{ border-bottom-left-radius:'+ corn+'} \n\r';
+    css += '.BodyCon{ border-bottom-right-radius:'+ corn+'} \n\r';
+    css += '.mainC, .mainC02{ border-bottom-left-radius:'+ corn+'} \n\r';
+    css += '.mainC, .mainC02{ border-bottom-right-radius:'+ corn+'} \n\r';
+    css += '.breadcrumbCon ul li{ border-bottom-right-radius:'+ corn+'} \n\r';
+    css += '.breadcrumbCon ul li{ border-top-right-radius:'+ corn+'} \n\r';
+    css += '.leftMainBox, .rightMainBox{ border-bottom-left-radius:'+corn+'} \n\r';
+    css += '.leftMainBox, .rightMainBox{ border-bottom-right-radius:'+ corn+'} \n\r';
+
+
+    $.ajax({
+        type: 'post',
+        url: '/<?=$this->organization->urlName?>/savestyles',
+        data: 'css=' + css,
+        success: function (data) {
+            window.location.reload(true);
+        }
+    });
+}
+
+function deleteBanner(NID) {
+    if (confirm("Are you sure you want to remove the banner for this organization?") == true) {
+        $.post('/nonprofit/removebanner', {NetworkId: NID}, function(data) {
+            alert(data);
+            window.location.reload(true);
+        })
+    }
+}
+<?php } ?>
+
+<?php if (!$this->is_member && $this->isLoggedIn) {?>
+function joinOrganization(NID, UID) {
+    $.post('/nonprofit/joinrequest', {NetworkId: NID, UserId: UID}, function(data) {
+        if(data == 'affiliate') {
+          window.location.href = "/<?=$this->organization->urlName?>/affiliate";
+        } else {
+          alert(data);
+          window.location.reload(true);
+        }
+    });
+}
+<?php } ?>
+</script>
+
+<style>
+    .popup-box { left: 25%; right: 25%; top:20%; position: absolute; z-index: 999999!important; background-color:#ffffff; border:5px solid #e5e5e5; padding:10px 0 20px 0; -moz-border-radius:7px }
+    #popup-overlay {
+        background: url(<?php echo $this->contentLocation ?>public/images/bg-overlay.png);
+        height:100%;
+        position:fixed;
+        display:block;
+        left:0;
+        top:0;
+        width:100%!important;
+        z-index:998;
+        display:none;
+    }
+</style>
+
+<div id="popup-overlay"></div>
+<div class="popup-box" style="padding: 30px 20px; display:none; width:640px; height:390px;">
+    <?php
+    //$origin = 'http://cdn.empowered.org/';
+    $origin = 'http://' . $_SERVER['HTTP_HOST'];
+
+    $video_path = $origin . "/public/videos/AdminVideo.mp4";
+    ?>
+    <div id="video-js-box" class="video-js-box" style="margin-top:0px; position:absolute;">
+        <video id="video_1" class="video-js" width="640" height="360" controls="controls" preload="auto" poster="<?php echo $origin; ?>/public/images/NewHomePage/video.png">
+            <source src="<?php echo $video_path; ?>" type="video/mp4" />
+            <source src="<?php echo str_replace('.mp4', '.webm', $video_path); ?>" type="video/webm" />
+            <source src="<?php echo str_replace('.mp4', '.ogv', $video_path); ?>" type="video/ogg" />
+
+            <!-- Flash Fallback. Use any flash video player here. Make sure to keep the vjs-flash-fallback class. -->
+            <object class="vjs-flash-fallback" width="640" height="360" type="application/x-shockwave-flash" data="<?php echo $origin; ?>/public/videos/flowplayer-3.2.10.swf">
+                <param name="movie" value="<?php echo $origin; ?>/public/videos/flowplayer-3.2.10.swf" />
+                <param name="allowfullscreen" value="true" />
+                <param name="wmode" value="transparent">
+                <param name="flashvars" value='config={"playlist":["<?php echo $origin; ?>/public/images/NewHomePage/video.png", {"url": "<?php echo $video_path ?>","autoPlay":false, "autoBuffering":true}]}' />
+
+                <!-- Image Fallback. Typically the same as the poster image. -->
+                <img src="<?php echo $origin; ?>/public/images/NewHomePage/video.png" width="640" height="360" alt="Poster Image" title="No video playback capabilities." />
+            </object>
+        </video>
+    </div>
+    <div class="clear" style="margin-bottom:390px;"></div>
+    <a class="btn btngreen" style="float:right;" href="javascript:;" onclick="closeAdminVideo(); return false;">Close</a>
+</div>
+
+<div class="wrapper">
+
+  <!-- org header -->
+  <?=$this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+  <div class="BodyCon">
+
+  <!-- breadcrumb -->
+  <?= $this->placeholder('breadcrumb'); ?>
+  <!-- // breadcrumb -->
+
+  <div class="clr"></div>
+
+  <!-- tabs -->
+  <?=$this->placeholder('tabs') ?>
+  <!-- // tabs -->
+
+  <div class="clr"></div>
+  <div class="mainC02">
+    <div class="spacer"></div>
+    <div class="leftC">
+      <?php if ($this->isAdmin) { ?>
+            <!-- tool box -->
+            <?=$this->placeholder('tool_box'); ?>
+            <!-- // tool box -->
+
+            <div class="clear" style="margin-bottom: 5px"></div>
+
+            <!-- progress bar -->
+            <?=$this->placeholder('progress_bar'); ?>
+            <!-- // progress bar -->
+
+        <div class="clear"></div>
+      <?php } ?>
+
+      <?php
+      if($this->members_count >= 9 || $this->organization->raised >= 500)
+      {
+          ?>
+          <div class="box01 rounded">
+            <div class="textSTyle01" style="font-size:26px;">
+                <?php if($this->members_count >= 9) echo number_format($this->members_count) . '<br />'; ?>
+                <?php if($this->organization->raised >= 500) echo $this->organization->currency . number_format($this->organization->raised); ?>
+            </div>
+            <div class="textSTyle02">
+                <?php if($this->members_count >= 9) echo 'Members<br />'; ?>
+                <?php if($this->organization->raised >= 500) echo 'Raised'; ?>
+            </div>
+          </div>
+          <?php
+      }
+      ?>
+
+      <div class="leftMainBox BG01">
+        <div class="box02">
+          <div class="headingStyle01 rounded">About</div>
+          <div class="box02Content box02Editable">
+            <?php if (!empty($this->organization->contact->website)) { ?>
+                <p><strong>Website</strong> <a class="anchorHiddenOverflow" href="<?=$this->organization->contact->website?>" target="_blank"><span id="orgWebsite"><?=$this->organization->contact->website?></span></a></p>
+            <? } ?>
+            <span id="orgDescription"><?= stripslashes(nl2br($this->organization->description)) ?></span>
+          </div>
+        </div>
+        <div class="box02">
+          <div class="headingStyle01 rounded">Contact</div>
+          <div class="box02Content box02Editable">
+            <?php if ($this->organization->contact->address != '') { ?><p><strong>Location</strong> <span id="orgLocation"><?=$this->organization->contact->address?></span></p><? } ?>
+            <?php if (!empty($this->organization->contact->email)) { ?><p><strong>Email</strong> <span id="orgEmail"><?=$this->organization->contact->email?></span></p><? } ?>
+            <?php if (!empty($this->organization->contact->phone)) { ?><p><strong>Phone</strong> <span id="orgPhone"><?=$this->organization->contact->phone?></span></p><? } ?>
+          </div>
+        </div>
+
+
+        <!-- Administrators -->
+        <div class="box02">
+          <div class="headingStyle01 rounded">Administrators (<?= number_format(count($this->administrators))?>)</div>
+          <?php if ($this->isAdmin) { ?><a href="/<?=$this->organization->urlName?>/add-admins" class="adminLink">+ Add Organization Admins</a><? } ?>
+          <div class="box02Content">
+            <? $limit = 0; ?>
+            <? foreach ($this->administrators as $admin) { ?>
+            <? if (($limit%3)==0 && $limit > 1) { ?>
+            </ul>
+            <div class="clr"></div>
+            <? } ?>
+            <? if ((($limit%3)==0) || $limit==0) { ?>
+            <ul class="ulStyel01">
+            <? } ?>
+              <li<? if ((($limit+1)%3)==0 && $limit > 1) { ?> class="noMR"<? } ?>>
+                <a href="/<?=$admin['URLName'] ?>">
+                <img src="/profile/loadimage/?UserId=<?= $admin['UserId'] ?>" alt="" width="53px" height="53px" class="BorderStyle" />
+                </a>
+              </li>
+            <? $limit ++; if ($limit>8) break; ?>
+            <? } ?>
+            <a href="/<?=$this->organization->urlName?>/leadership" style="float:right;margin:6px 3px 0 0;">See More</a>
+          </div>
+        </div>
+        <!-- //Administrators -->
+
+        <!-- Files -->
+        <?php echo $this->render('nonprofit/files_list.phtml'); ?>
+        <?php echo $this->placeholder('files_list') ?>
+        <!-- //Files -->
+
+      </div>
+    </div>
+
+    <div class="rightC">
+        <?php if ($this->isAdmin) { ?>
+        <div class="styleEditor hide rounded" id="styleEdit">
+          <form class="frmEditor">
+            <ul>
+            <li>
+                <span>Background Color:</span> <input type="text" id="bodyBack" value="#AED5F8" class="colPicker" /> <input type="button" value="Reset" onclick="styleBodyBack('#AED5F8');" />
+            </li>
+            <li>
+                <span>Tab Color:</span> <input type="text" id="tabBack" value="#C0DAD9" class="colPicker"/> <input type="button" value="Reset" onclick="styleTabBack('#C0DAD9');" />
+            </li>
+            <li>
+                <span>Link Color:</span> <input type="text" class="colPicker" value="#3F66FF" id="linkCol" /> <input type="button" value="Reset" onclick="styleLinkColor('#3F66FF');" />
+            </li>
+            <li>
+                <span>Titles Background Color:</span> <input type="text" class="colPicker" id="titleBack" value="#B4E356" /> <input type="button" value="Reset" onclick="styleTitleBack('#B4E356');" />
+            </li>
+            <li>
+                <span>Titles Color:</span> <input type="text" class="colPicker" id="titleCol" value="#000" /> <input type="button" value="Reset" onclick="styleTitleCol('#000');" />
+            </li>
+            <li>
+                <span>Rounded Corners:</span> <input type="checkbox" value="true" checked id="roundedCorners"/>
+            </li>
+            <li class="last">
+                <input type="button" value="save" class="opt" onclick="saveStyles();"/><input type="button" value="cancel" class="opt" onclick="$('#styleEdit').hide();" />
+            </li>
+            </ul>
+          </form>
+        </div>
+        <? } ?>
+
+      <?php $this->shareUrl = $_SERVER['HTTP_HOST']  . '/' . $this->organization->urlName ?>
+      <?php $this->shareEmail = $this->organization->name ?>
+      <?php echo $this->render('nonprofit/sociallinks.phtml'); ?>
+
+      <div class="mediaplayerCon">
+        <div class="chapterMember">
+          <form id="SearchOrganization" style="float:left;" action="/<?= $this->organization->urlName?>/search" method="post" onsubmit="searchOrganization(); return false">
+            <p>Find a <?=$this->organization->groupNamingSingular?> or Member</p>
+            <input id="search_text" name="search_text" type="text" class="textField01" value="" />
+          </form>
+          <?php if($this->organization->hasGroups && $this->organization->isOpen ) { ?><div class="startCBtn"><a <?= $this->isLoggedIn ? 'href="/'.$this->organization->urlName.'/create-group"' : 'href="javascript:;" class="joinS"' ?> >Start a <?=$this->organization->groupNamingSingular?></a></div><?php } ?>
+          <?php if ($this->organization->hasMembership) { ?>
+          <div class="<?= $this->is_member ? 'disabled-button' : ''; ?> startCBtn"><a <?=$this->joinlink?>>Become a Member</a></div>
+          <? } ?>
+        </div>
+      </div>
+      <div class="clr"></div>
+
+      <div class="rightMainBox BG01">
+
+        <!-- Programs -->
+        <?php if (count($this->organization->programs) || ($this->isAdmin && $this->organization->hasPrograms)) { ?>
+        <div class="box04">
+          <div class="headingStyle02 rounded">
+            <?php if(count($this->organization->programs)) { ?><a href="/<?=$this->organization->urlName?>/programs">See More</a><?php } ?>
+            <?=$this->organization->programNamingPlural?> (<?= count($this->organization->programs) ?>)
+          </div>
+          <?php if ($this->isAdmin && count($this->organization->programs)) { ?><a class="adminLink" href="/<?=$this->organization->urlName?>/create-program">+ Create a new <?=strtolower($this->organization->programNamingSingular)?></a><? } ?>
+          <div class="box04Content">
+            <?php if (count($this->organization->programs)) { ?>
+              <? $limit = 1; ?>
+              <?php foreach ($this->organization->programs as $program) { ?>
+              <div class="programBox">
+                <div class="programImg program01"><a href="/<?=$program->urlName?>"><img src="<?=$this->contentLocation?>public/Media/full/<?=$program->logo->systemMediaName?>" class="greyBorder1"/></a></div>
+                <div class="programText">
+                  <a href="/<?=$program->urlName?>"><?=stripslashes($program->name)?></a>
+                  <div class="clear"></div>
+                  <?=$program->description?>
+                </div>
+                <div class="programGroup">
+                  <a href="<?=$program->urlName?>/chapters"><div class="group"><span class="text19"><?=number_format(count($program->groups))?></span><br /><?=$this->organization->chapterNamingPlural?></div></a>
+                  <a href="<?=$program->urlName?>/active-campaigns"><div class="group"><span class="text19"><?=number_format(count($program->campaigns))?></span><br />Fundraising<br />Campaigns</div></a>
+                  <a href="<?=$program->urlName?>/upcoming-activities"><div class="group noMR"><span class="text19"><?=number_format(count($program->activities))?></span><br />Volunteer<br />Activities</div></a>
+                </div>
+              </div>
+              <? $limit ++; if ($limit>2) break; ?>
+              <? } ?>
+            <? } else if ($this->isAdmin && $this->organization->hasPrograms) { ?>
+              There are currently no programs. <a href="/<?=$this->organization->urlName?>/create-program" class="adminLink">+ Create a new program</a>
+            <? } ?>
+          </div>
+        </div>
+        <? } ?>
+        <!-- // Programs -->
+
+        <!-- Chapters -->
+        <?php if (count($this->organization->groups) || ($this->isAdmin && $this->organization->hasGroups)) { ?>
+        <div class="box04">
+          <div class="headingStyle02 rounded">
+            <?php if (count($this->organization->groups)) { ?>
+            <? $limit = 1; ?>
+            <a href="/<?=$this->organization->urlName?>/chapters">See More</a> <?=$this->organization->groupNamingPlural?> (<?=number_format(count($this->organization->groups))?>)
+          </div>
+          <?php if ($this->isAdmin) { ?><a class="adminLink" href="/<?=$this->organization->urlName?>/create-group">+ Create a new <?=strtolower($this->organization->groupNamingSingular)?></a><? } ?>
+          <div class="box04Content">
+            <div class="clr"></div>
+            <?php foreach ($this->organization->groups as $group) { ?>
+            <div class="programSearch">
+              <div class="memberCon"> <span class="member"><?=number_format(count($group->members)) ?> Members</span> <span class="city"><?= isset($group->contact->city) && isset($group->contact->state) ? stripslashes($group->contact->city->name.', '.$group->contact->state->name) : ''; ?></span></div>
+              <a href="/<?=$group->urlName?>" class="headignStyle03"><?=stripslashes($group->name) ?></a><br />
+              <div class="clr"></div>
+              <div class="box04GroupDescription"><?=stripslashes($group->description)?></div>
+            </div>
+            <? $limit ++; if ($limit>2) break; ?>
+            <? } ?>
+          <? } else if ($this->isAdmin && $this->organization->hasGroups) { ?>
+            <?=$this->organization->groupNamingPlural?> (0)
+            </div>
+            <div class="box04Content">
+              There are currently no <?=strtolower($this->organization->groupNamingPlural)?>. <a href="/<?=$this->organization->urlName?>/create-group" class="adminLink">+ Create a new <?=strtolower($this->organization->groupNamingSingular)?></a>
+          <?php } ?>
+            </div>
+        </div>
+        <? } ?>
+        <!-- // Groups -->
+
+        <!-- Volunteer Activities -->
+        <?php if ($this->organization->hasActivities && ($this->organization->countActivities > 0 || $this->isAdmin)) { ?>
+        <div class="box04">
+          <div class="headingStyle02 rounded">
+              <?php if ($this->organization->countActivities > 0) { ?>
+              <? $limit = 1; ?>
+                  <a href="/<?=$this->organization->urlName?>/upcoming-activities">See More</a>Volunteer Activities (<?= $this->organization->countActivities ?>)
+              </div>
+              <?php if ($this->isAdmin) { ?><a href="/<?=$this->organization->urlName?>/create-activity" class="adminLink">+ Create a new activity</a><? } ?>
+              <div class="box04Content">
+                <div class="clr"></div>
+                <?php foreach ($this->organization->activities as $activity) { ?>
+                <div class="dateCon">
+                  <div class="month"><strong><span class="color01"><?= date('M', strtotime($activity->startDate)); ?></span></strong><br />
+                  <?= date('d', strtotime($activity->startDate)); ?></div>
+                  <div class="dateConText"><a href="/<?=$activity->urlName?>"><?=stripslashes($activity->name) ?></a><br />
+                  <?=date('m/d/Y g:i A', strtotime($activity->startDate)) ?><?=($activity->endDate == '0000-00-00 00:00:00') ? '' : ' - ' . date('m/d/Y g:i A', strtotime($activity->endDate)) ?><br />
+                  <?php // display location here instead --- echo stripslashes($activity['Description']) ?>
+                  </div>
+                </div>
+                <? $limit ++; if ($limit>2) break; ?>
+                <? } ?>
+            <?php } else if ($this->isAdmin) { ?>
+              Volunteer Activities (0)
+              </div>
+              <div class="box04Content">
+                  There are currently no volunteer activities. <a href="/<?=$this->organization->urlName?>/create-activity" class="adminLink">+ Create a new activity</a>
+            <?php } ?>
+          </div>
+        </div>
+        <?php } ?>
+        <!-- //Volunteer Activities -->
+
+        <!-- Fundraising Campaign -->
+        <?php if($this->organization->hasCampaigns && ($this->organization->countCampaigns > 0 || $this->isAdmin)) { ?>
+        <div class="box04">
+          <div class="headingStyle02 rounded">
+            <?php if ($this->organization->countCampaigns > 0) { ?>
+            <? $limit = 1; ?>
+            <a href="/<?=$this->organization->urlName?>/active-campaigns">See More</a>Fundraising Campaigns (<?= $this->organization->countCampaigns ?>)
+          </div>
+              <?php if ($this->isAdmin) { ?><a href="/<?=$this->organization->urlName?>/create-campaign" class="adminLink">+ Create a new campaign</a><? } ?>
+              <div class="box04Content">
+                <?php foreach ($this->organization->campaigns as $campaign) { ?>
+                <div class="CampaignsCon">
+                  <div class="dollar"></div>
+                  <div class="CampaignsText"><a href="/<?=$campaign->urlName?>"><?=stripslashes($campaign->name)?></a></div>
+                  <div class="fundRaising"><?=number_format(count($campaign->volunteers))?><br />
+                    <?=$this->organization->currency.number_format($campaign->raised)?> </div>
+                  <div class="donation01">Fundraisers
+                  Donations</div>
+                </div>
+                <? $limit ++; if ($limit>2) break; ?>
+                <? } ?>
+            <? } else if ($this->isAdmin) { ?>
+              Fundraising Campaigns (0)
+              </div>
+              <div class="box04Content">
+                <?php if ($this->organization->googleId || $this->organization->paypalId || $this->organization->bluePayId) { ?>
+                  There are currently no fundraising campaigns. <a href="/<?=$this->organization->urlName?>/create-campaign" class="adminLink">+ Create a new campaign</a>
+                <?php } else { ?>
+                  You haven't chosen a payment processor. <a href="/<?=$this->organization->urlName?>/activate-fundraising" class="adminLink">Select one now!</a>
+                <?php } ?>
+            <? } ?>
+          </div>
+        </div>
+        <?php } ?>
+        <!-- //Fundraising Campaign -->
+
+        <!-- Events -->
+        <?php if ($this->organization->hasEvents && ($this->organization->countEvents || $this->isAdmin)) { ?>
+        <? $limit = 1; ?>
+        <div class="box04">
+          <div class="headingStyle02 rounded"><?php if (count($this->organization->events) > 0) { ?><a href="/<?= $this->organization->urlName?>/upcoming-events">See More</a><?php } ?>Events (<?= count($this->organization->events) ?>)</div>
+          <?php if ($this->isAdmin) { ?><div class="box04Content"><?php if (!(count($this->organization->events) > 0)) { ?>There are currently no events.<?php } ?><a href="/<?=$this->organization->urlName?>/create-event?Prev=home" class="adminLink">+ Create a new event</a></div><? } ?>
+          <div class="box04Content">
+            <div class="clr"></div>
+            <?php foreach ($this->organization->events as $event) { ?>
+            <div class="eventCon">
+              <div class="eventmonth"><strong><span class="color01"><?= date('M', strtotime($event->startDate)); ?></span></strong><br />
+                <?= date('d', strtotime($event->startDate)); ?></div>
+              <div class="eventText"><a href="/<?=$this->organization->urlName?>/events?EventId=<?=$event->id?>" class="headignStyle03"><?=stripslashes($event->title)?></a> <a href="javascript:;" onclick="showDetails('<?=$event->id?>')" id="btnShow-<?=$event->id?>">View Details</a><a href="javascript:;" onclick="hideDetails('<?=$event->id?>')" id="btnHide-<?=$event->id?>" class="hide">Hide Details</a>
+                <div class="loactionCon hide" id="details-<?=$event->id?>">
+                  <?php if($this->organization->hasPrograms && isset($event->group->program->name)) { ?>Program: <?=stripslashes($event->group->program->name)?><br/><?php } ?>
+                  <?php if($this->organization->hasGroups && isset($event->group->name)) { ?><?=$this->organization->groupNamingSingular?>: <?= stripslashes($event->group->name) ?><br/><?php } ?>
+                  <?php if($event->startDate != '0000-00-00 00:00:00') { ?><?= date('M d Y', strtotime($event->startDate)); }  if($event->endDate != '0000-00-00 00:00:00') { ?> - <?= date('M d Y', strtotime($event->endDate)); } ?><br />
+                  <?=$event->text?>
+                </div>
+              </div>
+            </div>
+            <? $limit ++; if ($limit>2) break; ?>
+            <? } ?>
+          </div>
+        </div>
+        <? } ?>
+        <!-- //Events -->
+
+        <!-- Members -->
+        <?php if ($this->organization->hasMembership && (count($this->members))) { ?>
+        <div class="box04">
+          <div class="headingStyle02 rounded"><a href="/<?=$this->organization->urlName?>/members">See More</a>Members (<?= number_format($this->members_count) ?>)</div>
+          <?php if ($this->isAdmin) { ?><a href="/<?= $this->organization->urlName?>/add-members" class="adminLink">+ Add Members</a><? } ?>
+          <div class="box04Content">
+            <div class="clr"></div>
+            <?php foreach ($this->members as $member) { ?>
+            <div class="memberCon01">
+              <div class="memberImg"><a href="/<?=$member['URLName'] ?>"><img src="/profile/loadimage/?UserId=<?= $member['UserId'] ?>" alt="" width="53px" height="53px" class="BorderStyle" /></a></div>
+              <div class="memberText">
+                <span class="headignStyle03"><a href="/<?=$member['URLName'] ?>"><?=stripslashes($member['FullName']) ?></a></span> Joined <span class="joinedDate"><?=date('F d, Y', strtotime($member['JoinedOn'])) ?></span><br />
+                  <p><?= stripslashes($member['AboutMe']) ?></p>
+              </div>
+            </div>
+            <? } ?>
+          </div>
+        </div>
+        <? } ?>
+        <!-- //Members -->
+
+      </div>
+    </div>
+  </div>
+  <div class="clr"></div>
+  <div class="clr"></div>
+</div>

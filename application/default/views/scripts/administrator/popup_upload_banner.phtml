@@ -1,0 +1,26 @@
+<?php $this->placeholder('popup_upload_banner')->captureStart() ?>
+<script>
+$(function() {
+    $('.uploadBanner').click(function() {
+        $.fancybox($("#upBannerFcyBx").html());
+    });
+});
+</script>
+
+<!-- banner upload -->
+<div id="upBannerFcyBx" style="display:none">
+<form method="post" action="/<?=$this->toolPopupObj->urlName?>/add-banner" enctype="multipart/form-data" onsubmit="return validate('#<?= (isset($this->uploadIdName)) ? $this->uploadIdName.'Banner' : 'NetworkBanner' ?>')">
+    <div style="padding:10px; padding-top:0px">
+    <h3>Upload Banner</h3>
+    <span style="color:#F00;">Please select jpeg, gif and png files that are under 2MB in size.<br />After saving your changes, you will be asked to crop your organization banner.</span><br /><br />
+    <b>Select an image:</b>
+    <input type="hidden" id="action" name="action" value="upload" />
+    <input type="hidden" name="<?= (isset($this->uploadIdName)) ? $this->uploadIdName.'Id' : 'NetworkId' ?>" value="<?=$this->toolPopupObj->id?>" />
+    <input type="file" size="24" name="<?= (isset($this->uploadIdName)) ? $this->uploadIdName.'Banner' : 'NetworkBanner' ?>" id="NetworkBanner" class="textfield"  onchange="update_logo()"/><br>
+    <input class="button" type="submit" value="Submit" style="float:right; margin-top:10px; margin-right:5px;">
+    <input class="button" type="button" value="Close" style="float:right; margin-top:10px; margin-right:5px" onclick="$.fancybox.close();">
+    </div>
+</form>
+</div>
+<!-- // banner upload -->
+<?php $this->placeholder('popup_upload_banner')->captureEnd() ?>

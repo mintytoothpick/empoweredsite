@@ -1,0 +1,58 @@
+<?php $this->placeholder('memberstoolbox')->captureStart();
+
+$config = Zend_Registry::get('configuration');
+if(
+($config->chapter->membership->enable &&
+  (in_array($this->group->organization->id, $config->chapter->membership->settings->toArray()) ||
+  in_array($this->group->organization->id, $config->chapter->membership->active->toArray())))
+  || $this->pendingRequests > 0 ) {
+?>
+<style>
+.programBox02 {width: 630px;}
+</style>
+<?php if($this->pendingRequests > 0) { ?>
+<script>
+function pendingRequests() {
+    $.get(
+        '/<?=$this->group->urlName?>/pending-members-requests',
+        function (data) {
+            $.fancybox(data, {
+                width: 630,
+                autoDimensions: true,
+                autoScale: true,
+                centerOnScroll: true,
+                showNavArrows: false,
+            });
+        }
+    );
+}
+</script>
+<?php } ?>
+<div class="adminPanelCon">
+  <div class="adminPanel">
+    <h1><span></span>Tools</h1>
+    <div class="tool-box-content">
+      <ul>
+<?php if($this->pendingRequests > 0) { ?>
+        <li><a class="volunteerIcon" href="javascript:;" onclick="pendingRequests();"><span style="vertical-align:top;">Accept or Deny Members</span></a></li>
+        <div class="adminPanelSeprator"></div>
+<? } ?>
+<?php
+if(($config->chapter->membership->enable &&
+  (in_array($this->group->organization->id, $config->chapter->membership->settings->toArray()) ||
+  in_array($this->group->organization->id, $config->chapter->membership->active->toArray())))
+) { ?>
+        <li><a class="donationIcon" href="/<?=$this->group->urlName?>/membership-report"><span style="vertical-align:top;">View Donation History</span></a></li>
+        <li><a class="donationIcon" href="/<?=$this->group->urlName?>/membership-funds"><span style="vertical-align:top;">Membership Funds</span></a></li>
+        <div class="adminPanelSeprator"></div>
+        <li><a class="editDetails" href="/<?=$this->group->urlName?>/membership-settings"><span style="vertical-align:top;">Settings</span></a></li>
+        <div class="adminPanelSeprator"></div>
+        <li><a class="" href="/<?=$this->group->urlName?>/leadership"><span style="vertical-align:top;">Administrators</span></a></li>
+<? } ?>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="clr"></div>
+<? } ?>
+<?php $this->placeholder('memberstoolbox')->captureEnd() ?>

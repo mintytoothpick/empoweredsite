@@ -1,0 +1,22 @@
+<?php $this->placeholder('popup_user_survey')->captureStart(); ?>
+<? if (!empty($this->missingSurveys)) { ?>
+<script type="text/javascript">
+$(function(){
+    $(document).trigger('showUserSurveyModal');
+});
+</script>
+<!-- popup - user missing survey info -->
+<div id="userSurveysFcyBx" style="display: none">
+    <div style="min-width:600px;">
+        <h2>Missing Information</h2>
+        <p>We noticed you have a survey for one or more initiatives to complete:</p>
+        <? foreach($this->missingSurveys as $projectInfo) { ?>
+        <div style=""><span class="left"><?=$projectInfo['name']?></span> <a href="/signup/editsurvey?ProjectId=<?=$projectInfo['id']?>" class="right">Complete Survey</a></div>
+        <div class="clear"></div><hr />
+        <? } ?>
+        </ul>
+    </div>
+</div>
+<!-- //popup - user missing survey info -->
+<? } ?>
+<?php $this->placeholder('popup_user_survey')->captureEnd() ?>

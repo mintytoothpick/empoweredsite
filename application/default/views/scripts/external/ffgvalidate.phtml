@@ -1,0 +1,43 @@
+<script>
+function finish(url) {
+    $("#btnId").html('Processing ...');
+    $.ajax({
+        url: '/external/ffg' + url,
+        dataType: 'json',
+        success: function(data) {
+            if (data == 'login') {
+                alert('Session timeout, please refresh the site.');
+            } else {
+                $("#key").val(data.key);
+                $("#status").val(data.status);
+                $('#payFrm').submit();
+            }
+        }
+    });
+}
+</script>
+
+<div class="leftAuto">
+  <label class="amtns">Amount Raised: <span><b><?=$this->currency?> $<?=number_format($this->raised, 2)?></b></span></label><br />
+  <label class="amtns">Amount Available: <span><b><?=$this->currency?> $<?=number_format($this->available, 2)?></b></span></label>
+</div>
+<div class="clear"></div>
+
+<form method="POST" action="<?=$this->urlFFG?>" name="payFrm" id="payFrm">
+  <input type="hidden" value="<?=$this->key?>" name="key" id="key" />
+  <input type="hidden" value="<?=$this->status?>" name="status" id="status"/>
+  <input type="hidden" value="<?=$this->idffg?>" name="idffg" />
+<?php if ($this->isOk) { ?>
+  <div class="successBox">Validation Success!</div>
+  <input type="hidden" value="<?=$this->organization->name?>" name="organizationName" />
+  <input type="hidden" value="<?=$this->organization->contact->email?>" name="organizationEmail" />
+  <input type="hidden" value="<?=$this->organization->contact->phone?>" name="organizationPhone" />
+  <input type="hidden" value="<?=$this->organization->contact->website?>" name="organizationWebsite" />
+  <br />
+  <div class="volunteerBtn02" id="btnId"><a href="javascript:void(0);" onclick="finish('pay');">Pay Ticket</a></div>
+<?php } else { ?>
+  <div class="errorBox errorBoxTxt">Not enough funds.</div><br />
+  <div class="disabled-button volunteerBtn02 btnLarge" id="btnId"><a href="javascript:void(0);" onclick="finish('cancel');">Back to Fly For Good</a></div>
+<?php } ?>
+</form>
+<br />

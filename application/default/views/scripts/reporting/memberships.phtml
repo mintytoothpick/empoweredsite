@@ -1,0 +1,74 @@
+<script type="text/javascript" src="/public/js/jquery-1.4.2.js"></script>
+<style>
+span {font-size:9px;}
+</style>
+<script>
+function list(id) {
+    $("#list_"+id).toggle();
+}
+
+function notes(statId, groupId) {
+    $("#"+statId+"_"+groupId).toggle();
+}
+
+function save(statId, groupId) {
+    $.ajax({
+        type: "POST",
+        url: "/reporting/membershipnotes",
+        data: 'GroupId='+groupId+'&StatId='+statId+'&Notes='+$("#notes_"+statId+"_"+groupId).val(),
+        dataType: "json",
+        success: function(data) {
+            if (data['status'] == 'ok') {
+                $("#"+statId+"_"+groupId).toggle();
+            } else {
+                alert(data);
+            }
+        }
+    });
+}
+</script>
+<p>Report created dialy 8am PDT. (server time)</p>
+<table cellpadding="5" cellspacing="0" width="100%" border="1">
+    <tr>
+        <td># Chapters</td>
+        <td># Chapters with Membership</td>
+        <td># Chapters without Membership</td>
+        <td># Chapters with Membership Fee and Activity Requires Membership</td>
+        <td># Paid Members <br /><span>(with payment up to date)</span></td>
+        <td># Members not paid<br /><span>(missing payment)</span></td>
+        <td>$ Total One Time</td>
+        <td>$ Total Monthly</td>
+        <td>$ Total Twice a Year</td>
+        <td>Estimated Annual<br /><span>(Monthly x 12) + Annuals Memberships + (Twice a Year x 2)</span></td>
+        <td>Date</td>
+    </tr>
+    <?php foreach ($this->paginator as $stat) { ?>
+    <tr>
+        <td><?=$stat->numChapters?></td>
+        <td><?=$stat->numChaptersMembership?></td>
+        <td><?=$stat->numChaptersNoMembership?> <?=(($stat->numChaptersNoMembership>0) ? '<a href="javascript:list(\''.$stat->id.'\');">List</a>':'')?></td>
+        <td><?=$stat->numChaptersMMToVolunteer?></td>
+        <td><?=$stat->numPaidMembers?></td>
+        <td><?=$stat->numMembersNoPay?></td>
+        <td align="right">$ <?=$stat->amountOneTime?></td>
+        <td align="right">$ <?=$stat->amountMonthly?></td>
+        <td align="right">$ <?=$stat->amountTwiceYear?></td>
+        <td align="right">$ <?=$stat->amountAnnual?></td>
+        <td nowrap><?=$stat->date?></td>
+    </tr>
+    <? if ($stat->numChaptersNoMembership > 0) { ?>
+    <tr id="list_<?=$stat->id?>" style="display:none;">
+        <td colspan="9">
+            <ul>
+            <? foreach($stat->groupsNoFee as $group) { ?>
+                <li><a href="http://www.empowered.org/<?=$group->urlName?>"><?=$group->name?></a> <a href="javascript:notes('<?=$stat->id?>','<?=$group->id?>');">[Notes]</a>
+                <div id="<?=$stat->id?>_<?=$group->id?>" style="display:none;"><textarea id="notes_<?=$stat->id?>_<?=$group->id?>"><?=$stat->getNotes($group)?></textarea><br /><input type="button" value="Save" onclick="save('<?=$stat->id?>','<?=$group->id?>')"/></div></li>
+            <? } ?>
+            </ul>
+        </td>
+    <tr>
+    <? } ?>
+    <?php } ?>
+</table>
+
+<?= $this->paginationControl($this->paginator, 'Sliding', '/dashboard/page_selector.phtml'); ?>

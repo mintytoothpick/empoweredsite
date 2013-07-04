@@ -1,0 +1,49 @@
+<input id="rowsCount" type="hidden" value="<?= $this->countRes ?>">
+
+<?php if (count($this->paginator)) {
+$this->render('profile/popup_project_donate.phtml');
+$this->render('profile/popup_project_volunteer.phtml');
+
+foreach ($this->paginator as $campaign) { ?>
+<div class="programBox02">
+    <div class="dollar"></div>
+    <div class="CampaignsText"><a href="/<?=$campaign->urlName?>"><?=stripslashes($campaign->name)?></a></div>
+    <div class="donation noMR"><strong><span class="text19"><?=$campaign->currency.number_format($campaign->raised)?></span></strong><br />
+    Donations</div>
+    <div class="donation noMR"><strong><span class="text19"><?=number_format(count($campaign->volunteers))?></span></strong><br />
+    Fundraisers</div>
+
+   <div class="volunteerBtn">
+    	<?php if($this->isLoggedIn){?>
+    		
+    		<?php if($campaign->getVolunteerByUser($this->userNew)) { ?>
+    			<a href="/<?=$campaign->urlName?>/stopvolunteering" class="stopVolunteerAction">
+			      Stop Volunteering
+				</a>
+    		<?php } else {?>
+	    		<a onclick="$(document).trigger('showProjectVolunteerModal', ['/<?=$campaign->urlName?>/join', <?= $campaign->isFinished() ? "true":"false" ?>, '<?=date('M d, Y h:i A', strtotime($campaign->endDate)) ?>' ]);" href="#">
+					Volunteer With Us
+				</a>
+			<?php }?>
+			
+    	<?php }else{?>
+			<a href="javascript:;" class="join">
+            	Volunteer With Us
+			</a>
+    	<?php }?>
+    </div>
+    <div class="donateBtn">
+        <a onclick="$(document).trigger('showProjectDonateModal', ['/<?=$campaign->urlName?>/donate', <?= $campaign->isFinished() ? "true":"false" ?>, '<?=date('M d, Y h:i A', strtotime($campaign->endDate)) ?>' ]);" href="#">
+    		Donate
+    	</a>
+	</div>
+</div>
+        <div class="clr" style="margin-bottom:20px;"></div>
+<? } ?>
+<?= $this->paginationControl($this->paginator, 'Sliding', 'nonprofit/new_page_selector.phtml', array('param' => 'page')); ?>
+<?php echo $this->placeholder('popup_project_donate') ?>
+<?php echo $this->placeholder('popup_project_volunteer') ?>
+
+<? } else { ?>
+<p>No results found.</p>
+<? } ?>

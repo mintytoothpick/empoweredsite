@@ -1,0 +1,47 @@
+<?php $this->placeholder('toolbox')->captureStart() ?>
+<div class="adminPanelCon">
+  <div class="adminPanel">
+    <h1><span></span>Tools</h1>
+    <div class="tool-box-content">
+      <ul>
+        <li><a class="editDetails" href="/group/editinfo?GroupId=<?=$this->group->id?>"><span style="vertical-align:top;">Edit Details</span></a></li>
+        <?php if (isset($this->siteBanner) && !empty($this->siteBanner['SystemMediaName'])) { ?>
+        <li><a class="bannerIcon" href="javascript:;" onclick="deleteBanner('<?=$this->group->id?>')"><span style="vertical-align:top; margin-right:15px;">Remove Chapter Banner</span></a></li>
+        <?php } else if ($this->isImageExists && !empty($this->siteMedia['SystemMediaName'])) { ?>
+        <li><a class="logoIcon uploadLogo" href="javascript:;"><span style="vertical-align:top; margin-right:15px;">Change Chapter Logo</span></a></li>
+        <li><a class="bannerIcon uploadBanner" href="javascript:;"><span style="vertical-align:top;">Upload a Banner</span></a></li>
+        <?php } else { ?>
+        <li><a class="logoIcon uploadLogo" href="javascript:;"><span style="vertical-align:top;">Upload a Logo</span></a></li>
+        <li><a class="bannerIcon uploadBanner" href="javascript:;"><span style="vertical-align:top; margin-right:15px;">Upload a Banner</span></a></li>
+        <?php } ?>
+      </ul>
+      <div class="adminPanelSeprator"></div>
+      <ul>
+        <?$line = false;
+        if ($this->group->organization->hasActivities) { $line = true; ?><li><a class="volunteerIcon" href="/<?=$this->group->urlName?>/create-activity"><span style="vertical-align:top;">Create a Volunteer Activity</span></a></li><? } ?>
+        <? if ($this->group->organization->hasCampaigns) { $line = true;?><li><a class="donationIcon" href="/<?=$this->group->urlName?>/create-campaign"><span style="vertical-align:top;">Create a Fundraising Campaign</span></a></li><? } ?>
+        <? if ($this->group->organization->hasEvents) { $line = true;?><li><a class="donorsIcon" href="/<?=$this->group->urlName?>/create-event"><span style="vertical-align:top;">Create an Event</span></a></li><? } ?>
+      <? if ($line) { ?></ul><div class="adminPanelSeprator"></div><ul><? } ?>
+        <? if ($this->group->organization->hasActivities) { ?><li><a class="volunteerIcon" href="/<?=$this->group->urlName?>/volunteers"><span style="vertical-align:top;">View Volunteers</span></a></li><? } ?>
+        <?php if(($this->group->googleId || $this->group->paypalId) && $this->group->raised) { ?>
+        <li><a class="donationIcon" href="/<?=$this->group->urlName?>/donations?Prev=home"><span style="vertical-align:top;">View Donation History</span></a></li>
+        <li><a class="donorsIcon" href="/<?=$this->group->urlName?>/donors"><span style="vertical-align:top;">View Donors</span></a></li>
+        <?php } ?>
+        <li><a class="reportsIcon" href="/<?=$this->group->urlName?>/reports"><span style="vertical-align:top;">View Reports</span></a></li>
+      </ul>
+      <div class="adminPanelSeprator"></div>
+      <ul>
+        <li><a class="adminIcon" href="/<?=$this->group->urlName?>/add-admins"><span style="vertical-align:top;">Add Chapter Admins</span></a></li>
+        <li><a class="adminIcon" href="/<?=$this->group->urlName?>/add-members"><span style="vertical-align:top;">Add Chapter Members</span></a></li>
+        <li><a class="files" href="/<?=$this->group->urlName?>/manage-files"><span style="vertical-align:top;">Share Files</span></a></li>
+        <li><a href="javascript:;" onclick="deleteGroup('<?=$this->group->id?>')"><span style="vertical-align:top;">Delete</span></a></li>
+      </ul>
+    </div>
+  </div>
+<div class="clr"></div>
+</div>
+
+<?php echo $this->placeholder('popup_upload_logo') ?>
+<?php echo $this->placeholder('popup_upload_banner') ?>
+
+<?php $this->placeholder('toolbox')->captureEnd() ?>

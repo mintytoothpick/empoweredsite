@@ -1,0 +1,38 @@
+<? if (!isset($this->filter)) { ?>
+<script>
+function pagingInitiatives(page) {
+    $("#loading").show();
+    $("#contentAlbums").html('');
+    $.ajax({
+        url: "/<?=$this->user->urlName?>/filteralbums",
+        data: 'projectId=<?=$this->project->id?>&page=' + page,
+        success: function(data) {
+            $("#contentAlbums").html(data);
+            $("#loading").hide();
+        }
+    });
+}
+</script>
+
+<div class="box002 noMB"> <div class="headingStyle01 BG02">All Albums</div></div>
+<div id="loading" class="hide"><div class="box002Content">Loading albums ...</div></div>
+<div id="contentAlbums">
+<? } ?>
+
+<?php if(count($this->initiatives)) { ?>
+<?php foreach($this->initiatives as $album) { ?>
+  <a href="/<?=$this->user->urlName?>/photos/<?=$album->urlName?>"><div class="leftBox <?= isset($this->project) && $album->id == $this->project->id ? 'border01' : '' ?>">
+  <p><img src="/public/Media/full/<?=$album->logo->systemMediaName?>" alt=" " width="67" height="38" align="left" class="imgstyle4" /><?=$album->name?></p>
+</div></a>
+<? } ?>
+<div class="pager">
+<?= $this->render('profile/page_selector_initiatives.phtml'); ?>
+</div>
+<? } else if ($this->project) { ?>
+  <a href="/<?=$this->user->urlName?>/photos/<?=$this->project->urlName?>"><div class="leftBox border01">
+  <p><img src="/public/Media/full/<?=$this->project->logo->systemMediaName?>" alt=" " width="67" height="38" align="left" class="imgstyle4" /><?=$this->project->name?></p>
+</div></a>
+<? } else { ?>
+<div class="leftBox"><p>No albums found.</p></div>
+<? } ?>
+<? if (!isset($this->filter)) { ?></div><? } ?>

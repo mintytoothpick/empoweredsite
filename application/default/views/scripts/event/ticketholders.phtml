@@ -1,0 +1,80 @@
+<?php $this->placeholder('currenttab')->set('events'); ?>
+<style>
+    .right { float:right; }
+    .hidden { display:none }
+</style>
+<div>
+    <div id="mainco2">
+        <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+        <div class="block001">
+            <div class="blst001">
+                <div class="blst002">
+                    <div class="MainBody">
+                        <?php
+                        if ($this->level == 'group') {
+                            include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/groupheader.php';
+                        } else if ($this->level == 'organization') { 
+                            include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/nonprofitheader.php';
+                        } else {
+                            include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/profileheader.php'; 
+                        } ?>
+							<div class="TabbedPanelsContentGroup">
+								<div class="TabbedPanelsContent">
+									<div id='whiteBox' class="whiteBox">
+                    <h2 style="color:#693;padding-bottom:8px;"><?php echo isset($this->level) && $this->level != 'user' ? $this->eventInfo['Title'].' - Ticket Holders' : '' ?></h2>
+                    <div id="divActiveVolunteersContent">
+                        <div>
+                            <div class="clear"></div>
+                                <input type="hidden" name="_action" value="update_candidates">
+                                <table cellspacing="0" cellpadding="3" border="0" style="border:1px solid #E7E7FF;width:100%; border-collapse:collapse;">
+                                    <tr style="color:#F7F7F7;background-color:#000;font-weight:bold;height:25px;">
+                                        <th scope="col"><span style="float:left;padding-left:3px;">Ticket Name</span></th>
+                                        <th scope="col"><span style="float:left;padding-left:3px;">Ticket Holder</span></th>
+                                        <th scope="col"><span style="float:left;">Email</span></th>
+                                        <th scope="col"><span style="float:left;">Verification Code</span></th>
+                                    </tr>
+                                    <?php
+                                    if (count($this->ticket_holders)) {
+                                        $ctr = 0;
+                                        foreach ($this->ticket_holders as $ticket_holder) {
+                                            if (!empty($ticket_holder['UserId'])) {
+                                                $userInfo = $this->users_class->loadInfo($ticket_holder['UserId']);
+                                                $FullName = $userInfo['FullName'];
+                                                $Email = $userInfo['Email'];
+                                            } else {
+                                                $FullName = $ticket_holder['FullName'];
+                                                $Email = $ticket_holder['Email'];
+                                            }
+                                    ?>
+                                    <tr style="background-color:<?php echo $ctr%2 == 1 ? "#e7e7e9" : "white" ?>;">
+                                        <td style="padding: 3px 0 3px 3px;"><?php echo stripslashes($ticket_holder['Name']) ?></td>
+                                        <td style="padding: 3px 0 3px 3px;"><?php echo stripslashes($FullName) ?></td>
+                                        <td style="padding: 3px 0 3px 3px;"><?php echo $Email ?></td>
+                                        <td style="padding: 3px 0 3px 3px;"><?php echo $ticket_holder['VerificationCode'] ?></td>
+                                    </tr>
+                                    <?php $ctr++; } ?>
+                                    <?php } else { ?>
+                                    <tr>
+                                        <td colspan="5" style="padding-left:3px;" >No record(s) found</td>
+                                    </tr>
+                                    <?php } ?>
+                                </table>
+                                <br />
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                    <div style="margin-top:30px;">
+                        <a class="btn btngreen" title="Back" href="/<?php echo $this->data['URLName'] ?>/events?EventId=<?php echo $this->eventInfo['EventId'] ?>" >Back</a>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+									</div>
+								</div>
+							</div>
+						<div class="clear"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		<div class="block001f01"><div class="blst001"><div class="blst002"></div></div>

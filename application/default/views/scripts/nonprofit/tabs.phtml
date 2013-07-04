@@ -1,0 +1,26 @@
+<?php $this->placeholder('tabs')->captureStart();
+$curTab  = $this->currentTab;
+$cssCurr = ' class="current"';
+
+if (isset($this->organization)) { ?>
+
+<div id="tabs">
+  <ul>
+    <li><a href="/<?=$this->organization->urlName?>"<?=($curTab=='home') ? $cssCurr :''; ?>>Home</a></li>
+    <?php if ($this->organization->hasPrograms == 1) { ?><li><a href="/<?=$this->organization->urlName?>/programs"<?=($curTab=='programs') ? $cssCurr :''; ?>><?=$this->organization->programNamingPlural?></a></li><? } ?>
+    <?php if ($this->organization->hasGroups == 1) { ?><li><a href="/<?=$this->organization->urlName?>/chapters"<?=($curTab=='chapters') ? $cssCurr :''; ?>><?=$this->organization->groupNamingPlural?></a></li><? } ?>
+    <?php if ($this->organization->hasActivities && count($this->organization->activities)) { ?><li><a href="/<?=$this->organization->urlName?>/upcoming-activities"<?=($curTab=='activities') ? $cssCurr :''; ?>>Volunteer Activities</a></li><? } ?>
+    <?php if ($this->organization->hasCampaigns && count($this->organization->campaigns)) { ?><li><a href="/<?=$this->organization->urlName?>/active-campaigns"<?=($curTab=='campaigns') ? $cssCurr :''; ?>>Fundraising Campaigns</a></li><? } ?>
+    <?php if ($this->organization->hasEvents && count($this->organization->events_all)) { ?><li><a href="/<?=$this->organization->urlName?>/upcoming-events"<?=($curTab=='events') ? $cssCurr :''; ?>>Events</a></li><? } ?>
+    <?php if ($this->organization->hasMembership) {?><li><a href="/<?=$this->organization->urlName?>/members"<?=($curTab=='members') ? $cssCurr :''; ?>>Members</a></li><? } ?>
+  </ul>
+
+    <form action="/search?utm_campaign=Internal&utm_medium=Search&utm_source=" method="post" onsubmit="beginSearch(); return false">
+    <div class="topbar_search" style="float:right;display:block;margin-right:20px;background-color: #fff">
+        <input name="search_text" type="text" class="searchbox" id="searchfield" />
+        <input type="submit" value="" class="go" />
+    </div>
+    </form>
+</div>
+<? } ?>
+<?php $this->placeholder('tabs')->captureEnd() ?>

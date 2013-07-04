@@ -1,0 +1,19 @@
+<?php $this->placeholder('login_link')->captureStart(); ?>
+<? if (!$this->isLoggedIn) { ?>
+<div class="loginBtn box"><a href="javascript:;" class="login" style="margin-right:0;">Login</a></div>
+<? } else { ?>
+
+<div id="userOptions" class="loginStatus box">
+<ul>
+  <li class="name">
+    <img src="/profile/loadimage/?UserId=<?=$this->userNew->id?>" />
+    Hi <?= $this->userNew->firstName; ?>
+  </li>
+  <li class="item"><a href="/<?=$this->userNew->urlName?>">Profile</a></li>
+  <li class="item"><a href="/profile/edit">Settings</a></li>
+  <li class="item"><a href="javascript:;" onclick="logout();">Logout</a></li>
+</ul>
+</div>
+
+<? } ?>
+<?php $this->placeholder('login_link')->captureEnd(); ?>

@@ -1,0 +1,91 @@
+<?php
+$this->headTitle($this->data['NetworkName']." - Donations Report");
+$this->placeholder('title')->set('mfsummary');
+$this->placeholder('currenttab')->set('donations');
+$start_date = date('m/d/Y', strtotime(date('Y-m-d',strtotime('+1 second',strtotime('-1 month',strtotime(date('m').'/01/'.date('Y').' 00:00:00'))))));
+$end_date = date('m/d/Y', strtotime(date('Y-m-d',strtotime('-1 second',strtotime('+0 month',strtotime(date('m').'/01/'.date('Y').' 00:00:00'))))));
+?>
+<link href="<?php echo $this->contentLocation ?>public/css/CalendarControl.css" rel="stylesheet" type="text/css"/>
+<script src="<?php echo $this->contentLocation ?>public/js/CalendarControl.js" type="text/javascript" language="javascript"></script>
+<style>
+    #dateRangeTbl tr td {
+        padding:3px;
+    }
+</style>
+<div>
+    <div id="mainco2">
+        <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+        <div class="block001">
+            <div class="blst001">
+                <div class="blst002">
+                    <div class="MainBody">
+                        <?php if(file_exists("/home/$this->envUsername/public_html/public/Media/full/".$this->image['SystemMediaName'])) { ?><div class="logo2"><img src="<?php echo $this->contentLocation ?>public/Media/full/<?php echo $this->image['SystemMediaName'] ?>" style="width:141px;height:70px; border-width:0px;" /></div><?php } ?>
+                        <div class="share">
+                            <!-- Share Button BEGIN -->
+                            <div class="addthis_toolbox addthis_default_style" style="float:right;">
+                                <div style="float:right;"><a class="addthis_button_email"></a>
+                                    <a class="addthis_button_facebook"></a>
+                                    <a class="addthis_button_twitter"></a></div><div style="float:right;padding-top:2px;">Share: </div>
+                            </div>
+                            <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4e319b9362855da9"></script>
+                            <!-- Share Button END -->
+                        </div>
+                        <h1 style="font-size:27px; line-height:27px; float:left"><?php echo stripslashes($this->data['NetworkName']) ?></h1><iframe src="http://www.facebook.com/widgets/like.php?href=http://www.empowered.org/<?php echo $this->data['URLName'] ?>&amp;layout=button_count&amp;show_faces=true" scrolling="no" frameborder="0" style="border:none; float:left; height:70px; width:90px; margin: 5px 0 0 10px;"></iframe>
+                        <div id="TabbedPanels1" class="TabbedPanels">
+                            <?php include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/nonprofitheader.php'; ?>
+                            <div class="TabbedPanelsContentGroup">
+                                <!-- FIRST TAB -->
+                                <div class="TabbedPanelsContent">
+                                    <div class="Menu2Body">
+                                        <div class="whiteBox">
+            <form name="DonationsReport" method="post" action="/reporting/export" id="DonationsReport">
+                <input type="hidden" id="SiteId" name="SiteId" value="<?php echo $this->SiteId ?>" />
+                <input type="hidden" id="Type" name="Type" value="<?php echo $this->Type ?>" />
+                <div>
+                    <h2>Create Donation Report</h2>
+                    <div style="width:400px;">
+                        <table id="dateRangeTbl">
+                            <tr>
+                                <td>Start Date:</td>
+                                <td><input name="StartDate" value="<?php echo $start_date ?>" type="text" id="ctl00_ContentHolderMain_txtStartDate" style="background-color:#fff; border:1px solid #aaaaaa;" readonly /><span style="color:Red;vertical-align:top;">**</span></td>
+                                <td><a href ="javascript:showCalendarControl(document.getElementById('ctl00_ContentHolderMain_txtStartDate'), '');"><img id="imgCalenderSD" src="<?php echo $this->contentLocation ?>public/images/Pictures/003.gif" alt=""/></a></td>
+                            </tr>
+                            <tr>
+                                <td>End Date:</td>
+                                <td><input name="EndDate" value="<?php echo $end_date ?>" type="text" id="ctl00_ContentHolderMain_txtEndDate" style="background-color:#fff; border:1px solid #aaaaaa;" readonly /><span style="color:Red;vertical-align:top;">**</span></td>
+                                <td><a href ="javascript:showCalendarControl(document.getElementById('ctl00_ContentHolderMain_txtEndDate'), $('#ctl00_ContentHolderMain_txtStartDate').val());"><img id="imgCalenderED" src="<?php echo $this->contentLocation ?>public/images/Pictures/003.gif" alt=""/></a></td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" style="text-align:center">
+									<?php if (strtolower($this->Type) == 'project'):?>
+                                    <a href="/<?php echo strtolower($this->Type) ?>/info/<?php echo $this->SiteId ?>" class="btn btngreen">Back</a>
+                                    <?php elseif (strtolower($this->Type) == 'nonprofit'):?>
+                                    <a href="/<?php echo $this->data['URLName'] ?>/donations" class="btn btngreen">Back</a>
+                                    <?php elseif ($this->Type == 'nonprofit_program'):?>
+                                    <a class="btn btngreen" title="Back" href="/nonprofit/programs/?NetworkId=<?php echo $this->SiteId ?>" >Back</a>
+                                    <?php else:?>
+                                    <a href="/<?php echo strtolower($this->Type) ?>/detail/<?php echo $this->SiteId ?>" class="btn btngreen">Back</a>
+                                    <?php endif;?>
+                                    <input type="submit" class="btn btngreen" name="ctl00$ContentHolderMain$btnGo" value="Go" id="ctl00_ContentHolderMain_btnGo" />
+                                </td>
+                            </tr>
+                        </table>
+                        <div style="float:left;clear:both;width:300px;padding-left:50px">
+                            <span id="ctl00_ContentHolderMain_lblErrorMsg"></span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="clear"></div>
+        </div>
+    </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+    </div>
+    <div class="block001f01"><div class="blst001"><div class="blst002"></div></div></div>
+</div>
+     

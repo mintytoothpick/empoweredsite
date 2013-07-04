@@ -1,0 +1,56 @@
+<?php $this->headTitle("Empowered.org - Start an Organization"); ?>
+<script type="text/javascript" language="javascript">
+    function ValidateForm() {
+        if ($('GroupId').val() == '') {
+            alert('Please select a group where you want to associate your <?php echo $this->list ?>');
+            return false;
+        }
+        return true;
+    }
+    
+    function hideBoxes() {
+        $('.info-boxes').hide();
+    }
+</script>
+<style type="text/css">
+    .success { color:green }
+    .error { color:red }
+    .field-label { float:left; font-weight:bold; color:#000; width:110px; margin-bottom:20px;}
+    .field-input { float:left; width:800px; padding-bottom:20px; margin-left: 10px }
+    .field-input input { padding:1px; }
+    .hidden { display:none }
+    .create-opts { float: left }
+    .info-boxes { margin: 10px 0px; margin-left: 15px; background: #fff7c8; border:1px solid #dcbd00; padding: 10px 5px; -moz-border-radius:5px; width: 500px; float: left }
+</style>
+
+
+<div>
+    <div id="mainco2">
+        <div class="roundedbox">
+            <a id="top" href="#top" style="text-decoration:none">&nbsp;</a>
+            <form name="CreateGroup" method="post" onsubmit="return ValidateForm()">
+                <?php if ($this->list == 'event') { ?>
+                <input type="hidden" name="EventId" value="<?php echo $this->eventInfo['EventId'] ?>" />
+                <?php } else { ?>
+                <input type="hidden" name="ProjectId" value="<?php echo $this->data['ProjectId'] ?>" />
+                <?php } ?>
+                <div style="margin:auto; width:960px; padding-right:5px; ">
+                    <div id="message" class="error" style=" border:2px solid #e3e3e3; margin-bottom:15px; padding:5px; width:475px; <?php if(!$this->message) { echo "display:none;"; } ?>"><?php if(isset($this->message)) { echo $this->message; } ?></div>
+                    <h1 style="margin-bottom:0px; font-size:23px; font-weight:bold">Assign <?php echo $this->list == 'event' ? $this->eventInfo['Title'] : $this->data['Name'] ?> to Chapter</h1>
+                    <div class="clear"></div>
+                    <ul style="list-style:none; padding:0px; margin-bottom:0px; margin:auto; float:left; width:100%;">
+                        <li class="field-label">Affiliated Chapter:</li>
+                        <li class="field-input">
+                            <select name="GroupId">
+                                <?php foreach($this->groups as $group) { ?>
+                                <option value="<?php echo $group['GroupId'] ?>"><?php echo $group['GroupName'] ?></option>
+                                <?php } ?>
+                            </select>
+                        </li>
+                    </ul>
+                    <div class="clear"></div>
+                    <input type="submit" value="Submit" class="btn btngreen" />
+                </div>
+            </form>
+        </div>
+    </div>

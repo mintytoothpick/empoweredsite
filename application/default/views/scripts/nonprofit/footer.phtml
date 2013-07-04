@@ -1,0 +1,20 @@
+<?php $this->placeholder('footer')->captureStart() ?>
+<div class="wrapper">
+  <div class="footerLink rounded">
+    <div class="footerLogo"><a href="http://<?= $_SERVER['HTTP_HOST'] ?>"></a></div>
+    <div class="socialNets"><a href="http://www.facebook.com/empowered.org"></a><a href="http://www.twitter.com/empoweredorg"></a><a href="http://www.youtube.com/empoweredorg"></a></div>
+  </div>
+  <div class="clr"></div>
+</div>
+<div class="wrapper">
+  <div class="copyright">&copy; 2011 Empowered.org, All Rights Reserved.
+  <?php
+    $time = explode(" ", microtime());
+    $usec = (double)$time[0];
+    $sec  = (double)$time[1];
+    $end  = $sec + $usec;
+    $run  = $end - $this->starttime;
+    echo "(rendered in ".substr($run, 0, 5)."s)"; ?>
+    Using this site constitutes acceptance of the Terms of Use</div>
+</div>
+<?php $this->placeholder('footer')->captureEnd() ?>

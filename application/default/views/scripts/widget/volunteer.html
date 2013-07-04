@@ -1,0 +1,56 @@
+<html>
+<head>
+	<!--  link to style sheet for buttons on cdn.empowered.org -->
+	<script type='text/javascript' src='http://cdn.empowered.org/public/js/jquery-1.3.2.min.js'></script>
+	<script type='text/javascript' src="http://cdn.empowered.org/public/js/jquery.tools.min.js"></script>
+	<script type='text/javascript'>
+		function toggleRegisterBox($isNewUser){
+			if ($isNewUser) {
+				$('#empoweredNewUser').css("display", "block");
+				$('#empoweredReturningUser').css("display", "none");
+			} else {
+				$('#empoweredNewUser').css("display", "none");
+				$('#empoweredReturningUser').css("display", "block");	
+			}
+		}
+		
+		function submitForm(form){
+			$.get("http://dev.empowered.org/widget/volunteer", $("#"+form).serialize(), function(data) { alert(data) });
+			$('.empoweredFormSubmitted').css("display", "block");
+		}
+	</script>
+	
+</head>
+
+<body style="width:200px; height:200px; border:2px solid #693; padding:5px;">
+	
+	<div id="empoweredReturningUser" style="display:block">
+		<form name="empoweredVolunteerBox1" id="empoweredVolunteerBox1" onsubmit="submitForm('empoweredVolunteerBox1'); return false"> <!-- onsubmit="return validateEmpoweredDonationForm()"> -->
+			<input type="hidden" name="empoweredVolunteerType" id="empoweredVolunteerType" value="returning">
+			<input type="hidden" name="empoweredProjectId" id="empoweredProjectId" value="4413AAF8-494D-11E0-A13C-0025900034B2" />
+			<input type="hidden" name="empoweredAutoAccept" id="empoweredAutoAccept" value="1">
+			Email: <input type="text" name="empoweredEmailAccount" id="empoweredEmailAccount" value="eppascal@gmail.com">
+			Password: <input type="password" name="empoweredPassword" id="empoweredPassword" value="patrick">
+			<div class="clear"></div>
+			<a href="javascript:;" onclick="toggleRegisterBox(1)">Register for an account</a>
+			<br /><input type="submit" name="empoweredVolunteerNow" id="empoweredVolunteerNow" value="Volunteer Now" style="float:right;">
+		</form>
+		<div class="clear" style="margin-bottom:10px;"></div>
+		<div class="empoweredFormSubmitted" style="color:#F00;display:none;font-size:12px;">Your request to volunteer has been submitted. please check your email for confirmation.</div>
+	</div>
+	<div id="empoweredNewUser" style="display:none;">
+		<form name="empoweredVolunteerBox2" id="empoweredVolunteerBox2" onsubmit="submitForm('empoweredVolunteerBox2'); return false"> <!-- onsubmit="return validateEmpoweredDonationForm()"> -->
+			<input type="hidden" name="empoweredVolunteerType" id="empoweredVolunteerType" value="new">
+			<input type="hidden" name="empoweredProjectId" id="empoweredProjectId" value="4413AAF8-494D-11E0-A13C-0025900034B2" />
+			<input type="hidden" name="empoweredAutoAccept" id="empoweredAutoAccept" value="1">
+			Name: <input type="text" name="empoweredName" id="empoweredName" value="Eamonn Pascal">
+			Email: <input type="text" name="empoweredEmailAccount" id="empoweredEmailAccount" value="eppascal@gmail.com">
+			Password: <input type="password" name="empoweredPassword" id="empoweredPassword" value="patrick">
+			<a href="javascript:;" onclick="toggleRegisterBox(0)">Already have an account?</a>
+			<br /><input type="submit" name="empoweredVolunteerNow" id="empoweredVolunteerNow" value="Volunteer Now" style="float:right;">
+		</form>
+		<div class="clear" style="margin-bottom:10px;"></div>
+		<div class="empoweredFormSubmitted" style="color:#F00;display:none;font-size:12px;">Your request to volunteer has been submitted. please check your email for confirmation.</div>
+	</div>
+</body>
+</html>

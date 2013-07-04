@@ -1,0 +1,59 @@
+<?php
+$this->headTitle("Empowered.org : Get Started");
+?>
+<script>
+    $(function() {
+        $("#getstarted").validate({
+            rules: {
+                organization: "required",
+                name:"required",
+                email:  {
+                    required: true,
+                    email: true
+                },
+                phone: "required"
+            }
+        });
+    });
+</script>
+<style>
+    form.contact label.error {
+        text-align:left;
+        display:block;
+        width: 350px;
+        clear:both;
+        color:red;
+        padding-left: 215px;
+        margin-top:2px;
+    }
+</style>
+<div class="container" style="margin-top: -10px">
+    <div class="MainBody">
+        <div class="MainBodyTop"></div>
+        <div class="MainBodyContents">
+            <div class="leftC" style="margin-right: 40px">
+                <?php echo $this->placeholder('aboutus_nav'); ?>
+            </div>
+            <div class="rightC">
+                <span class="Heading01">Get Started Form</span>
+                <p class="Text15">
+                    A consultant will contact you within two business days to learn more about your organization's needs.
+                </p>
+                <form method="post" class="contact" id="getstarted" action="contactsend">
+                    <label>Organization</label><input type="text" name="organization" id="organization" value="" />
+                    <label>URL</label><input type="text" name="url" id="url" value="" />
+                    <label>Your Name</label><input type="text" name="name" id="name" value="" />
+                    <label>Your Email</label><input type="text" name="email" id="email" value="" />
+                    <label>Your Phone</label><input type="text" name="phone" id="phone" value="" />
+                    <label>Annual Online Fundraising Goal</label><input type="text" name="goal" id="goal" value="" />
+                    <label>Preferred Time to be Contacted</label><input type="text" name="time" value="" />
+                    <label></label><div class="JoinBtn btnSubmit"><a href="javascript:;" onclick="$('#getstarted').submit();">Submit</a></div>
+                </form>
+
+
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>
+<div class="clear" style="margin-bottom:5px;"></div>

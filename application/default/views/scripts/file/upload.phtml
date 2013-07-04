@@ -1,0 +1,114 @@
+<?php $this->headTitle("Empowered.org - Upload a File"); ?>
+<script type='text/javascript' src='/public/js/jquery-1.4.2.js'></script>
+<link href="/public/css/styles.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="/public/css/photogallery.css" type="text/css" media="screen" />
+
+<script type="text/javascript" language="javascript">
+    function validate() {
+        var accepted_files = new Array('pdf', 'ppt', 'xls', 'xlsx', 'doc', 'docx');
+        var uploads = 0;
+        var invalid_file = 0;
+        $('#files div input[type=file]').each(function() {
+            var filename = $(this).val().toString().split(".");
+            var extension = filename[filename.length-1].toString();
+            if (jQuery.trim($(this).val()) != '') {
+                uploads++;
+                if (jQuery.inArray(extension, accepted_files) < 0) {
+                    invalid_file++;
+                }
+            }
+        })
+        if (uploads == 0) {
+            alert("Please select a file to upload.");
+            return false;
+        } else if (invalid_file > 0) {
+            alert("Please select a valid file format");
+            return false;
+        } else if ($('#files-1').val() == "") {
+            alert("Please select a file to upload");
+            return false;
+        }
+        return true;
+    }
+
+    var counter = 1;
+    function addFiles() {
+        counter++;
+        var new_photo = '<div class="new-files-'+counter+'"><input class="photo-1" type="file" name="files-'+counter+'" id="files-'+counter+'" onchange="toggleMoreLink()" />&nbsp;&nbsp;<a class="desc-'+counter+'" href="javascript:;" onclick="toggleCaption(\'.caption-'+counter+'\', \'.desc-'+counter+'\')">Add Description</a>&nbsp;&nbsp;<a href="javascript:;" onclick="removeFile('+counter+').remove()">Remove</a></div>';
+        new_photo += '<div class="new-files-'+counter+'" class="caption-'+counter+' hidden" style="margin-top:5px; margin-bottom:10px"><textarea id="captions-'+counter+'" name="captions['+counter+']" rows="2" cols="53" style="font-size: 12px;"></textarea><div>';
+        $('#files').append(new_photo);
+        $('#total_uploads').val(counter);
+    }
+    
+    function removeFile(id) {
+        counter--;
+        $('.new-files-'+id).remove();
+        $('#total_uploads').val(counter);
+    }
+
+    function toggleMoreLink() {
+        if ($('#moreUploadsLink').hasClass('hidden')) {
+            $('#moreUploadsLink').removeClass('hidden')
+        }
+    }
+
+    function toggleCaption(div, btn) {
+        $(div).toggle();
+        $(btn).toggle();
+    }
+
+    $(function() {
+        window.onunload = window.opener.parent.location.href = window.opener.parent.location.href;
+    })
+    
+    <?php if (isset($this->uploadedfiles) && $this->uploadedfiles) { ?>
+    $(function() {
+        alert("You have successfull uploaded <?php echo $this->uploadedfiles ?> file(s).");
+        window.opener.parent.location.href = window.opener.parent.location.href;
+        window.close();
+    })
+    <?php } ?>
+</script>
+<style>
+    .hidden { display:none }
+</style>
+<div>
+    <div id="mainco2">
+        <div class="roundedbox">
+            <h2>Upload Files</h2>
+            <div>
+                <span style="color:#F00;">Please select pdf, ppt, xls, xlsx, doc and docx files that are under 2MB in size.</span><br /><br />
+                <?php if (isset($this->uploadedfiles)) { ?>
+                <div style="border:2px solid silver; padding:5px; color:green; width:350px;">You have successfully uploaded <?php echo $this->uploadedfiles.($this->uploadedfiles > 1 ? ' files' : ' file') ?>.</div><br />
+                <!--
+                <?php foreach($this->uploadedfiles as $file) { ?>
+                    <a href="/public/files/<?php echo $file['SystemMediaName'] ?>"><?php echo $file['UploadedFileName'] ?></a>
+                <?php } ?>
+                <br /><br />
+                -->
+                <?php } ?>
+                <?php if (isset($this->error)) { ?>
+                <div style="border:2px solid silver; padding:5px; color:red; width:350px;"><?php echo $this->error ?></div><br />
+                <?php } ?>
+
+                <form id="uploadphoto" method="post" action="/<?php echo $this->data['URLName'] ?>/upload-file" enctype="multipart/form-data" onsubmit="return validate();">
+                    <?php if ($this->Level == "group") { ?>
+                    <input type="hidden" name="GroupId" value="<?php echo $this->data['GroupId'] ?>" />
+                    <?php } else { ?>
+                    <input type="hidden" name="NetworkId" value="<?php echo $this->data['NetworkId'] ?>" />
+                    <?php } ?>
+                    <div id="files" class="multfile" style="float:left; width:100%">
+                        <div><input class="file-1" type="file" name="files-1" id="files-1" onchange="toggleMoreLink()" />&nbsp;&nbsp;<a class="desc-1" href="javascript:;" onclick="toggleCaption('.caption-1', '.desc-1')">Add Description</a></div>
+                        <div class="caption-1 hidden" style="margin-top:5px; margin-bottom:10px">
+                            <textarea id="caption-1" name="captions[1]" rows="2" cols="53" style="font-size: 12px;"></textarea>
+                        </div>
+                    </div>
+                    <div id="moreUploadsLink" class="hidden" style="float:left; width:100%"><a href="javascript:;" onclick="addFiles()">Attach another File</a></div>
+                    <input type="hidden" id="total_uploads" name="total_uploads" value="1" />
+                    <input type="submit" name="submit" value="Upload" class="button" />
+                </form>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>

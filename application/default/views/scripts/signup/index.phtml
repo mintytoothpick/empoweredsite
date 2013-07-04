@@ -1,0 +1,127 @@
+<?php $this->headTitle("Empowered.org:  Empowering groups of volunteers to create social change"); ?>
+
+<script>
+    function validateForm() {
+        var error = "";
+        <?php if(($this->project->bluePayId == 1 || $this->project->bluePayId == 4 || $this->project->googleId == 2 || $this->project->paypalId == 211) && (!empty($this->project->organization->id) && $this->project->organization->id != '6EE43F7E-616A-11E0-8F48-0025900034B2' && $this->program->id != 'A30949C6-7A5A-11E0-9C55-0025900034B2')) { ?>
+        if ($.trim($('#signatureName').val()) == '') {
+            error += "You must complete your full name.<br>";
+        }
+        if ($.trim($('#signatureAge').val()) == '' || !($('#signatureAge').val() > 0)) {
+            error += "You must complete your age in number format.<br>";
+        }
+        /*if ($('#acceptterms_2') != undefined && !$('#acceptterms_2').attr('checked')) {
+            error += "You must agree to the initial pledge set by Global Brigades.<br>";
+        }*/
+        if ($('#acceptterms_3') != undefined && !$('#acceptterms_3').attr('checked')) {
+            error += "You must agree to Global Brigades Cancellation and Refund Policy.<br>";
+        }
+        <?php } ?>
+        if (!document.getElementById('acceptterms').checked) {
+            error += "You must agree to the Terms and Conditions.<br>";
+        }
+        if (error != '') {
+            $('#error').html(error).show();
+            return false;
+        }
+        return true;
+    }
+
+    $(function() {
+        $('#signupsubmit').click( function() {
+            FB.api(
+                '/me/<?php echo $this->fbAppNamespace ?>:volunteer?initiative=http://<?php echo $_SERVER['HTTP_HOST']; ?>/<?php echo $this->project->urlName ?>',
+                'post',
+                function(response) {
+                    $('#volunteerSignUp').submit();
+                }
+            );
+        });
+
+        $('#volunteerSignUp').submit(function() {
+            if (validateForm()) {
+                $(':submit', this).click(function() {
+                    return false;
+                });
+                return true;
+            } else {
+                return false;
+            }
+        });
+    });
+</script>
+<div class="wrapper">
+    <!-- org header -->
+    <?=$this->placeholder('header') ?>
+    <!-- // org header -->
+
+    <div class="BodyCon">
+
+        <!-- breadcrumb -->
+        <?=$this->placeholder('breadcrumb') ?>
+        <!-- // breadcrumb -->
+        <div class="clr"></div>
+
+        <!-- tabs -->
+        <?=$this->placeholder('tabs') ?>
+        <!-- // tabs -->
+
+        <div class="mainC">
+            <div class="box05">
+                <div class="headingStyle02">Volunteer Registration</div>
+                <div style="padding:15px">
+                <? if (!empty($this->needAdminAppr)) { ?>
+                <p>Hi, to participate in <a href="/<?=$this->project->urlName?>"><?=$this->project->name?></a>, you need your membership approval first. Please, contact the <a href="/<?=$this->project->group->urlName?>"><?=$this->project->group->name?></a> administrator for more information. Thanks.</p>
+                <? } else { ?>
+                <div id="error" style="border: solid 2px silver; color: red; padding: 4px; padding-right:40px; width: 500px; margin-bottom: 10px; <?=$this->error == '' ? 'display:none' : '' ?>"><?=$this->error != '' ? $this->error : '' ?></div>
+
+                <p>Thank you for volunteering <?= $this->user['FirstName'] ?>!<br /><br />
+                    You are joining the <a href="/<?=$this->project->urlName?>"><?=$this->project->name?></a><br />This Volunteer Activity is taking place from <?=date('M d, Y', strtotime($this->project->startDate)).($this->project->endDate != '0000-00-00 00:00:00' ? " to ".date('M d, Y', strtotime($this->project->endDate)) : '') ?>.</p><br />
+                <p>If you would like to send the activity leader a message, enter it below:</p>
+                <form name="volunteerSignUp" method="post" action="" id="volunteerSignUp">
+                    <input type="hidden" id="ProjectId" name="ProjectId" value="<?=$this->project->id?>" />
+                    <input type="hidden" id="UserId" name="UserId" value="<?=$_SESSION['UserId'] ?>" />
+                    <textarea name="ShortComment" rows="3" cols="70" id="ShortComment"></textarea>
+                    <br /><br />
+
+                    <!-- Terms and conditions -->
+                    <?= $this->placeholder('terms'); ?>
+                    <!-- // Terms and conditions -->
+
+                    <?php if($this->project->googleId == 3) { ?>
+                        <p><input type="checkbox" value="false" id="acceptterms" name="acceptterms"/> I have read and agree to the <a href="/waiver/serviceforpeace/" target="_blank">Service for Peace Terms and Conditions</a></p><br />
+                    <?php } else if($this->project->bluePayId == 1 || $this->project->bluePayId == 4 || $this->project->googleId == 2 || $this->project->paypalId == 211) { ?>
+                        <p><label>Full Name:</label> <input type="text" value="<?=($this->userNew->fullName)?>" name="signatureName" id="signatureName" />
+                        <label>Age:</label> <input type="text" value="" name="signatureAge" id="signatureAge" />
+                        <label>Date:</label> <input type="text" value="<?=date('Y-m-d')?>" disabled name="signatureDate" id="signatureDate"/></p>
+                        <p>
+                            <input type="checkbox" value="false" id="acceptterms" name="acceptterms"/> I have read and agree to the Global Brigades <a href="/public/Files/GB-Participants-Waiver-and-Ethics-Policy.doc" target="_blank">Liability Waiver and Ethics Policy</a>. I also authorize Global Brigades to add me to their mailing list.<br />
+                            <?php if(!empty($this->project->organization->id) && $this->project->organization->id != '6EE43F7E-616A-11E0-8F48-0025900034B2' && $this->program->id != 'A30949C6-7A5A-11E0-9C55-0025900034B2') { ?>
+                            <?php
+                            /*
+                            $pledge = 250;
+                            if ($this->project->organizationId == "7D428431-A7C7-4DF6-A667-F9207E14674E") {
+                                $pledge = 200;
+                            } else if ($this->project->organizationId == "547086E0-5456-4631-AB2A-BA781E7DB9A7") {
+                                $pledge = 150;
+                            }
+                            <input type="checkbox" value="false" id="acceptterms_2" name="acceptterms_2"/> I have read and agree to the initial pledge of <?=$this->project->currency?><?=$pledge?> for all participants that is non-refundable in order for the Honduran, Ghanaian and Panamanian<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; team members to secure commitments with community leaders and finalize project plans. Date set by advisor and Brigade president.
+                            */
+                            ?>
+                            <input type="checkbox" value="false" id="acceptterms_3" name="acceptterms_3"/> I have read and agree to the <a href="http://brigaders.wikidot.com/professional:pledging-cancellations" target="_blank">Global Brigades Cancellation and Refund Policy</a>.
+                            <?php } ?>
+                        </p><br />
+                    <?php } else { ?>
+                        <p><input type="checkbox" value="false" id="acceptterms" name="acceptterms"/> I have read and agree to the Empowered.org <a href="/termsandcondition">Terms and Conditions</a></p><br />
+                    <?php } ?>
+                    <?php if($this->project->status != "Open") { ?><font color="#FF0000">* You will not appear in this Volunteer Activity until you have been accepted by an activity leader.</font><?php } ?>
+                    <div class="clear"></div>
+                    <input class="btn btngreen" type="submit" value="SUBMIT" id="signupsubmit" />
+                </form>
+                <? } ?>
+                </div>
+            </div>
+        </div>
+    <div class="clr"></div>
+    <div class="clr"></div>
+</div>

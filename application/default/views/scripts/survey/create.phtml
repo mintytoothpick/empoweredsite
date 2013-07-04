@@ -1,0 +1,320 @@
+<?php $this->headTitle("Empowered.org - Create Survey"); ?>
+<script type="text/javascript" language="javascript">
+    var act_counter = 1;
+    var grp_counter = 1;
+    var mem_counter = 1;
+    function ValidateForm() {
+        var error = "";
+        if ($('#existing-members').attr('checked')) {
+            if (jQuery.trim($('#SurveyTitle3').val()) == '') {
+                error += "Please specify the survey title.<br>";
+            }
+            if (validateQuestions('members-questionaires') > 0) {
+                error += "Please specify the survey questions.<br>";
+            }
+        } else if ($('#volunteer-activities').attr('checked')) {
+            if (validateActivity() == 0) {
+                error += "Please select which volunteer activity the survey will be created for.<br>";
+            }
+            if (jQuery.trim($('#SurveyTitle').val()) == '') {
+                error += "Please specify the survey title.<br>";
+            }
+            if (validateQuestions('activity-questionaires') > 0) {
+                error += "Please specify the survey questions.<br>";
+            }
+        } else if ($('#join-group').attr('checked')) {
+            if (jQuery.trim($('#SurveyTitle2').val()) == '') {
+                error += "Please specify the survey title.<br>";
+            }
+            if (validateQuestions('join-group-questionaires') > 0) {
+                error += "Please specify the survey questions.<br>";
+            }
+        } else {
+            error += "Please select where to create the survey.<br>";
+        }
+
+        if (error == '') {
+            return true;
+        } else {
+            $('#message').html(error).show();
+            return  false;
+        }
+    }
+
+    function validateActivity() {
+        var ctr = 0;
+        $('#volunteer-activities-form ul li input[type=checkbox]').each(function() {
+            if ($(this).attr('checked')) {
+                ctr++;
+            }
+        })
+        return ctr;
+    }
+
+    function validateQuestions(div) {
+        var ctr = 0;
+        $('#'+div+' li input[type=text]').each(function() {
+            if (jQuery.trim($(this).val()) == '') {
+                ctr++;
+            }
+        })
+        return ctr;
+    }
+
+    $(function() {
+        $('.create_survey').bind('click', function() {
+            var id = $(this).attr('id');
+            $('.forms').each(function() {
+                $(this).hide();
+            })
+            $('#'+id+'-form').show();
+        })
+    })
+
+    function addQuestion(div, type) {
+        var counter = 0;
+        var id = '';
+        if (type == 'act') {
+            act_counter++;
+            counter = act_counter;
+            id = 'JoinActQuestions';
+
+        } else if (type == 'group') {
+            grp_counter++;
+            counter = grp_counter;
+            id = 'JoinGroupQuestions';
+        } else if (type == 'members') {
+            mem_counter++;
+            counter = mem_counter;
+            id = 'MembersQuestions';
+        }
+        var new_question = '<div class="clear"></div><li id="'+type+'-label-'+counter+'" class="label">Question '+counter+'</li><li id="'+type+'-field-'+counter+'" class="field"><input type="text" id="'+id+'-1" name="'+id+'[]" value="" class="questions input" />&nbsp;&nbsp;<input type="checkbox" id="" name="Require'+id+'['+counter+']" value="1" />&nbsp;Required&nbsp;&nbsp;&nbsp;<a href="javascript:;" onclick="removeQuestion(\''+type+'\', '+counter+')">Remove</a></li>';
+        $(div).append(new_question);
+    }
+
+    function removeQuestion(type, ctr) {
+        if (type == 'act') {
+            act_counter--;
+        } else if (type == 'group') {
+            grp_counter--;
+        }
+        $('#'+type+'-label-'+ctr).remove();
+        $('#'+type+'-field-'+ctr).remove();
+    }
+
+    function loadGroup(PID) {
+        $('#GroupId').load('/nonprofit/loadgroups', {ProgramId: PID});
+    }
+    
+    function loadProjects(GID, type) {
+        if (type == 'group') {
+            $('#activity-list').load('/nonprofit/loadprojects', {GroupId: GID, list: 1});
+        } else {
+            $('#activity-list').load('/nonprofit/loadprojects', {ProgramId: GID, list: 1});
+        }
+    }
+
+</script>
+<style type="text/css">
+    .success { color:green }
+    .error { color:red }
+    .field-label { float:left; font-weight:bold; color:#000; width:90px; margin-bottom:20px;}
+    .field-input { float:left; width:670px; padding-bottom:10px; }
+    .field-input input { padding:1px; }
+    .hidden { display:none }
+    .leftCol {
+        float:left;
+        width:300px;
+        padding-right:15px;
+        line-height:22px;
+        border-right:1px solid #e5e5e5;
+    }
+    .rightCol {
+        float:left;
+        width:300px;
+        padding-left:15px;
+        line-height:22px;
+    }
+    .label {
+        float:left;
+        width:80px;
+        margin-bottom:4px;
+        line-height:24px;
+    }
+    .field {
+        float:left;
+        width:450px;
+        margin-bottom:4px;
+        line-height:24px;
+    }
+    .input {
+        width:300px;
+    }
+</style>
+
+<div class="wrapper">
+   <!-- org header -->
+  <?=$this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+            
+    <!-- breadcrumb -->
+    <?=$this->placeholder('breadcrumb') ?>
+    <!-- // breadcrumb -->
+    <div class="clr"></div>
+
+    <!-- tabs -->
+    <?=$this->placeholder('tabs') ?>
+    <!-- // tabs -->
+
+    <div class="mainC">
+      <div class="box05">
+        <div class="headingStyle02">
+            Create a Survey for:
+        </div>
+        <a id="top" href="#top" style="text-decoration:none">&nbsp;</a>
+        <form name="CreateGroup" method="post" action="/<?php echo $this->level == "group" ? $this->group->urlName : $this->network['URLName']; ?>/create-survey" id="CreateSurvey" onsubmit="return ValidateForm()">
+            <?php if($this->level == "group") { ?>
+            <input type="hidden" id="GroupId" name="GroupId" value="<?php echo $this->group->id ?>" />
+            <?php } else { ?>
+            <input type="hidden" id="NetworkId" name="NetworkId" value="<?php echo $this->network['NetworkId'] ?>" />
+            <?php } ?>
+            <div style="width:100%; padding-right:5px; ">
+                <ul style="list-style:none; padding:0px; margin-bottom:0px; margin:auto; margin:auto">
+                    <div id="message" class="<?php echo isset($this->message) ? "success" : "error" ?>" style=" border:2px solid #e3e3e3; margin-bottom:15px; padding:5px; width:685px; <?php if(!$this->message) { echo "display:none;"; } ?>"><?php if(isset($this->message)) { echo $this->message; } ?></div>
+                    <?php if ($this->level == "organization") { ?>
+                    <?php if ($this->network['hasPrograms']) { ?>
+					<li class="field-label" style="width:90px">
+                        Program:
+                    </li>
+                    <li class="field-input">
+                        <select name="ProgramId" onchange="loadGroup(this.value); loadProjects(this.value, 'program')">
+                            <option value="All">All</option>
+                            <?php foreach($this->programs as $program) { ?>
+                            <option value="<?php echo $program['ProgramId'] ?>" <?php echo isset($_REQUEST['ProgramId']) && $_REQUEST['ProgramId'] == $program['ProgramId'] ? 'selected' : ''; ?>><?php echo stripslashes($program['ProgramName']) ?></option>
+                            <?php } ?>
+                        </select>
+                    </li>
+					<?php } ?>
+                    <div class="clear"></div>
+                    <li class="field-label" style="width:90px">
+                        Chapter:
+                    </li>
+                    <li class="field-input" id="groups-list">
+                        <select name="GroupId" id="GroupId" onchange="loadProjects(this.value, 'group')">
+                            <option value="All">All</option>
+                            <?php foreach($this->groups as $group) { ?>
+                            <option value="<?php echo $group['GroupId'] ?>"><?php echo stripslashes($group['GroupName']) ?></option>
+                            <?php } ?>
+                        </select>
+                    </li>
+                    <div class="clear"></div>
+                    <?php } ?>
+                    <li class="field-input">
+	                    <?php if (count($this->members) > 0) { ?>
+                        <?php if(isset($_REQUEST['Prev']) && ($_REQUEST['Prev'] == 'volunteers' || $_REQUEST['Prev'] == 'summary' || $_REQUEST['Prev'] == 'activity')) { ?><div><input class="create_survey" name="create_survey" id="existing-members" type="radio" value="existing members" />&nbsp;&nbsp;Existing Volunteers</div><?php } ?>
+                        <?php if(isset($_REQUEST['Prev']) && $_REQUEST['Prev'] == 'members') { ?><div><input class="create_survey" name="create_survey" id="existing-members" type="radio" value="existing members" checked="checked" />&nbsp;&nbsp;Existing Members</div><?php } ?>
+	                    <?php } if (count($this->upcoming_brigades) > 0 && isset($_REQUEST['Prev']) && ($_REQUEST['Prev'] == 'volunteers' || $_REQUEST['Prev'] == 'summary' || $_REQUEST['Prev'] == 'activity')) { ?>
+	                        <div><input class="create_survey" name="create_survey" id="volunteer-activities" type="radio" value="join activity" <?php echo isset($_REQUEST['ProjectId']) || (isset($_REQUEST['Prev']) && $_REQUEST['Prev'] == 'volunteers') ? "checked" : "" ?> />&nbsp;&nbsp;People Signing Up for a Volunteer Activity</div>
+		                <?php } ?>
+                    </li>
+                    <li class="field-label" style="margin-top:-10px">&nbsp;</li>
+                    <li class="field-input" style="margin-top:10px">
+                        <div id="existing-members-form" class="forms <?php if(isset($_REQUEST['Prev']) && $_REQUEST['Prev'] == 'members') { echo ''; } else { echo 'hidden'; } ?>" style="margin-left:50px;">
+                            <div style="margin:15px 0px; margin-left:10px; float:left">
+                                <input type="checkbox" name="isRequiredMembers" value="1" />&nbsp;Survey is required
+                            </div>
+                            <ul id="members-more-questions" style="list-style:none; width:680px; float:left; margin-left:13px;">
+                                <li class="label">Survey Title</li>
+                                <li class="field"><input type="text" id="SurveyTitle3" name="SurveyTitle3" value="" class="input" /></li>
+                                <li style="width:100%; float:left">
+                                    <ul id="members-questionaires" style="list-style:none">
+                                        <li class="label">Question 1</li>
+                                        <li class="field">
+                                            <input type="text" id="MembersQuestions-1" name="MembersQuestions[]" value="" class="input" />&nbsp;
+                                            <input type="checkbox" id="" name="RequireMembersQuestions[1]" value="1" />&nbsp;Required
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="label">&nbsp;</li>
+                                <li class="field">
+                                    <a href="javascript:;" onclick="addQuestion('#members-questionaires', 'members')">Add Question</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div id="volunteer-activities-form" class="forms <?php echo isset($_REQUEST['ProjectId']) || (isset($_REQUEST['Prev']) && $_REQUEST['Prev'] == 'volunteers') ? "" : "hidden" ?>" style="margin-left:50px;">
+                            <script>
+                                function selectAll(id) {
+                                    $(id + ' > li > input[type=checkbox]').each(function() {
+                                        $(this).attr('checked', 'checked');
+                                    })
+                                }
+                                function selectNone(id) {
+                                    $(id + ' > li > input[type=checkbox]').each(function() {
+                                        $(this).removeAttr('checked');
+                                    })
+                                }
+                            </script>
+                            <span>
+                                <a href="javascript:;" class="link_icon" onclick="selectAll('#activity-list')">Select All</a>
+                                <a href="javascript:;" class="link_icon" onclick="selectNone('#activity-list')">Select None</a>
+                            </span>
+                            <ul id="activity-list" style="list-style:none; padding:7px; float:left; border:1px solid #e5e5e5; width:680px">
+                                <div style="border:1px solid #dcbd00; background-color:#fff7c8; padding:10px; margin-top:8px;">Please select which volunteer activities this survey will apply to:</div><br />
+                                <?php $ctr = 1; foreach($this->upcoming_brigades as $brigade) { ?>
+                                <li class="<?php echo $ctr%2==1 ? "leftCol" : "rightCol" ?>">
+                                    <input type="checkbox" name="ProjectId[]" value="<?php echo $brigade['ProjectId'] ?>" style="width:auto; line-height:14px;" <?php if (isset($_REQUEST['ProjectId']) && $_REQUEST['ProjectId'] == $brigade['ProjectId']) { echo "checked"; } else if (isset($_REQUEST['Prev']) && $_REQUEST['Prev'] == 'volunteers' && !isset($_REQUEST['ProjectId'])) { echo "checked"; }  ?> />&nbsp;<?php echo strlen(stripslashes($brigade['Name'])) > 40 ? substr(stripslashes($brigade['Name']), 0, 37)."..." : stripslashes($brigade['Name']) ?>
+                                </li>
+                                <?php $ctr++; } ?>
+                            </ul>
+                            <div style="margin:30px 0px 15px 0px; margin-left:10px; float:left">
+                                <input type="checkbox" name="isRequiredActivity" value="1" />&nbsp;Survey is required
+                            </div>
+                            <ul id="vol-act-more-questions" style="list-style:none; width:680px; float:left; margin-left:13px;">
+                                <li class="label">Survey Title</li>
+                                <li class="field"><input type="text" id="SurveyTitle" name="SurveyTitle" value="" class="input" /></li>
+                                <li style="width:100%; float:left">
+                                    <ul id="activity-questionaires" style="list-style:none">
+                                        <li class="label">Question 1</li>
+                                        <li class="field">
+                                            <input type="text" id="JoinActQuestions-1" name="JoinActQuestions[]" value="" class="input" />&nbsp;
+                                            <input type="checkbox" id="" name="RequireJoinActQuestions[]" value="1" />&nbsp;Required
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="label">&nbsp;</li>
+                                <li class="field">
+                                    <a href="javascript:;" onclick="addQuestion('#activity-questionaires', 'act')">Add Question</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="field-label" style="margin-top:-10px">&nbsp;</li>
+                    <li class="field-input" style="margin-top:10px">
+                    <?php
+                    if(isset($_REQUEST['Prev']) && $_REQUEST['Prev'] == 'members') { ?>
+						<a href="/<?=$this->group->urlName?>/members" class="btn btngreen" style="padding:3px 15px">Back</a>&nbsp;&nbsp;
+                    <?php } else if(isset($_REQUEST['Prev']) && $_REQUEST['Prev'] == 'volunteers') { ?>
+                        <a href="/<?=$this->group->urlName?>/volunteers" class="btn btngreen" style="padding:3px 15px">Back</a>&nbsp;&nbsp;
+                    <?php } else if(isset($_REQUEST['Prev']) && $_REQUEST['Prev'] == 'activity' && isset($_REQUEST['ProjectId'])) { ?>
+						<a href="/<?=$this->ProjectURL?>" class="btn btngreen" style="padding:3px 15px">Back</a>&nbsp;&nbsp;
+					<?php } ?>
+                    <input type="submit" class="btn btngreen" name="btnCreateNew" value="Create" style="padding:2px 15px" />
+                    </li>
+                </ul>
+            </div>
+        </form>
+        <div class="clear"></div>
+    </div>
+							</div>
+						</div>
+					</div>
+				<div class="clear"></div>
+                </div>
+              </div>
+              <div class="clr"></div>
+              <div class="clr"></div>
+            </div>

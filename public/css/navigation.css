@@ -1,0 +1,250 @@
+/*
+Description: Dynamic Menu System - Horizontal/Vertical
+*/
+.menu_pretitle {
+	padding:0 5px;
+	font-weight:bold;
+	background:#EEE;
+	line-height:33px;
+	}
+	
+.navmenu-h { 
+	display: inline-block;
+    margin: 0 0 10px 0;
+    padding:0;
+    border-radius: 6px;
+    height: 33px;
+
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    
+    -webkit-box-shadow: 0 1px 3px #CCC;
+    -moz-box-shadow: 0 1px 3px #CCC;
+
+    border: solid 1px #F2F2F2;
+	}
+
+.navmenu-h ul {
+	/* Sub Menu Width */
+ 	margin: 0;
+ 	list-style: none;
+ 	display: none;
+ 	position: absolute;
+ 	top: 100%;
+ 	left: 0;
+ 	width: 160px;
+ 	
+ 	background: #f7f7f7;
+    background: -webkit-gradient(linear, left top, left bottom, from(#f7f7f7), to(#e1e1e1));
+    background: -moz-linear-gradient(top,  #f7f7f7,  #e1e1e1);
+    filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#f7f7f7', endColorstr='#e1e1e1');
+}
+.longmenu {
+	width: 220px !important;
+	}
+.navmenu-h ul ul,.navmenu-h ul ul ul { top: 0; left: 100%; }
+
+.navmenu-h li { float: left; display: inline; position: relative; }
+.navmenu-h ul li { width: 100%; display: block; }
+
+/* Root Menu */
+.navmenu-h a {
+ /*border-top: 1px solid #FFF;
+ 	border-right: 1px solid #FFF;
+ 	background-color: #EEE;*/
+ 	
+ 	padding: 0 20px;
+ 	float: left;
+ 	display: block;
+ 	color: #666;
+ 	font: bold 12px Arial, sans-serif;
+ 	text-decoration: none;
+ 	
+ 	line-height: 33px;
+}
+
+/* Root Menu Hover Persistence */
+.navmenu-h a:hover,.navmenu-h li:hover a,.navmenu-h li.iehover a {
+ background-color: #FFF;
+}
+
+/* 2nd Menu */
+.navmenu-h li:hover li a,.navmenu-h li.iehover li a {
+ float: none;
+ background: #FFF;
+}
+
+/* 2nd Menu Hover Persistence */
+.navmenu-h li:hover li a:hover,.navmenu-h li:hover li:hover a,.navmenu-h li.iehover li a:hover,.navmenu-h li.iehover li.iehover a {
+ background: #F2F2F2;
+}
+
+/* 3rd Menu */
+.navmenu-h li:hover li:hover li a,.navmenu-h li.iehover li.iehover li a {
+ background: #FFF;
+}
+
+/* 3rd Menu Hover Persistence */
+.navmenu-h li:hover li:hover li a:hover,.navmenu-h li:hover li:hover li:hover a,.navmenu-h li.iehover li.iehover li a:hover,.navmenu-h li.iehover li.iehover li.iehover a {
+ background: #F2F2F2;
+}
+
+/* 4th Menu */
+.navmenu-h li:hover li:hover li:hover li a,.navmenu-h li.iehover li.iehover li.iehover li a {
+ background: #FFF;
+}
+
+/* 4th Menu Hover */
+.navmenu-h li:hover li:hover li:hover li a:hover,.navmenu-h li.iehover li.iehover li.iehover li a:hover {
+ background: #F2F2F2;
+}
+/*navsubmenu */
+.navsubmenu {
+	z-index:9999;
+	padding-bottom:0;
+	border: solid 1px #ccc;
+	
+ 	border-radius: 5px;
+ 	-webkit-border-radius: 5px;
+    	-moz-border-radius: 5px;
+	}
+.navsubmenu li a, .navsubmenu ul li a{
+	border-bottom: 1px solid #ccc;
+	height:33px;
+	overflow:hidden;
+	}
+
+.navsubmenu li a:hover, .navsubmenu ul li a:hover {
+	height:auto;
+	}
+
+.widenavsubmenu {
+	width:220px;
+	}
+		
+.navsubmenu li:last-child a, .navsubmenu ul li:last-child a{
+	border-bottom-right-radius:5px;
+	border-bottom-left-radius:5px;
+	
+	-moz-border-radius-bottomright:5px;
+	-moz-border-radius-bottomleft:5px;
+	
+	-webkit-border-bottom-right-radius:5px;
+	-webkit-border-bottom-left-radius:5px;
+	}
+		
+.navsubmenu li:first-child a, .navsubmenu ul li:first-child a{
+	border-top-right-radius:5px;
+	border-top-left-radius:5px;
+	
+	-moz-border-radius-topright:5px;
+	-moz-border-radius-topleft:5px;
+	
+	-webkit-border-top-right-radius:5px;
+	-webkit-border-top-left-radius:5px;
+	}
+	
+.navsubmenu ul {
+	padding-bottom:0;
+	border: solid 1px #ccc;
+	
+ 	border-radius: 5px;
+ 	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	}
+	
+
+	
+.arrow-down {
+	background: transparent url("../images/arrow-down.png") no-repeat 6px 55%;
+	float: right;
+    	height: 33px;
+    	width: 17px;
+	}
+	
+.arrow-right {
+	background-image: url("../images/arrow-right.png");
+    position:absolute;
+    top:10px;
+    right:7px;
+    height: 10px;
+    width: 10px;
+    
+	}
+		
+/* Hover Function - Do Not Move */
+.navmenu-h li:hover ul ul,.navmenu-h li:hover ul ul ul,.navmenu-h li.iehover ul ul,.navmenu-h li.iehover ul ul ul { display: none; }
+.navmenu-h li:hover ul,.navmenu-h ul li:hover ul,.navmenu-h ul ul li:hover ul,.navmenu-h li.iehover ul,.navmenu-h ul li.iehover ul,.navmenu-h ul ul li.iehover ul { display: block; }
+
+/* icons for the top menu */
+.general_icon {
+	background: #EEE url("../images/nav/clipboard_text.png") no-repeat 6px 50%;
+	padding-left:24px !important;
+}
+.activity_icon {
+	background: #EEE url("../images/nav/calendar_2.png") no-repeat 6px 50%;
+	padding-left:24px !important;
+}
+.event_icon {
+	background: #EEE url("../images/nav/calendar_1.png") no-repeat 6px 50%;
+	padding-left:24px !important;
+}
+.manager_icon {
+	background: #EEE url("../images/nav/user_business.png") no-repeat 6px 50%;
+	padding-left:24px !important;
+}
+.blog_icon {
+	background: #EEE url("../images/nav/blog.png") no-repeat 6px 50%;
+	padding-left:24px !important;
+}
+.announcement_icon {
+	background: #EEE url("../images/nav/sound.png") no-repeat 6px 50%;
+	padding-left:24px !important;
+}
+.report_icon {
+	background: #EEE url("../images/nav/report.png") no-repeat 6px 50%;
+	padding-left:24px !important;
+}
+.program_icon {
+	background: #EEE url("../images/nav/group.png") no-repeat 6px 50%;
+	padding-left:24px !important;
+}
+.email_icon {
+	background: #EEE url("../images/nav/email.png") no-repeat 2px 50%;
+	padding-left:24px !important;
+}
+
+/*Dropdown css*/
+.tab-menunav {
+	list-style:none; 
+	display:none; 
+	position:absolute; 
+	background-color:#fff; 
+	z-index:9999;
+	padding-bottom:0;
+	
+	border-radius: 5px;
+ 	-webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+}
+.tab-menunav li a, .tab-menunav ul li a{
+	overflow:hidden;
+	}
+
+.tab-menunav li{
+	width:180px;
+	color:#fff; 
+	padding:0px 5px;
+	border-top: solid 1px #ccc;	
+}
+
+.tab-menunav li:last-child{
+	border-bottom-right-radius:5px;
+	border-bottom-left-radius:5px;
+	
+	-moz-border-radius-bottomright:5px;
+	-moz-border-radius-bottomleft:5px;
+	
+	-webkit-border-bottom-right-radius:5px;
+	-webkit-border-bottom-left-radius:5px;
+	}

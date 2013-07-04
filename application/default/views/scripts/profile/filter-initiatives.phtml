@@ -1,0 +1,78 @@
+<? if (!isset($this->filter)) { ?>
+<script>
+function filterInitiatives() {
+    $("#loading").show();
+    $("#contentInitiatives").html('');
+    $.ajax({
+        url: "/<?=$this->user->urlName?>/filterinitiatives",
+        data: 'projectId=<?=$this->project->id?>&type=' + $('#typeInitiative').val() + '&status=' + $('#statusInitiative').val(),
+        success: function(data) {
+            $("#contentInitiatives").html(data);
+            $("#loading").hide();
+        }
+    });
+}
+
+function pagingInitiatives(page) {
+    $("#loading").show();
+    $("#contentInitiatives").html('');
+    $.ajax({
+        url: "/<?=$this->user->urlName?>/filterinitiatives",
+        data: 'projectId=<?=$this->project->id?>&type=' + $('#typeInitiative').val() + '&status=' + $('#statusInitiative').val() + '&page=' + page,
+        success: function(data) {
+            $("#contentInitiatives").html(data);
+            $("#loading").hide();
+        }
+    });
+}
+
+$(function() {
+    $('#typeInitiative, #statusInitiative').change(function(){
+        filterInitiatives();
+    });
+});
+</script>
+
+<div class="box002 noMB">
+  <div class="headingStyle01 BG02">All Initiatives</div>
+  <div class="box002Content">
+    <div class="filterBy03"><span>Filter By:</span>
+      <select id="typeInitiative" class="dropDown01">
+        <option value="all">All</option>
+        <option value="0" <?=($this->project->type == 0 ) ? 'selected' : '';?>>Volunteer Activities</option>
+        <option value="1" <?=($this->project->type == 1 ) ? 'selected' : '';?>>Fundraising Campaign</option>
+      </select>
+    </div>
+    <div class="filterBy03">
+      <span>Sort By:</span>
+      <select id="statusInitiative" class="dropDown01">
+        <option value="upcoming" <?=($this->pStatus == 'upcoming') ? 'selected':''?>>Upcoming</option>
+        <option value="completed" <?=($this->pStatus == 'completed') ? 'selected':''?>>Completed</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<div id="loading" class="hide"><div class="box002Content">Loading initiatives ...</div></div>
+<div id="contentInitiatives">
+<? } ?>
+
+<?php if(count($this->initiatives)) { ?>
+  <?php foreach($this->initiatives as $album) { ?>
+    <a href="/<?=$this->user->urlName?>/initiatives/<?=$album->urlName?>"><div class="leftBox <?= isset($this->project) && $album->id == $this->project->id ? 'border01' : '' ?>">
+    <?php if($album->type == 1) { ?>
+    <div class="dollar"></div>
+    <?php } else { ?>
+    <div class="month NoMarginTop"><strong><span class="color01"><?= date('M', strtotime($album->startDate)); ?></span></strong><br /><?= date('d', strtotime($album->startDate))?></div>
+    <?php } ?>
+    <p class="Style03"><?= $album->type == 1 ? 'Fundraising Campaign' : 'Volunteer Activity'; ?>: <?=$album->name?></p>
+    </div></a>
+<?php } ?>
+
+<div class="pager">
+<?= $this->render('profile/page_selector_initiatives.phtml'); ?>
+</div>
+<? } else { ?>
+<div class="leftBox"><p>No initiatives found.</p></div>
+<? } ?>
+<? if (!isset($this->filter)) { ?></div><? } ?>

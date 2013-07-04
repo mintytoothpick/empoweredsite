@@ -1,0 +1,189 @@
+<?php $this->headTitle("Make a donation to ".stripslashes($this->project->name)); ?>
+<script>
+    function updateItemName() {
+        var item_name = "Your donation on behalf of ";
+        if (document.getElementById('rdoName').checked == true) {
+            item_name += $('#Name').val();
+            $('#volunteers').attr('disabled', true);
+            $('#VolunteerId').val('');
+        } else if (document.getElementById('rdoVolunteer').checked == true) {
+            item_name += $('#volunteers option:selected').text();
+            $('#volunteers').attr('disabled', false);
+            $('#VolunteerId').val($('#volunteers').val());
+        }
+        item_name += " is being processed";
+        $('#item_name_1').val(item_name);
+    }
+    function updateVolunteer(val) {
+        $('#VolunteerId').val(val);
+        $('#item_name_1').val("Your donation on behalf of "+$('#volunteers option:selected').text()+" is being processed");
+    }
+    function isFloat(value) {
+        if(value == ""){
+            return false;
+        }
+        value = value.replace(/,/, '.');
+        if(parseFloat(value) != (value*1)) {
+            return false;
+        }
+        return true;
+    }
+    function validatePayment() {
+        var error = "";
+        var donation = $('#donationAmount').val();
+
+        donation = _validateAmount(donation);
+        if (!donation) error = "You must enter a valid donation.<br>";
+
+        if (document.getElementById("paypal_option").checked == true) {
+        } else if (document.getElementById("direct_option").checked == true) {
+            if (jQuery.trim($('#firstName').val()) == "") {
+                error += "Please specify your first name.<br>";
+            }
+            if (jQuery.trim($('#lastName').val()) == "") {
+                error += "Please specify your last name.<br>";
+            }
+            if (jQuery.trim($('#creditCardNumber').val()) == "") {
+                error += "Please specify your credit card number.<br>";
+            }
+            if (jQuery.trim($('#address').val()) == "") {
+                error += "Please specify your address.<br>";
+            }
+            if (jQuery.trim($('#city').val()) == "") {
+                error += "Please specify your city.<br>";
+            }
+            if (jQuery.trim($('#state').val()) == "") {
+                error += "Please specify your state.<br>";
+            }
+            if (jQuery.trim($('#zipcode').val()) == "") {
+                error += "Please specify your zip code.<br>";
+            }
+            if (jQuery.trim($('#email').val()) == "") {
+                error += "Please specify your email.<br>";
+            } else if (!validateEmail(jQuery.trim($('#email').val()))) {
+                error += "Please specify a valid email.<br>";
+            }
+        } else {
+            error += "Please select a payment method.<br>";
+        }
+        if (error == "") {
+            return true;
+        } else {
+            $('#error').html(error).show();
+            window.location.href = "#error";
+            return false;
+        }
+    }
+    function displayPayment(toggle) {
+        if (toggle == 'Direct Payment') {
+            $('#direct-payment').show();
+        } else {
+            $('#direct-payment').hide();
+        }
+    }
+
+    function validateDonationAmount(amount) {
+        if (amount >= 1) {
+            updateTotalBill();
+            <?=$this->project->allowPercentageFee == 'mandatory' ? "$('#transfeemandatory').show();" : "$('#transfee').show();"; ?>
+        } else {
+            $('#error').html("The amount should be greater than $1.").show();
+            window.location.href = "#error";
+        }
+    }
+
+    function updateTotalBill() {
+        var percent = Number($('#PercentageFee').val());
+        if ($('#donationAmount').length > 0) {
+            $('#trans-fee').html(Number($('#donationAmount').val() * ((percent/100) + 0.015)).toFixed(2));
+        } else {
+            $('#trans-fee').html(Number($('#item_price_1').val() * (percent/100)).toFixed(2));
+        }
+    }
+
+<?php if($this->project->isGlobalProject()) { ?>
+    $(function() {
+        $("input:radio[name=coverTransFee]").click(function() {
+            var val = $(this).val();
+            if (val == 0) {
+                $("#feebox").show();
+            } else {
+                $("#feebox").hide();
+            }
+        });
+     });
+<?php } ?>
+</script>
+<div class="wrapper">
+    <!-- org header -->
+    <?=$this->placeholder('header') ?>
+    <!-- // org header -->
+
+    <div class="BodyCon">
+
+        <!-- breadcrumb -->
+        <?=$this->placeholder('breadcrumb') ?>
+        <!-- // breadcrumb -->
+        <div class="clr"></div>
+
+        <!-- tabs -->
+        <?=$this->placeholder('tabs') ?>
+        <!-- // tabs -->
+
+        <div class="mainC02">
+            <div class="box05 BG01">
+                <div class="headingStyle02">Donate to <?=stripslashes($this->project->name)?></div>
+                <div style="padding:0 10px;">
+                <p>
+                    <? if ($this->project->organizationId == 'DAF7E701-4143-4636-B3A9-CB9469D44178') { ?>
+                    Your donation to <?=$this->project->organization->name?> is sincerely appreciated and much needed! Your support is driving health and sustainable development initiatives year-round in under resourced communities. Thank you!
+                    <? } else { ?>
+                    Your donation to our <?=$this->project->type == 1 ? 'fundraising campaign' : 'volunteer activity';?> is sincerely appreciated and much needed! You and your support help make social change possible. Thank you!<br />
+                    <?php if ($this->project->organizationId == "DB04F20F-59FE-468F-8E55-AD75F60FB0CB") { ?>
+                    <span style="color:#FF0000;">* Please be aware that Global Brigades Canada is awaiting charitable status and therefore your donation is currently not tax deductible</span>
+                    <?php } ?>
+                    <?php } ?>
+                </p>
+                <div id="error" style="color:red; padding:5px; margin:5px 0px 10px 0px; border:solid 1px #e5e5e5; <?=!$this->error ? "display:none" : "font-size:15px; padding:8px" ?>"><?=$this->error ? "This group is not set up for fundraising yet." : "" ?></div>
+                <?php if (!$this->error) { ?>
+                <h2>Destination</h2>
+                <?php if (count($this->project->volunteers)) { ?>
+                <p style="height:21px;">
+                    <span class="ist03"><input id="rdoVolunteer" type="radio" name="rdoVolunteer" value="rdoVolunteer" <?=$this->UserId != '' ? 'checked="checked"' : "" ?> onclick="updateItemName()" /></span>
+                    <label for="rdoVolunteer">Make a donation on behalf of a volunteer: </label> &nbsp;
+                    <select name="volunteers" id="volunteers" onchange="updateVolunteer(this.value)" <?=$this->UserId != '' ? "" : 'disabled' ?>>
+                        <option value="none">Select One</option>
+                        <?php foreach ($this->project->volunteers as $volunteer) { ?>
+                            <option value="<?=$volunteer->userId?>" <?=$volunteer->userId == $this->UserId ? 'selected' : ''?>><?=stripslashes(ucwords($volunteer->user->fullName))?></option>
+                        <?php } ?>
+                    </select>
+                    <br />&nbsp;<?php if($this->project->googleId == "1") { ?><span style="color:#666;font-size:10px;margin-left:15px;">*Please be aware that donations on behalf of a volunteer are made to Global Brigades Inc.</span><?php } ?>
+                </p>
+                <?php } ?>
+                <input type="hidden" id="Name" name="Name" value="<?=$this->project->name ?>" />
+                <p>
+                    <span class="ist03"><input id="rdoName" type="radio" name="rdoVolunteer" value="rdoName" onclick="updateItemName()" /></span>
+                    <label for="rdoName">Make general donation to <?=stripslashes($this->project->name).(isset($this->group) ? " / ".stripslashes($this->group->name)  : "")?></label>
+                </p>
+                <div id="errorDest"></div>
+
+                <h2>Amount</h2>
+                <?php if (!$this->error) {
+                    echo $this->placeholder('paymentform');
+                } ?>
+                <?php if ($this->UserId != '') { ?>
+                <script type="text/javascript">$('#rdoVolunteer').click()</script>
+                <?php } ?>
+            <?php } ?>
+                <div class="clear"></div>
+            </div>
+            </div>
+        </div>
+    <div class="clr"></div>
+    <div class="clr"></div>
+</div>
+
+
+<!-- giftaid -->
+<?=$this->placeholder('giftaid') ?>
+<!-- // giftaid -->

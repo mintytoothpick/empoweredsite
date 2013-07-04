@@ -1,0 +1,39 @@
+<?php if (count($this->paginator)) {
+foreach ($this->paginator as $event) { ?>
+<div class="programBox02">
+    <div class="month NoMarginTop"><strong><span class="color01"><?= date('M', strtotime($event->startDate)) ?></span></strong><br /><?= date('d', strtotime($event->startDate)) ?></div>
+    <div class="CampaignsText"><span class="TextStyle03"><a href="javascript:;" onclick="$('#details-<?=$event->id?>').toggle();">View Details</a></span><a href="/<?= !empty($event->group) ? $event->group->urlName : $this->organization->urlName?>/events?EventId=<?=$event->id?>"><?=stripslashes($event->title)?></a></div>
+    <div class="clr"></div>
+    <div class="greenBox hidden" id="details-<?=$event->id?>">
+    <table width="100%" border="0" cellspacing="0" cellpadding="5">
+        <?php if(!empty($event->group)) { ?>
+        <tr>
+        <td width="80">Chapter:</td>
+        <td><?=stripslashes($event->group->name)?></td>
+        <?php } ?>
+        </tr>
+        <tr>
+        <td>When:</td>
+        <td><?= date('M d Y h:i', strtotime($event->startDate)) ?> - <?= date('M d Y h:i', strtotime($event->endDate)) ?></td>
+        </tr>
+        <?php if(!empty($event->link)) { ?>
+        <tr>
+        <td>Location:</td>
+        <td><?=stripslashes($event->link)?></td>
+        </tr>
+        <?php } ?>
+        <?php if(!empty($event->text)) { ?>
+        <tr>
+        <td>Description:</td>
+        <td><?=stripslashes(nl2br($event->text))?></td>
+        </tr>
+        <?php } ?>
+    </table>
+    </div>
+</div>
+<div class="clr" style="margin-bottom:20px;"></div>
+<? } ?>
+<?= $this->paginationControl($this->paginator, 'Sliding', 'nonprofit/new_page_selector.phtml', array('param' => 'page')); ?>
+<? } else { ?>
+<p>No results found.</p>
+<? } ?>

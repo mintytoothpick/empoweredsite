@@ -1,0 +1,16 @@
+<?php $this->placeholder('aboutus_nav')->captureStart();
+$activePage  = $this->activePage;
+$activeClass = ' class="active"';
+?>
+<style>body {background-color:#E7E7DE}</style>
+<div class="leftSiderBar">
+  <ul class="leftSiderBarStyle01">
+    <li><a href="/about-us" <?=($activePage=='about') ? $activeClass :''; ?> title="About Us: About">About</a></li>
+    <li><a href="/services" <?=($activePage=='services') ? $activeClass :''; ?> title="About Us: Servicies">Services</a></li>
+    <li><a href="/fly-for-good" <?=($activePage=='flyforgood') ? $activeClass :''; ?> title="About Us: Impact">Fly For Good</a></li>
+    <li><a href="/demo" <?=($activePage=='demo') ? $activeClass :''; ?> title="About Us: Impact">Demo</a></li>
+    <li><a href="/pricing" <?=($activePage=='pricing') ? $activeClass :''; ?> title="About Us: pricing">Pricing</a></li>
+    <li><a href="/contactus" <?=($activePage=='contact') ? $activeClass :''; ?> title="About Us: Contact">Contact Us</a></li>
+  </ul>
+</div>
+<?php $this->placeholder('aboutus_nav')->captureEnd() ?>

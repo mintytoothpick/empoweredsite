@@ -1,0 +1,11 @@
+          <?php if (count($this->paginator)) {
+          foreach($this->paginator as $initiative) { ?>
+          <div class="TextBox" style="width:auto;"><a href="/<?=$initiative->urlName?>/signup" ><?=stripslashes($initiative->name)?></a></div>
+          <div class="clr" style="margin-bottom:20px;"></div>
+          <? } ?>
+          <div class="spacer"></div>
+          <?= $this->paginationControl($this->paginator, 'Sliding', 'nonprofit/new_page_selector_slim.phtml', array('param' => 'page')); ?>
+          <? } else { ?>
+          <p>No results found.</p>
+          <? } ?>
+

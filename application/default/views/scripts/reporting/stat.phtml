@@ -1,0 +1,214 @@
+<link href="<?php echo $this->contentLocation ?>public/css/ui.css" rel="stylesheet" type="text/css"/>
+<script src="<?php echo $this->contentLocation ?>public/js/jquery-1.3.2.min.js" type="text/javascript" language="javascript"></script>
+<script src="<?php echo $this->contentLocation ?>public/js/custom.js" type="text/javascript" language="javascript"></script>
+<script src="<?php echo $this->contentLocation ?>public/js/datepicker/ui.datepicker.js" type="text/javascript" language="javascript"></script>
+<script src="<?php echo $this->contentLocation ?>public/js/FusionCharts.js" type="text/javascript" language="javascript"></script>
+<!--[if IE 8]>
+<script type="text/javascript">
+    $(function() {
+        alert("The graphs presented here do not work using Internet Explorer 8, please try using another browser");
+    })
+</script>
+<![endif]-->
+<script type="text/javascript">
+    $(function() {
+        $( "#fundraising_date_from" ).datepicker({dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true});
+        $( "#fundraising_date_to" ).datepicker({dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true});
+        $( "#supporters_date_from" ).datepicker({dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true});
+        $( "#supporters_date_to" ).datepicker({dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true});
+    });
+
+    function validateForm(val){
+        if (val == 1){
+            var datefrom = $("#fundraising_date_from").val();
+            var dateto = $("#fundraising_date_to").val();
+        }else {
+            var datefrom = $("#supporters_date_from").val();
+            var dateto = $("#supporters_date_to").val();
+        }
+        if(datefrom > dateto){
+            alert('Invalid date from');
+        }else {
+            $('#filter_form').submit();
+        }
+    }
+
+    function filterGraph(value){
+        $('#projectId').val(value);
+        $('#filter_form').submit();
+    }
+
+    function loadGroup(PID) {
+        $('#GroupId').load('/reporting/loadgroups', {ProgramId: PID});
+        $('#ProjectId').html('<option value="">Activity or Campaign: All</option>');
+    }
+
+    function loadProjects(GID) {
+        $('#ProjectId').load('/reporting/loadprojects', {GroupId: GID});
+    }
+
+    function donationsReport() {
+        var siteId    = '';
+        var type      = '';
+        var startDate = $('#fundraising_date_from').val();
+        var endDate   = $('#fundraising_date_to').val();
+        if ($('#ProjectId').val() != '') {
+            siteId = $('#ProjectId').val();
+            type   = 'Project';
+        } else {
+            if ($('#GroupId').val() != '') {
+                siteId = $('#GroupId').val();
+                type   = 'Group';
+            } else {
+                if ($('#ProgramId').val() != '') {
+                    siteId = $('#ProgramId').val();
+                    type   = 'Program';
+                } else {
+                    siteId = '<?=$this->organization->id?>';
+                    type   = 'Organization';
+                }
+            }
+        }
+
+        location.href="/reporting/export2?SiteId="+siteId+"&Type="+type+"&StartDate="+startDate+"&EndDate="+endDate;
+    }
+</script>
+<?php if ($this->error) { ?>
+    <div class="response-msg error ui-corner-all">
+        <a href="javascript:;" class="close"><img src="/images/icons/cross_grey_small.png" title="Close this notification" alt="close"></a>
+        <div>
+            <?= $this->error ?>
+        </div>
+    </div>
+<?php } ?>
+<div class="wrapper">
+  <?php echo $this->placeholder('header');?>
+
+
+  <div class="BodyCon">
+
+    <!-- breadcrumb -->
+    <?php echo $this->placeholder('breadcrumb') ?>
+    <!-- // breadcrumb -->
+    <div class="clr"></div>
+
+    <!-- tabs -->
+    <?php echo $this->placeholder('tabs') ?>
+    <!-- // tabs -->
+
+    <div class="mainC">
+      <div class="box05">
+        <div class="headingStyle02">
+            Reports
+        </div>
+        <form name="filter_form" id="filter_form" style="padding-bottom: 20px;" method="post">
+            <?php if (isset($this->organization)) { ?>
+            <div class="article01" style="padding-bottom:15px; border:0; border-bottom: 1px solid #E5E5E5">
+                <span style="float:left;">
+                    <span style="color:#693; font-weight:bold; font-size:13px;" >Filter By: </span>
+                    <?php if ($this->organization->hasPrograms) { ?>
+                    <select name="ProgramId" id="ProgramId" onchange="loadGroup(this.value); $('#GroupId').removeAttr('disabled')" style="max-width: 290px; padding: 2px 2px 2px 0">
+                        <option value="">Program: All</option>
+                        <?php foreach($this->organization->programs as $program) { ?>
+                        <option value="<?=$program->id?>" <?php echo ((isset($this->program) && $this->program->id == $program->id) || (isset($this->project) && $this->project->program->id == $program->id)) ? "selected" : "" ?>>Program: <?php echo stripslashes($program->name) ?></option>
+                        <?php } ?>
+                    </select>
+                    <img src="/public/images/filter_arrow.jpg" style="margin-top:3px;"/>
+                    <?php } ?>
+                    <?php if ($this->organization->hasGroups) { ?>
+                    <select name="GroupId" id="GroupId" style="max-width:290px; padding: 2px 2px 2px 0" onchange="loadProjects(this.value); $('#ProjectId').removeAttr('disabled')" <?php if(!isset($this->program) &&  !isset($this->project)) { echo 'disabled="disabled"'; } ?>>
+                        <option value="">Group: All</option>
+                        <?php if(isset($this->program)) {
+                            $programCbo = $this->program;
+                        } else if (isset($this->project)) {
+                            $programCbo = $this->project->program;
+                        }
+                        if (isset($programCbo)) {
+                        foreach($programCbo->groups as $group) { ?>
+                        <option value="<?=$group->id?>" <?php echo isset($_POST['GroupId']) && $_POST['GroupId'] == $group->id ? "selected" : "" ?>>Group: <?php echo stripslashes($group->name) ?></option>
+                        <?php } } ?>
+                    </select>
+                    <img src="/public/images/filter_arrow.jpg" style="margin-top:3px;"/>
+                    <?php } ?>
+                    <select name="ProjectId" id="ProjectId" style="max-width:290px; padding: 2px 2px 2px 0" <?php if(!isset($_POST['GroupId'])) { echo 'disabled="disabled"'; } ?>>
+                        <option value="">Activity or Campaign: All</option>
+                        <?php if(isset($this->group)) { ?>
+                        <?php foreach ($this->group->initiatives as $activity) { ?>
+                            <option value="<?=$activity->id?>" <?= (isset($this->project) && $this->project->id == $activity->id ? 'selected="selected"' : '') ?>><?= ($activity->type == 1 ? 'Campaign: ' : 'Activity: ').stripslashes($activity->name) ?></option>
+                        <?php } } ?>
+                    </select>
+                    <input type="submit" value="Update" class="btn btngreen" style="margin-top:-2px" />
+                </span>
+                <div class="clear"></div>
+            </div>
+            <? } ?>
+
+            <p></p>
+            <div class="two-column ui-helper-clearfix">
+                <div class="column">
+                    <div class="portlet">
+                        <div class="portlet-header no-collapse">
+                            <div class="title">Donations</div>
+                        </div>
+                        <div class="portlet-content" >
+                            <div id="chart-fundraising" >
+                                <div align="center">
+                                    <input class="text smaller" id="fundraising_date_from" name="fundraising_date_from" type="text" value="<?= isset($this->fundraising_date_from) ? $this->fundraising_date_from : date("Y-m-d", strtotime("-1 month")) ?>" style="cursor:pointer; width: 100px" readonly="readonly" onchange="validateForm(1)"/>
+                                    &nbsp;to&nbsp;
+                                    <input class="text smaller" id="fundraising_date_to" name="fundraising_date_to" type="text" value="<?= isset($_REQUEST["fundraising_date_to"]) ? $_REQUEST["fundraising_date_to"] : date("Y-m-d") ?>" style="cursor:pointer; width: 100px" readonly="readonly" onchange="validateForm(1)"/>
+                                    <p></p>
+                                </div>
+                                <?= $this->fundraisingchart ?>
+                            </div>
+                            <div align="center">
+                                <p style="margin-top:15px"></p>
+                                <center><a href="javascript:;" onclick="donationsReport();">Pull Donations Report &raquo;</a></center>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="portlet">
+                        <div class="portlet-header no-collapse">
+                            <div class="title">Volunteers & Donors</div>
+                        </div>
+                        <div class="portlet-content" >
+                            <div id="chart-upporters" >
+                                <div align="center">
+                                    <input type="text" class="text smaller" name="supporters_date_from" id="supporters_date_from" value="<?= isset($_REQUEST["supporters_date_from"]) ? $_REQUEST["supporters_date_from"] : date("Y-m-d", strtotime("-1 month")) ?>" style="cursor:pointer; width: 100px" readonly="readonly" onchange="validateForm(2)"/>
+                                    &nbsp;to&nbsp;
+                                    <input type="text" class="text smaller" name="supporters_date_to" id="supporters_date_to"  value="<?= isset($_REQUEST["supporters_date_to"]) ? $_REQUEST["supporters_date_to"] : date("Y-m-d") ?>" style="cursor:pointer; width: 100px" readonly="readonly" onchange="validateForm(2)"/>
+                                    <p></p>
+                                </div>
+                                <?= $this->supporterschart ?>
+                                <div align="center"><img src="/public/images/ui/legend.jpg" ></div>
+                            </div>
+                            <?php if ($this->level == 'group') { ?>
+                                <a href="/volunteer/volunteersreport?<?php echo (!empty($this->filter) ? "ProjectId=".$this->filter : "GroupId=".$this->group->id) ?>">Pull Volunteer Summary Report &raquo;</a>
+                                <a href="/dashboard/exportdonordonations?GroupId=<?php echo $this->group->id.(!empty($this->filter) ? "&ProjectId=".$this->filter : "") ?>" style="margin-left:10px;">Pull Donor Report &raquo;</a>
+                                </center>
+                            <?php } else if ($this->level == "organization") { ?>
+                                <center>
+                                    <a href="/volunteer/volunteersreport?NetworkId=<?php echo $this->organization->id.(isset($this->program) ? "&ProgramId=".$this->program->id : "").(isset($_REQUEST['GroupId']) && !empty($_REQUEST['GroupId']) ? "&GroupId=".$_REQUEST['GroupId'] : "").(isset($_REQUEST['ProjectId']) && !empty($_REQUEST['ProjectId']) ? "&ProjectId=".$_REQUEST['ProjectId'] : "").(!empty($this->supporters_date_from) ? "&StartDate=".$this->supporters_date_from : "").(!empty($this->supporters_date_to) ? "&EndDate=".$this->supporters_date_to : "") ?>">Pull Volunteer Report &raquo;</a>
+                                    <a href="/nonprofit/exportdonordonations?NetworkId=<?php echo $this->organization->id.(isset($this->program) ? "&ProgramId=".$this->program->id : "").(isset($_REQUEST['GroupId']) && !empty($_REQUEST['GroupId']) ? "&GroupId=".$_REQUEST['GroupId'] : "").(isset($_REQUEST['ProjectId']) && !empty($_REQUEST['ProjectId']) ? "&ProjectId=".$_REQUEST['ProjectId'] : "").(!empty($this->fundraising_date_from) ? "&StartDate=".$this->fundraising_date_from : "").(!empty($this->fundraising_date_to) ? "&EndDate=".$this->fundraising_date_to : "") ?>&Type=Organization" style="margin-left:10px;">Pull Donor Report &raquo;</a>
+                                </center>
+                            <?php } else { ?>
+                                <center>
+                                    <a href="/volunteer/volunteersreport?ProjectId=<?php echo $this->project->id?>">Pull Volunteer Summary Report &raquo;</a>
+                                    <a href="/dashboard/exportdonordonations?ProjectId=<?php echo $this->project->id?>" style="margin-left:10px;">Pull Donor Report &raquo;</a>
+                                </center>
+                            <?php } ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <?php if($this->level == 'user') { ?>
+        <a class="btn btngreen" href="/<?php echo $this->project->urlName?>">Back</a>
+        <?php } ?>
+        <div class="clear"></div>
+            </div>
+        </div>
+        <div class="clr"></div>
+        <div class="clr"></div>
+    </div>

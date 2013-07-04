@@ -1,0 +1,368 @@
+<?php
+$this->headTitle("Empowered.org - Create Chapter");
+$this->placeholder('title')->set('home');
+$this->placeholder('currenttab')->set('orggroups');
+$config = Zend_Registry::get('configuration');
+?>
+<script type="text/javascript" language="javascript">
+    function hidePopup() {
+        $('#popup-box').hide();
+        if ($('#ProgramLogo').val() != '') {
+            $('#add-photo').html("Change Photo");
+        }
+    }
+
+    function createProgram() {
+        $('#ProgramId').hide();
+        $('#ProgramId').rules("remove");
+        $('label[for=ProgramId]').remove();
+        $('#ProgramId').val('');
+        $('#ProgramName').show();
+        $('#ProgramName').rules("add",{
+            required: true,
+            notEqualTo: 'New Program Name',
+            messages: {
+                required: "The new program's name cannot be blank.",
+                notEqualTo: "The new program's name cannot be blank."
+            }
+        });
+        $('#CreateProgramLink').hide();
+    }
+
+    function loadPrograms(NID) {
+        $('#ProgramId').load('/group/loadprograms', {NetworkId: NID});
+    }
+
+    function showPrompt() {
+        $('.popup-box').toggle();
+        $('#popup-overlay').toggle();
+    }
+
+    function next(create_again) {
+        $('#create_again').val(create_again);
+        showPrompt();
+        isValid = true;
+        $('#CreateGroup').submit();
+    }
+
+    $(function() {
+        //form contact validate
+        $("#CreateGroup").validate({
+            onfocusout: function(element) { this.element(element); },
+            rules: {
+                GroupLogo: {
+                    accept: "jpeg|jpg|png|gif"
+                },
+<?php if ($this->organization->hasPrograms && count($this->organization->programs)) { ?>
+                ProgramId: {
+                    required: true,
+                },
+<?php } else { ?>
+                ProgramName: {
+                    required: true,
+                    notEqualTo: 'New Program Name',
+                },
+<?php } ?>
+                GroupName: 'required',
+                Description: 'required',
+                CountryId: 'required',
+                RegionId: 'required',
+                CityId: 'required',
+                Email: {
+                    required: true,
+                    email: true
+                },
+                WebAddress: {
+                    domainChk: true
+                }
+            },
+            messages: {
+                GroupLogo: {
+                    accept: 'Please upload pictures in jpeg, png and gif format only.'
+                },
+<?php if ($this->organization->hasPrograms && count($this->organization->programs)) { ?>
+                ProgramId: {
+                    required: 'You must associate this activity with an existing program or create a one to associate with it.',
+                },
+<?php } else { ?>
+                ProgramName: {
+                    required: 'You must create a program for the chapter.',
+                    notEqualTo: 'You must create a program for the chapter.',
+                },
+<?php } ?>
+                GroupName: 'Please specify the name of chapter.',
+                Description: "Please enter the chapter's description.",
+                CountryId: 'Please select country location.',
+                RegionId: 'Please select region location.',
+                CityId: 'Please select city location.',
+                Email: {
+                    required: "Please provide the chapter's contact email.",
+                    email: 'You have entered an invalid email.',
+                },
+                WebAddress: {
+                    required: 'You have entered an invalid website.',
+                    url: 'You have entered an invalid website.'
+                }
+            }
+<?php if (isset($this->getstarted) || isset($this->upgradeOrg)) { ?>,
+            submitHandler: function(form) {
+                    if ($('#GroupLogo').val() == "") {
+                        showPrompt();
+                        return false;
+                    }
+                    $(form).submit();
+            }
+<? } ?>
+        });
+    });
+</script>
+<style>
+    .field-label { float:left; font-weight:bold; color:#000; margin-bottom:15px;<?=(isset($this->edit)) ? 'width:190px;clear:left;' : 'width:140px;'?>}
+    .popup-box { width: 250px; left: 40%; right: 40%; top:25%; position: absolute; z-index: 999999!important; background-color:#ffffff; border:5px solid #e5e5e5; padding:10px 0 20px 0; -moz-border-radius:7px }
+    .info-boxes, .info-boxes2 { margin: 10px 0px; margin-left: 15px; background: #fff7c8; border:1px solid #dcbd00; padding: 10px 5px; -moz-border-radius:5px; width: 500px; float: left }
+    #popup-overlay {
+        background: url(<?php echo $this->contentLocation ?>public/images/bg-overlay.png);
+        height:100%;
+        position:fixed;
+        display:block;
+        left:0;
+        top:0;
+        width:100%!important;
+        z-index:998;
+        display:none;
+    }
+</style>
+<div id="popup-overlay"></div>
+<div class="popup-box" style="padding: 30px 20px; display: none">
+    Would you like to create another chapter?<br><br><br>
+    <center>
+        <a class="btn btngreen" href="javascript:;" onclick="next(1)">Yes</a>
+        &nbsp;&nbsp;
+        <a class="btn btngreen" href="javascript:;" onclick="next(0)">No</a>
+    </center>
+</div>
+<div class="wrapper">
+    <!-- org header -->
+    <?php echo $this->placeholder('header') ?>
+    <!-- // org header -->
+
+    <div class="BodyCon">
+
+        <?php if(isset($this->getstarted)) { ?>
+            <h2 style="font-size:14px">
+                <div style="color:#669933; width:21%; float:left">Step 1. Structure & Details</div>
+                <div style="color:#A9A9A9; width:18%; float:left">Step 2. Add Admins</div>
+                <div style="color:#A9A9A9; width:19%; float:left">Step 3. Add Members</div>
+                <div style="color:#A9A9A9; width:23%; float:left">Step 4. Activate Fundraising</div>
+                <div style="color:#A9A9A9; width:19%; float:left">Step 5. Spread the Word</div>
+                <div class="clear"></div>
+            </h2>
+        <?php } else { ?>
+            <!-- breadcrumb -->
+            <?php echo $this->placeholder('breadcrumb') ?>
+            <!-- // breadcrumb -->
+            <div class="clr"></div>
+
+            <!-- tabs -->
+            <?php echo $this->placeholder('tabs') ?>
+            <!-- // tabs -->
+        <?php } ?>
+
+        <div class="mainC">
+            <div class="box05">
+                <div class="headingStyle02">
+                    <?= (isset($this->edit)) ? 'Edit' : 'Create a New' ?> <?=$this->organization->groupNamingSingular?>
+                </div>
+            <form name="CreateGroup" method="post" action="" id="CreateGroup"  <?php if (!isset($this->edit)) { ?>enctype="multipart/form-data"<? } ?>>
+                <?php if (!isset($this->edit)) { ?>
+                <input type="hidden" id="NetworkId" name="NetworkId" value="<?=$this->organization->id?>" />
+                <?php } ?>
+                <?php if (isset($this->program)) { ?>
+                <input type="hidden" id="ProgramId" name="ProgramId" value="<?=$this->program->id?>" />
+                <?php } ?>
+                <input type="hidden" id="Type" name="Type" value="<?php echo $this->Type ?>" />
+                <?php if (isset($this->getstarted) || isset($this->upgradeOrg)) { ?>
+                <input type="hidden" id="create_again" name="create_again" value="" />
+                    <?php if (isset($this->getstarted)) { ?>
+                    <input type="hidden" id="getstarted" name="getstarted" value="1" />
+                    <?php } ?>
+                <?php } ?>
+
+                <ul class="formCreatePicture">
+                    <?php if (!isset($this->edit)) { ?>
+                    <li class="col1">
+                        <div class="picUpload">
+                            <div><img src="<?php echo $this->contentLocation ?>public/images/addphoto.jpeg" width="100" height="75" /></div>
+                        </div>
+                        <div class="infoPicUpload">
+                            <input type="file" size="12" name="GroupLogo" id="GroupLogo" /><br />
+                            <div class="info-boxes">
+                                <h3>Uploading a Logo?</h3>
+                                Your image must be in either <strong>jpg</strong>, <strong>png</strong>, or <strong>gif</strong> format and it must be <strong>< 2MB</strong> in size.<br /><br />You will be asked to crop your logo to a 2:1 width to height ratio
+                            </div>
+                        </div>
+                    </li>
+                    <? } ?>
+                    <li class="col2" <?php if (isset($this->edit)) { ?>style="border-left: none;width:700px;"<? } ?>>
+                        <div id="message" class="error" style="<?php if(!$this->message) { echo "display:none;"; } ?>"><?php if(isset($this->message)) { echo $this->message; } ?></div><br />
+                        <ul>
+                        <?php if ($this->organization->hasPrograms) { ?>
+                            <li class="field-label"><span>*</span> Program:</li>
+                            <li class="field-input">
+<?php if (count($this->organization->programs)) { ?>
+                                <select id="ProgramId" name="ProgramId" class="input">
+                                    <option value="">Select a Program</option>
+<?php foreach ($this->organization->programs as $program) { ?>
+<?php if ($this->edit) { ?>
+                                    <option value="<?=$program->id?>"<?= $this->group->program->id == $program->id ? ' selected' : ''; ?>><?=$program->name?></option>
+<? } else { ?>
+                                    <option value="<?=$program->id?>"<?= (isset($this->program) && ($this->program->id == $program->id)) ? ' selected' : ''; ?>><?=$program->name?></option>
+<?php } ?>
+<?php } ?>
+                                </select>
+<?php } ?>
+<?php if($this->isAdmin && !isset($this->edit)) { ?>
+                                <?php if (count($this->organization->programs)) { ?><a id="CreateProgramLink" href="javascript:;" onclick="createProgram();"><br /> or Create a New Program</a><?php } ?>
+                                <input type="text" id="ProgramName" name="ProgramName" value="New Program Name" class="input" onfocus="this.value=''; $('#ProgramName').css('color', '#000');" style="color:#AAA; <?php echo count($this->organization->programs) == 0 ? '' : 'display:none;'?>" />
+<?php } ?>
+
+                            </li>
+                        <?php } ?>
+                            <li class="field-label"><span>*</span> Name:</li>
+                            <li class="field-input">
+                                <input name="GroupName" type="text" id="GroupName" class="input" value="<?=(isset($this->edit)) ? $this->group->name : ''?>" />
+                            </li>
+                            <li class="field-label"><span>*</span> Description:</li>
+                            <li class="field-input">
+                                <?php
+                                    $desc = '';
+                                    if (!isset($this->edit)) {
+                                        if (isset($this->program)) {
+                                            $desc = stripslashes($this->program->description);
+                                        } else {
+                                            $desc = stripslashes($this->organization->description);
+                                        }
+                                    } else {
+                                        $desc = $this->group->description;
+                                    }
+                                ?>
+                                <textarea name="Description" rows="10" cols="20" id="Description" class="input" onblur="return fnKeepWordLenTrack(this,3000);" onkeyup="return fnKeepWordLenTrack(this,3000);" style="font-size:14px"><?=$desc?></textarea>
+                            </li>
+                            <li class="field-label"><span>*</span> Country:</li>
+                            <li class="field-input">
+                                <select type="text" name="CountryId" id="CountryId" style="width:300px" onchange="populateLocation('state', this.value); $('#Country').val(this.options[this.selectedIndex].text); populateLocation('city', 0);">
+                                    <option value="" selected>Select ...</option>
+                                    <?php foreach($this->country_list as $country) { ?>
+                                    <?php
+                                    $selectd = '';
+                                    if(isset($this->edit)) {
+                                        if ($this->group->contact && $this->group->contact->countryId == $country['CountryId']) {
+                                            $selectd = ' selected';
+                                        }
+                                    } ?>
+                                    <option value="<?php echo $country['CountryId'] ?>"<?=$selectd?>><?php echo $country['Country'] ?></option>
+                                    <?php } ?>
+                                </select>
+                            </li>
+                            <li class="field-label"><span>*</span> Region:</li>
+                            <li class="field-input" id="state-list">
+                                <select type="text" name="RegionId" id="RegionId" style="width:300px" onchange="populateLocation('city', this.value); $('#Region').val(this.options[this.selectedIndex].text);">
+                                    <option value="">All</option>
+                                </select>
+                            </li>
+                            <li class="field-label"><span>*</span> City:</li>
+                            <li class="field-input" id="city-list">
+                                <select type="text" name="CityId" id="CityId" style="width:300px" onchange="$('#City').val(this.options[this.selectedIndex].text);">
+                                    <option value="">All</option>
+                                </select>
+                            </li>
+                            <li class="field-label">Street Address:</li>
+                            <li class="field-input">
+                                <?php
+                                    $street = '';
+                                    if (!isset($this->edit)) {
+                                        if (isset($this->program) && $this->program->contact) {
+                                            $street = stripslashes($this->program->contact->street);
+                                        } elseif ($this->organization->contact) {
+                                            $street = stripslashes($this->organization->contact->street);
+                                        }
+                                    } else {
+                                        if ($this->group->contact) {
+                                            $street = $this->group->contact->street;
+                                        }
+                                    }
+                                ?>
+                                <input name="Street" type="text" maxlength="100" id="Street" class="input" value="<?=$street?>" />
+                            </li>
+                            <li class="field-label">Website:</li>
+                            <li class="field-input">
+                                <?php
+                                    $web = '';
+                                    if (!isset($this->edit)) {
+                                        if (isset($this->program) && $this->program->contact) {
+                                            $web = stripslashes($this->program->contact->website);
+                                        } elseif ($this->organization->contact) {
+                                            $web = stripslashes($this->organization->contact->website);
+                                        }
+                                    } else {
+                                        if ($this->group->contact) {
+                                            $web = $this->group->contact->website;
+                                        }
+                                    }
+                                ?>
+                                <input name="WebAddress" type="text" id="WebAddress" class="input" value="<?=$web?>" />
+                            </li>
+                            <li class="field-label"><span>*</span> Email:</li>
+                            <li class="field-input">
+                                <?php
+                                    $email = '';
+                                    if (!isset($this->edit)) {
+                                        if (isset($this->program) && $this->program->contact) {
+                                            $email = stripslashes($this->program->contact->email);
+                                        } elseif ($this->organization->contact) {
+                                            $email = stripslashes($this->organization->contact->email);
+                                        }
+                                    } else {
+                                        $email = $this->group->contact->email;
+                                    }
+                                ?>
+                                <input name="Email" type="text" maxlength="50" id="Email" class="input" value="<?=$email?>" />
+                            </li>
+<?php
+if(!($config->chapter->membership->enable &&
+  (in_array($this->organization->id, $config->chapter->membership->settings->toArray()) ||
+  in_array($this->organization->id, $config->chapter->membership->active->toArray())))
+) { ?>
+                            <li class="field-label">&nbsp;</li>
+                            <li class="field-input">
+                                <input name="isOpen" type="checkbox" id="isOpen" value="1" <?=(isset($this->group) && $this->group->isOpen) ? 'checked' : ''?>/>
+                                &nbsp;Individuals can become members of this chapter without being accepted by an admin
+                            </li>
+<?php } ?>
+                            <div style="margin-top:15px; float:left; width:100%; margin-bottom:20px" id="btns">
+                            <?php if (!isset($this->getstarted) && !count($this->groups)) { ?>
+                                <a class="btn btngreen" href="/<?= isset($this->program) ? $this->program->urlName : $this->organization->urlName?>">Back</a>
+                            <?php } ?>
+                            <?php if (isset($this->getstarted) || count($this->groups)) { ?>
+                                <input type="submit" class="btn btngreen" name="btnCreateNew" value="Add Chapter" id="btnCreateNew" onclick="$('#create_group_again').val(1)" />
+                            <?php } else { ?>
+                                <input type="submit" class="btn btngreen" name="btnCreateNew" value="<?=(!isset($this->edit) ? 'Create New' : 'Save Changes')?>" id="btnCreateNew" />
+                            <?php } ?>
+                            </div>
+                            <li class="field-label"><span>*</span><span style="color:#AAA;"> denotes a required field.</span></li>
+                            <li class="field-input">&nbsp;</li>
+                        </ul>
+                    </li>
+                </ul>
+            </form>
+        </div>
+    </div>
+<div class="clr"></div>
+<div class="clr"></div>
+</div>
+<? if (isset($this->edit) && $this->group->contact) { ?>
+<script>
+populateLocation('state', <?=$this->group->contact->countryId?>, <?=$this->group->contact->stateId?>);
+populateLocation('city', <?=$this->group->contact->stateId?>, <?=$this->group->contact->cityId?>);
+</script>
+<? } ?>

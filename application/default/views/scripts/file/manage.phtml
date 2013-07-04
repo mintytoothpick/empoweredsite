@@ -1,0 +1,323 @@
+<?php
+$this->headTitle("Empowered.org - Manage Files");
+$file_icons = array('doc' => 'word_icon.png', 'docx' => 'word_icon.png', 'xls' => 'excel_icon.png', 'xlsx' => 'excel_icon.png', 'pdf' => 'pdf.png', 'ppt' => 'ppt_icon.png', 'pptx' => 'ppt_icon.png');
+?>
+<script type="text/javascript" language="javascript">
+
+    function deleteFiles() {
+        var selected_files = 0;
+        $('#file-list tr td input[type=checkbox]').each(function() {
+            if ($(this).attr('checked')) {
+                selected_files++;
+            }
+        })
+        if (selected_files > 0) {
+            $.post('/file/deletefiles', $('#delete-files').serialize(), function(data) {
+                alert(data);
+                window.location.reload(true);
+            })
+        } else {
+            alert("Please select at least one record to be deleted");
+        }
+        return false;
+    }
+
+    function openWindow(pageURL, title, w, h) {
+        var left = (screen.width/2)-(w/2);
+        var top = (screen.height/2)-(h/2);
+        var targetWin = window.open (pageURL, '_blank', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=no, copyhistory=no, width='+w+', height='+h+', top='+top+', left='+left);
+    }
+
+    $(function() {
+        $('.edit-links').bind('click', function() {
+            var id = $(this).attr('id').replace('edit-link', '');
+            $('#caption'+id).toggle();
+            $('#edit-caption'+id).toggle();
+            $('#edit-link'+id).toggle();
+        });
+        
+        $('.uploadFile').click(function() {
+            $.fancybox($('.uploadFcyBx').html());
+            postFiles();
+        });
+    });
+    
+    function editCaption(FID, div) {
+        $.post('/file/updatecaption', {FileId: FID, Caption: $('#caption-textarea-'+div).val()}, function() {
+            alert('You have successfully updated the caption for the selected file.')
+            window.location.reload(true);
+        });
+    }
+</script>
+<style type="text/css">
+    #file-list tr.tblHeader th {
+        text-align: center;
+        padding: 4px;
+        background-color: #333333;
+        color: #F7F7F7;
+        font-weight: bold;
+    }
+
+    #file-list tr td {
+        padding: 4px;
+    }
+
+    #file-list tr td.td_even {
+        padding: 4px;
+        background-color: #e7e7e9;
+    }
+    
+    #file-list tr td.td_odd {
+        padding: 4px;
+        background-color: #ffffff;
+    }
+
+    #file-list {
+        width: 100%;
+        border: 1px solid #E7E7FF;
+        border-collapse: collapse;
+    }
+</style>
+
+<div class="wrapper">
+  <?php if ($this->level == "group" || $this->level == "organization") {
+	  echo $this->placeholder('header');
+  } else {
+      include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/profileheader.php'; 
+  } ?>
+
+
+  <div class="BodyCon">
+
+    <!-- breadcrumb -->
+    <?php echo $this->placeholder('breadcrumb') ?>
+    <!-- // breadcrumb -->
+    <div class="clr"></div>
+
+    <!-- tabs -->
+    <?php echo $this->placeholder('tabs') ?>
+    <!-- // tabs -->
+
+<div class="mainC">
+    <div class="box05">
+    <div class="headingStyle02">Files (<?= count($this->files) ?>)</div>
+    <div class="clear" style="margin-bottom:10px"></div>
+    <form id="delete-files" method="post" onsubmit="return deleteFiles();">
+        <table id="file-list" cellspacing="0" cellpadding="3" border="0" width="100%">
+            <tr class="tblHeader" style="">
+                <th scope="col" style="width:20px;">&nbsp;</th>
+                <th scope="col">Filename</th>
+                <th scope="col">Caption</th>
+                <th scope="col">Added By</th>
+                <th scope="col">Date Added</th>
+            </tr>
+            <?php if (count($this->files)) { ?>
+                <?php $ctr = 0;
+                foreach ($this->files as $file) { ?>
+                    <tr>
+                        <td class="<?php echo $ctr % 2 == 1 ? "td_even" : "td_odd" ?>">
+                            <input id="delete_<?php echo $file['FileId'] ?>" type="checkbox" name="deleted_files[]" value="<?php echo $file['FileId'] ?>" />
+                        </td>
+                        <td class="<?php echo $ctr % 2 == 1 ? "td_even" : "td_odd" ?>" style="padding-left:5px;"><img src="/public/images/<?php echo $file_icons[$file['Type']] ?>" width="16" height="16" />&nbsp;<?php echo $file['UploadedFileName'] ?></td>
+                        <td class="<?php echo $ctr % 2 == 1 ? "td_even" : "td_odd" ?>" style="text-align: center;">
+                            <span id="caption-<?php echo $ctr ?>"><?php echo stripslashes($file['Caption']) ?></span>
+                            <span class="edit-captions" id="edit-caption-<?php echo $ctr ?>" style="display: none">
+                                <textarea id="caption-textarea-<?php echo $ctr ?>" rows="2" cols="60" style="font-size: 12px; height: 30px; float: left"><?php echo stripslashes($file['Caption']) ?></textarea>
+                                &nbsp;<input type="button" value="Save" style="float:left; margin-top:5px; margin-left: 3px" onclick="editCaption('<?php echo $file['FileId'] ?>', <?php echo $ctr ?>)" />
+                            </span>
+                            &nbsp;&nbsp;<a href="javascript:;" class="edit-links" id="edit-link-<?php echo $ctr ?>">Edit</a>
+                        </td>
+                        <td class="<?php echo $ctr % 2 == 1 ? "td_even" : "td_odd" ?>" style="text-align: center;"><a href='/<?php echo $file['URLName'] ?>' target="_blank"><?php echo stripslashes($file['FullName']) ?></a></td>
+                        <td class="<?php echo $ctr % 2 == 1 ? "td_even" : "td_odd" ?>" style="text-align: center;"><?php echo date('Y-m-d', strtotime($file['DateUploaded'])) ?></td>
+                    </tr>
+                    <?php $ctr++;
+                } ?>
+                <?php } else { ?>
+                    <tr>
+                        <td colspan="6" style="font-size:13px"><span style="font-size:13px;">You haven't uploaded any files yet! Use the upload button below to add a file.</span></td>
+                    </tr>
+                    <?php } ?>
+                </table>
+                <br />
+                <div id="formupload" style="width:100%; float:left; display:block">
+                    <a class="btn btngreen" title="Back" href="/<?= isset($this->group) ? $this->group->urlName : $this->organization->urlName ?><?=$this->Prev?>">Back</a>
+                    <?php if (count($this->files)) { ?>
+                        <a class="btn btngreen" href="javascript:;" onclick="return deleteFiles();">Delete</a>
+                        <?php } ?>
+                        <a id="btngreen1" class="btn btngreen uploadFile" title="Upload" href="javascript:;">Upload</a>
+                    </div>
+                </form>
+                <div class="clear"></div>
+            </div>
+        </div>
+    </div>
+    <div class="clr"></div>
+    <div class="clr"></div>
+</div>
+
+<!-- upload file box -->
+<script type="text/javascript" language="javascript">
+    function validate() {
+        var accepted_files = new Array('pdf', 'ppt', 'xls', 'xlsx', 'doc', 'docx');
+        var uploads = 0;
+        var invalid_file = 0;
+        $('#fancybox-content .multfile input[type=file]').each(function() {
+            var filename = $(this).val().toString().split(".");
+            var extension = filename[filename.length-1].toString();
+            if (jQuery.trim($(this).val()) != '') {
+                uploads++;
+                if (jQuery.inArray(extension, accepted_files) < 0) {
+                    invalid_file++;
+                }
+            }
+        })
+        if (uploads == 0) {
+            alert("Please select a file to upload.");
+            return false;
+        } else if (invalid_file > 0) {
+            alert("Please select a valid file format");
+            return false;
+        } else if ($('#fancybox-content .multfile .files-1').val() == "") {
+            alert("Please select a file to upload");
+            return false;
+        }
+        return true;
+    }
+
+    var counter = 1;
+    function addFiles() {
+        counter++;
+        var new_photo = '<div class="new-files-'+counter+'"><label class="uploadBoxLabel">File:</label><input class="photo-1 fileInput" type="file" name="files[]" />&nbsp;&nbsp;<a class="desc-'+counter+'" href="javascript:;" onclick="toggleCaption(\'.caption-'+counter+'\', \'.desc-'+counter+'\')">Add Description</a>&nbsp;&nbsp;<a href="javascript:;" onclick="removeFile('+counter+').remove()">Remove</a></div>';
+        new_photo += '<div class="new-files-'+counter+' caption-'+counter+' hide" style="margin-top:5px; margin-bottom:10px"><textarea class="captions-'+counter+' descInput" name="captions[]" rows="2" cols="53" style="font-size: 12px;"></textarea><div>';
+        $('#fancybox-content .multfile').append(new_photo);
+    }
+    
+    function removeFile(id) {
+        $('.new-files-'+id).remove();
+    }
+
+    function toggleMoreLink() {
+        if ($('#fancybox-content .moreUploadsLink').hasClass('hide')) {
+            $('#fancybox-content .moreUploadsLink').removeClass('hide');
+        }
+    }
+
+    function toggleCaption(div, btn) {
+        $('#fancybox-content '+div).toggle();
+        $('#fancybox-content '+btn).toggle();
+    }
+    
+    // Post all files by ajax upload
+    function postFiles() {
+        $('#fancybox-content form.uploadphoto').iframePostForm({
+            json: true,
+            iframeID: 'iframeUploadFiles',
+            post: function () {
+                var ret = validate();
+                if (ret) $.fancybox.showActivity();
+                return ret;
+            },
+            complete: function (response) {
+                $.fancybox.hideActivity();
+                if (!response.ok) {
+                    $('#fancybox-content .message').html(response.err).show();
+                } else {
+                    window.location.reload(true);
+                }
+                return false;
+            }
+        });
+    }
+
+    function updateProjects(groupId) {
+    	$.get('/chapters/get-projects?GroupId=' + groupId, function(data) {
+    		list = jQuery.parseJSON(data);
+    		html = '<option value="-1">None</option>';
+    		count = 0;
+    		$.each(list, function(index, project) {
+    			count++; 
+                html = html + '<option value=' + project.ProjectId + '>'+ project.Name +'</option>';
+            });
+            $("#fancybox-content #projectSelectByGroup").html(html);
+            if (count > 0) {
+                $("#fancybox-content #projectSelectContainer").show();
+            } else {
+            	$("#fancybox-content #projectSelectContainer").hide();
+            }
+        });
+    }
+     
+</script>
+
+
+<div class="uploadFcyBx" style="display:none; width:495px;">
+    <h3>Upload Files</h3>
+    <div>
+        <span style="color:#F00;">Please select pdf, ppt, xls, xlsx, doc and docx files that are under 2MB in size.</span><br /><br />
+        <label class="message hide error"></label>
+        <form class="uploadphoto" method="post" action="/<?=$this->urlName?>/upload-file" enctype="multipart/form-data">
+            <?php if ($this->level == "group") { ?>
+            
+            
+	            <div>
+	              <?php if(!empty($this->projects)) {?>
+	              <div>
+		              <label class="uploadBoxLabel">Project:</label>
+		              <select name="ProjectId" id="projectSelect">
+		                    <option value="-1">None</option>
+		                <?php foreach($this->projects as $project) { ?>
+		                    <option value="<?php echo $project["ProjectId"]?>"><?php echo $project["Name"]?></option>
+		                <?php }?>
+		              </select>
+		          </div>
+		          <?php } ?>
+	              <input type="hidden" name="GroupId" value="<?=$this->group->id?>" />
+	            </div>
+	            
+            <?php } else if($this->level == "project") { ?>
+            
+                <input type="hidden" name="ProjectId" value="<?=$this->project->id?>" />
+                
+                
+            <?php } else { ?>
+                <div>
+                  <?php if(empty($this->groups)) {?>
+                    <input type="hidden" name="NetworkId" value="<?=$this->organization->id?>" />
+                  <?php } else { ?>
+	                  <div>
+	                      <input type="hidden" name="NetworkId" value="<?=$this->organization->id?>" />
+	                      <label class="uploadBoxLabel">Chapter:</label>
+	                      <select name="GroupId" id="groupSelect" onchange="updateProjects($(this).val());">
+	                            <option value="-1">None</option>
+	                        <?php foreach($this->groups as $group) { ?>
+	                            <option value="<?php echo $group["GroupId"]?>"><?php echo $group["GroupName"]?></option>
+	                        <?php }?>
+	                      </select>
+	                  </div>
+	              <?php } ?>
+                  <div id="projectSelectContainer" <?php if(empty($this->projects)) { echo "style='display:none;'"; }?>>
+                      <label class="uploadBoxLabel">Project:</label>
+                      <select name="ProjectId" id="projectSelectByGroup">
+                      <?php if(!empty($this->projects)) {?>
+                            <option value="-1">None</option>
+	                        <?php foreach($this->projects as $project) { ?>
+	                           <option value="<?php echo $project["ProjectId"]?>"><?php echo $project["Name"]?></option>
+	                        <?php }?>
+                      <?php } ?>
+                      </select>
+                  </div>
+                </div>
+
+
+            <?php } ?>
+            <div class="multfile" style="float:left; width:100%">
+                <div><label class="uploadBoxLabel">File:</label><input class="file-0 fileInput" type="file" name="files[]" onchange="toggleMoreLink()" />&nbsp;&nbsp;<a class="desc-0" href="javascript:;" onclick="toggleCaption('.caption-0', '.desc-0')">Add Description</a></div>
+                <div class="caption-0 hide" style="margin-top:5px; margin-bottom:10px">
+                    <textarea name="captions[]" rows="2" cols="53" style="font-size: 12px;"></textarea>
+                </div>
+            </div>
+            <div class="moreUploadsLink hide" style="float:left; width:100%"><a href="javascript:;" onclick="addFiles()">Attach another File</a></div>
+            <input type="submit" name="submit" value="Upload" class="button" />
+        </form>
+    </div>
+</div>

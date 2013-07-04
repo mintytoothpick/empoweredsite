@@ -1,0 +1,21 @@
+<?php $this->placeholder('popup_project_volunteer')->captureStart(); ?>
+
+<div id="projectVolunteerFcyBx" style="display:none">
+<div class="fcybxLogin">
+    <p><strong>This initiative was completed on
+        <span style="display:inline;" id="volunteerEndDate">
+        <?php if(isset($this->project)) { ?>
+            <?=date('M d, Y h:i A', strtotime($this->project->endDate)) ?>
+        <?php } ?>
+        </span>
+    </strong></p>
+    <p><strong>Would you still like to make a volunter?</strong></p>
+
+    <div class="clr"></div>
+    <div class="btnCenter">
+        <input type="button" value="Yes" class="btnSubmitLarge box confirm">
+        <input type="button" value="Never mind" class="btnSubmitLarge box">
+    </div>
+</div>
+</div>
+<?php $this->placeholder('popup_project_volunteer')->captureEnd() ?>

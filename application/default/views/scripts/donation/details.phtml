@@ -1,0 +1,93 @@
+<?php $this->headTitle("Empowered.org - Manage Donations");
+$this->placeholder('currenttab')->set('upcoming');
+?>
+<script type="text/javascript">
+    function generateReports() {
+        $.post('/donation/generatereport', {ProjectId: '<?php echo $this->ProjectId ?>'});
+        return false;
+    }
+    function isFloat(value) {
+        if(value == ""){
+            return false;
+        }
+        value = value.replace(/,/, '.');
+        if(parseFloat(value) != (value*1)) {
+            return false;
+        }
+        return true;
+    }
+</script>
+<div class="wrapper">
+   <!-- org header -->
+  <?php echo $this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+
+    <!-- breadcrumb -->
+    <?php echo $this->placeholder('breadcrumb') ?>
+    <!-- // breadcrumb -->
+    <div class="clr"></div>
+
+    <!-- tabs -->
+    <?php echo $this->placeholder('tabs') ?>
+    <!-- // tabs -->
+
+    <div class="mainC">
+      <div class="box05">
+        <div class="headingStyle02">
+            Donations Details - <?php echo stripslashes($this->ProjectName) ?>
+        </div>
+        <div>
+            <table id="donations" cellspacing="0" cellpadding="3" border="0" style="width:100%; border-collapse:collapse;">
+                <tr style="color:#F7F7F7;background-color:#000;font-weight:bold;height:25px;">
+                    <th style="text-align:center;" scope="col">Recipient</th>
+                    <th style="text-align:center;" scope="col">Amount</th>
+                    <th style="text-align:center;" scope="col">Comment</th>
+                    <th style="text-align:center;" scope="col">Donor Name</th>
+                    <th style="text-align:center;" scope="col">Donor Email</th>
+                    <th style="text-align:center;" scope="col">Donation Date</th>
+                    <th style="text-align:center;" scope="col">Donation Source</th>
+                </tr>
+                <?php
+                if (count($this->donations) > 0) {
+                $ctr = 0;
+            foreach ($this->donations as $donation) { ?>
+
+            <tr style="background-color:<?php echo $ctr%2 == 1 ? "#e7e7e9" : "white" ?>;border-bottom:1px solid #E7E7FF;<?php if($donation['OrderStatusId'] > 2) { echo "color:#F00;"; $delMSG = 1; } ?>">
+                <td style="border-right:1px solid silver;border-left:1px solid silver;width:200px; padding-left:3px;"><?php if(!empty($donation['VolunteerId']) && $donation['VolunteerId'] != 'none') { echo '<a href="/'.$this->usersClass->getURLNameById($donation['VolunteerId']).'">'; } ?><?php echo (empty($donation['VolunteerId']) || $donation['VolunteerId'] == 'none') ? "General Fund" : stripslashes($this->usersClass->getFullNameById($donation['VolunteerId'])) ?></a></td>
+                <td style="text-align:right; width:110px; border-right:1px solid silver;"><?php echo number_format($donation['DonationAmount']) ?>&nbsp;&nbsp;</td>
+                <td style="text-align:right; width:110px; border-right:1px solid silver;"><?php echo $donation['OrderStatusId'] > 2 ? "CANCELLED" : stripslashes($donation['DonationComments']) ?>&nbsp;&nbsp;</td>
+                <td style="text-align:right; width:110px; border-right:1px solid silver;"><?php echo $donation['isAnonymous'] ? "Anonymous" : stripslashes($donation['SupporterName']) ?>&nbsp;&nbsp;</td>
+                <td style="text-align:right; width:110px; border-right:1px solid silver;"><?php echo $donation['isAnonymous'] ? "Anonymous" : stripslashes($donation['SupporterEmail']) ?>&nbsp;&nbsp;</td>
+                <td style="text-align:right; width:110px; border-right:1px solid silver;"><?php echo $donation['CreatedOn'] ?>&nbsp;&nbsp;</td>
+                <td style="text-align:center; width:120px;border-right:1px solid silver;"><?php echo $donation['TransactionSource'] ?></td>
+            </tr>
+            <?php $ctr++;?>
+            <?php } ?>
+            <?php if(isset($delMSG) && $delMSG) { echo "<span style='color:#F00;'>* Donations in red signify a volunteer who has been deleted from the activity</span>"; } ?>
+                <?php } else {
+                    ?>
+                <tr><td colspan="7"><b>&nbsp;No records found.</b></td></tr>
+                <?php } ?>
+            </table>
+            <br /><br />
+            <div id="divUpdateDesc">
+                <a class="btn btngreen" title="Back" href="/<?php echo $this->URLName ?>/manage-donations" >Back</a>
+                <a class="btn btngreen" style="float:right;" href="/donation/generatereport/?ProjectId=<?php echo $this->ProjectId ?>">Pull Report</a>
+            </div>
+        </div>
+        <div class="clear"></div>
+    </div>
+    </div>
+                            </div>
+                        </div>
+                    </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+    <div class="clr"></div>
+    <div class="clr"></div>
+</div>

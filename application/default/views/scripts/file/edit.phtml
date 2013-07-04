@@ -1,0 +1,41 @@
+<?php
+$this->headTitle("Empowered.org - Upload Photos");
+$this->placeholder('tab')->set('Organization');
+?>
+<script type="text/javascript" language="javascript">
+    function validate() {
+        if (jQuery.trim($('#name').val()) == '') {
+            alert("Please select name to upload.");
+            return false;
+        } else {
+        	return true;}
+           /* var image = $('#upload').val().split(".");
+            var accepted_files = new Array("jpeg", "gif", "png", "jpg");
+            if (!accepted_files.inArray(image[image.length-1])) {
+                alert("Please select jpeg, gif and png files only.");
+                return false;
+            } else {
+                return true;
+            }
+        }*/
+    }
+</script>
+<div>
+    <div id="mainco2">
+        <div class="roundedbox">
+            <h2>Upload Photos</h2>
+            <div>
+                <form id="uploadphoto" method="post" action="/file/edit" enctype="multipart/form-data" onsubmit="return validate()">
+                    <input type="hidden" id="fileid" name="fileid" value="<?php echo $this->infofiles['FileId']; ?>" />
+                    Name: <input id="name" type="text" name="fname" value="<?php echo $this->infonamefiles; ?>" /><br />
+                    <br>
+                    <input name="check2" type="checkbox"  <?php if($this->check!='') echo "checked=".$this->check; ?>" />This is checked<br />
+                    <input type="submit" name="submit" value="Upload" class="button" />
+                    <input type="hidden" name="GroupId" value="<?php echo $this->GroupId; ?>" class="button" />
+                    
+                </form>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>

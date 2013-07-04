@@ -1,0 +1,35 @@
+<?php
+$this->headTitle("Empowered.org:  Empowering groups of volunteers to create social change");
+$this->placeholder('tab')->set('Profile login');
+?>
+<div>
+    <div id="centred">
+        <!-- main col - 100% width -->
+        <div id="mainco2">
+            <!-- block001 -->
+            <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+            <div class="block001">
+                <div class="blst001">
+                    <div class="blst002 hsp">
+                        <h1>Login</h1>
+                        <?php if ($this->loginError) : ?>
+                        <span style="border: solid 2px silver; color: red; padding: 4px; padding-right:40px"><?php echo $this->message ?></span>
+                        <?php endif; ?>
+                        <!-- login form -->
+                        <?php echo $this->loginForm; ?>
+                        <div class="ppst06"><a id="ctl00_ContentPHMain_lnkFPassword" href="/profile/forgotpassword">Forgot password?</a> | <a href="/profile/register" >Join Now</a></div>
+                        <!-- e o login form -->
+                    </div>
+                </div>
+            </div>
+            <div class="block001f01">
+                <div class="blst001">
+                    <div class="blst002"></div>
+                </div>
+            </div>
+            <!-- e o block001 -->
+        </div>
+        <!-- e o main col -->
+        <div class="clear"></div>
+    </div>
+</div>

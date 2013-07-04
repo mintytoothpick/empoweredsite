@@ -1,0 +1,71 @@
+<?php $this->placeholder('tool_box')->captureStart() ?>
+<? if ($this->isGlobAdmin) { ?>
+<script>
+function deleteOrg() {
+    if (confirm('Do you want to delete the organization with events,programs,groups,initiatives?')) {
+        location.href="/nonprofit/delete?OrganizationId=<?=$this->organization->id?>";
+    }
+}
+</script>
+<? } ?>
+
+<div class="adminPanelCon">
+  <div class="adminPanel">
+    <h1><span></span>Tools</h1>
+    <div class="tool-box-content">
+      <ul>
+        <li><a href="#" onclick="showAdminVideo(); return false;">Watch Administrator Video</a></li>
+      </ul>
+      <div class="adminPanelSeprator"></div>
+      <ul>
+        <li><a class="editDetails" href="/nonprofit/editinfo?NetworkId=<?=$this->organization->id?>"><span style="vertical-align:top;">Edit Details</span></a></li>
+        <li><a class="editDetails" href="javascript:;" onclick="editStyle();"><span style="vertical-align:top;">Edit Style</span></a></li>
+        <?php if (isset($this->siteBanner) && !empty($this->siteBanner['SystemMediaName'])) { ?>
+        <li><a class="bannerIcon" href="javascript:;" onclick="deleteBanner('<?=$this->organization->id?>')"><span style="vertical-align:top; margin-right:15px;">Remove Organization Banner</span></a></li>
+        <?php } else if ($this->isImageExists && !empty($this->siteMedia['SystemMediaName'])) { ?>
+        <li><a class="logoIcon uploadLogo" href="javascript:;"><span style="vertical-align:top; margin-right:15px;">Change Organization Logo</span></a></li>
+        <li><a class="bannerIcon uploadBanner" href="javascript:;"><span style="vertical-align:top;">Upload a Banner</span></a></li>
+        <?php } else { ?>
+        <li><a class="logoIcon uploadLogo" href="javascript:;"><span style="vertical-align:top;">Upload a Logo</span></a></li>
+        <li><a class="bannerIcon uploadBanner" href="javascript:;"><span style="vertical-align:top; margin-right:15px;">Upload a Banner</span></a></li>
+        <?php } ?>
+      </ul>
+      <div class="adminPanelSeprator"></div>
+      <ul>
+        <? if ($this->organization->hasActivities) { ?><li><a class="volunteerIcon" href="/<?=$this->organization->urlName?>/volunteers"><span style="vertical-align:top;">View Volunteers</span></a></li><? } ?>
+        <?php if ($this->organization->googleId || $this->organization->paypalId) { ?>
+        <li><a class="donationIcon" href="/<?=$this->organization->urlName?>/donations"><span style="vertical-align:top;">View Donation History</span></a></li>
+        <li><a class="donorsIcon" href="/<?=$this->organization->urlName?>/donors"><span style="vertical-align:top;">View Donors</span></a></li>
+        <li><a class="customize" href="/<?=$this->organization->urlName?>/custom-receipt"><span style="vertical-align:top;">Customize Donation Receipts</span></a></li>
+        <?php } ?>
+        <li><a class="reportsIcon" href="/<?=$this->organization->urlName?>/reports"><span style="vertical-align:top;">View Reports</span></a></li>
+        <?php if ($this->organization->hasGiftAid()) { ?><li><a class="reportsIcon" href="/<?=$this->organization->urlName?>/giftaidreport"><span style="vertical-align:top;">Gift Aid Report</span></a></li><? } ?>
+      </ul>
+    <? if ($this->hasMembership) { ?>
+      <div class="adminPanelSeprator"></div>
+      <ul>
+        <li><a class="reportsIcon" href="/<?=$this->organization->urlName?>/membership-report"><span style="vertical-align:top;">Membership Donations Report</span></a></li>
+        <li><a class="reportsIcon" href="/<?=$this->organization->urlName?>/membership-funds"><span style="vertical-align:top;">Membership Funds Transfers</span></a></li>
+      </ul>
+    <? } ?>
+      <div class="adminPanelSeprator"></div>
+      <ul>
+        <?php if (!$this->organization->googleId && !$this->organization->paypalId && !$this->organization->bluePayId) { ?>
+        <li><a href="/<?=$this->organization->urlName?>/activate-fundraising"><span style="vertical-align:top;">Activate Fundraising</span></a></li>
+        <?php } else { ?>
+        <li><a href="/<?=$this->organization->urlName?>/edit-fundraising"><span style="vertical-align:top;">Edit Fundraising Settings</span></a></li>
+        <?php } ?>
+        <li><a class="adminIcon" href="/<?=$this->organization->urlName?>/add-admins"><span style="vertical-align:top;">Add Organization Admins</span></a></li>
+        <li><a class="adminIcon" href="/<?=$this->organization->urlName?>/memberstitles"><span style="vertical-align:top;">Members Titles</span></a></li>
+        <li><a class="files" href="/<?=$this->organization->urlName?>/manage-files"><span style="vertical-align:top;">Manage Files</span></a></li>
+        <? if ($this->isGlobAdmin) { ?><li><a class="" href="javascript:;" onclick="deleteOrg();"><span style="vertical-align:top;">Delete Organization</span></a></li><? } ?>
+      </ul>
+    </div>
+  </div>
+<div class="clr"></div>
+</div>
+
+<?php echo $this->placeholder('popup_upload_logo') ?>
+<?php echo $this->placeholder('popup_upload_banner') ?>
+
+<?php $this->placeholder('tool_box')->captureEnd() ?>

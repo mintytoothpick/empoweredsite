@@ -1,0 +1,20 @@
+<?php $this->placeholder('bluepayform_cc')->captureStart(); ?>
+<fieldset class="left">
+    <label>First Name:</label><input type="text" id="firstName" name="firstName" value="<?=($this->isLoggedIn) ? $this->userNew->firstName : ''?>" />
+    <label>Last Name:</label><input type="text" id="lastName" name="lastName" value="<?=($this->isLoggedIn) ? $this->userNew->lastName : ''?>" />
+    <label>Street Address:</label><input type="text" id="street" name="street" value="<?=($this->isLoggedIn && !empty($this->userNew->contact)) ? $this->userNew->contact->street : ''?>" />
+    <label>City:</label><input type="text" name="city" id="city" value="<?=($this->isLoggedIn && !empty($this->userNew->contact)) ? $this->userNew->contact->city : ''?>" />
+    <label>State:</label><input type="text" name="state" id="state" value="<?=($this->isLoggedIn && !empty($this->userNew->contact)) ? $this->userNew->contact->state : ''?>" />
+    <label>Zip Code:</label><input type="text" name="zipcode" id="zipcode" />
+    <label>Country:</label><input type="text" name="country" id="country" />
+    <label>Phone:</label><input type="text" id="phone" name="phone" value="<?=($this->isLoggedIn) ? $this->userNew->phone : ''?>" />
+    <label>Email:</label><input type="text" id="email" name="email" value="<?=($this->isLoggedIn) ? $this->userNew->email : ''?>" />
+</fieldset>
+<fieldset class="cardInfo">
+  <label>Card Number:</label><input type="text" name="cardNumber" id="cardNumber" value=""/>
+  <label>Validation Code:</label><input type="password" name="validationCode" id="validationCode" value="" class="dateInp" />
+  <label>Expiration Date:</label>
+  <input type="text" name="expirationDateMM" class="dateInp" id="cardExpMonth" value="MM" onfocus="this.style.color='black'; this.value='';" size="11" style="color:grey;" />
+  <input type="text" name="expirationDateYY" id="cardExpYear" value="YYYY" class="dateInp"  onfocus="this.style.color='black'; this.value='';" size="11" style="color:grey;" />
+</fieldset>
+<?php $this->placeholder('bluepayform_cc')->captureEnd(); ?>

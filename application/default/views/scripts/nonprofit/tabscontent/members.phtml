@@ -1,0 +1,76 @@
+<?php if ($this->isAdmin && !$this->organization->hasGroups) { ?>
+<script>
+function makeAdmin(UID) {
+    $.post('/nonprofit/adminuser', {
+            NetworkId: '<?=$this->organization->id?>',
+            UserId: UID,
+            setAdmin: true
+        },
+        function(data) {
+            window.location.reload(true);
+        }
+    );
+}
+
+function removeAdmin(UID) {
+    $.post('/nonprofit/adminuser', {
+            NetworkId: '<?=$this->organization->id?>',
+            UserId: UID,
+            removeAdmin: true
+        },
+        function(data) {
+            window.location.reload(true);
+        }
+    );
+}
+
+function removeMember(UID, name) {
+    if (confirm('Do you want to remove '+name+' member?')) {
+        $.post('/nonprofit/adminuser', {
+                NetworkId: '<?=$this->organization->id?>',
+                UserId: UID,
+                removeMember: true
+            },
+            function(data) {
+                window.location.reload(true);
+            }
+        );
+    }
+}
+</script>
+<?php } ?>
+
+<?php if (count($this->paginator)) {
+foreach ($this->paginator as $member) { ?>
+
+<div class="programBox02">
+
+    <?php if($this->isAdmin && $member->id != $this->userNew->id && !$this->organization->hasGroups) { ?>
+    <span style="float:right;">
+        <?php if($this->organization->isAdmin($member)) { ?>
+            <a id="status_<?=$member->id?>" href="javascript:;" onclick="removeAdmin('<?=$member->id?>')" style="font-size:11px; margin-right:11px;">Remove Admin</a>
+        <?php } else { ?>
+            <a id="status_<?=$member->id?>" href="javascript:;" onclick="makeAdmin('<?=$member->id?>')" style="font-size:11px; margin-right:11px;">Make Admin</a>
+        <?php } ?>
+        <a href="javascript:;" onclick="removeMember('<?=$member->id?>', '<?=$member->fullName?>')">
+        <img src="/public/images/cancel.png" /></a>
+    </span>
+    <?php } ?>
+
+
+
+    <p class="eventStyle"><img src="/profile/loadimage/?UserId=<?=$member->id?>" alt=" " width="75" height="75" class="imgstyle" /><span class="eventStyleText01"><a href="/<?=$member->urlName?>"><?=stripslashes($member->fullName)?></a></span>
+     <span class="eventStyleText02">Joined <?php echo isset($member->relData['JoinedOn']) ? date('F d, Y', strtotime($member->relData['JoinedOn'])) : date('F d, Y', strtotime($member->createdOn)) ?></span>
+    <br />
+    <p><?=stripslashes($member->aboutMe)?></p>
+    </p>
+</div>
+<div class="clr" style="margin-bottom:20px;"></div>
+<? } ?>
+<?= $this->paginationControl($this->paginator, 'Sliding', 'nonprofit/new_page_selector.phtml', array('param' => 'page')); ?>
+<? } else { ?>
+<p>No results found.</p>
+<? } ?>
+
+<input type="hidden" id="totalMembers" value="<?php echo $this->countRes; ?>" />
+

@@ -1,0 +1,114 @@
+<?php $this->headTitle("Empowered.org : world's largest student-led global health and sustainable development organization");
+$this->placeholder('title')->set('home');
+$this->placeholder('currenttab')->set('administrators');
+?>
+<script type="text/javascript">
+    var candidate_list = [];
+    function deleteAdminUser() {
+        var user_id = '';
+        var deleted = 0;
+        $('#admin_users tr td.td input[type=checkbox]').each(function(){
+            var chkbox = $(this).attr('name');
+            var user_id = chkbox.split('_');
+            if (document.getElementById(chkbox).checked == true) {
+                $.post('/administrator/delete', {UserId: user_id[1], SiteId: $('#SiteId').val()});
+                deleted++;
+            }
+        })
+        if (deleted > 0) {
+            alert("User(s) has been deleted successfully from the administrator list.")
+            return true;
+        } else {
+            alert("Please check a checkbox beside the user's name to delete it from the administrators list.")
+            return false;
+        }
+    }
+    function AddAdminUser() {
+        var success = false;
+        $.post('/administrator/create', {Email: $('#Email').val(), SiteId: $('#SiteId').val()}, function(response, status, xhr) {
+            msg = response.split("|");
+            if (msg[0] == 'success') {
+                alert(msg[1]);
+                window.location = "/administrator/manage/"+$('#SiteId').val()+"/"+$('#Type').val();
+            } else {
+                alert(msg[1]);
+            }
+        });
+    }
+    //$(function(){ $('#url').val(document.location.href) });
+</script>
+<style type="text/css">
+    table tr th {
+        text-align:center;
+    }
+</style>
+
+<div>
+	<div id="mainco2">
+        <div class="block001h01"><div class="blst001"><div class="blst002"></div></div></div>
+        <div class="block001">
+            <div class="blst001">
+                <div class="blst002">
+                    <div class="MainBody">
+                        <?php if(file_exists("/home/$this->envUsername/public_html/public/Media/full/".$this->image['SystemMediaName'])) { ?><div class="logo2"><img src="<?php echo $this->contentLocation ?>public/Media/full/<?php echo $this->image['SystemMediaName'] ?>" style="width:141px;height:70px; border-width:0px;" /></div><?php } ?>
+                        <h1 style="font-size:27px; line-height:27px; float:left"><?php echo stripslashes($this->network['NetworkName']) ?></h1><iframe src="http://www.facebook.com/widgets/like.php?href=http://www.empowered.org/<?php echo $this->network['URLName'] ?>&amp;layout=button_count&amp;show_faces=true" scrolling="no" frameborder="0" style="border:none; float:left; height:70px; width:90px; margin: 5px 0 0 10px;"></iframe>
+                        <div id="TabbedPanels1" class="TabbedPanels">
+                            <?php include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/nonprofitheader.php'; ?>
+                            <div class="TabbedPanelsContentGroup">
+                                <!-- FIRST TAB -->
+                                <div class="TabbedPanelsContent">
+                                    <div class="Menu2Body">
+                                        <div class="whiteBox">
+		<h2><span id="ctl00_lblHeading"></span><span id="ctl00_lblSiteNameHeading"></span>Manage Administrators</h2>
+        <div>
+            <div>
+                <form id="AddAdminRights" method="post" action="/administrator/create" onsubmit="AddAdminUser(); return false;" >
+                    <h3 style="margin-bottom:3px;">Add New Administrator</h3>
+                    <input type="hidden" id="SiteId" name="SiteId" value="<?php echo $this->SiteId ?>" />
+                    <input type="hidden" id="Type" name="Type" value="<?php echo $this->Type ?>" />
+                    <input type="hidden" id="url" name="url" value="" />
+                    Enter user's email: <input type="text" id="Email" name="Email" value="" /> <input type="submit" value="Add"/>
+                </form>
+            </div>
+            <br/><br/><br/>
+            <div>
+                <form id="DeleteAdminRights" method="post" action="" onsubmit="return deleteAdminUser()">
+                    <input type="hidden" id="SiteId" name="SiteId" value="<?php echo $this->SiteId ?>" />
+                    <table id="admin_users" cellspacing="0" cellpadding="3" border="0" style="border:1px solid #E7E7FF;width:700px; border-collapse:collapse;">
+                        <tr style="color:#F7F7F7;background-color:#000;font-weight:bold;height:25px;">
+                            <th scope="col">Administrators</th>
+			    <th scope="col">Delete</th>
+                        </tr>
+                        <?php $ctr=0; foreach ($this->administrators as $admin) { ?>
+                        <tr style="background-color:<?php echo $ctr%2 == 1 ? "#e7e7e9" : "white" ?>;">
+                            <td style="width:140px;">
+                                &nbsp;<?php echo stripslashes($admin['FirstName'])." ".stripslashes($admin['LastName']) ?>
+                            </td>
+                            <td style="width:70px; text-align:center" class="td">
+                                <input id="delete_<?php echo $admin['UserId'] ?>" type="checkbox" name="delete_<?php echo $admin['UserId'] ?>" value="" />
+                            </td>
+                        </tr>
+                        <? $ctr++;} ?>
+                    </table>
+                    <br />
+                    <?php if (count($this->administrators) > 0) { ?>
+                    <input type="submit" class="btn btngreen" value="Delete Selected" />
+                    <?php } ?>
+                    
+                </form>
+            </div>
+        </div>
+		<div class="clear"></div>
+	</div>
+	</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+    </div>
+    <div class="block001f01"><div class="blst001"><div class="blst002"></div></div></div>
+</div>
+     
+

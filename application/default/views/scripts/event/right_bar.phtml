@@ -1,0 +1,94 @@
+<?php $this->placeholder('right_bar')->captureStart() ?>
+<script>
+$(function() {
+    $('#selNumTickets').change(function() {
+        if($(this).val() == 'more') {
+            $('#moreInput').show();
+        } else {
+            $('#moreInput').hide();
+        }
+    });
+    <?php if ($this->event->isRSVP) { ?>
+    $('#arsvp').click(function(event) {
+        event.preventDefault();
+        totalTickets = $('#selNumTickets').val();
+        if (totalTickets == 'more') {
+            if($('#morTickets').val() <= <?=$this->event->remainingTickets?>) {
+                totalTickets = $('#morTickets').val();
+            } else {
+                alert('There is a limit of <?=$this->event->remainingTickets?> tickets to register');
+                return;
+            }
+        }
+        var html = '<h2>Purchase Tickets - Fill Information</h2>';
+        html += '<form id="frmPurchRSVPTickets" action="/event/purchaseticketsholder">';
+        html += '<input type="hidden" name="EventId" value="<?=$this->event->id?>">';
+        for (i=0; i<totalTickets; i++) {
+            html += '<div class="ticket"><span>Ticket #' + (i+1) + ':</span>';
+            html += '<label>Name</label>';
+            html += '<input type="text" name="name['+i+']" id="name'+i+'" class="required"/>';
+            html += '<div class="clear"></div>';
+            html += '<label>Email</label>';
+            html += '<input type="text" name="email['+i+']" id="email'+i+'" class="required email"/>';
+            html += '<div class="clear"></div>';
+            html += '</div>';
+        }
+        html += '<input type="submit" value="Finish">';
+        html += ' <input type="button" value="Cancel" onclick="$.fancybox.close();"></form>';
+        $.fancybox(html);
+        $('#frmPurchRSVPTickets').validate({
+            submitHandler: function(form) {
+                $.fancybox.showActivity();
+                $.post($(form).attr('action'),
+                    $(form).serialize(),
+                    function(data) {
+                        var html = '<h3>Tickets successfully sent</h3>';
+                        html += '<input type="button" value="Close" onclick="$.fancybox.close()" />';
+                        $.fancybox(html);
+                    }
+                );
+            }
+        });
+    });
+    <?php } ?>
+});
+</script>
+
+<div class="goal-greyC">
+  <div class="days-go">
+    <? if ($this->event->isUpcoming()) { ?>
+    <strong><span class="Text36"><?=$this->daysToGo?></span></strong> Days to Go
+    <? } else if ($this->event->isInProgress()) { ?>
+    <span class="Text36">In Progress</span>
+    <? } else { ?>
+    <span class="Text36">Ended</span>
+    <? } ?>
+  </div>
+
+  <? if ($this->daysToGo > 0) {?>
+  <? if (($this->event->isRSVP || $this->event->isSellTickets) && ($this->event->remainingTickets > 0 || is_null($this->event->remainingTickets))) { ?>
+  <div class="greyBox2">
+    <p>How many tickets do you <br /> want to buy?</p>
+    <strong><span class="color03">FREE</span></strong>
+    <div class="clr"></div>
+    <select name="select" class="textfield14" id="selNumTickets">
+      <? for($t=0;$t<$this->event->remainingTickets; $t++) { ?>
+      <option value="<?=$t+1?>"><?=$t+1?> ticket<?=($t==1) ? '' : 's'?></option>
+      <? if ($t==9) break; ?>
+      <? } ?>
+      <? if ($this->event->remainingTickets > 10) { ?>
+      <option value="more">More ...</option>
+      <? } ?>
+    </select>
+    <div class="clr"></div>
+    <? if ($this->event->remainingTickets > 10) { ?>
+    <span id="moreInput" class="hide">More Tickets: <input type="text" name="morTickets" id="morTickets" value="11"/></span>
+    <div class="clr"></div>
+    <? } ?>
+    <p>Available: <?=date('M d', strtotime($this->event->startDate))?> to <?=date('M d', strtotime($this->event->endDate))?> </p>
+    <div class="donateBtn2"><a href="/<?=$this->group->urlName?>/purchase-tickets?EventId=<?=$this->event->id?>" <?=($this->event->isRSVP) ? 'id="arsvp"':''?>><?=($this->event->isRSVP) ? 'Register':'Purchase'?></a></div>
+  </div>
+  <? } ?>
+  <? } ?>
+</div>
+<?php $this->placeholder('right_bar')->captureEnd() ?>

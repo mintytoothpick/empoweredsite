@@ -1,0 +1,73 @@
+<?php $this->headTitle("Empowered.org - Start an Organization"); ?>
+<script type="text/javascript" language="javascript">
+    function ValidateForm() {
+        var unassigned = 0;
+        $('.programs').each(function() {
+            if ($(this).val() == '') {
+                unassigned ++;
+            }
+        })
+        if (unassigned > 0) {
+            alert("Please assign all groups to their affiliated program.");
+            return false;
+        }
+        return true;
+    }
+    
+    function hideBoxes() {
+        $('.info-boxes').hide();
+    }
+</script>
+<style type="text/css">
+    .success { color:green }
+    .error { color:red }
+    .field-label { float:left; font-weight:bold; color:#000; width:210px; margin-bottom:20px;}
+    .field-input { float:left; width:700px; padding-bottom:20px; margin-left: 10px }
+    .field-input input { padding:1px; }
+    .hidden { display:none }
+    .create-opts { float: left }
+    .info-boxes { margin: 10px 0px; margin-left: 15px; background: #fff7c8; border:1px solid #dcbd00; padding: 10px 5px; -moz-border-radius:5px; width: 500px; float: left }
+</style>
+
+
+<div>
+    <div id="mainco2">
+        <div class="roundedbox">
+            <a id="top" href="#top" style="text-decoration:none">&nbsp;</a>
+            <form name="CreateGroup" method="post" onsubmit="return ValidateForm()">
+                <?php if ($this->list == 'event') { ?>
+                <input type="hidden" name="EventId" value="<?php echo $this->eventInfo['EventId'] ?>" />
+                <?php } else { ?>
+                <input type="hidden" name="ProjectId" value="<?php echo $this->data['ProjectId'] ?>" />
+                <?php } ?>
+                <div style="margin:auto; width:960px; padding-right:5px; ">
+                    <div id="message" class="error" style=" border:2px solid #e3e3e3; margin-bottom:15px; padding:5px; width:475px; <?php if(!$this->message) { echo "display:none;"; } ?>"><?php if(isset($this->message)) { echo $this->message; } ?></div>
+                    <h1 style="margin-bottom:0px; font-size:23px; font-weight:bold">Assign Groups to their Affiliated Program</h1>
+                    <div class="clear"></div>
+                    <ul style="list-style:none; padding:0px; margin-bottom:0px; margin:auto; float:left; width:100%;">
+                        <li class="field-label" style="font-weight: bold; font-size: 14px">Groups</li>
+                        <li class="field-input" style="font-weight: bold; font-size: 14px">Affiliated Programs</li>
+                        <?php
+                        $ctr = 0;
+                        foreach($this->groups as $group) { 
+                            if (empty($group['ProgramId'])) {
+                        ?>
+                        <input type="hidden" name="GroupId[<?=$ctr?>]" value="<?php echo $group['GroupId'] ?>" />
+                        <li class="field-label"><?php echo $group['GroupName'] ?></li>
+                        <li class="field-input">
+                            <select class="programs" name="ProgramId[<?=$ctr?>]" style="padding: 2px">
+                                <option value="">Select a Program</option>
+                                <?php foreach($this->programs as $program) { ?>
+                                <option value="<?php echo $program['ProgramId'] ?>"><?php echo $program['ProgramName'] ?></option>
+                                <?php } ?>
+                            </select>
+                        </li>
+                        <?php } 
+                        } ?>
+                    </ul>
+                    <div class="clear"></div>
+                    <input type="submit" value="Submit" class="btn btngreen" />
+                </div>
+            </form>
+        </div>
+    </div>

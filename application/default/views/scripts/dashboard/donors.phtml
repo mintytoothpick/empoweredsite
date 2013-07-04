@@ -1,0 +1,217 @@
+<?php if (isset($this->group)) { ?>
+<link rel="stylesheet" href="/public/css/dashboard.css" media="screen,projection" type="text/css" />
+<?php } ?>
+<script>
+function togglePopup(form, id, val, note) {
+    $('#popup-overlay').toggle();
+    $('.'+form).toggle()
+    $(id).val(val);
+    if (form == 'add-note') {
+        $('#'+form+' .Notes').val(note)
+    } else {
+        $('#'+form+' .Notes').val($('#hidden-note-'+val).val());
+    }
+}
+
+function manageNote(form, action) {
+    if (jQuery.trim($(form+' .Notes').val()) == '') {
+        alert("Please enter the donor's notes")
+    } else {
+        $.post('/dashboard/'+action, $(form).serialize(), function(data) {
+            alert(data);
+            window.location.reload(true);
+        })
+    }
+    return false;
+}
+
+function deleteNote(id) {
+    if (confirm("Are you sure you want to delete this donor note?") == true) {
+        $.post('/dashboard/deletenote', {DonationNoteId: id}, function(data) {
+            alert(data);
+            window.location.reload(true);
+        })
+    } else {
+        return false;
+    }
+}
+
+function showDonation(id) {
+    $.fancybox('<h2>Donation History</h2>' + $(id).html());
+}
+</script>
+<style>
+    .popup-box { width: 600px; left: 30%; right: 30%; top:25%; position: fixed; z-index: 999999!important; background-color:#ffffff; border:5px solid #e5e5e5; padding:10px 0 20px 0; -moz-border-radius:5px; margin:auto }
+    #popup-overlay {
+        background: url(<?=$this->contentLocation ?>public/images/bg-overlay.png);
+        height:100%;
+        position:fixed;
+        display:block;
+        left:0;
+        top:0;
+        width:100%!important;
+        z-index:998;
+        display:none;
+    }
+    .right {
+        float:right;
+    }
+    .hidden { display:none }
+</style>
+<div class="add-note popup-box hidden" style="margin-bottom:15px; margin-left:15px; padding:10px; font-size:14px">
+    <h2>Add Donor Note</h2>
+    <form id="add-note" onsubmit="manageNote('#add-note', 'addnote'); return false;">
+        <input id="SupporterEmail" type="hidden" name="SupporterEmail" value="" />
+        <textarea cols="60" rows="3" name="Notes" class="Notes"></textarea>
+        <div class="clear"></div><br>
+        <a href="javascript:;" class="btn btngreen" onclick="togglePopup('add-note', '#SupporterEmail', '', '')">Cancel</a>
+        <input type="submit" class="btn btngreen" value="Submit" />&nbsp;
+    </form>
+</div>
+<div class="edit-note popup-box hidden" style="margin-bottom:15px; margin-left:15px; padding:10px; font-size:14px">
+    <h2>Edit Donor Note</h2>
+    <form id="edit-note" onsubmit="manageNote('#edit-note', 'editnote'); return false;">
+        <input id="DonationNoteId" type="hidden" name="DonationNoteId" value="" />
+        <textarea cols="60" rows="3" name="Notes" class="Notes"></textarea>
+        <div class="clear"></div><br>
+        <a href="javascript:;" class="btn btngreen" onclick="togglePopup('edit-note', '#DonationNoteId', '', '')">Cancel</a>
+        <input type="submit" class="btn btngreen" value="Submit" />&nbsp;
+    </form>
+</div>
+<div id="popup-overlay"></div>
+<div class="wrapper">
+   <!-- org header -->
+  <?=$this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+    
+    <?php if(isset($this->group)) { ?>
+      <!-- breadcrumb -->
+      <?=$this->placeholder('breadcrumb') ?>
+      <!-- // breadcrumb -->
+      <div class="clr"></div>
+
+      <!-- tabs -->
+      <?=$this->placeholder('tabs') ?>
+      <!-- // tabs -->
+    <?php } else {
+      include_once realpath(dirname(__FILE__) . '/../../../').'/layouts/profileheader.php'; 
+    } ?>
+
+    <div class="mainC">
+      <div class="box05">
+        <div class="headingStyle02">
+            <?= isset($this->project) ? $this->project->name : $this->group->name ?>'s Donors (<?=number_format(count($this->donations)) ?>)
+        </div>
+		<div id="mainnotleft" style="width:100%;">
+            <div class="tab-container" style="width:100%; padding-top:0;">
+                <div id="donorFilters" class="article01" style="border:0; margin-bottom:15px;display:none;">
+                    <form method="post">
+                        <?php if (isset($this->group)) { ?>
+                        <span style="float:left;">
+                            <span style="color:#693; font-weight:bold; font-size:13px;" >Filter By: </span>
+                            <select name="ProjectId" style="padding: 2px 2px 2px 0" onchange="this.form.submit();">
+                                <option value="">All Activities & Campaigns</option>
+                                <?php foreach($this->activities as $activity) { ?>
+                                <option value="<?=$activity['ProjectId'] ?>" <?= isset($this->project) && $this->project->id == $activity['ProjectId'] ? "selected" : ""; ?>><?=stripslashes($activity['Name']) ?></option>
+                                <?php } ?>
+                            </select>
+                        </span>
+                        <div class="clear" style="margin-bottom:25px"></div>
+                        <?php } ?>
+                        <div class="search" style="float:left; margin:0;width:auto;">
+                            <input type="text" name="search_text" style="width:250px; border:2px solid #528D19; padding:3px; float: left; color: gray; background: url(/public/images/search.gif) no-repeat 98% center" <?php if(isset($_REQUEST['search_text'])) { echo 'value="'.$_REQUEST['search_text'].'"'; } ?> />
+                            <input type="submit" value="" style="display: none" />
+                        </div>
+                        <span style="float:left;margin:3px 0 0 5px;">
+                            Show:
+                            <select name="limit" id="limit" style="padding: 2px 2px 2px 0" onchange="this.form.submit();">
+                                    <option value="10" <?=isset($_REQUEST['limit']) && $_REQUEST['limit'] == 10 ? "selected" : "" ?>>10</option>
+                                    <option value="25" <?=isset($_REQUEST['limit']) && $_REQUEST['limit'] == 25 ? "selected" : "" ?>>25</option>
+                                    <option value="50" <?=isset($_REQUEST['limit']) && $_REQUEST['limit'] == 50 ? "selected" : "" ?>>50</option>
+                                    <option value="100" <?=isset($_REQUEST['limit']) && $_REQUEST['limit'] == 100 ? "selected" : "" ?>>100</option>
+                                    <option value="All" <?=isset($_REQUEST['limit']) && $_REQUEST['limit'] == 'All' ? "selected" : "" ?>>All</option>
+                            </select>
+                        </span>
+
+                	</form>
+        		</div>
+                <div class="article01" style="padding-bottom:10px;">
+                    <ul id="tools-links">
+                        <h2 style="border:none;"><li><a href="javascript:;"><img src="/public/images/wrench.jpeg" style="border:1px solid #AAA;"></a>
+                                <ul style="font-size:12px; font-weight:normal;">
+                                    <li><a href="/<?= isset($this->project) ? $this->project->urlName : $this->group->urlName ?>/email-donors?Prev=donors"><img src="/public/images/envelope.png" style="margin:3px 5px;"><span style="vertical-align:top;">Email Donors</span></a></li><br />
+                                    <li><a href="/dashboard/exportdonordonations?<?= isset($this->project) ? 'ProjectId='.$this->project->id : 'GroupId='.$this->group->id; ?>"><img src="/public/images/reports.png" style="margin:3px 5px;"><span style="vertical-align:top;margin-right:15px;">Pull Donor Report</span></a></li><br />
+                                </ul>
+                            </li>
+                    </ul></h2>
+                    <div id="showFilterLink" style="float:right;margin-top:10px;"><a href="javascript:;" onclick="$('#showFilterLink').hide(); $('#donorFilters').show(); $('#hideFilterLink').show();" >Show Filters</a></div>
+                    <div id="hideFilterLink" style="float:right;margin-top:10px;display:none;"><a href="javascript:;" onclick="$('#showFilterLink').show(); $('#donorFilters').hide(); $('#hideFilterLink').hide();" >Hide Filters</a></div>
+                </div>
+            <?php $ctr = 1; foreach($this->paginator as $donor) { ?>
+                <div class="article01">
+                    <div class="tab-right" style="width:900px;">
+                        <!-- move all of these actions into ajax calls -->
+                        <table style="width:100%">
+                            <tr>
+                                <td valign="top" style="width:800px" class="tablespace">
+                                    <b><?=stripslashes($donor['SupporterName']) ?></b> - <?=$donor['SupporterEmail'] ?><br />
+                                    <a href="javascript:;" onclick="showDonation('#history-<?=$ctr ?>')" style="margin-right:5px">&bull; Donation History</a>
+                                    <a href="javascript:;" onclick="<?php if (!empty($donor['SupporterEmail'])) { ?>$('#notes-<?=$ctr ?>').toggle()<?php } else { echo "return false"; } ?>" style="margin-right:5px">&bull; Notes</a>
+                                    <a href="/<?= isset($this->project) ? $this->project->urlName : $this->group->urlName ?>/donor-donations/<?=$donor['SupporterEmail'] ?>">&bull; Donation Report</a>
+                                    <br />
+                                    <div id="history-<?=$ctr ?>" style="display:none;">
+                                    <p><?=stripslashes($donor['SupporterName']) ?></p><br />
+                                    <p>
+                                    <?php
+                                    $donations_list = $this->project_donations->getDonorDonations($donor['SupporterEmail'], isset($this->project) ? $this->project->id : $this->group->id, isset($this->project) ? 'activity' : 'group');
+                                    if (count($donations_list)) {
+                                    foreach($donations_list as $donation) {
+                                        $projInfo = $this->projects_class->loadInfo1($donor['ProjectId']);
+                                        $userInfo = !empty($donor['VolunteerId']) ? $this->users_class->loadInfo($donor['VolunteerId']) : "";
+                                    ?>
+                                        Donated <?=(isset($this->project) ? $this->project->currency : $this->group->currency).number_format($donation['DonationAmount']) ?> to <?=stripslashes($projInfo['Name']).(!empty($userInfo) ? " in behalf of ".stripslashes($userInfo['FullName']) : "" ) ?>.<br />
+                                    </p>
+                                    <?php }  } ?>
+                                    </div>
+                                    <?php if (!empty($donor['SupporterEmail'])) { ?>
+                                        <div id="notes-<?=$ctr ?>" style="display:none; margin-top:10px; margin-bottom:5px;">
+                                            <a href="javascript:;" onclick="togglePopup('add-note', '#SupporterEmail', '<?=$donor['SupporterEmail'] ?>', '')">Add Note</a>
+                                        <?php
+                                        $notes = $this->donation_notes->getDonorNotes($donor['SupporterEmail']);
+                                        foreach($notes as $note) {
+                                        ?>
+                                            <span> - <?=stripslashes($note['Notes']) ?></span>
+                                            <input type="hidden" id="hidden-note-<?=$note['DonationNoteId'] ?>" value="<?=stripslashes($note['Notes']) ?>" />
+                                             &bull;<a href="javascript:;" onclick="togglePopup('edit-note', '#DonationNoteId', '<?=$note['DonationNoteId'] ?>', '')">Edit</a>
+                                            &nbsp;&bull;&nbsp;
+                                            <a href="javascript:;" onclick="deleteNote('<?=$note['VolunteerNoteId'] ?>')">Delete</a>
+                                            <br>
+                                        <?php } ?>
+                                        </div>
+                                    <?php } ?>
+                                </td>
+                                <td valign="top" style="width:120px!important; display:inline-block">
+                                    Donated:&nbsp;<?=(isset($this->project) ? $this->project->currency : $this->group->currency).number_format($donor['total_donation']) ?><br />
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <?php $ctr++; } ?>
+				<div class="spacer"></div>
+                <div class="navpage">
+                    <div class='s2st03' style="margin-top:10px"><?= $this->paginationControl($this->paginator, 'Sliding', '/dashboard/page_selector.phtml'); ?></div>
+                </div>
+				<a href="/<?=isset($this->project) ? $this->project->urlName : $this->group->urlName ?>" class="btn btngreen">Back</a>
+				                
+            </div>
+        </div><!--End Main Content-->
+	</div>
+</div>
+<div class="clr"></div>
+<div class="clr"></div>
+</div>

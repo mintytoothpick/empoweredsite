@@ -1,0 +1,88 @@
+<?php
+$_REQUEST['URLName'] = $this->data['URLName'];
+$_REQUEST['page'] = "donations";
+?>
+
+<link rel="stylesheet" href="/public/css/donations.css" media="screen,projection" type="text/css" />
+<link rel="stylesheet" type="text/css" href="<?php echo $this->contentLocation ?>public/js/datepicker/themes/smoothness/jquery-ui-1.7.3.custom.css" media="screen"/>
+<script type="text/javascript" src="<?php echo $this->contentLocation ?>public/js/datepicker/ui.core.js"></script>
+<script type="text/javascript" src="<?php echo $this->contentLocation ?>public/js/datepicker/ui.datepicker.js"></script>
+<div class="wrapper">
+   <!-- org header -->
+  <?php echo $this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="BodyCon">
+
+    <!-- breadcrumb -->
+    <?php echo $this->placeholder('breadcrumb') ?>
+    <!-- // breadcrumb -->
+    <div class="clr"></div>
+
+    <!-- tabs -->
+    <?php echo $this->placeholder('tabs') ?>
+    <!-- // tabs -->
+
+    <div class="mainC">
+
+                                                <div class="fundtitle" style="padding:15px 0"><?php echo $this->list == 'Donor' ? "Donor Donations" : "Donations on Behalf of ".(stripslashes($this->fundraiser['FullName'])) ?></div>
+                                                <div class="clear"></div>
+                                                <div class="tab-container">
+                                                    <table cellpadding="0" cellspacing="0" style="width:96%;">
+                                                        <tr>
+                                                            <td colspan="5" class="donation_tablehead" style="border-right:1px solid #BBCFF9;">
+                                                                <div class="donation_navpage">
+                                                                    
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr style="width:100%!important">
+                                                            <td class="do_col1" style="width:150px">&nbsp;Transaction ID</td>
+                                                            <td class="do_col2" style="width:150px" align="center">Donation Amount</td>
+                                                            <td class="do_col2" style="width:120px" align="center">Charged</td>
+                                                            <td class="do_col2" style="width:320px">Donation Destination</td>
+                                                            <td class="do_col2" style="width:170px; border-right:1px solid #BBCFF9;" align="center">Date</td>
+                                                        </tr>
+                                                        <?php foreach ($this->paginator as $donation) { ?>
+                                                        <tr>
+                                                            <td class="xdo_col1">&nbsp;<?php echo $donation['TransactionId'] ?></td>
+                                                            <td  class="xdo_col2" align="center"><?php echo $this->data['Currency'].number_format($donation['DonationAmount']) ?></td>
+                                                            <td  class="xdo_col2" align="center">
+                                                                <?php if ($donation['OrderStatusId'] == 2) { ?>
+                                                                <img src="/public/images/dashboard/note.png" />
+                                                                <?php } else if ($donation['OrderStatusId'] == 1) { ?>
+                                                                <img src="/public/images/dashboard/x.png" />
+                                                                <?php } else { ?>
+                                                                <img src="/public/images/dashboard/t.png" />
+                                                                <?php } ?>
+                                                            </td>
+                                                            <td class="xdo_col2">
+                                                                <?php
+                                                                if(!empty($donation['VolunteerId'])) {
+                                                                    $userInfo = $this->users_class->loadInfo($donation['VolunteerId']);
+                                                                    echo stripslashes($userInfo['FullName']);
+                                                                } else { 
+                                                                    $projInfo = $this->projects_class->loadInfo1($donation['ProjectId']);
+                                                                    echo stripslashes($projInfo['Name']);
+                                                                } ?>
+                                                            </td>
+                                                            <td class="xdo_col2" align="center" style="border-right:1px solid #BBCFF9;">
+                                                                <?php echo date('M d, Y h:i:s A', strtotime($donation['CreatedOn'])) ?>
+                                                            </td>
+                                                        </tr>
+                                                        <?php } ?>
+                                                        <tr>
+                                                            <td class="donation_tablehead1" colspan="5" align="left" style="border-right:1px solid #BBCFF9;">
+                                                                &nbsp;<a href="/nonprofit/exportdonordonations?NetworkId=<?php echo $this->data['NetworkId'] ?>&<?php echo $this->param ?>">Download data to spreadsheet (.csv)</a>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                                <div class="spacer"></div>
+                                                <a class="btn btngreen" style="padding:3px 15px; margin: 15px 0 15px 3px" href="/<?php echo $this->data['URLName'] ?>/<?php echo $this->Prev == 'Volunteer' ? 'volunteers' : 'donors' ?>">Back</a>
+                                                <div class="spacer"></div>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+                </div>
+
