@@ -287,10 +287,11 @@ class ExternalController extends BaseController {
             $ffg->fee            = $external->ffg->params['fee'];
             $ffg->currency       = $external->ffg->params['curr'];
             $ffg->flyForGoodId   = $external->ffg->params['idffg'];
+            $ffg->createdOn      = date('Y-m-d H:i:s');
             if (isset($external->ffg->params['txt'])) {
                 $ffg->description = $external->ffg->params['txt'];
             }
-            $ffg->payTicket();
+            $ffg->save();
         }
         $data = array(
             'key' => md5(
