@@ -3,5 +3,8 @@ library/Zend/**
 library/Zend/**/**
 library/Zend/**/**/*
 
+library/Brigade/Reporting
+library/Brigade/Reporting/**
+
 logs
 logs/**
