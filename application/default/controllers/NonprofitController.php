@@ -50,6 +50,7 @@ require_once 'Event.php';
 require_once 'Organization.php';
 require_once 'GiftAid.php';
 require_once 'Salesforce.php';
+require_once 'FlyForGood.php';
 
 class NonprofitController extends BaseController {
 
@@ -134,10 +135,10 @@ class NonprofitController extends BaseController {
         }
 
         //fly for good
-        /*$this->view->hasFlyForGood = false;
+        $this->view->hasFlyForGood = false;
         if (in_array($organization->id, Organization::$withFlyForGood)) {
             $this->view->hasFlyForGood = true;
-        }*/
+        }
 
         $this->getHeaderMedia($organization);
 
@@ -3318,7 +3319,7 @@ class NonprofitController extends BaseController {
     /**
      * Fly For good report
      */
-    /*public function ffgreportAction() {
+    public function ffgreportAction() {
         if (!$this->view->isAdmin) {
             $this->_helper->redirector('badaccess', 'error');
         }
@@ -3328,8 +3329,8 @@ class NonprofitController extends BaseController {
         $this->view->headTitle(stripslashes($org->name).' | Fly For Good Transactions');
 
         //filter
-        $perPage  = $this->_getParam('show_list', 50);
-        $page     = $this->_getParam('page', 1);
+        $perPage = $this->_getParam('show_list', 50);
+        $page    = $this->_getParam('page', 1);
 
         //breadcrumb
         $this->view->breadcrumb   = $this->view->breadcrumbHelper($org, 'Fly For Good Transactions');
@@ -3337,17 +3338,17 @@ class NonprofitController extends BaseController {
         $this->view->organization = $org;
         $this->view->showList     = $perPage;
 
-        $this->view->membershipFunds = FlyForGood::getListByOrganization($org);
+        $this->view->ffgFunds = FlyForGood::getListByOrganization($org);
 
-        $paginator = Zend_Paginator::factory($this->view->membershipFunds);
+        $paginator = Zend_Paginator::factory($this->view->ffgFunds);
         $paginator->setItemCountPerPage($perPage);
         $paginator->setCurrentPageNumber($page);
-        $this->view->funds = $paginator;
-        $_REQUEST['URLName']  = $org->urlName;
-        $_REQUEST['subpage']  = 'membership-funds';
+        $this->view->paginator = $paginator;
+        $_REQUEST['URLName']   = $org->urlName;
+        $_REQUEST['subpage']   = 'membership-funds';
 
         $this->renderPlaceHolders();
-    }*/
+    }
 
 
     /**

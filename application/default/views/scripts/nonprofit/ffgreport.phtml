@@ -41,75 +41,43 @@
                     <td class="do_col2" align="center">Currency</td>
                     <td class="do_col2" align="center">Status</td>
                 </tr>
-                <?php foreach ($this->paginator as $donation) { ?>
+                <?php foreach ($this->paginator as $ffg) { ?>
                 <tr>
                     <td class="xdo_col1">
-                        <?php echo $donation->transactionId ?>
+                        <?php echo $ffg->id ?>
                     </td>
                     <td class="xdo_col2">
-                        <?= $donation->transactionSource ?>
+                        <?= $ffg->flyForGoodId ?>
                     </td>
                     <td class="xdo_col2">
-                        <?php if($donation->donor) {
-                            echo $donation->donor->fullName;
-                        } else if(!empty($donation->supporterName)) {
-                            echo $donation->supporterName;
-                        } else {
-                            echo 'Guest';
-                        }?>
+                        <?= $ffg->user->fullName ?>
                     </td>
                     <td class="xdo_col2">
-                        <span id="destination_<?php echo $donation->transactionId ?>"><?php echo $donation->destination; ?></span>
-                        <? if ($hasVol) { ?><a href="javascript:void(0);" onclick="editDestination('<?php echo $donation->transactionId ?>','<?=$donation->userId?>')"><img src="/public/images/icon_edit.jpg" /><? } ?>
+                        <?= $ffg->description ?>
                     </td>
-                    <td  class="xdo_col2" align="center"><?= (isset($this->project) ? $this->project->currency : $this->group->currency).number_format($donation->amount,2) ?></td>
+                    <td class="xdo_col2">
+                        $<?= $ffg->amount ?>
+                    </td>
                     <td  class="xdo_col2" align="center">
-                        <?php if ($donation->status == 2) { ?>
-                        <img src="/public/images/dashboard/note.png" />
-                        <?php } else if ($donation->status == 3) { ?>
-                        <img src="/public/images/dashboard/decline.png" alt="Cancelled" title="Cancelled"/>
-                        <?php } ?>
+                        <?= $ffg->fee ?>
                     </td>
-                    <td class="xdo_col2">
-                        <?= substr($donation->comments,0,50) ?>
-                        <? if (strlen($donation->comments) > 50 ) {
-                            echo "<div id='comment{$donation->id}' class='hidden'>" . $donation->comments . "</div>
-                            ... <a href='javascript:;' onclick='showComment(\"comment{$donation->id}\")'>Show Comment</a>";
-                        } ?>
+                    <td  class="xdo_col2" align="center">
+                        <?= $ffg->currency ?>
                     </td>
                     <td class="xdo_col2" align="center">
-                        <?php echo date('M d, Y h:i:s A', strtotime($donation->createdOn)) ?>
-                    </td>
-                    <td class="xdo_col3" align="center">
-                        <a id="resend-<?php echo $donation->id ?>" href="javascript:;" onclick="resendReceipt('<?php echo $donation->id ?>')"><img src="/public/images/dashboard/e.png" /></a>
-                        <img id="sent-<?php echo $donation->id ?>" src="/public/images/dashboard/check_icon.png" style="display:none" />
+                        <?php if ($ffg->status == 2) { ?>
+                        <img src="/public/images/dashboard/note.png" />
+                        <?php } else if ($ffg->status == 3) { ?>
+                        <img src="/public/images/dashboard/x.png" alt="Cancelled" title="Cancelled"/>
+                        <?php } ?>
                     </td>
                 </tr>
-                    <?php if (count($donation->notes)) { ?>
-                    <tr id="notes-<?php echo $donation->id ?>" style="display:none; background-color:#e7e7e9; border-left:1px solid #BBCFF9!important; border-bottom:1px solid #BBCFF9!important; padding:3px 5px!important">
-                        <td colspan="7">
-                            <div style="padding:5px 0;">
-                                <?php foreach($donation->notes as $note) { ?>
-                                    &nbsp;&nbsp;<?php echo ($note->isPrivate == 1 ? "Private Note - " : "Public Note - ").stripslashes($note->note) ?>
-                                    <input type="hidden" id="hidden-note-<?php echo $note->id ?>" value="<?php echo stripslashes($note->note) ?>" />
-                                    <a href="javascript:;" onclick="togglePopup('edit-note', '#DonationNoteId', '<?php echo $note->id ?>', '')">Edit</a>
-                                    &nbsp;/&nbsp;
-                                    <a href="javascript:;" onclick="deleteNote('<?php echo $note->id ?>')">Delete</a>
-                                    <br>
-                                <?php } ?>
-                                <a style="margin-left:10px" href="javascript:;" onclick="togglePopup('add-note', '#ProjectDonationId', '<?php echo $donation->id ?>')">Add New</a>
-                                <br>
-                            </div>
-                        </td>
-                    </tr>
-                    <?php } ?>
                 <?php } ?>
             </table>
             <div class="spacer"></div>
             <div class="navpage">
                 <div class='s2st03' style="margin-top:10px"><?= $this->paginationControl($this->paginator, 'Sliding', '/dashboard/page_selector.phtml'); ?></div>
             </div>
-            <a class="btn btngreen" href="/<?= isset($this->project) ? $this->project->urlName : $this->group->urlName ?>">Back</a>
         </div><!--End Main Content-->
         </div>
     </div>

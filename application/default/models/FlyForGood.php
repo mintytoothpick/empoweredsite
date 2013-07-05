@@ -16,8 +16,43 @@ class FlyForGood extends Base {
     public $currency;
     public $flyForGoodId;
     public $description = '';
-    public $status;
+    public $status      = 2;
     public $createdOn;
+
+    protected $_user = null;
+
+
+    /**
+     * Magic getter for relationship objects.
+     * Lazy load.
+     *
+     * @param String $name Name attr.
+     */
+    public function __get($name) {
+        $data  = $this->_getLimits($name);
+        $attr  = '_'.$data[0];
+        $param = $data[1];
+        if (property_exists('FlyForGood', $attr)) {
+            if (is_null($this->$attr)) {
+                $method = '_get'.ucfirst($data[0]);
+                if ($param != '') {
+                    $this->$method($param);
+                } else {
+                    $this->$method();
+                }
+            }
+            return $this->$attr;
+        }
+    }
+
+    /**
+     * TODO: Implement cache layer.
+     * @return Class Object
+     */
+    static public function getByFlyForGoodId($ffgId) {
+        $obj = new self;
+        return $obj->loadByFlyForGoodId($ffgId);
+    }
 
     /**
      * Return total user spent in fly for good site.
@@ -72,7 +107,19 @@ class FlyForGood extends Base {
     }
 
     /**
-     * Add payment into database
+     * Load information of the selected ffg by ffg internal id.
+     *
+     * @param String $id Fly For Good Id.
+     */
+    public function loadByFlyForGoodId($id) {
+        $FFG  = new Brigade_Db_Table_FlyForGood();
+        $data = $FFG->getByFlyForGoodId($id);
+
+        return self::_populateObject($data);
+    }
+
+    /**
+     * Add/edit payment into database
      *
      * return void
      */
@@ -89,7 +136,11 @@ class FlyForGood extends Base {
         $data['CreatedOn']      = $this->createdOn;
 
         $ffg = new Brigade_Db_Table_FlyForGood();
-        $ffg->insert($data);
+        if ($this->id) {
+            $ffg->edit($this->id, $data);
+        } else {
+            $ffg->insert($data);
+        }
     }
 
 
@@ -118,5 +169,18 @@ class FlyForGood extends Base {
 
         }
         return $obj;
+    }
+
+    /**
+     * Gets user
+     *
+     * @return void
+     */
+    protected function _getUser() {
+        if (!empty($this->userId)) {
+            $this->_user = User::get($this->userId);
+        } else {
+            $this->_user = false;
+        }
     }
 }

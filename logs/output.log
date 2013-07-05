@@ -208,3 +208,24 @@
                 Link: local.empowered.org/favicon.ico<br>
                 Error: <br>
                 
+2013-07-05T14:31:28-04:00 INFO (6): ExternalController::ffgdeclineAction::1
+2013-07-05T14:31:50-04:00 INFO (6): ExternalController::ffgdeclineAction::1
+2013-07-05T14:32:07-04:00 INFO (6): ExternalController::ffgdeclineAction::1
+2013-07-05T14:32:56-04:00 INFO (6): ExternalController::ffgdeclineAction::Array
+(
+    [controller] => external
+    [action] => ffgdecline
+    [module] => default
+    [key] => bf1146a53667af9c8f733df6729257ed
+    [idffg] => 123456
+)
+
+2013-07-05T14:37:05-04:00 INFO (6): ExternalController::ffgdeclineAction::Array
+(
+    [controller] => external
+    [action] => ffgdecline
+    [module] => default
+    [key] => bf1146a53667af9c8f733df6729257ed
+    [idffg] => 123456
+)
+

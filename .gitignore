@@ -7,4 +7,6 @@ library/Brigade/Reporting
 library/Brigade/Reporting/**
 
 logs
+logs/*
 logs/**
+logs/**/*
