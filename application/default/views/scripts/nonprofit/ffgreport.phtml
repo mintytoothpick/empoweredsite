@@ -40,6 +40,7 @@
                     <td class="do_col2" align="center">Fee</td>
                     <td class="do_col2" align="center">Currency</td>
                     <td class="do_col2" align="center">Status</td>
+                    <td class="do_col3" align="center">Date</td>
                 </tr>
                 <?php foreach ($this->paginator as $ffg) { ?>
                 <tr>
@@ -70,6 +71,9 @@
                         <?php } else if ($ffg->status == 3) { ?>
                         <img src="/public/images/dashboard/x.png" alt="Cancelled" title="Cancelled"/>
                         <?php } ?>
+                    </td>
+                    <td  class="xdo_col3" align="center">
+                        <?= date('M d, Y', strtotime($ffg->createdOn)) ?>
                     </td>
                 </tr>
                 <?php } ?>
