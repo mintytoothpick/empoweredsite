@@ -261,6 +261,7 @@ class ExternalController extends BaseController {
 
         // security code invalid
         if (!$valid) {
+            Zend_Registry::get('logger')->info(__METHOD__.'::Invalid params');
             $this->_helper->redirector('badparams', 'error');
         }
 
