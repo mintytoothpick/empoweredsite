@@ -657,8 +657,9 @@ class Brigade_Db_Table_Organizations extends Zend_Db_Table_Abstract {
     public function getWithUserRaised($userId) {
         $row = $this->fetchAll(
             $this->select()
-            ->from(array('o' => 'networks'), array('o.*'))
-            ->joinInner(array('pd' => 'project_donations'), 'pd.NetworkId = o.NetworkId')
+            ->distinct()
+            ->from(array('o' => 'networks'), 'o.*')
+            ->joinInner(array('pd' => 'project_donations'), 'pd.NetworkId = o.NetworkId', '')
             ->where('pd.VolunteerId = ?', $userId)
             ->where('pd.OrderStatusId = 2')
             ->setIntegrityCheck(false)

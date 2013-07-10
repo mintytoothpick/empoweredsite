@@ -48,6 +48,12 @@ function deleteOrg() {
         <li><a class="reportsIcon" href="/<?=$this->organization->urlName?>/membership-funds"><span style="vertical-align:top;">Membership Funds Transfers</span></a></li>
       </ul>
     <? } ?>
+    <? if ($this->hasFlyForGood) { ?>
+      <div class="adminPanelSeprator"></div>
+      <ul>
+        <li><a class="reportsIcon" href="/<?=$this->organization->urlName?>/ffg-report"><span style="vertical-align:top;">Fly For Good Report</span></a></li>
+      </ul>
+    <? } ?>
       <div class="adminPanelSeprator"></div>
       <ul>
         <?php if (!$this->organization->googleId && !$this->organization->paypalId && !$this->organization->bluePayId) { ?>

@@ -2,7 +2,7 @@
 
 /**
  * External controller for other sites using empowered.
- * Now: Fly for good.
+ * Now: Fly for good + FFG Cancel Operation
  *      BluePay Refunds
  *      Membership Rebill + Donation to project + Payment History
  *      Membership Funds
@@ -223,6 +223,55 @@ class ExternalController extends BaseController {
     }
 
     /**
+     * Fly for good request to decline a ticket under empowered
+     *
+     * Get Params:
+     *  - idffg: Id fly for good
+     *  - key: Security hash (idffg | amnt | fee | curr | ffgKey)
+     *
+     * @return void
+     */
+    public function ffgdeclineAction() {
+        $this->_helper->layout()->disableLayout();
+        $this->_helper->viewRenderer->setNoRender();
+
+        $params = $this->_getAllParams();
+        Zend_Registry::get('logger')->info(__METHOD__.'::'.print_r($params, true));
+
+        // validate all params
+        if (!isset($params['idffg']) || !isset($params['key'])) {
+            Zend_Registry::get('logger')->info(__METHOD__.'::Missing Params');
+            $this->_helper->redirector('badparams', 'error');
+        }
+
+        $ffg = FlyForGood::getByFlyForGoodId($params['idffg']);
+        if (!$ffg) {
+            Zend_Registry::get('logger')->info(__METHOD__.'::Not FFG record');
+            $this->_helper->redirector('error', 'error');
+        }
+
+        //validate security code
+        $valid = $this->_validateSecurityCode($params['key'], array(
+            $ffg->flyForGoodId,
+            $ffg->amount,
+            $ffg->fee,
+            $ffg->currency,
+            self::ffgKey
+        ));
+
+        // security code invalid
+        if (!$valid) {
+            Zend_Registry::get('logger')->info(__METHOD__.'::Invalid params');
+            $this->_helper->redirector('badparams', 'error');
+        }
+
+        $ffg->status = 3;
+        $ffg->save();
+
+        echo json_encode(array('status' => 'updated'));
+    }
+
+    /**
      * Fly for good ajax request validation amount
      *
      * Params:
@@ -287,10 +336,12 @@ class ExternalController extends BaseController {
             $ffg->fee            = $external->ffg->params['fee'];
             $ffg->currency       = $external->ffg->params['curr'];
             $ffg->flyForGoodId   = $external->ffg->params['idffg'];
+            $ffg->createdOn      = date('Y-m-d H:i:s');
+            $ffg->status         = 2;
             if (isset($external->ffg->params['txt'])) {
                 $ffg->description = $external->ffg->params['txt'];
             }
-            $ffg->payTicket();
+            $ffg->save();
         }
         $data = array(
             'key' => md5(

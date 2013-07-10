@@ -263,6 +263,9 @@
                 <file>calendrical.css</file>
                 <file>ui.core.css</file>
             </membershipfunds>
+            <ffgreport>
+                <file>donations.css</file>
+            </ffgreport>
         </nonprofit>
         <project>
             <index>

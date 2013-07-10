@@ -433,7 +433,7 @@ function joinOrganization(NID, UID) {
               <? $limit = 1; ?>
               <?php foreach ($this->organization->programs as $program) { ?>
               <div class="programBox">
-                <div class="programImg program01"><a href="/<?=$program->urlName?>"><img src="<?=$this->contentLocation?>public/Media/full/<?=$program->logo->systemMediaName?>" class="greyBorder1"/></a></div>
+                <? if ($program->logo) { ?><div class="programImg program01"><a href="/<?=$program->urlName?>"><img src="<?=$this->contentLocation?>public/Media/full/<?=$program->logo->systemMediaName?>" class="greyBorder1"/></a></div><? } ?>
                 <div class="programText">
                   <a href="/<?=$program->urlName?>"><?=stripslashes($program->name)?></a>
                   <div class="clear"></div>

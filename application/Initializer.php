@@ -1590,9 +1590,9 @@ class FundraisingRoute extends Zend_Controller_Router_Route
                 $defaults = array('controller'=>'nonprofit', 'action'=>'membershipreport', 'NetworkId' => $result['SiteId']);
             } else if ($pathBits[1] == 'membership-funds') {
                 $defaults = array('controller'=>'nonprofit', 'action'=>'membershipfunds', 'NetworkId' => $result['SiteId']);
-/*            } else if ($pathBits[1] == 'ffg-report') {
+            } else if ($pathBits[1] == 'ffg-report') {
                 $defaults = array('controller'=>'nonprofit', 'action'=>'ffgreport', 'NetworkId' => $result['SiteId']);
-*/          } else if ($pathBits[1] == 'get-groups') {
+            } else if ($pathBits[1] == 'get-groups') {
                 $defaults = array('controller'=>'nonprofit', 'action'=>'getgroups', 'NetworkId' => $result['SiteId']);
             } else if ($pathBits[1] == 'get-activities') {
                 $defaults = array('controller'=>'nonprofit', 'action'=>'getprojects', 'NetworkId' => $result['SiteId']);

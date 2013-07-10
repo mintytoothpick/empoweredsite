@@ -1,0 +1,90 @@
+<div class="wrapper">
+   <!-- org header -->
+  <?php echo $this->placeholder('header') ?>
+  <!-- // org header -->
+
+  <div class="clr"></div>
+
+  <div class="BodyCon">
+    <!-- breadcrumb -->
+    <?php echo $this->placeholder('breadcrumb') ?>
+    <!-- // breadcrumb -->
+    <div class="clr"></div>
+
+    <!-- tabs -->
+    <?php echo $this->placeholder('tabs') ?>
+    <!-- // tabs -->
+
+    <div class="mainC">
+      <div class="box05">
+        <div class="headingStyle02">
+            Fly For Good Transactions List
+        </div>
+
+        <div class="clear"></div>
+        <div class="tab-container">
+            <table cellpadding="5" cellspacing="0" width="100%">
+                <tr>
+                    <td colspan="10" class="donation_tablehead">
+                        <div class="donation_navpage">
+
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="do_col1" style="color: #000">Transaction Id</td>
+                    <td class="do_col2">Fly For Good Id</td>
+                    <td class="do_col2">User</td>
+                    <td class="do_col2">Description</td>
+                    <td class="do_col2" align="center">Amount</td>
+                    <td class="do_col2" align="center">Fee</td>
+                    <td class="do_col2" align="center">Currency</td>
+                    <td class="do_col2" align="center">Status</td>
+                    <td class="do_col3" align="center">Date</td>
+                </tr>
+                <?php foreach ($this->paginator as $ffg) { ?>
+                <tr>
+                    <td class="xdo_col1">
+                        <?php echo $ffg->id ?>
+                    </td>
+                    <td class="xdo_col2">
+                        <?= $ffg->flyForGoodId ?>
+                    </td>
+                    <td class="xdo_col2">
+                        <?= $ffg->user->fullName ?>
+                    </td>
+                    <td class="xdo_col2">
+                        <?= $ffg->description ?>
+                    </td>
+                    <td class="xdo_col2">
+                        $<?= $ffg->amount ?>
+                    </td>
+                    <td  class="xdo_col2" align="center">
+                        <?= $ffg->fee ?>
+                    </td>
+                    <td  class="xdo_col2" align="center">
+                        <?= $ffg->currency ?>
+                    </td>
+                    <td class="xdo_col2" align="center">
+                        <?php if ($ffg->status == 2) { ?>
+                        <img src="/public/images/dashboard/note.png" />
+                        <?php } else if ($ffg->status == 3) { ?>
+                        <img src="/public/images/dashboard/x.png" alt="Cancelled" title="Cancelled"/>
+                        <?php } ?>
+                    </td>
+                    <td  class="xdo_col3" align="center">
+                        <?= date('M d, Y', strtotime($ffg->createdOn)) ?>
+                    </td>
+                </tr>
+                <?php } ?>
+            </table>
+            <div class="spacer"></div>
+            <div class="navpage">
+                <div class='s2st03' style="margin-top:10px"><?= $this->paginationControl($this->paginator, 'Sliding', '/dashboard/page_selector.phtml'); ?></div>
+            </div>
+        </div><!--End Main Content-->
+        </div>
+    </div>
+    <div class="clr"></div>
+    <div class="clr"></div>
+</div>
