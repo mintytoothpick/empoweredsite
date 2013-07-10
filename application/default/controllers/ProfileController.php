@@ -2789,6 +2789,8 @@ class ProfileController extends BaseController {
         if (empty($params['memberId'])) {
             $this->_helper->redirector('error', 'error');
         }
+        Zend_Registry::get('logger')->info('InfusionSoft::Membership Remove:'.$params['memberId']);
+
         $member = Member::get($params['memberId']);
         $group  = $member->group;
         if (!$config->chapter->membership->enable ||
@@ -2803,8 +2805,9 @@ class ProfileController extends BaseController {
         }
         //update member status
         $member->stopMembership();
-        if ($member->rebillId) {
+        if ($member->rebillId != '') {
             $this->_stopMembershipPayments($member);
+            Zend_Registry::get('logger')->info('InfusionSoft::Membership Deactivated:'.$member->id);
         }
         $configIS = $config->infusionsoft;
         if ($configIS->active &&
@@ -2812,7 +2815,6 @@ class ProfileController extends BaseController {
         ) {
             $is = Infusionsoft::getInstance();
             $is->updateMemberContact($member);
-            Zend_Registry::get('logger')->info('InfusionSoft::Membership Deactivated:'.$member->id);
         }
         $this->salesforceMemberIntegration($member);
     }
