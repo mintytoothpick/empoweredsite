@@ -83,6 +83,7 @@ class Organization extends Base {
         "7D428431-A7C7-4DF6-A667-F9207E14674E", // Ireland
         "69F11A6C-E582-11E1-A671-003048C5176A", // Exit West
         "47866989-6380-445C-95C0-827E55ACA9CB", // GB Germany
+        "E81D930C-6034-11E2-A227-0025904EACF0"  // GB-Institutes
         //"AE6476D8-6FE0-11E2-805A-0025904EACF0", // Deloitte 4G
     );
 
