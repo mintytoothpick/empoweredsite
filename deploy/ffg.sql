@@ -1,0 +1,2 @@
+ALTER TABLE  `fly_for_good` ADD  `CreatedOn` DATETIME NULL ,
+ADD  `Status` TINYINT NOT NULL DEFAULT  '1'

@@ -32,7 +32,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td class="do_col1" style="color: #000">Transaction Id</td>
+                    <td class="do_col1" style="color: #000">Id</td>
                     <td class="do_col2">Fly For Good Id</td>
                     <td class="do_col2">User</td>
                     <td class="do_col2">Description</td>
@@ -73,7 +73,11 @@
                         <?php } ?>
                     </td>
                     <td  class="xdo_col3" align="center">
-                        <?= date('M d, Y', strtotime($ffg->createdOn)) ?>
+                        <? if ($ffg->createdOn) {
+                            echo date('M d, Y', strtotime($ffg->createdOn));
+                        } else {
+                            echo 'N/A';
+                        }?>
                     </td>
                 </tr>
                 <?php } ?>

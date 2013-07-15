@@ -3340,12 +3340,12 @@ class NonprofitController extends BaseController {
 
         $this->view->ffgFunds = FlyForGood::getListByOrganization($org);
 
+        $_REQUEST['pageUrl'] = $org->urlName;
+        $_REQUEST['subPage'] = 'ffg-report';
         $paginator = Zend_Paginator::factory($this->view->ffgFunds);
         $paginator->setItemCountPerPage($perPage);
         $paginator->setCurrentPageNumber($page);
         $this->view->paginator = $paginator;
-        $_REQUEST['URLName']   = $org->urlName;
-        $_REQUEST['subpage']   = 'membership-funds';
 
         $this->renderPlaceHolders();
     }
