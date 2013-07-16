@@ -644,8 +644,15 @@ class ProfileController extends BaseController {
     }
 
     public function loginAction() {
+        if (isset($_GET['url']) && !empty($_GET['url'])) {
+            $_SESSION['url_redirect'] = $_GET['url'];
+        }
         if ($this->_helper->authUser->isLoggedIn()) {
-            header("location: /".$this->view->userNew->urlName);
+            if (isset($_GET['url']) && !empty($_GET['url'])) {
+                header("location: ".$_GET['url']);
+            } else {
+                header("location: /".$this->view->userNew->urlName);
+            }
         }
 
         $this->view->loginForm = $this->getLoginForm();
@@ -678,7 +685,13 @@ class ProfileController extends BaseController {
                             if ($userInfo->FirstLogin == 1) {
                                 $this->_helper->redirector('edit', 'profile');
                             } else {
-                                header("location: /".$this->view->userNew->urlName);
+                                if ($_SESSION['url_redirect']) {
+                                    $url = $_SESSION['url_redirect'];
+                                    $_SESSION['url_redirect'] = null;
+                                    header("location: ".$url);
+                                } else {
+                                    header("location: /".$this->view->userNew->urlName);
+                                }
                             }
                         } else {
                             $activation_link = "/profile/resendactivation/?UserId=$userInfo->UserId&firstname=$userInfo->FirstName&email=$email&activation_code=$userInfo->activation_code";
