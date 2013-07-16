@@ -48,9 +48,11 @@ class ProgramController extends BaseController {
         if ($config->cms_migrate->active &&
             in_array($program->organizationId, $config->cms_migrate->org->toArray())
         ) {
-            $this->_helper->redirector->gotoUrl(
-                $config->cms_migrate->host . '/program/' . $group->id
-            );
+            if (!($this->view->isLoggedIn && $this->view->isAdmin)) {
+                $this->_helper->redirector->gotoUrl(
+                    $config->cms_migrate->host . '/program/' . $group->id
+                );
+            }
         }
 
         $this->view->headTitle(stripslashes($program->name));

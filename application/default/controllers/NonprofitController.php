@@ -70,7 +70,9 @@ class NonprofitController extends BaseController {
         if ($config->cms_migrate->active &&
             in_array($parameters['NetworkId'], $config->cms_migrate->org->toArray())
         ) {
-            $this->_helper->redirector->gotoUrl($config->cms_migrate->host);
+            if (!($this->view->isLoggedIn && $this->view->isAdmin)) {
+                $this->_helper->redirector->gotoUrl($config->cms_migrate->host);
+            }
         }
 
         $organization = Organization::get($parameters['NetworkId']);

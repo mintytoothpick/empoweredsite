@@ -67,11 +67,13 @@ class ProjectController extends BaseController {
         if ($config->cms_migrate->active &&
             in_array($project->organizationId, $config->cms_migrate->org->toArray())
         ) {
-            $this->_helper->redirector->gotoUrl(
-                $config->cms_migrate->host . '/chapter/' . $project->groupId .
-                '/initiatives/type:' . (($project->type === 0) ? 'activity' : 'campaign') .
-                '/id:' . $project->id
-            );
+            if (!($this->view->isLoggedIn && $this->view->isAdmin)) {
+                $this->_helper->redirector->gotoUrl(
+                    $config->cms_migrate->host . '/chapter/' . $project->groupId .
+                    '/initiatives/type:' . (($project->type === 0) ? 'activity' : 'campaign') .
+                    '/id:' . $project->id
+                );
+            }
         }
 
         $this->view->headTitle(stripslashes($project->name));

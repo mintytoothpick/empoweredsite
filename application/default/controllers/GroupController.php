@@ -73,9 +73,11 @@ class GroupController extends BaseController {
         if ($config->cms_migrate->active &&
             in_array($group->organizationId, $config->cms_migrate->org->toArray())
         ) {
-            $this->_helper->redirector->gotoUrl(
-                $config->cms_migrate->host . '/chapter/' . $group->id
-            );
+            if (!($this->view->isLoggedIn && $this->view->isAdmin)) {
+                $this->_helper->redirector->gotoUrl(
+                    $config->cms_migrate->host . '/chapter/' . $group->id
+                );
+            }
         }
 
         $this->view->headTitle(stripslashes($group->name));
