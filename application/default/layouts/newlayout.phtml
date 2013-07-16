@@ -68,5 +68,17 @@ $fbPrefix = 'prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# ' . $this->f
 <!-- popup user survey -->
 <?php echo $this->placeholder('popup_user_survey') ?>
 
+<!-- sticky -->
+<script type='text/javascript'>
+(function() {
+function asyncLoad() {
+var s = document.createElement('script');
+s.type = 'text/javascript';s.async = true;s.src = '//cdn.addsticky.com/widget/203/popupresource.js';
+var x = document.getElementsByTagName('script')[0];x.parentNode.insertBefore(s, x); }
+if (window.attachEvent) window.attachEvent('onload', asyncLoad);
+else window.addEventListener('load', asyncLoad, false);
+})();
+</script>
+
 </body>
 </html>
