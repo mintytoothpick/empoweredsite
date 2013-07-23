@@ -134,9 +134,12 @@ class SignUpController extends BaseController {
                         $session->signatureAge  = $parameters['signatureAge'];
                         $session->signatureDate = date('Y-m-d');
                     }
-
-
-                    header('location: /signup/survey/?ProjectId='.$ProjectId);
+                    //custom surveys
+                    if (in_array($organization->id, $config->organization->customSurvey->toArray())) {
+                        return $this->_redirect('/signup/customsurvey?ProjectId='.$ProjectId);
+                    } else {
+                        header('location: /signup/survey/?ProjectId='.$ProjectId);
+                    }
                 } else {
                     $this->coreTravelIntegration($project);
                     if ($is_signed_up && $stoped_user) {
@@ -189,6 +192,28 @@ class SignUpController extends BaseController {
         $this->view->render('nonprofit/footer.phtml');
         $this->_helper->layout->setLayout('newlayout');
 
+    }
+
+    /**
+     * Set a new survey page for custom orgs not GB USA.
+     */
+    public function customsurveyAction() {
+        $params  = $this->_getAllParams();
+        $project = Project::get($params['ProjectId']);
+
+        $this->view->project = $project;
+        $this->view->group   = $project->group;
+
+        $this->_helper->viewRenderer->setRender(
+            'survey-'.strtolower($project->organization->urlName)
+        );
+
+        $this->view->breadcrumb = $this->view->breadcrumbHelper($project);
+        $this->view->render('nonprofit/footer.phtml');
+        $this->view->render('project/header.phtml');
+        $this->view->render('nonprofit/breadcrumb.phtml');
+        $this->view->render('group/tabs.phtml');
+        $this->_helper->layout->setLayout('newlayout');
     }
 
     /**

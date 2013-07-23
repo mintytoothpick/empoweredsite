@@ -1,0 +1,319 @@
+<?php $this->headTitle("Empowered.org: Volunteer Signup Survey"); ?>
+<style>
+    fieldset {
+        margin:25px 0;
+        border:1px solid #ccc;
+        width:90%;
+    }
+    fieldset legend{
+        font-weight:bold;
+    }
+    fieldset span {
+        color:red;
+        font-weight:bold;
+    }
+    fieldset p {
+        font-weight:bold;
+        margin-top:10px;
+        margin-bottom:-10px;
+    }
+    fieldset input, fieldset textarea {
+        width:90%;
+    }
+    ol.list-survey li {width: 400px;height:20px;margin-bottom:2px;}
+</style>
+
+<div class="wrapper">
+    <!-- org header -->
+    <?php echo $this->placeholder('header') ?>
+    <!-- // org header -->
+
+    <div class="BodyCon">
+
+        <!-- breadcrumb -->
+        <?php echo $this->placeholder('breadcrumb') ?>
+        <!-- // breadcrumb -->
+        <div class="clr"></div>
+
+        <!-- tabs -->
+        <?php echo $this->placeholder('tabs') ?>
+        <!-- // tabs -->
+
+        <div class="mainC">
+            <div class="box05">
+                <div class="headingStyle02">REGISTRATION, HEALTH SCREEN, AND PARTICIPANT AGREEMENT</div>
+
+                <? if (isset($this->updated)) { ?>
+                <center><p><strong>The survey was successfully updated.</strong></p></center>
+                <? } ?>
+
+                <?php if (count($this->errors) ) : ?>
+                <div class="box box-error">
+                        <?php
+                        foreach($this->errors as $msg) {
+                            echo $msg."<br>";
+                        }
+                        ?>
+                </div>
+                <? endif; ?>
+                <form name="survey_form" id="survey_form" method="post">
+                <input type="hidden" name="ProjectId" id="ProjectId" value="<?php echo $this->project->id?>">
+                <fieldset>
+                <table class="no-style">
+                <tr>
+                  <td style="width:180px"><label for="firstname">Participant First Name:</label><br /><em>(as it appears on passport or birth certificate)</em></td>
+                  <td><input name="firstname" type="text"  id="firstname" value="<?php echo (!isset($this->survey) || is_null($this->survey)) ? stripslashes($this->userNew->firstName) : $this->survey->firstName ?>" /></td>
+                </tr>
+                <tr>
+                  <td><label for="middlename">Participant Middle Name:</label><br /><em>(as it appears on passport or birth certificate)</em></td>
+                  <td><input name="middlename" type="text" id="middlename" value="<?php echo (isset($this->survey) && !is_null($this->survey)) ? $this->survey->middleName : '' ?>" /></td>
+                </tr>
+                <tr>
+                  <td><label for="lastname">Participant Last Name:</label><br /><em>(as it appears on passport or birth certificate)</em></td>
+                  <td><input name="lastname" type="text" id="lastname" value="<?php echo (!isset($this->survey) || is_null($this->survey)) ? stripslashes($this->userNew->lastName) : $this->survey->lastName ?>" /></td>
+                </tr>
+                <tr>
+                  <td><label for="nickname">Preferred Name:</label></td>
+                  <td><input name="nickname" type="text" id="nickname" value="<?php echo (isset($this->survey) && !is_null($this->survey)) ? $this->survey->nickName : '' ?>" /></td>
+                </tr>
+                <tr>
+                  <td><label for="birthdate">Date of Birth (MM/DD/YYYY):</label></td>
+                  <td><input type="text" class="text" id="birthdate" name="birthdate" value="<? echo (isset($this->survey)) ? date("m/d/Y",strtotime($this->survey->birthday)) : '' ?>"/></td>
+                </tr>
+                <tr>
+                  <td><label for="birthdate">Address:</label></td>
+                  <td><input type="text" class="text" id="birthdate" name="birthdate" value="<? echo (isset($this->survey)) ? '' : '' ?>"/></td>
+                </tr>
+                <tr>
+                  <td><label for="birthdate">Participant Cell #:</label></td>
+                  <td><input type="text" class="text" id="birthdate" name="birthdate" value="<? echo (isset($this->survey)) ?  : '' ?>"/></td>
+                </tr>
+                <tr>
+                  <td><label for="email">Participant Email:</label></td>
+                  <td><input name="email" type="text" id="email" value="<? echo isset($this->survey) ? $this->survey->email : !empty($this->userNew->email) ? $this->userNew->email : '' ?>" /></td>
+                </tr>
+                <tr>
+                  <td><label for="email">Grade/Year in School:</label></td>
+                  <td><input name="email" type="text" id="email" value="" /></td>
+                </tr>
+                <tr>
+                  <td><label for="gender">Gender:</label></td>
+                  <td>
+                    <select name="gender" id="gender">
+                        <? if (isset($this->survey)) {
+                            $gender = $this->survey->gender;
+                        } else {
+                            $gender = $this->userNew->gender;
+                        } ?>
+                        <option value="">Select Gender</option>
+                        <option <?php if($gender == 1) { echo 'selected="selected"'; } ?> value="1">Male</option>
+                        <option <?php if($gender == 2) { echo 'selected="selected"'; } ?> value="2">Female</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td><label for="email">Name of Parent(s) or Legal Gardian(s) (if Participant is a minor):</label></td>
+                  <td>
+                    (1) <input name="email" type="text" id="email" value="<? echo isset($this->survey) ? $this->survey->email : '' ?>" /><br />
+                    (2) <input name="email" type="text" id="email" value="<? echo isset($this->survey) ? $this->survey->email : '' ?>" />
+                  </td>
+                </tr>
+                <tr>
+                  <td><label for="birthdate">Address:<br /><em>(if different than above)</em></label></td>
+                  <td><input type="text" class="text" id="birthdate" name="birthdate" value="<? echo (isset($this->survey)) ? '' : '' ?>"/></td>
+                </tr>
+                </table>
+
+
+                <h3>EMERGENCY CONTACTS – Parent or Legal Guardian must be provided as first emergency contact</h3>
+                <table class="no-style">
+                <tr>
+                  <td><label for="firstname">(1) Name:</label></td>
+                  <td><input name="firstname" type="text"  id="firstname" value="" /></td>
+                  <td><label for="middlename">(1) Relation:</label></td>
+                  <td><input name="middlename" type="text" id="middlename" value="" /></td>
+                  <td><label for="lastname">(1) Email:</label></td>
+                  <td><input name="lastname" type="text" id="lastname" value="" /></td>
+                </tr>
+                <tr>
+                  <td><label for="lastname">(1) Day Phone:</label></td>
+                  <td><input name="lastname" type="text" id="lastname" value="" /></td>
+                  <td><label for="lastname">(1) Evening Phone:</label></td>
+                  <td><input name="lastname" type="text" id="lastname" value="" /></td>
+                  <td><label for="lastname">(1) Cell Phone:</label></td>
+                  <td><input name="lastname" type="text" id="lastname" value="" /></td>
+                </tr>
+
+                <tr>
+                  <td><label for="firstname">(2) Name:</label></td>
+                  <td><input name="firstname" type="text"  id="firstname" value="" /></td>
+                  <td><label for="middlename">(2) Relation:</label></td>
+                  <td><input name="middlename" type="text" id="middlename" value="" /></td>
+                  <td><label for="lastname">(2) Email:</label></td>
+                  <td><input name="lastname" type="text" id="lastname" value="" /></td>
+                </tr>
+                <tr>
+                  <td><label for="lastname">(2) Day Phone:</label></td>
+                  <td><input name="lastname" type="text" id="lastname" value="" /></td>
+                  <td><label for="lastname">(2) Evening Phone:</label></td>
+                  <td><input name="lastname" type="text" id="lastname" value="" /></td>
+                  <td><label for="lastname">(2) Cell Phone:</label></td>
+                  <td><input name="lastname" type="text" id="lastname" value="" /></td>
+                </tr>
+                </table>
+
+                <h3>HEALTH INFORMATION – PLEASE FILL OUT COMPLETELY (Doctors signature not required)</h3>
+                <p>Does the Participant have, or has the participant had, any of the following conditions or symptoms?</p>
+                <ol class="list-survey">
+                  <li>Bleeding/Clotting Disorders <div style="float:right"><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</div></li>
+                  <li>Asthma <div style="float:right"><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</div></li>
+                  <li>Diabetes <div style="float:right"><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</div></li>
+                  <li>Ear Infections <div style="float:right"><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</div></li>
+                  <li>Heart Defects/Hypertension <div style="float:right"><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</div></li>
+                  <li>Psychiatric Treatment <div style="float:right"><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</div></li>
+                  <li>Seizure Disorder <div style="float:right"><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</div></li>
+                  <li>Immuno-Compromised <div style="float:right"><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</div></li>
+                  <li>Sleep Walking <div style="float:right"><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</div></li>
+                  <li>Bed Wetting <div style="float:right"><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</div></li>
+                  <li>Hospitalized in the last 5 years? <div style="float:right"><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</div></li>
+                  <li>Chicken Pox <div style="float:right"><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</div></li>
+                  <li>Measles <div style="float:right"><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</div></li>
+                  <li>Mumps <div style="float:right"><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</div></li>
+                  <li>Other Diseases <div style="float:right"><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</div></li>
+                  <li>Date of last Tetanus shot:</li>
+                  <li>Hay Fever <div style="float:right"><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</div></li>
+                  <li>Iodine <div style="float:right"><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</div></li>
+                  <li>Mangos <div style="float:right"><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</div></li>
+                  <li>Poison Oak <div style="float:right"><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</div></li>
+                  <li>Penicillin <div style="float:right"><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</div></li>
+                  <li>Bees, Wasps. Insects <div style="float:right"><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</div></li>
+                  <li>Food <div style="float:right"><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</div></li>
+                  <li>Other Allergies <div style="float:right"><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</div></li>
+                  <h3 style="left:-25px;position: relative;">If Participant Has Allergies</h3>
+                  <li>Do you carry your own Epinephrine pen? <div style="float:right"><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</div></li>
+                  <li>Do you carry your own Inhaler? <div style="float:right"><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</div></li>
+                </ol>
+
+                <p>If you answered “yes” to any of the above items, please explain below.  Provide corresponding number.</p><br />
+                <textarea></textarea>
+
+                <h3>Passport Information</h3>
+                <p><em>Please make sure that your passport information is correct.  Incorrect name and birthdate information could prohibit you from traveling internationally.</em></p><br />
+                <table>
+                <tr>
+                  <td>Do you have a current passport?</td>
+                  <td><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</td>
+                  <td>If YES, list passport country</td>
+                  <td><input name="" type="text" id="citizenship" value="" /></td>
+                </tr>
+                <tr>
+                  <td>Name on Passport <br />(DOUBLE CHECK FOR ACCURACY)</td>
+                  <td colspan="2"><input name="" type="text" id="citizenship" value="" /></td>
+                </tr>
+                <tr>
+                  <td>Passport Expiration Date</td>
+                  <td colspan="2"><input name="" type="text" id="citizenship" value="" /></td>
+                </tr>
+                <tr>
+                  <td colspan="4"><b>You will not be able to travel with your passport if it expires within 6 months of when you are travelling internationally.</b></td>
+                </tr>
+                <tr>
+                  <td><label for="citizenship">Country of Birth:</label></td>
+                  <td><input name="citizenship" type="text" id="citizenship" value="<? echo (isset($this->survey)) ? $this->survey->citizenship : '' ?>" /></td>
+                </tr>
+                <tr>
+                  <td><label for="citizenship">Citizenship:</label></td>
+                  <td><input name="citizenship" type="text" id="citizenship" value="<? echo (isset($this->survey)) ? $this->survey->citizenship : '' ?>" /></td>
+                </tr>
+                </table>
+                <h3>Academic Information</h3>
+                <table>
+                <tr>
+                  <td>GRADE (YEAR IN SCHOOL 9-16)</td>
+                  <td><input name="" type="text" id="citizenship" value="" /></td>
+                </tr>
+                <tr>
+                  <td>GPA</td>
+                  <td><input name="" type="text" id="citizenship" value="" /></td>
+                </tr>
+                <tr><td colspan="2">LEVEL OF SPANISH PROFICIENCY</td></tr>
+                <tr>
+                  <td>Listening</td>
+                  <td>
+                    <select>
+                      <option>None</option>
+                      <option>Beginner</option>
+                      <option>Intermediate</option>
+                      <option>Advanced</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Reading/writing</td>
+                  <td>
+                    <select>
+                      <option>None</option>
+                      <option>Beginner</option>
+                      <option>Intermediate</option>
+                      <option>Advanced</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Speaking</td>
+                  <td>
+                    <select>
+                      <option>None</option>
+                      <option>Beginner</option>
+                      <option>Intermediate</option>
+                      <option>Advanced</option>
+                    </select>
+                  </td>
+                </tr>
+                </table>
+                <h3>Previous Travel Experience</h3>
+                <table>
+                <tr>
+                  <td>Have you ever traveled outside of the United States?</td>
+                  <td><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</td>
+                </tr>
+                <tr>
+                  <td>Have you ever traveled in the developing world?</td>
+                  <td><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</td>
+                </tr>
+                <tr>
+                  <td colspan="2">PLEASE ELABORATE ON ANY TRAVEL EXPERIENCE (OR LACK THERE OF) THAT YOU THINK IS IMPORTANT FOR GSE STAFF TO BE AWARE OF.</td>
+                </tr>
+                <tr>
+                  <td colspan="2"><textarea></textarea></td>
+                </tr>
+                </table>
+                <center><h3>Applicant Certification</h3></center>
+                <p>I certify that all the information provided in my application, supporting documentation and subsequent communication are complete and accurate to the best of my knowledge.  I understand that I have an obligation to update the information provided in this application as necessary.  I accept that any misrepresentation or omission may invalidate any further consideration and may be cause for denial or cancellation of participation.  I agree to the terms of the contract and the payment details.  I commit to working hard to ensure the participation in GSE is a positive experience for me, and for other members of the group.</p><br />
+                <table>
+                <tr>
+                  <td>Student Name</td>
+                  <td><input type="text" /></td>
+                  <td>Parent Name</td>
+                  <td><input type="text" /></td>
+                </tr>
+                </table>
+                <table>
+                <tr>
+                  <td>Would you like fundraising support and/or materials?</td>
+                  <td><input type="radio" style="width:auto"/> Yes <input type="radio"  style="width:auto"/> No</td>
+                </tr>
+                </table>
+                </fieldset>
+                <div>
+                <input type="reset" class="btn btngreen" />
+                <input type="button" class="btn btngreen" onclick="validateSurveyForm(); return false" value="Submit"/>
+                </div>
+                </form>
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+    <div class="clr"></div>
+    <div class="clr"></div>
+</div>
