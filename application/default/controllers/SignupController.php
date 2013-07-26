@@ -14,6 +14,7 @@ require_once 'Group.php';
 require_once 'Organization.php';
 require_once 'Infusionsoft.php';
 require_once 'Salesforce.php';
+require_once 'SurveyGlobalStudentEmbassy.php';
 
 class SignUpController extends BaseController {
     protected $_http;
@@ -200,6 +201,89 @@ class SignUpController extends BaseController {
     public function customsurveyAction() {
         $params  = $this->_getAllParams();
         $project = Project::get($params['ProjectId']);
+
+        if ($this->getRequest()->isPost()) {
+            $survey = new SurveyGlobalStudentEmbassy();
+            $survey->userId                      = $this->sessionUser->id;
+            $survey->groupId                     = $project->group->id;
+            $survey->projectId                   = $project->id;
+            $survey->firstName                   = $params['firstname'];
+            $survey->middleName                  = $params['middlename'];
+            $survey->lastName                    = $params['lastname'];
+            $survey->preferredName               = $params['preferredName'];
+            $survey->dateBirth                   = $params['birthdate'];
+            $survey->address                     = $params['address'];
+            $survey->participantCellNum          = $params['participantCellNum'];
+            $survey->participantEmail            = $params['participantEmail'];
+            $survey->gradeYearSchool             = $params['gradeYearSchool'];
+            $survey->gender                      = $params['gender'];
+            $survey->parent1                     = $params['parent1'];
+            $survey->parent2                     = $params['parent2'];
+            $survey->parentAddress               = $params['parentAddress'];
+            $survey->emergencyName1              = $params['emergencyName1'];
+            $survey->emergencyRelation1          = $params['emergencyRelation1'];
+            $survey->emergencyEmail1             = $params['emergencyEmail1'];
+            $survey->emergencyDayPhone1          = $params['emergencyDayPhone1'];
+            $survey->emergencyEveningPhone1      = $params['emergencyEveningPhone1'];
+            $survey->emergencyCellPhone1         = $params['emergencyCellPhone1'];
+            $survey->emergencyName2              = $params['emergencyName2'];
+            $survey->emergencyRelation2          = $params['emergencyRelation2'];
+            $survey->emergencyEmail2             = $params['emergencyEmail2'];
+            $survey->emergencyDayPhone2          = $params['emergencyDayPhone2'];
+            $survey->emergencyEveningPhone2      = $params['emergencyEveningPhone2'];
+            $survey->emergencyCellPhone2         = $params['emergencyCellPhone2'];
+            $survey->bleedingClottingDisorders   = $params['bleedingClottingDisorders'];
+            $survey->asthma                      = $params['asthma'];
+            $survey->diabetes                    = $params['diabetes'];
+            $survey->earInfections               = $params['earInfections'];
+            $survey->heartDefectsHypertension    = $params['heartDefectsHypertension'];
+            $survey->psychiatricTreatment        = $params['psychiatricTreatment'];
+            $survey->seizureDisorder             = $params['seizureDisorder'];
+            $survey->immunoCompromised           = $params['immunoCompromised'];
+            $survey->sleepWalking                = $params['sleepWalking'];
+            $survey->bedWetting                  = $params['bedWetting'];
+            $survey->hospitalizedLast5Years      = $params['hospitalizedLast5Years'];
+            $survey->chickenPox                  = $params['chickenPox'];
+            $survey->measles                     = $params['measles'];
+            $survey->mumps                       = $params['mumps'];
+            $survey->otherDiseases               = $params['otherDiseases'];
+            $survey->dateLastTetanusShot         = $params['dateLastTetanusShot'];
+            $survey->hayFever                    = $params['hayFever'];
+            $survey->iodine                      = $params['iodine'];
+            $survey->mangos                      = $params['mangos'];
+            $survey->poisonOak                   = $params['poisonOak'];
+            $survey->penicillin                  = $params['penicillin'];
+            $survey->beesWaspsInsects            = $params['beesWaspsInsects'];
+            $survey->food                        = $params['food'];
+            $survey->otherAllergies              = $params['otherAllergies'];
+            $survey->epinephrinePen              = $params['epinephrinePen'];
+            $survey->inhaler                     = $params['inhaler'];
+            $survey->explanation                 = $params['explanation'];
+            $survey->passport                    = $params['passport'];
+            $survey->passportCountry             = $params['passportCountry'];
+            $survey->passportName                = $params['passportName'];
+            $survey->passportExpirationDate      = $params['passportExpirationDate'];
+            $survey->countryBirth                = $params['countryBirth'];
+            $survey->citizenship                 = $params['citizenship'];
+            $survey->grade                       = $params['grade'];
+            $survey->GPA                         = $params['GPA'];
+            $survey->spanishListening            = $params['spanishListening'];
+            $survey->spanishReadingWriting       = $params['spanishReadingWriting'];
+            $survey->spanishSpeaking             = $params['spanishSpeaking'];
+            $survey->traveledOutsideUS           = $params['traveledOutsideUS'];
+            $survey->traveledDevelopingWorld     = $params['traveledDevelopingWorld'];
+            $survey->experiences                 = $params['experiences'];
+            $survey->signatureName               = $params['signatureName'];
+            $survey->signatureParentName         = $params['signatureParentName'];
+            $survey->fundraisingSupportMaterials = $params['fundraisingSupportMaterials'];
+            $survey->date                        = date('Y-m-d');
+            $survey->save();
+            if (empty($this->view->userNew->dateOfBirth)) {
+                    $this->view->userNew->dateOfBirth = date("Y-m-d",strtotime($this->_getParam('birthdate')));
+                    $this->view->userNew->save();
+            }
+            header('location: /signup/next/?ProjectId='.$project->id);
+        }
 
         $this->view->project = $project;
         $this->view->group   = $project->group;

@@ -1,5 +1,5 @@
 <?php
-require_once 'Brigade/Db/Table/Survey.php';
+require_once 'Brigade/Db/Table/SurveyGlobalStudentEmbassy.php';
 require_once 'Base.php';
 require_once 'Group.php';
 require_once 'User.php';
@@ -309,7 +309,7 @@ class SurveyGlobalStudentEmbassy extends Base {
             'date'                        => $this->date
         );
 
-        $sa = new Brigade_Db_Table_Survey();
+        $sa = new Brigade_Db_Table_SurveyGlobalStudentEmbassy();
         if (!empty($this->id) && $this->id > 0) {
             $sa->updateInfo($data, $this->id);
         } else {

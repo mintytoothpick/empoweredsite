@@ -187,6 +187,11 @@
                 <file>custom.validate.js</file>
             </edit>
         </event>
+        <signup>
+            <customsurvey>
+                <file>datepicker/ui.datepicker.js</file>
+            </customsurvey>
+        </signup>
         <!-- // controller/action -->
     </javascript>
     <css>
@@ -413,6 +418,13 @@
                 <file>ui.core.css</file>
             </membershipfunds>
         </group>
+        <signup>
+            <customsurvey>
+                <file>ui.datepicker.css</file>
+                <file>ui.theme.css</file>
+                <file>ui.core.css</file>
+            </customsurvey>
+        </signup>
         <!-- // controller/action -->
     </css>
 </configdata>
