@@ -34,7 +34,7 @@
                 <span class="Text14"><?=$this->project->user_message?></span></p><?php } ?>
               <?php if(!empty($this->project->logo->systemMediaName)) { ?><p><img src="<?=$this->contentLocation?>public/Media/full/<?=$this->project->logo->systemMediaName?>" alt=" " class="imgstyle3" /></p><?php } ?>
                 <!-- survey check info-->
-                <?php if (isset($this->userNew) && $this->userNew->id == $this->user->id && $this->project->hasSurvey() && !is_null($this->project->getVolunteerByUser($this->userNew))) { ?><a href="/signup/editsurvey?ProjectId=<?=$this->project->id?>">Edit Survey Results</a><br /><?php } ?>
+                <?php if (isset($this->surveyLink)) { ?><a href="<?=$this->surveyLink?>">Edit Survey Results</a><br /><?php } ?>
                 <!-- //survey check info -->
                 <?php if(isset($this->userNew) && $this->userNew->id == $this->user->id) { ?><a href="/<?=$this->userNew->urlName?>/<?=$this->project->urlName?>/donor-list">View Donation History</a><?php } ?>
               <?php if($this->project->endDate != '0000-00-00 00:00:00') { ?><p><strong>End Date:</strong> <?=date('M d, Y h:i A', strtotime($this->project->endDate))?></p><?php } ?>

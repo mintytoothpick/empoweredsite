@@ -178,34 +178,34 @@ class SurveyGlobalStudentEmbassy extends Base {
             $obj->emergencyDayPhone2          = $data['EmergencyDayPhone2'];
             $obj->emergencyEveningPhone2      = $data['EmergencyEveningPhone2'];
             $obj->emergencyCellPhone2         = $data['EmergencyCellPhone2'];
-            $obj->bleedingClottingDisorders   = $data['BleedingClottingDisorders'];
-            $obj->asthma                      = $data['Asthma'];
-            $obj->diabetes                    = $data['Diabetes'];
-            $obj->earInfections               = $data['EarInfections'];
-            $obj->heartDefectsHypertension    = $data['HeartDefectsHypertension'];
-            $obj->psychiatricTreatment        = $data['PsychiatricTreatment'];
-            $obj->seizureDisorder             = $data['SeizureDisorder'];
-            $obj->immunoCompromised           = $data['ImmunoCompromised'];
-            $obj->sleepWalking                = $data['SleepWalking'];
-            $obj->bedWetting                  = $data['BedWetting'];
-            $obj->hospitalizedLast5Years      = $data['HospitalizedLast5Years'];
-            $obj->chickenPox                  = $data['ChickenPox'];
-            $obj->measles                     = $data['Measles'];
-            $obj->mumps                       = $data['Mumps'];
-            $obj->otherDiseases               = $data['OtherDiseases'];
+            $obj->bleedingClottingDisorders   = (bool)$data['BleedingClottingDisorders'];
+            $obj->asthma                      = (bool)$data['Asthma'];
+            $obj->diabetes                    = (bool)$data['Diabetes'];
+            $obj->earInfections               = (bool)$data['EarInfections'];
+            $obj->heartDefectsHypertension    = (bool)$data['HeartDefectsHypertension'];
+            $obj->psychiatricTreatment        = (bool)$data['PsychiatricTreatment'];
+            $obj->seizureDisorder             = (bool)$data['SeizureDisorder'];
+            $obj->immunoCompromised           = (bool)$data['ImmunoCompromised'];
+            $obj->sleepWalking                = (bool)$data['SleepWalking'];
+            $obj->bedWetting                  = (bool)$data['BedWetting'];
+            $obj->hospitalizedLast5Years      = (bool)$data['HospitalizedLast5Years'];
+            $obj->chickenPox                  = (bool)$data['ChickenPox'];
+            $obj->measles                     = (bool)$data['Measles'];
+            $obj->mumps                       = (bool)$data['Mumps'];
+            $obj->otherDiseases               = (bool)$data['OtherDiseases'];
             $obj->dateLastTetanusShot         = $data['DateLastTetanusShot'];
-            $obj->hayFever                    = $data['HayFever'];
-            $obj->iodine                      = $data['Iodine'];
-            $obj->mangos                      = $data['Mangos'];
-            $obj->poisonOak                   = $data['PoisonOak'];
-            $obj->penicillin                  = $data['Penicillin'];
-            $obj->beesWaspsInsects            = $data['BeesWaspsInsects'];
-            $obj->food                        = $data['Food'];
-            $obj->otherAllergies              = $data['OtherAllergies'];
-            $obj->epinephrinePen              = $data['EpinephrinePen'];
-            $obj->inhaler                     = $data['Inhaler'];
+            $obj->hayFever                    = (bool)$data['HayFever'];
+            $obj->iodine                      = (bool)$data['Iodine'];
+            $obj->mangos                      = (bool)$data['Mangos'];
+            $obj->poisonOak                   = (bool)$data['PoisonOak'];
+            $obj->penicillin                  = (bool)$data['Penicillin'];
+            $obj->beesWaspsInsects            = (bool)$data['BeesWaspsInsects'];
+            $obj->food                        = (bool)$data['Food'];
+            $obj->otherAllergies              = (bool)$data['OtherAllergies'];
+            $obj->epinephrinePen              = (bool)$data['EpinephrinePen'];
+            $obj->inhaler                     = (bool)$data['Inhaler'];
             $obj->explanation                 = $data['Explanation'];
-            $obj->passport                    = $data['Passport'];
+            $obj->passport                    = (bool)$data['Passport'];
             $obj->passportCountry             = $data['PassportCountry'];
             $obj->passportName                = $data['PassportName'];
             $obj->passportExpirationDate      = $data['PassportExpirationDate'];
@@ -221,7 +221,7 @@ class SurveyGlobalStudentEmbassy extends Base {
             $obj->experiences                 = $data['Experiences'];
             $obj->signatureName               = $data['SignatureName'];
             $obj->signatureParentName         = $data['SignatureParentName'];
-            $obj->fundraisingSupportMaterials = $data['FundraisingSupportMaterials'];
+            $obj->fundraisingSupportMaterials = (bool)$data['FundraisingSupportMaterials'];
             $obj->date                        = $data['date'];
         }
         return $obj;
@@ -329,9 +329,27 @@ class SurveyGlobalStudentEmbassy extends Base {
         $survey = $sMan->getByProjectAndUser($project->id, $user->id);
         $obj    = null;
         if ($survey) {
-            $obj = self::_populateObject($survey[0]);
+            $obj = self::_populateObject($survey);
         }
         return $obj;
+    }
+
+    /**
+     * Get survey report
+     *
+     * @param Project $project Project instance
+     *
+     * @return array survey
+     */
+    static public function getByProject($project) {
+        $sMan   = new Brigade_Db_Table_SurveyGlobalStudentEmbassy();
+        $surveys = $sMan->getByProject($project->id);
+        $list    = array();
+        foreach($surveys as $survey) {
+            // create objects project
+            $list[] = self::_populateObject($survey);
+        }
+        return $list;
     }
 
 }

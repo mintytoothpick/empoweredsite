@@ -47,6 +47,9 @@ $(function() {
           },
           passportExpirationDate: {
             required: 'input[type="radio"].yesPassport:checked'
+          },
+          signatureParentName: {
+            required: "#parent1[value!='']"
           }
         }
     });
@@ -78,15 +81,6 @@ $(function() {
                 <center><p><strong>The survey was successfully updated.</strong></p></center>
                 <? } ?>
 
-                <?php if (count($this->errors) ) : ?>
-                <div class="box box-error">
-                        <?php
-                        foreach($this->errors as $msg) {
-                            echo $msg."<br>";
-                        }
-                        ?>
-                </div>
-                <? endif; ?>
                 <form name="surveyForm" id="surveyForm" method="post">
                 <input type="hidden" name="ProjectId" id="ProjectId" value="<?php echo $this->project->id?>">
                 <fieldset>
@@ -125,7 +119,7 @@ $(function() {
                 </tr>
                 <tr>
                   <td><label for="gradeYearSchool">Grade/Year in School:</label></td>
-                  <td><input name="gradeYearSchool" type="text" id="gradeYearSchool" value="" /></td>
+                  <td><input name="gradeYearSchool" type="text" id="gradeYearSchool" value="<? echo isset($this->survey) ? $this->survey->participantEmail : '' ?>" /></td>
                 </tr>
                 <tr>
                   <td><label for="gender">Gender:</label></td>
@@ -160,90 +154,90 @@ $(function() {
                 <table class="no-style">
                 <tr>
                   <td><label for="emergencyName1">(1) Name:</label></td>
-                  <td><input name="emergencyName1" type="text"  id="emergencyName1" value=""  class="required"/></td>
+                  <td><input name="emergencyName1" type="text"  id="emergencyName1" value="<? echo isset($this->survey) ? $this->survey->emergencyName1 : '' ?>"  class="required"/></td>
                   <td><label for="emergencyRelation1">(1) Relation:</label></td>
-                  <td><input name="emergencyRelation1" type="text" id="emergencyRelation1" value="" class="required"/></td>
+                  <td><input name="emergencyRelation1" type="text" id="emergencyRelation1" value="<? echo isset($this->survey) ? $this->survey->emergencyRelation1 : '' ?>" class="required"/></td>
                   <td><label for="emergencyEmail1">(1) Email:</label></td>
-                  <td><input name="emergencyEmail1" type="text" id="emergencyEmail1" value="" class="required" /></td>
+                  <td><input name="emergencyEmail1" type="text" id="emergencyEmail1" value="<? echo isset($this->survey) ? $this->survey->emergencyEmail1 : '' ?>" class="required" /></td>
                 </tr>
                 <tr>
                   <td><label for="emergencyDayPhone1">(1) Day Phone:</label></td>
-                  <td><input name="emergencyDayPhone1" type="text" id="emergencyDayPhone1" value="" class="required" /></td>
+                  <td><input name="emergencyDayPhone1" type="text" id="emergencyDayPhone1" value="<? echo isset($this->survey) ? $this->survey->emergencyDayPhone1 : '' ?>" class="required" /></td>
                   <td><label for="emergencyEveningPhone1">(1) Evening Phone:</label></td>
-                  <td><input name="emergencyEveningPhone1" type="text" id="emergencyEveningPhone1" value="" class="required" /></td>
+                  <td><input name="emergencyEveningPhone1" type="text" id="emergencyEveningPhone1" value="<? echo isset($this->survey) ? $this->survey->emergencyEveningPhone1 : '' ?>" class="required" /></td>
                   <td><label for="emergencyCellPhone1">(1) Cell Phone:</label></td>
-                  <td><input name="emergencyCellPhone1" type="text" id="emergencyCellPhone1" value="" class="required" /></td>
+                  <td><input name="emergencyCellPhone1" type="text" id="emergencyCellPhone1" value="<? echo isset($this->survey) ? $this->survey->emergencyCellPhone1 : '' ?>" class="required" /></td>
                 </tr>
 
                 <tr>
                   <td><label for="emergencyName2">(2) Name:</label></td>
-                  <td><input name="emergencyName2" type="text"  id="emergencyName2" value="" class="required" /></td>
+                  <td><input name="emergencyName2" type="text"  id="emergencyName2" value="<? echo isset($this->survey) ? $this->survey->emergencyName2 : '' ?>" class="required" /></td>
                   <td><label for="emergencyRelation2">(2) Relation:</label></td>
-                  <td><input name="emergencyRelation2" type="text" id="emergencyRelation2" value="" class="required" /></td>
+                  <td><input name="emergencyRelation2" type="text" id="emergencyRelation2" value="<? echo isset($this->survey) ? $this->survey->emergencyRelation2 : '' ?>" class="required" /></td>
                   <td><label for="emergencyEmail2">(2) Email:</label></td>
-                  <td><input name="emergencyEmail2" type="text" id="emergencyEmail2" value="" class="required" /></td>
+                  <td><input name="emergencyEmail2" type="text" id="emergencyEmail2" value="<? echo isset($this->survey) ? $this->survey->emergencyEmail2 : '' ?>" class="required" /></td>
                 </tr>
                 <tr>
                   <td><label for="emergencyDayPhone2">(2) Day Phone:</label></td>
-                  <td><input name="emergencyDayPhone2" type="text" id="emergencyDayPhone2" value="" class="required" /></td>
+                  <td><input name="emergencyDayPhone2" type="text" id="emergencyDayPhone2" value="<? echo isset($this->survey) ? $this->survey->emergencyDayPhone2 : '' ?>" class="required" /></td>
                   <td><label for="emergencyEveningPhone2">(2) Evening Phone:</label></td>
-                  <td><input name="emergencyEveningPhone2" type="text" id="emergencyEveningPhone2" value="" class="required" /></td>
+                  <td><input name="emergencyEveningPhone2" type="text" id="emergencyEveningPhone2" value="<? echo isset($this->survey) ? $this->survey->emergencyEveningPhone2 : '' ?>" class="required" /></td>
                   <td><label for="emergencyCellPhone2">(2) Cell Phone:</label></td>
-                  <td><input name="emergencyCellPhone2" type="text" id="emergencyCellPhone2" value="" class="required" /></td>
+                  <td><input name="emergencyCellPhone2" type="text" id="emergencyCellPhone2" value="<? echo isset($this->survey) ? $this->survey->emergencyCellPhone2 : '' ?>" class="required" /></td>
                 </tr>
                 </table>
 
                 <h3>HEALTH INFORMATION – PLEASE FILL OUT COMPLETELY (Doctors signature not required)</h3>
                 <p>Does the Participant have, or has the participant had, any of the following conditions or symptoms?</p>
                 <ol class="list-survey">
-                  <li>Bleeding/Clotting Disorders <div style="float:right"><input type="radio" style="width:auto" name="bleedingClottingDisorders" class="required yes" value="1"/> Yes <input type="radio"  style="width:auto" name="bleedingClottingDisorders" value="0"/> No</div></li>
-                  <li>Asthma <div style="float:right"><input type="radio" style="width:auto" name="asthma" class="required yes" value="1"/> Yes <input type="radio"  style="width:auto" name="asthma" value="0"/> No</div></li>
-                  <li>Diabetes <div style="float:right"><input type="radio" style="width:auto" name="diabetes" class="required yes" value="1"/> Yes <input type="radio"  style="width:auto" name="diabetes" value="0"/> No</div></li>
-                  <li>Ear Infections <div style="float:right"><input type="radio" style="width:auto" name="earInfections" class="required yes" value="1"/> Yes <input type="radio"  style="width:auto" name="earInfections" value="0"/> No</div></li>
-                  <li>Heart Defects/Hypertension <div style="float:right"><input type="radio" style="width:auto" name="heartDefectsHypertension" class="required yes" value="1"/> Yes <input type="radio"  style="width:auto" name="heartDefectsHypertension" value="0"/> No</div></li>
-                  <li>Psychiatric Treatment <div style="float:right"><input type="radio" style="width:auto" name="psychiatricTreatment" class="required yes" value="1"/> Yes <input type="radio"  style="width:auto" name="psychiatricTreatment" value="0"/> No</div></li>
-                  <li>Seizure Disorder <div style="float:right"><input type="radio" style="width:auto" name="seizureDisorder" class="required yes" value="1"/> Yes <input type="radio"  style="width:auto" name="seizureDisorder" value="0"/> No</div></li>
-                  <li>Immuno-Compromised <div style="float:right"><input type="radio" style="width:auto" name="immunoCompromised" class="required yes" value="1"/> Yes <input type="radio"  style="width:auto" name="immunoCompromised" value="0"/> No</div></li>
-                  <li>Sleep Walking <div style="float:right"><input type="radio" style="width:auto" name="sleepWalking" class="required yes" value="1"/> Yes <input type="radio"  style="width:auto" name="sleepWalking" value="0"/> No</div></li>
-                  <li>Bed Wetting <div style="float:right"><input type="radio" style="width:auto" name="bedWetting" class="required" value="1"/> Yes <input type="radio"  style="width:auto" name="bedWetting" value="0"/> No</div></li>
-                  <li>Hospitalized in the last 5 years? <div style="float:right"><input type="radio" style="width:auto" name="hospitalizedLast5Years" class="required yes" value="1"/> Yes <input type="radio"  style="width:auto" name="hospitalizedLast5Years" value="0"/> No</div></li>
-                  <li>Chicken Pox <div style="float:right"><input type="radio" style="width:auto" name="chickenPox" class="required yes" value="1"/> Yes <input type="radio"  style="width:auto" name="chickenPox" value="0"/> No</div></li>
-                  <li>Measles <div style="float:right"><input type="radio" style="width:auto" name="measles" class="required yes" value="1"/> Yes <input type="radio"  style="width:auto" name="measles" value="0"/> No</div></li>
-                  <li>Mumps <div style="float:right"><input type="radio" style="width:auto" name="mumps" class="required yes" value="1"/> Yes <input type="radio"  style="width:auto" name="mumps" value="0"/> No</div></li>
-                  <li>Other Diseases <div style="float:right"><input type="radio" style="width:auto" name="otherDiseases" class="required yes" value="1"/> Yes <input type="radio"  style="width:auto" name="otherDiseases" value="0"/> No</div></li>
-                  <li>Date of last Tetanus shot: <div style="float:right"><input type="text" id="dateLastTetanusShot" name="dateLastTetanusShot" style="width:100px" class="required"/></div></li>
-                  <li>Hay Fever <div style="float:right"><input type="radio" style="width:auto" name="hayFever" class="required yes" value="1"/> Yes <input type="radio"  style="width:auto" name="hayFever" value="0"/> No</div></li>
-                  <li>Iodine <div style="float:right"><input type="radio" style="width:auto" name="iodine" class="required yes" value="1"/> Yes <input type="radio"  style="width:auto" name="iodine" value="0"/> No</div></li>
-                  <li>Mangos <div style="float:right"><input type="radio" style="width:auto" name="mangos" class="required yes" value="1"/> Yes <input type="radio"  style="width:auto" name="mangos" value="0"/> No</div></li>
-                  <li>Poison Oak <div style="float:right"><input type="radio" style="width:auto" name="poisonOak" class="required yes" value="1"/> Yes <input type="radio"  style="width:auto" name="poisonOak" value="0"/> No</div></li>
-                  <li>Penicillin <div style="float:right"><input type="radio" style="width:auto" name="penicillin" class="required yes" value="1"/> Yes <input type="radio"  style="width:auto" name="penicillin" value="0"/> No</div></li>
-                  <li>Bees, Wasps. Insects <div style="float:right"><input type="radio" style="width:auto" name="beesWaspsInsects" class="required yes" value="1"/> Yes <input type="radio"  style="width:auto" name="beesWaspsInsects" value="0"/> No</div></li>
-                  <li>Food <div style="float:right"><input type="radio" style="width:auto" name="food" class="required yes" value="1"/> Yes <input type="radio"  style="width:auto" name="food" value="0"/> No</div></li>
-                  <li>Other Allergies <div style="float:right"><input type="radio" style="width:auto" name="otherAllergies" class="required yes" value="1"/> Yes <input type="radio"  style="width:auto" name="otherAllergies" value="0"/> No</div></li>
+                  <li>Bleeding/Clotting Disorders <div style="float:right"><input type="radio" style="width:auto" name="bleedingClottingDisorders" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->bleedingClottingDisorders) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="bleedingClottingDisorders" value="0" <?=(isset($this->survey) && !$this->survey->bleedingClottingDisorders) ? 'checked' : '' ?>/> No</div></li>
+                  <li>Asthma <div style="float:right"><input type="radio" style="width:auto" name="asthma" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->asthma) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="asthma" value="0" <?=(isset($this->survey) && !$this->survey->asthma) ? 'checked' : '' ?>/> No</div></li>
+                  <li>Diabetes <div style="float:right"><input type="radio" style="width:auto" name="diabetes" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->diabetes) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="diabetes" value="0" <?=(isset($this->survey) && !$this->survey->diabetes) ? 'checked' : '' ?>/> No</div></li>
+                  <li>Ear Infections <div style="float:right"><input type="radio" style="width:auto" name="earInfections" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->earInfections) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="earInfections" value="0" <?=(isset($this->survey) && !$this->survey->earInfections) ? 'checked' : '' ?>/> No</div></li>
+                  <li>Heart Defects/Hypertension <div style="float:right"><input type="radio" style="width:auto" name="heartDefectsHypertension" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->heartDefectsHypertension) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="heartDefectsHypertension" value="0" <?=(isset($this->survey) && !$this->survey->heartDefectsHypertension) ? 'checked' : '' ?>/> No</div></li>
+                  <li>Psychiatric Treatment <div style="float:right"><input type="radio" style="width:auto" name="psychiatricTreatment" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->psychiatricTreatment) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="psychiatricTreatment" value="0" <?=(isset($this->survey) && !$this->survey->psychiatricTreatment) ? 'checked' : '' ?>/> No</div></li>
+                  <li>Seizure Disorder <div style="float:right"><input type="radio" style="width:auto" name="seizureDisorder" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->seizureDisorder) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="seizureDisorder" value="0" <?=(isset($this->survey) && !$this->survey->seizureDisorder) ? 'checked' : '' ?>/> No</div></li>
+                  <li>Immuno-Compromised <div style="float:right"><input type="radio" style="width:auto" name="immunoCompromised" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->immunoCompromised) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="immunoCompromised" value="0" <?=(isset($this->survey) && !$this->survey->immunoCompromised) ? 'checked' : '' ?>/> No</div></li>
+                  <li>Sleep Walking <div style="float:right"><input type="radio" style="width:auto" name="sleepWalking" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->sleepWalking) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="sleepWalking" value="0" <?=(isset($this->survey) && !$this->survey->sleepWalking) ? 'checked' : '' ?>/> No</div></li>
+                  <li>Bed Wetting <div style="float:right"><input type="radio" style="width:auto" name="bedWetting" class="required" value="1" <?=(isset($this->survey) && $this->survey->bedWetting) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="bedWetting" value="0" <?=(isset($this->survey) && !$this->survey->bedWetting) ? 'checked' : '' ?>/> No</div></li>
+                  <li>Hospitalized in the last 5 years? <div style="float:right"><input type="radio" style="width:auto" name="hospitalizedLast5Years" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->hospitalizedLast5Years) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="hospitalizedLast5Years" value="0" <?=(isset($this->survey) && !$this->survey->hospitalizedLast5Years) ? 'checked' : '' ?>/> No</div></li>
+                  <li>Chicken Pox <div style="float:right"><input type="radio" style="width:auto" name="chickenPox" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->chickenPox) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="chickenPox" value="0" <?=(isset($this->survey) && !$this->survey->chickenPox) ? 'checked' : '' ?>/> No</div></li>
+                  <li>Measles <div style="float:right"><input type="radio" style="width:auto" name="measles" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->measles) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="measles" value="0" <?=(isset($this->survey) && !$this->survey->measles) ? 'checked' : '' ?>/> No</div></li>
+                  <li>Mumps <div style="float:right"><input type="radio" style="width:auto" name="mumps" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->mumps) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="mumps" value="0" <?=(isset($this->survey) && !$this->survey->mumps) ? 'checked' : '' ?>/> No</div></li>
+                  <li>Other Diseases <div style="float:right"><input type="radio" style="width:auto" name="otherDiseases" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->otherDiseases) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="otherDiseases" value="0" <?=(isset($this->survey) && !$this->survey->otherDiseases) ? 'checked' : '' ?>/> No</div></li>
+                  <li>Date of last Tetanus shot: <div style="float:right"><input type="text" id="dateLastTetanusShot" name="dateLastTetanusShot" style="width:100px" class="required" value="<? echo isset($this->survey) ? $this->survey->dateLastTetanusShot : '' ?>"/></div></li>
+                  <li>Hay Fever <div style="float:right"><input type="radio" style="width:auto" name="hayFever" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->hayFever) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="hayFever" value="0" <?=(isset($this->survey) && !$this->survey->hayFever) ? 'checked' : '' ?>/> No</div></li>
+                  <li>Iodine <div style="float:right"><input type="radio" style="width:auto" name="iodine" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->iodine) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="iodine" value="0" <?=(isset($this->survey) && !$this->survey->iodine) ? 'checked' : '' ?>/> No</div></li>
+                  <li>Mangos <div style="float:right"><input type="radio" style="width:auto" name="mangos" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->mangos) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="mangos" value="0" <?=(isset($this->survey) && !$this->survey->mangos) ? 'checked' : '' ?>/> No</div></li>
+                  <li>Poison Oak <div style="float:right"><input type="radio" style="width:auto" name="poisonOak" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->poisonOak) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="poisonOak" value="0" <?=(isset($this->survey) && !$this->survey->poisonOak) ? 'checked' : '' ?>/> No</div></li>
+                  <li>Penicillin <div style="float:right"><input type="radio" style="width:auto" name="penicillin" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->penicillin) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="penicillin" value="0" <?=(isset($this->survey) && !$this->survey->penicillin) ? 'checked' : '' ?>/> No</div></li>
+                  <li>Bees, Wasps. Insects <div style="float:right"><input type="radio" style="width:auto" name="beesWaspsInsects" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->beesWaspsInsects) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="beesWaspsInsects" value="0" <?=(isset($this->survey) && !$this->survey->beesWaspsInsects) ? 'checked' : '' ?>/> No</div></li>
+                  <li>Food <div style="float:right"><input type="radio" style="width:auto" name="food" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->food) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="food" value="0" <?=(isset($this->survey) && !$this->survey->food) ? 'checked' : '' ?>/> No</div></li>
+                  <li>Other Allergies <div style="float:right"><input type="radio" style="width:auto" name="otherAllergies" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->otherAllergies) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="otherAllergies" value="0" <?=(isset($this->survey) && !$this->survey->otherAllergies) ? 'checked' : '' ?>/> No</div></li>
                   <h3 style="left:-25px;position: relative;">If Participant Has Allergies</h3>
-                  <li>Do you carry your own Epinephrine pen? <div style="float:right"><input type="radio" style="width:auto" name="epinephrinePen" class="required yes" value="1"/> Yes <input type="radio"  style="width:auto" name="epinephrinePen" value="0"/> No</div></li>
-                  <li>Do you carry your own Inhaler? <div style="float:right"><input type="radio" style="width:auto" name="inhaler" class="required yes" value="1"/> Yes <input type="radio"  style="width:auto" name="inhaler" value="0"/> No</div></li>
+                  <li>Do you carry your own Epinephrine pen? <div style="float:right"><input type="radio" style="width:auto" name="epinephrinePen" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->epinephrinePen) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="epinephrinePen" value="0" <?=(isset($this->survey) && !$this->survey->epinephrinePen) ? 'checked' : '' ?>/> No</div></li>
+                  <li>Do you carry your own Inhaler? <div style="float:right"><input type="radio" style="width:auto" name="inhaler" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->inhaler) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="inhaler" value="0" <?=(isset($this->survey) && !$this->survey->inhaler) ? 'checked' : '' ?>/> No</div></li>
                 </ol>
 
                 <p>If you answered “yes” to any of the above items, please explain below.  Provide corresponding number.</p><br />
-                <textarea name="explanation" id="explanation"></textarea>
+                <textarea name="explanation" id="explanation"><? echo (isset($this->survey)) ? $this->survey->explanation : '' ?></textarea>
 
                 <h3>Passport Information</h3>
                 <p><em>Please make sure that your passport information is correct.  Incorrect name and birthdate information could prohibit you from traveling internationally.</em></p><br />
                 <table>
                 <tr>
                   <td>Do you have a current passport?</td>
-                  <td><input type="radio" style="width:auto" name="passport" class="required yesPassport" value="1"/> Yes <input type="radio"  style="width:auto" name="passport"/> No</td>
+                  <td><input type="radio" style="width:auto" name="passport" class="required yesPassport" value="1" <?=(isset($this->survey) && $this->survey->passport) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="passport" <?=(isset($this->survey) && !$this->survey->passport) ? 'checked' : '' ?>/> No</td>
                   <td>If YES, list passport country</td>
-                  <td><input name="passportCountry" type="text" id="passportCountry" value="" /></td>
+                  <td><input name="passportCountry" type="text" id="passportCountry" value="<? echo (isset($this->survey)) ? $this->survey->passportCountry : '' ?>" /></td>
                 </tr>
                 <tr>
                   <td>Name on Passport <br />(DOUBLE CHECK FOR ACCURACY)</td>
-                  <td colspan="2"><input name="passportName" type="text" id="passportName" value="" /></td>
+                  <td colspan="2"><input name="passportName" type="text" id="passportName" value="<? echo (isset($this->survey)) ? $this->survey->passportName : '' ?>" /></td>
                 </tr>
                 <tr>
                   <td>Passport Expiration Date</td>
-                  <td colspan="2"><input name="passportExpirationDate" type="text" id="passportExpirationDate" value="" /></td>
+                  <td colspan="2"><input name="passportExpirationDate" type="text" id="passportExpirationDate" value="<? echo (isset($this->survey)) ? $this->survey->passportExpirationDate : '' ?>" /></td>
                 </tr>
                 <tr>
                   <td colspan="4"><b>You will not be able to travel with your passport if it expires within 6 months of when you are travelling internationally.</b></td>
@@ -261,21 +255,21 @@ $(function() {
                 <table>
                 <tr>
                   <td>GRADE (YEAR IN SCHOOL 9-16)</td>
-                  <td><input name="grade" type="text" id="grade" value=""  class="required"/></td>
+                  <td><input name="grade" type="text" id="grade" value="<? echo (isset($this->survey)) ? $this->survey->grade : '' ?>"  class="required"/></td>
                 </tr>
                 <tr>
                   <td>GPA</td>
-                  <td><input name="GPA" type="text" id="GPA" value=""  class="required"/></td>
+                  <td><input name="GPA" type="text" id="GPA" value="<? echo (isset($this->survey)) ? $this->survey->GPA : '' ?>"  class="required"/></td>
                 </tr>
                 <tr><td colspan="2">LEVEL OF SPANISH PROFICIENCY</td></tr>
                 <tr>
                   <td>Listening</td>
                   <td>
                     <select name="spanishListening" class="required">
-                      <option>None</option>
-                      <option>Beginner</option>
-                      <option>Intermediate</option>
-                      <option>Advanced</option>
+                      <option value="None" <?=(isset($this->survey) && $this->survey->spanishListening == 'None') ? 'selected' : ''?>>None</option>
+                      <option value="Beginner" <?=(isset($this->survey) && $this->survey->spanishListening == 'Beginner') ? 'selected' : ''?>>Beginner</option>
+                      <option value="Intermediate" <?=(isset($this->survey) && $this->survey->spanishListening == 'Intermediate') ? 'selected' : ''?>>Intermediate</option>
+                      <option value="Advanced" <?=(isset($this->survey) && $this->survey->spanishListening == 'Advanced') ? 'selected' : ''?>>Advanced</option>
                     </select>
                   </td>
                 </tr>
@@ -283,10 +277,10 @@ $(function() {
                   <td>Reading/writing</td>
                   <td>
                     <select name="spanishReadingWriting" class="required">
-                      <option>None</option>
-                      <option>Beginner</option>
-                      <option>Intermediate</option>
-                      <option>Advanced</option>
+                      <option value="None" <?=(isset($this->survey) && $this->survey->spanishReadingWriting == 'None') ? 'selected' : ''?>>None</option>
+                      <option value="Beginner" <?=(isset($this->survey) && $this->survey->spanishReadingWriting == 'Beginner') ? 'selected' : ''?>>Beginner</option>
+                      <option value="Intermediate" <?=(isset($this->survey) && $this->survey->spanishReadingWriting == 'Intermediate') ? 'selected' : ''?>>Intermediate</option>
+                      <option value="Advanced" <?=(isset($this->survey) && $this->survey->spanishReadingWriting == 'Advanced') ? 'selected' : ''?>>Advanced</option>
                     </select>
                   </td>
                 </tr>
@@ -294,10 +288,10 @@ $(function() {
                   <td>Speaking</td>
                   <td>
                     <select name="spanishSpeaking" class="required">
-                      <option>None</option>
-                      <option>Beginner</option>
-                      <option>Intermediate</option>
-                      <option>Advanced</option>
+                      <option value="None" <?=(isset($this->survey) && $this->survey->spanishSpeaking == 'None') ? 'selected' : ''?>>None</option>
+                      <option value="Beginner" <?=(isset($this->survey) && $this->survey->spanishSpeaking == 'Beginner') ? 'selected' : ''?>>Beginner</option>
+                      <option value="Intermediate" <?=(isset($this->survey) && $this->survey->spanishSpeaking == 'Intermediate') ? 'selected' : ''?>>Intermediate</option>
+                      <option value="Advanced" <?=(isset($this->survey) && $this->survey->spanishSpeaking == 'Advanced') ? 'selected' : ''?>>Advanced</option>
                     </select>
                   </td>
                 </tr>
@@ -306,17 +300,17 @@ $(function() {
                 <table>
                 <tr>
                   <td width="400">Have you ever traveled outside of the United States?</td>
-                  <td><input type="radio" style="width:auto" name="traveledOutsideUS" value="1" class="required"/> Yes <input type="radio"  style="width:auto" name="traveledOutsideUS" value="0"/> No</td>
+                  <td><input type="radio" style="width:auto" name="traveledOutsideUS" value="1" class="required" <?=(isset($this->survey) && $this->survey->traveledOutsideUS) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="traveledOutsideUS" value="0" <?=(isset($this->survey) && !$this->survey->traveledOutsideUS) ? 'checked' : '' ?>/> No</td>
                 </tr>
                 <tr>
                   <td>Have you ever traveled in the developing world?</td>
-                  <td><input type="radio" style="width:auto" name="traveledDevelopingWorld" value="1" class="required"/> Yes <input type="radio"  style="width:auto" name="traveledDevelopingWorld" value="0"/> No</td>
+                  <td><input type="radio" style="width:auto" name="traveledDevelopingWorld" value="1" class="required" <?=(isset($this->survey) && $this->survey->traveledDevelopingWorld) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="traveledDevelopingWorld" value="0" <?=(isset($this->survey) && !$this->survey->traveledDevelopingWorld) ? 'checked' : '' ?>/> No</td>
                 </tr>
                 <tr>
                   <td colspan="2">PLEASE ELABORATE ON ANY TRAVEL EXPERIENCE (OR LACK THERE OF) THAT YOU THINK IS IMPORTANT FOR GSE STAFF TO BE AWARE OF.</td>
                 </tr>
                 <tr>
-                  <td colspan="2"><textarea name="experiences"></textarea></td>
+                  <td colspan="2"><textarea name="experiences"><? echo (isset($this->survey)) ? $this->survey->experiences : '' ?></textarea></td>
                 </tr>
                 </table>
                 <center><h3>Applicant Certification</h3></center>
@@ -324,19 +318,22 @@ $(function() {
                 <table>
                 <tr>
                   <td>Student Name</td>
-                  <td><input type="text" name="signatureName" class="required"/></td>
+                  <td><input type="text" name="signatureName" class="required" value="<? echo (isset($this->survey)) ? $this->survey->signatureName : '' ?>"/></td>
                   <td>Parent Name</td>
-                  <td><input type="text" name="signatureParentName" /></td>
+                  <td><input type="text" name="signatureParentName" id="signatureParentName" value="<? echo (isset($this->survey)) ? $this->survey->signatureParentName : '' ?>"/></td>
                 </tr>
                 </table>
                 <table>
                 <tr>
                   <td>Would you like fundraising support and/or materials?</td>
-                  <td><input type="radio" name="fundraisingSupportMaterials" style="width:auto" value="1"/> Yes <input type="radio"  style="width:auto" name="fundraisingSupportMaterials" value="0"/> No</td>
+                  <td><input type="radio" name="fundraisingSupportMaterials" style="width:auto" value="1" <?=(isset($this->survey) && $this->survey->fundraisingSupportMaterials) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="fundraisingSupportMaterials" value="0" <?=(isset($this->survey) && !$this->survey->fundraisingSupportMaterials) ? 'checked' : '' ?>/> No</td>
                 </tr>
                 </table>
                 </fieldset>
                 <div>
+                <? if (isset($this->survey)) { ?>
+                <input type="button" class="btn btngreen" value="Cancel" onclick="location.href='/<?=$this->project->urlName?>'"/>
+                <? } ?>
                 <input type="reset" class="btn btngreen" />
                 <input type="submit" class="btn btngreen" value="Submit"/>
                 </div>

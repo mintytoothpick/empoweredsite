@@ -20,7 +20,7 @@ class Brigade_Db_Table_SurveyGlobalStudentEmbassy extends Zend_Db_Table_Abstract
         }
     }
 
-    public function getProjectSurveyReport($ProjectId) {
+    public function getByProject($ProjectId) {
         try {
             return $this->fetchAll($this->select()->where('ProjectId = ?', $ProjectId)->order('FirstName'))->toArray();
         } catch (Zend_Db_Adapter_Exception $zdae) {
@@ -38,7 +38,7 @@ class Brigade_Db_Table_SurveyGlobalStudentEmbassy extends Zend_Db_Table_Abstract
      * @return Array Survey row info.
      */
     public function loadInfo($SurveyId) {
-        $res = $this->fetchRow($this->select()->where('SurveyId = ?', $SurveyId));
+        $res = $this->fetchRow($this->select()->where('Id = ?', $SurveyId));
         if ($res) {
             return $res->toArray();
         } else return null;
@@ -53,7 +53,7 @@ class Brigade_Db_Table_SurveyGlobalStudentEmbassy extends Zend_Db_Table_Abstract
      * @return Array Survey row info.
      */
     public function getByProjectAndUser($ProjectId, $UserId) {
-        $row = $this->fetchAll(
+        $row = $this->fetchRow(
             $this->select()
                 ->where('ProjectId = ?', $ProjectId)
                 ->where('UserId = ?', $UserId)
@@ -69,7 +69,7 @@ class Brigade_Db_Table_SurveyGlobalStudentEmbassy extends Zend_Db_Table_Abstract
      * Update information survey
      */
     public function updateInfo($data, $id) {
-        $where = $this->getAdapter()->quoteInto('SurveyId = ?', $id);
+        $where = $this->getAdapter()->quoteInto('Id = ?', $id);
         $this->update($data, $where);
     }
 }

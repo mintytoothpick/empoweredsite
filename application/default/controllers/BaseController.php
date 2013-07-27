@@ -11,6 +11,7 @@ require_once 'Brigade/Util/FBConnect.php';
 require_once 'Zend/Auth.php';
 
 require_once 'User.php';
+require_once 'SurveyGlobalStudentEmbassy.php';
 
 /**
  * Base controller methods.
@@ -178,6 +179,8 @@ class BaseController extends Zend_Controller_Action {
      * Used for name and last name + surveys inclomplete.
      */
     protected function checkMissinInfo() {
+        $config = Zend_Registry::get('configuration');
+
         //Validate complete name
         $this->view->needNameInfo = false;
         if (((trim($this->sessionUser->fullName) == trim($this->sessionUser->email))
@@ -189,7 +192,9 @@ class BaseController extends Zend_Controller_Action {
         }
 
         //Validate incomplete survey
-        if ($this->_getParam('action') != 'editsurvey') {
+        if ($this->_getParam('action') != 'editsurvey' &&
+            $this->_getParam('action') != 'customsurvey'
+        ) {
             $this->view->missingSurveys = false;
             foreach ($this->sessionUser->initiatives as $project) {
                 $isAdmin = false; //avoid popup for admins
@@ -203,11 +208,25 @@ class BaseController extends Zend_Controller_Action {
                         $isAdmin = $project->organization->isAdmin($this->sessionUser);
                     }
                     if (!$isAdmin && !$project->isFinished()) {
-                        $survey = Survey::getByProjectAndUser($project,$this->sessionUser);
+                        if (in_array($project->organizationId,
+                            $config->organization->customSurvey->toArray())
+                        ) {
+                            $survey = SurveyGlobalStudentEmbassy::getByProjectAndUser($project,$this->sessionUser);
+                        } else {
+                            $survey = Survey::getByProjectAndUser($project,$this->sessionUser);
+                        }
                         if (is_null($survey)) {
+
+                            $url = "/signup/editsurvey?ProjectId=".$project->id;
+                            if (in_array($project->organizationId,
+                                $config->organization->customSurvey->toArray())
+                            ) {
+                                $url = "/signup/customsurvey?ProjectId=".$project->id;
+                            }
                             $this->view->missingSurveys[] = array(
-                                'id'      => $project->id,
-                                'name'    => $project->name
+                                'id'   => $project->id,
+                                'name' => $project->name,
+                                'url'  => $url
                             );
                         }
                     }

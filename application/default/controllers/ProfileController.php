@@ -281,8 +281,19 @@ class ProfileController extends BaseController {
         } else {
           $this->view->hasProfilePic = false;
         }
-
-
+        $config  = Zend_Registry::get('configuration');
+        if ((in_array($project->organizationId, $config->organization->customSurvey->toArray()) ||
+            in_array($project->organizationId, Organization::$withSurvey)) &&
+            isset($this->sessionUser) && $this->sessionUser->id == $user->id &&
+            !is_null($project->getVolunteerByUser($this->sessionUser))
+        ) {
+            if (in_array($project->organizationId, $config->organization->customSurvey->toArray())) {
+                $urlSurvey = "/signup/customsurvey?ProjectId={$project->id}";
+            } else {
+                $urlSurvey = "/signup/editsurvey?ProjectId={$project->id}";
+            }
+            $this->view->surveyLink = $urlSurvey;
+        }
         $this->view->currentTab = 'initiatives';
         $this->renderPlaceHolders();
     }

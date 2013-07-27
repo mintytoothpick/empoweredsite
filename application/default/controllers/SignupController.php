@@ -202,11 +202,20 @@ class SignUpController extends BaseController {
         $params  = $this->_getAllParams();
         $project = Project::get($params['ProjectId']);
 
+        $isVolunteer = Volunteer::getByUserAndProject($this->sessionUser, $project);
+        $survey      = SurveyGlobalStudentEmbassy::getByProjectAndUser(
+                    $project,
+                    $this->sessionUser
+        );
         if ($this->getRequest()->isPost()) {
-            $survey = new SurveyGlobalStudentEmbassy();
-            $survey->userId                      = $this->sessionUser->id;
-            $survey->groupId                     = $project->group->id;
-            $survey->projectId                   = $project->id;
+            $edit = true;
+            if (!$survey) {
+                $edit              = false;
+                $survey            = new SurveyGlobalStudentEmbassy();
+                $survey->userId    = $this->sessionUser->id;
+                $survey->groupId   = $project->group->id;
+                $survey->projectId = $project->id;
+            }
             $survey->firstName                   = $params['firstname'];
             $survey->middleName                  = $params['middlename'];
             $survey->lastName                    = $params['lastname'];
@@ -278,13 +287,24 @@ class SignUpController extends BaseController {
             $survey->fundraisingSupportMaterials = $params['fundraisingSupportMaterials'];
             $survey->date                        = date('Y-m-d');
             $survey->save();
-            if (empty($this->view->userNew->dateOfBirth)) {
-                    $this->view->userNew->dateOfBirth = date("Y-m-d",strtotime($this->_getParam('birthdate')));
-                    $this->view->userNew->save();
+            if (empty($this->sessionUser->dateOfBirth)) {
+                $this->sessionUser->dateOfBirth = date("Y-m-d",strtotime($params['birthdate']));
+                $this->sessionUser->save();
             }
-            header('location: /signup/next/?ProjectId='.$project->id);
+            $volunteer = $this->signupVolunteer($project->id, $this->sessionUser->id);
+            if ($volunteer) {
+                $volunteer->user->phone = $params['participantCellNum'];
+                $volunteer->user->save();
+            }
+            if (!$edit) {
+                header('location: /signup/next/?ProjectId='.$project->id);
+            } else {
+                $this->view->updated = true;
+            }
         }
-
+        if ($survey) {
+            $this->view->survey = $survey;
+        }
         $this->view->project = $project;
         $this->view->group   = $project->group;
 
@@ -938,12 +958,16 @@ class SignUpController extends BaseController {
         $this->_helper->viewRenderer->setNoRender();
         $parameters = $this->_getAllParams();
         if (isset($parameters['ProjectId'])) {
-            $Survey = new Brigade_Db_Table_Survey();
-            $Brigades = new Brigade_Db_Table_Brigades();
+            $project = Project::get($parameters['ProjectId']);
+            $config  = Zend_Registry::get('configuration');
+            if (in_array($project->organizationId, $config->organization->customSurvey->toArray())) {
+                return $this->customsurveyReport($parameters['ProjectId']);
+            }
+
+            $Survey           = new Brigade_Db_Table_Survey();
             $ProjectDonations = new Brigade_Db_Table_ProjectDonations();
-            $volunteers = $Survey->getProjectSurveyReport($parameters['ProjectId']);
-            $projectinfo = $Brigades->loadInfo($parameters['ProjectId']);
-            $projectname = str_replace(",", "-", $projectinfo['Name']);
+            $volunteers  = $Survey->getProjectSurveyReport($parameters['ProjectId']);
+            $projectname = str_replace(",", "-", $project->name);
             $projectname = str_replace(" ", "-", $projectname." Volunteer Survey Report.xls");
             header("Content-type: application/x-msdownload");
             header("Content-Disposition: attachment; filename=$projectname");
@@ -986,5 +1010,111 @@ class SignUpController extends BaseController {
 
             print "$headers\n$data";
         }
+    }
+
+    /**
+     * Custom survey report download
+     */
+    public function customsurveyReport($projectId) {
+        $project = Project::get($projectId);
+        $report  = SurveyGlobalStudentEmbassy::getByProject($project);
+
+        header("Content-type: application/x-msdownload");
+        header("Content-Disposition: attachment; filename={$project->urlName}.xls");
+        header("Pragma: no-cache");
+        header("Expires: 0");
+        $headers = '';
+        $data    = '';
+        $columns = array('First Name', 'Middle Name', 'Last Name', 'Preferred Name',
+        'Gender', 'Date of Birth', 'Address', 'Participant Cell Number', 'Participant Email',
+        'Grade Year School', 'Parent1', 'Parent2', 'Parent Address',
+        'Emergency Name 1', 'Emergency Relation 1', 'Emergency Email 1', 'Emergency Day Phone 1', 'Emergency Evening Phone 1', 'Emergency Cell Phone 1',
+        'Emergency Name 2', 'Emergency Relation 2', 'Emergency Email 2', 'Emergency Day Phone 2', 'Emergency Evening Phone 2', 'Emergency Cell Phone 2',
+        'Bleeding Clotting Disorders', 'Asthma', 'Diabetes', 'EarInfections', 'Heart Defects Hypertension', 'Psychiatric Treatment', 'Seizure Disorder',
+        'Immuno Compromised', 'Sleep Walking', 'Bed Wetting', 'Hospitalized Last 5 Years', 'Chicken Pox', 'Measles', 'Mumps',
+        'Other Diseases', 'Date Last Tetanus Shot', 'Hay Fever', 'Iodine', 'Mangos', 'Poison Oak', 'Penicillin', 'Bees Wasps Insects',
+        'Food', 'Other Allergies', 'Epinephrine Pen', 'Inhaler', 'Explanation', 'Passport', 'Passport Country', 'Passport Name',
+        'Passport Expiration Date', 'Country Birth', 'Citizenship', 'Grade', 'GPA', 'Spanish Listening', 'Spanish Reading Writing',
+        'Spanish Speaking', 'Traveled Outside US', 'Traveled Developing World', 'Experiences', 'Signature Name', 'Signature Parent Name', 'Fundraising Support Materials',
+        'Date'
+        );
+        foreach($columns as $column) {
+            $headers .= $column.";";
+        }
+        foreach($report as $survey) {
+            $line  = $survey->firstName;
+            $line .= ';' . $survey->middleName;
+            $line .= ';' . $survey->lastName;
+            $line .= ';' . $survey->preferredName;
+            $line .= ';' . (($survey->gender == 1) ? 'Male' : 'Female');
+            $line .= ';' . $survey->dateBirth;
+            $line .= ';' . $survey->address;
+            $line .= ';' . $survey->participantCellNum;
+            $line .= ';' . $survey->participantEmail;
+            $line .= ';' . $survey->gradeYearSchool;
+            $line .= ';' . $survey->parent1;
+            $line .= ';' . $survey->parent2;
+            $line .= ';' . $survey->parentAddress;
+            $line .= ';' . $survey->emergencyName1;
+            $line .= ';' . $survey->emergencyRelation1;
+            $line .= ';' . $survey->emergencyEmail1;
+            $line .= ';' . $survey->emergencyDayPhone1;
+            $line .= ';' . $survey->emergencyEveningPhone1;
+            $line .= ';' . $survey->emergencyCellPhone1;
+            $line .= ';' . $survey->emergencyName2;
+            $line .= ';' . $survey->emergencyRelation2;
+            $line .= ';' . $survey->emergencyEmail2;
+            $line .= ';' . $survey->emergencyDayPhone2;
+            $line .= ';' . $survey->emergencyEveningPhone2;
+            $line .= ';' . $survey->emergencyCellPhone2;
+            $line .= ';' . (($survey->bleedingClottingDisorders) ? 'Yes' : 'No');
+            $line .= ';' . (($survey->asthma) ? 'Yes' : 'No');
+            $line .= ';' . (($survey->diabetes) ? 'Yes' : 'No');
+            $line .= ';' . (($survey->earInfections) ? 'Yes' : 'No');
+            $line .= ';' . (($survey->heartDefectsHypertension) ? 'Yes' : 'No');
+            $line .= ';' . (($survey->psychiatricTreatment) ? 'Yes' : 'No');
+            $line .= ';' . (($survey->seizureDisorder) ? 'Yes' : 'No');
+            $line .= ';' . (($survey->immunoCompromised) ? 'Yes' : 'No');
+            $line .= ';' . (($survey->sleepWalking) ? 'Yes' : 'No');
+            $line .= ';' . (($survey->bedWetting) ? 'Yes' : 'No');
+            $line .= ';' . (($survey->hospitalizedLast5Years) ? 'Yes' : 'No');
+            $line .= ';' . (($survey->chickenPox) ? 'Yes' : 'No');
+            $line .= ';' . (($survey->measles) ? 'Yes' : 'No');
+            $line .= ';' . (($survey->mumps) ? 'Yes' : 'No');
+            $line .= ';' . (($survey->otherDiseases) ? 'Yes' : 'No');
+            $line .= ';' . $survey->dateLastTetanusShot;
+            $line .= ';' . (($survey->hayFever) ? 'Yes' : 'No');
+            $line .= ';' . (($survey->iodine) ? 'Yes' : 'No');
+            $line .= ';' . (($survey->mangos) ? 'Yes' : 'No');
+            $line .= ';' . (($survey->poisonOak) ? 'Yes' : 'No');
+            $line .= ';' . (($survey->penicillin) ? 'Yes' : 'No');
+            $line .= ';' . (($survey->beesWaspsInsects) ? 'Yes' : 'No');
+            $line .= ';' . (($survey->food) ? 'Yes' : 'No');
+            $line .= ';' . (($survey->otherAllergies) ? 'Yes' : 'No');
+            $line .= ';' . (($survey->epinephrinePen) ? 'Yes' : 'No');
+            $line .= ';' . (($survey->inhaler) ? 'Yes' : 'No');
+            $line .= ';' . str_replace (array("\r\n", "\n", "\r"), ' ', $survey->explanation);
+            $line .= ';' . (($survey->passport) ? 'Yes' : 'No');
+            $line .= ';' . $survey->passportCountry;
+            $line .= ';' . $survey->passportName;
+            $line .= ';' . $survey->passportExpirationDate;
+            $line .= ';' . $survey->countryBirth;
+            $line .= ';' . $survey->citizenship;
+            $line .= ';' . $survey->grade;
+            $line .= ';' . $survey->GPA;
+            $line .= ';' . $survey->spanishListening;
+            $line .= ';' . $survey->spanishReadingWriting;
+            $line .= ';' . $survey->spanishSpeaking;
+            $line .= ';' . (($survey->traveledOutsideUS) ? 'Yes' : 'No');
+            $line .= ';' . (($survey->traveledDevelopingWorld) ? 'Yes' : 'No');
+            $line .= ';' . str_replace (array("\r\n", "\n", "\r"), ' ', $survey->experiences);
+            $line .= ';' . $survey->signatureName;
+            $line .= ';' . $survey->signatureParentName;
+            $line .= ';' . (($survey->fundraisingSupportMaterials) ? 'Yes' : 'No');
+            $line .= ';' . $survey->date .';';
+            $data .= trim($line)."\n";
+        }
+
+        print "$headers\n$data";
     }
 }

@@ -11,7 +11,7 @@ $(function(){
         <h2>Missing Information</h2>
         <p>We noticed you have a survey for one or more initiatives to complete:</p>
         <? foreach($this->missingSurveys as $projectInfo) { ?>
-        <div style=""><span class="left"><?=$projectInfo['name']?></span> <a href="/signup/editsurvey?ProjectId=<?=$projectInfo['id']?>" class="right">Complete Survey</a></div>
+        <div style=""><span class="left"><?=$projectInfo['name']?></span> <a href="<?=$projectInfo['url']?>" class="right">Complete Survey</a></div>
         <div class="clear"></div><hr />
         <? } ?>
         </ul>

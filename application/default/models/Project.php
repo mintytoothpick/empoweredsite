@@ -27,10 +27,10 @@ require_once 'MembershipFund.php';
 class Project extends Base {
 
     public static $NETWORKS =  array(
-            'DAF7E701-4143-4636-B3A9-CB9469D44178', // Usa
-            'DB04F20F-59FE-468F-8E55-AD75F60FB0CB', // Canada
-            '547086E0-5456-4631-AB2A-BA781E7DB9A7'  // UK
-        );
+        'DAF7E701-4143-4636-B3A9-CB9469D44178', // Usa
+        'DB04F20F-59FE-468F-8E55-AD75F60FB0CB', // Canada
+        '547086E0-5456-4631-AB2A-BA781E7DB9A7'  // UK
+    );
 
     public $id;
     public $name;
