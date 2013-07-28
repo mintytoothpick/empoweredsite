@@ -220,7 +220,7 @@ class SignUpController extends BaseController {
             $survey->middleName                  = $params['middlename'];
             $survey->lastName                    = $params['lastname'];
             $survey->preferredName               = $params['preferredName'];
-            $survey->dateBirth                   = $params['birthdate'];
+            $survey->dateBirth                   = date("Y/m/d",strtotime($params['birthdate']));
             $survey->address                     = $params['address'];
             $survey->participantCellNum          = $params['participantCellNum'];
             $survey->participantEmail            = $params['participantEmail'];
@@ -271,7 +271,7 @@ class SignUpController extends BaseController {
             $survey->passport                    = $params['passport'];
             $survey->passportCountry             = $params['passportCountry'];
             $survey->passportName                = $params['passportName'];
-            $survey->passportExpirationDate      = $params['passportExpirationDate'];
+            $survey->passportExpirationDate      = (!empty($params['passportExpirationDate'])) ? date("Y/m/d",strtotime($params['passportExpirationDate'])) : null;
             $survey->countryBirth                = $params['countryBirth'];
             $survey->citizenship                 = $params['citizenship'];
             $survey->grade                       = $params['grade'];

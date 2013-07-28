@@ -103,7 +103,7 @@ $(function() {
                 </tr>
                 <tr>
                   <td><label for="birthdate">Date of Birth (MM/DD/YYYY):</label></td>
-                  <td><input type="text" id="birthdate" name="birthdate" value="<? echo (isset($this->survey)) ? date("m/d/Y",strtotime($this->survey->dateBirth)) : '' ?>" class="required text" /></td>
+                  <td><input type="text" id="birthdate" name="birthdate" value="<? echo (isset($this->survey)) ? date("m/d/Y",strtotime($this->survey->dateBirth)) : '' ?>" class="required date text" /></td>
                 </tr>
                 <tr>
                   <td><label for="address">Address:</label></td>
@@ -205,7 +205,7 @@ $(function() {
                   <li>Measles <div style="float:right"><input type="radio" style="width:auto" name="measles" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->measles) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="measles" value="0" <?=(isset($this->survey) && !$this->survey->measles) ? 'checked' : '' ?>/> No</div></li>
                   <li>Mumps <div style="float:right"><input type="radio" style="width:auto" name="mumps" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->mumps) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="mumps" value="0" <?=(isset($this->survey) && !$this->survey->mumps) ? 'checked' : '' ?>/> No</div></li>
                   <li>Other Diseases <div style="float:right"><input type="radio" style="width:auto" name="otherDiseases" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->otherDiseases) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="otherDiseases" value="0" <?=(isset($this->survey) && !$this->survey->otherDiseases) ? 'checked' : '' ?>/> No</div></li>
-                  <li>Date of last Tetanus shot: <div style="float:right"><input type="text" id="dateLastTetanusShot" name="dateLastTetanusShot" style="width:100px" class="required" value="<? echo isset($this->survey) ? $this->survey->dateLastTetanusShot : '' ?>"/></div></li>
+                  <li>Date of last Tetanus shot (MM/DD/YYYY): <div style="float:right"><input type="text" id="dateLastTetanusShot" name="dateLastTetanusShot" style="width:100px" class="required" value="<? echo isset($this->survey) ? $this->survey->dateLastTetanusShot : '' ?>"/></div></li>
                   <li>Hay Fever <div style="float:right"><input type="radio" style="width:auto" name="hayFever" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->hayFever) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="hayFever" value="0" <?=(isset($this->survey) && !$this->survey->hayFever) ? 'checked' : '' ?>/> No</div></li>
                   <li>Iodine <div style="float:right"><input type="radio" style="width:auto" name="iodine" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->iodine) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="iodine" value="0" <?=(isset($this->survey) && !$this->survey->iodine) ? 'checked' : '' ?>/> No</div></li>
                   <li>Mangos <div style="float:right"><input type="radio" style="width:auto" name="mangos" class="required yes" value="1" <?=(isset($this->survey) && $this->survey->mangos) ? 'checked' : '' ?>/> Yes <input type="radio"  style="width:auto" name="mangos" value="0" <?=(isset($this->survey) && !$this->survey->mangos) ? 'checked' : '' ?>/> No</div></li>
@@ -236,8 +236,8 @@ $(function() {
                   <td colspan="2"><input name="passportName" type="text" id="passportName" value="<? echo (isset($this->survey)) ? $this->survey->passportName : '' ?>" /></td>
                 </tr>
                 <tr>
-                  <td>Passport Expiration Date</td>
-                  <td colspan="2"><input name="passportExpirationDate" type="text" id="passportExpirationDate" value="<? echo (isset($this->survey)) ? $this->survey->passportExpirationDate : '' ?>" /></td>
+                  <td>Passport Expiration Date (MM/DD/YYYY)</td>
+                  <td colspan="2"><input name="passportExpirationDate" type="text" id="passportExpirationDate" value="<? echo (isset($this->survey) && !empty($this->survey->passportExpirationDate)) ? date("m/d/Y",strtotime($this->survey->passportExpirationDate)) : '' ?>" /></td>
                 </tr>
                 <tr>
                   <td colspan="4"><b>You will not be able to travel with your passport if it expires within 6 months of when you are travelling internationally.</b></td>

@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS `survey_global_student_embassy` (
   `PassportExpirationDate` date DEFAULT NULL,
   `CountryBirth` varchar(60) DEFAULT NULL,
   `Citizenship` varchar(60) DEFAULT NULL,
-  `Grade` tinyint(4) DEFAULT NULL,
+  `Grade` varchar(30) DEFAULT NULL,
   `GPA` varchar(30) DEFAULT NULL,
   `SpanishListening` varchar(12) DEFAULT NULL,
   `SpanishReadingWriting` varchar(12) DEFAULT NULL,
