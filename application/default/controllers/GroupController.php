@@ -3668,13 +3668,21 @@ class GroupController extends BaseController {
             }
 
             if (!empty($params['feeFreq'])) {
-                MembershipFrequency::clean($group);
+                $errorAmount = false;
                 foreach($params['feeFreq'] as $id) {
-                    $membershipFreq          = new MembershipFrequency();
-                    $membershipFreq->id      = $id;
-                    $membershipFreq->amount  = $params['feeAmnt_'.$id];
-                    $membershipFreq->groupId = $group->id;
-                    $membershipFreq->save();
+                    if ($params['feeAmnt_'.$id] <= 0) {
+                        $errorAmount = true;
+                    }
+                }
+                if (!$errorAmount) {
+                    MembershipFrequency::clean($group);
+                    foreach($params['feeFreq'] as $id) {
+                        $membershipFreq          = new MembershipFrequency();
+                        $membershipFreq->id      = $id;
+                        $membershipFreq->amount  = $params['feeAmnt_'.$id];
+                        $membershipFreq->groupId = $group->id;
+                        $membershipFreq->save();
+                    }
                 }
             }
 
