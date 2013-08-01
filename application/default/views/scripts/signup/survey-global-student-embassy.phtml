@@ -281,7 +281,14 @@ $(function() {
                 </tr>
                 <tr>
                   <td><span>*</span>GPA</td>
-                  <td><input name="GPA" type="text" id="GPA" value="<? echo (isset($this->survey)) ? $this->survey->GPA : '' ?>"  class="required"/></td>
+                  <td>
+                    <select class="required" id="GPA" name="GPA">
+                        <option value="">Select ...</option>
+                    <? $count = 0; while ($count <= 4) { ?>
+                        <option value="<?=number_format($count, 2)?>" <? echo (isset($this->survey) && $this->survey->GPA == number_format($count, 2)) ? 'selected' : '' ?>><?=number_format($count, 2)?></option>
+                    <? $count += 0.01; } ?>
+                    </select>
+                  </td>
                 </tr>
                 <tr><td colspan="2">LEVEL OF SPANISH PROFICIENCY</td></tr>
                 <tr>
