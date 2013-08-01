@@ -2411,6 +2411,13 @@ class GroupController extends BaseController {
             if (!empty($parameters['isOpen'])) {
                 $group->isOpen = true;
             }
+            $config = Zend_Registry::get('configuration');
+            if(!($config->chapter->membership->enable &&
+              (in_array($this->organization->id, $config->chapter->membership->settings->toArray()) ||
+              in_array($this->organization->id, $config->chapter->membership->active->toArray())))
+            ) {
+                $group->activityRequiresMembership = $parameters['activityRequiresMembership'];
+            }
             $updateInfusion = false;
             if ($group->name != $parameters['GroupName']) {
                 $oldName        = $group->name;

@@ -338,6 +338,11 @@ if(!($config->chapter->membership->enable &&
                                 <input name="isOpen" type="checkbox" id="isOpen" value="1" <?=(isset($this->group) && $this->group->isOpen) ? 'checked' : ''?>/>
                                 &nbsp;Individuals can become members of this chapter without being accepted by an admin
                             </li>
+                            <li class="field-label">&nbsp;</li>
+                            <li class="field-input">
+                                <input name="activityRequiresMembership" type="checkbox" id="activityRequiresMembership" value="1" <?=(isset($this->group) && $this->group->activityRequiresMembership) ? 'checked' : ''?>/>
+                                &nbsp;Volunteers become a member of the <?=strtolower($this->organization->groupNamingSingular)?> once they sign up to the initiative.
+                            </li>
 <?php } ?>
                             <div style="margin-top:15px; float:left; width:100%; margin-bottom:20px" id="btns">
                             <?php if (!isset($this->getstarted) && !count($this->groups)) { ?>
