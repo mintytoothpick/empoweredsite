@@ -991,6 +991,10 @@ class DonationController extends BaseController {
      */
     private function _sendReceipt($donation, $paymentAmount) {
         $custom = false;
+        //custom receipt for deloitte
+        if ($donation->organization->id == "6EE43F7E-616A-11E0-8F48-0025900034B2") {
+            $customDeloitte = true;
+        }
         if ($donation->organization->id == "DAF7E701-4143-4636-B3A9-CB9469D44178") {
             $custom = true;
         }
@@ -999,11 +1003,18 @@ class DonationController extends BaseController {
         if ($custom) {
             $message .= "Thank you for your generous donation.";
         } else {
-            $message .= "Thank you for your donation to {$donation->organization->name}";
+            if ($customDeloitte) {
+                $message .= "Thank you for your donation to Global Brigades";
+            } else {
+                $message .= "Thank you for your donation to {$donation->organization->name}";
+            }
         }
+        $at = "";
         if (!empty($donation->userId) && $donation->user) {
-            if (!$custom) {
+            if (!$custom && !$customDeloitte) {
                 $message .= " on behalf of ". $donation->user->fullName;
+            } else {
+                $at = " @ ".$donation->project->name;
             }
             $share = "http://www.empowered.org/" . $donation->user->urlName .
                      "/initiatives/" . $donation->project->urlName .
@@ -1023,23 +1034,28 @@ class DonationController extends BaseController {
             $NPMessage .= '<br /><br />';
         }
 
-        if (!$custom) {
-            $message .= ". You donation details are as follows:<br />";
+        if (!$custom || $customDeloitte) {
+            $message .= ". You donation details are as follows:<br /><br />";
+        } else {
+            $message .= "<br />Here are your donation details:<br /><br />";
         }
-        $message .= "<br />Here are your donation details:<br /><br />";
-        if ($custom) {
+        if ($custom || $customDeloitte) {
             // for gb usa change to INC
             $message .= "Recipient: <span style='color:blue'>Global Brigades, Inc.</span><br />";
         } else {
             $message .= "Recipient: {$donation->organization->name}<br />";
         }
-        $message .= "In support of: {$donation->destination}<br />
+        $message .= "In support of: {$donation->destination}";
+        if ($customDeloitte) {
+            $message .= $at;
+        }
+        $message .= "<br />
         Amount: {$donation->project->currency}" . number_format($paymentAmount, 2) . "<br />
         Donation #: {$donation->transactionId}<br />
         Date of Donation: ".date('m/d/Y', strtotime($donation->createdOn))."<br /><br />
         $NPMessage
         Know someone who would love to help? Share this cause with family and" .
-        " friends by sending them this link: $share
+        " friends by sending them this link: $share <br />
         Regards,<br />
         {$donation->organization->name}";
 
