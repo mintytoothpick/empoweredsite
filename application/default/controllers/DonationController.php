@@ -1000,14 +1000,10 @@ class DonationController extends BaseController {
         }
 
         $message = "Dear {$donation->supporterName},<br /><br />";
-        if ($custom) {
-            $message .= "Thank you for your generous donation.";
+        if ($custom || $customDeloitte) {
+            $message .= "Thank you for your generous donation";
         } else {
-            if ($customDeloitte) {
-                $message .= "Thank you for your donation to Global Brigades";
-            } else {
-                $message .= "Thank you for your donation to {$donation->organization->name}";
-            }
+            $message .= "Thank you for your donation to {$donation->organization->name}";
         }
         $at = "";
         if (!empty($donation->userId) && $donation->user) {
@@ -1035,7 +1031,7 @@ class DonationController extends BaseController {
         }
 
         if (!$custom || $customDeloitte) {
-            $message .= ". You donation details are as follows:<br /><br />";
+            $message .= ". Your donation details are as follows:<br /><br />";
         } else {
             $message .= "<br />Here are your donation details:<br /><br />";
         }
@@ -1056,8 +1052,12 @@ class DonationController extends BaseController {
         $NPMessage
         Know someone who would love to help? Share this cause with family and" .
         " friends by sending them this link: $share <br />
-        Regards,<br />
-        {$donation->organization->name}";
+        Regards,<br />";
+        if ($customDeloitte) {
+            $message .= "Global Brigades, Inc.";
+        } else {
+            $message .= "{$donation->organization->name}";
+        }
 
         if (!$donation->isReceiptSent) {
             if ($donation->supporterEmail != '') {
