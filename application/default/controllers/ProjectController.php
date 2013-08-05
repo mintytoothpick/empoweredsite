@@ -1752,10 +1752,12 @@ class ProjectController extends BaseController {
         $this->view->project = $project;
         $this->view->group   = $project->group;
 
+        $this->view->currentTab        = 'initiatives';
         $this->view->userProjectRaised = $volunteer->raised;
         $this->view->userProjectGoal   = $volunteer->userDonationGoal;
         $this->view->breadcrumb        = $this->view->breadcrumbHelper($project);
         $this->view->rightbarHelper($project, $volunteer);
+        $this->view->headTitle(stripslashes($project->name));
 
         if(!empty($project->programId)) {
             $this->view->program  = $project->program;

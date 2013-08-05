@@ -7,12 +7,14 @@ if (count($actWall) > 0 ) {
   foreach($actWall as $activity) {
     $text = '';
     if($activity->type == 'Uploads') {
+        $url = $this->urlHelper()->memberProfileUrl($this->group, $activity->user);
         if($activity->entity) {
             $text = 'Uploaded a photo for <a href="/'.$activity->entity->urlName.'/photos">'.$activity->entity->name.'</a>';
         } else {
             $text = 'Uploaded a photo';
         }
     } else if($activity->type == 'Events') {
+        $url = $this->urlHelper()->memberProfileUrl($this->group, $activity->user);
         if (isset($activity->entity)) {
             $text = 'Created the event: <a href="/'.$this->group->urlName.'/events?EventId='.$activity->entity->id.'">'.$activity->entity->title.'</a>';
         } else {
@@ -27,22 +29,29 @@ if (count($actWall) > 0 ) {
         //    $text = 'Uploaded the file: '.$file['UploadedFileName'];
         //}
     } else if($activity->type == 'User Donation') {
-        if($activity->recipient) {
+         $volunteer = $activity->entity->getVolunteerByUser($activity->user);
+         if ($volunteer) {
+            $url = $this->urlHelper()->volunteerProfileUrl($activity->entity, $activity->user);
+         } else {
+            $url = $this->urlHelper()->memberProfileUrl($this->group, $activity->user);
+         }
+         if($activity->recipient) {
             if($activity->createdById == $activity->recipientId) {
                 $text = 'Made a '.$this->group->currency.number_format($activity->details).' donation to <a href="/'.$activity->entity->urlName.'">'.$activity->entity->name.'</a>';
             } else {
-                $text = 'Made a donation to <a href="/'.$activity->entity->urlName.'">'.$activity->entity->name.'</a> on behalf of ' . $this->urlHelper()->userUrl($activity->recipient);
+                $text = 'Made a donation to <a href="/'.$activity->entity->urlName.'">'.$activity->entity->name.'</a> on behalf of ' . $this->urlHelper()->volunteerProfileUrl($activity->entity, $activity->recipient);
             }
         } else {
             $text = 'Made a donation.';
         }
     } else if($activity->type == 'Guest Donation') {
         if($activity->recipient) {
-            $text = 'Made a donation to <a href="/'.$activity->entity->urlName.'">'.$activity->entity->name.'</a> on behalf of ' . $this->urlHelper()->userUrl($activity->recipient);
+            $text = 'Made a donation to <a href="/'.$activity->entity->urlName.'">'.$activity->entity->name.'</a> on behalf of ' . $this->urlHelper()->volunteerProfileUrl($activity->entity, $activity->recipient);
         } else {
             $text = 'Made a donation.';
         }
     } else if($activity->type == 'Wall Post') {
+        $url  = $this->urlHelper()->memberProfileUrl($this->group, $activity->user);
         $text = $activity->details;
     } else if($activity->type == 'Campaign Added') {
         if($activity->entity) {
@@ -51,6 +60,7 @@ if (count($actWall) > 0 ) {
             $text = 'Created a fundraising campaign';
         }
     } else if($activity->type == 'Brigade Added') {
+        $url = $this->urlHelper()->memberProfileUrl($this->group, $activity->user);
         $initiative = Project::get($activity->siteId);
         if ($initiative) {
             $text = 'Created the volunteer activity: <a href="/'.$initiative->urlName.'">'.$initiative->name.'</a>';
@@ -61,12 +71,16 @@ if (count($actWall) > 0 ) {
         $initiative = Project::get($activity->siteId);
         if ($initiative) {
             $text = 'Joined the initiative: <a href="/'.$initiative->urlName.'">'.$initiative->name.'</a>';
+            $url = $this->urlHelper()->volunteerProfileUrl($initiative, $activity->user);
         }
     } else if($activity->type == 'Group Updated') {
+        $url  = $this->urlHelper()->memberProfileUrl($this->group, $activity->user);
         $text = 'Updated the chapter information';
     } else if($activity->type == 'Group Member Joined') {
+        $url  = $this->urlHelper()->memberProfileUrl($this->group, $activity->user);
         $text = 'Became a new chapter member!';
     } else {
+        $url  = $this->urlHelper()->memberProfileUrl($this->group, $activity->user);
         $text = $activity->type;
     }
 ?>
@@ -74,7 +88,7 @@ if (count($actWall) > 0 ) {
   <div class="memberCon01">
     <? if($activity->type != 'Guest Donation') { ?>
     <div class="memberImgStyle2"><img src="/profile/loadimage/?UserId=<?= $activity->createdById ?>" width="55" height="52" alt=" " /></div>
-    <div class="memberText"> <span class="headignStyle03"><?=$this->urlHelper()->userUrl($activity->user)?></span><br />
+    <div class="memberText"> <span class="headignStyle03"><?=$url?></span><br />
     <? } else { ?>
     <div class="memberImgStyle2"><img src="/public/images/ico/people.jpg" width="55" height="52" alt=" " /></div>
     <div class="memberText"> <span class="headignStyle03">Guest User</span><br />

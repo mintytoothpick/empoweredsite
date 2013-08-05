@@ -991,6 +991,7 @@ class DonationController extends BaseController {
      */
     private function _sendReceipt($donation, $paymentAmount) {
         $custom = false;
+        $customDeloitte = false;
         //custom receipt for deloitte
         if ($donation->organization->id == "6EE43F7E-616A-11E0-8F48-0025900034B2") {
             $customDeloitte = true;
