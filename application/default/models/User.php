@@ -107,6 +107,20 @@ class User extends Base {
     }
 
     /**
+     * Get a user by url name.
+     *
+     * @param String $urlName Url to find user
+     *
+     * @return User
+     */
+    static public function getByUrl($urlName) {
+        $User = new Brigade_Db_Table_Users();
+        $data = $User->getUserDataByUrlName($urlName);
+
+        return self::_populateObject($data);
+    }
+
+    /**
      * Get a user by facebook id.
      *
      * @param String $fbid FaceBookId to find user

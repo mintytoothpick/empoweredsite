@@ -190,8 +190,12 @@ class ProfileController extends BaseController {
 
         if (isset($parameters['UserId']) &&
             isset($parameters['message'])) {
-            $user    = User::get($parameters['UserId']);
-            $project = Project::getFeaturedUserInitiative($user->id);
+            $user = User::get($parameters['UserId']);
+            if (isset($parameters['ProjectId'])) {
+                $project = Project::get($parameters['ProjectId']);
+            } else {
+                $project = Project::getFeaturedUserInitiative($user->id);
+            }
             $project->updateMessageUser($user, $parameters['message']);
 
             echo json_encode(array('ok' => true));

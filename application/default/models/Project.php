@@ -181,6 +181,16 @@ class Project extends Base {
         return $obj->load($id);
     }
 
+
+    /**
+     * TODO: Implement cache layer.
+     * @return Class Object
+     */
+    static public function getByUrl($urlName) {
+        $obj = new self;
+        return $obj->loadByUrl($urlName);
+    }
+
     /**
      * Load information of the selected project.
      *
@@ -189,6 +199,18 @@ class Project extends Base {
     public function load($id) {
         $Projects = new Brigade_Db_Table_Projects();
         $data     = $Projects->loadInfo($id);
+
+        return self::_populateObject($data);
+    }
+
+    /**
+     * Load information of the selected project.
+     *
+     * @param String $id Project Url Name.
+     */
+    public function loadByUrl($urlName) {
+        $Projects = new Brigade_Db_Table_Projects();
+        $data     = $Projects->loadByUrl($urlName);
 
         return self::_populateObject($data);
     }

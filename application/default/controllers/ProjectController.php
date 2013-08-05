@@ -1740,6 +1740,51 @@ class ProjectController extends BaseController {
     }
 
     /**
+     * Volunteer Profile Page
+     */
+    public function volunteerAction() {
+        $params    = $this->_getAllParams();
+        $project   = Project::getByUrl($params['ProjectURL']);
+        $user      = User::getByUrl($params['UserUrl']);
+        $volunteer = $project->getVolunteerByUser($user);
+
+        $this->view->user    = $user;
+        $this->view->project = $project;
+        $this->view->group   = $project->group;
+
+        $this->view->userProjectRaised = $volunteer->raised;
+        $this->view->userProjectGoal   = $volunteer->userDonationGoal;
+        $this->view->breadcrumb        = $this->view->breadcrumbHelper($project);
+        $this->view->rightbarHelper($project, $volunteer);
+
+        if(!empty($project->programId)) {
+            $this->view->program  = $project->program;
+        }
+
+        if(!empty($project->groupId)) {
+            $this->view->group = $project->group;
+
+            $this->view->render('group/header.phtml');
+            $this->view->render('group/tabs.phtml');
+            $this->view->render('nonprofit/breadcrumb.phtml');
+        } else if(!empty($project->organizationId)) {
+            $this->view->render('nonprofit/header.phtml');
+            $this->view->render('nonprofit/tabs.phtml');
+            $this->view->render('nonprofit/breadcrumb.phtml');
+        } else {
+            $this->view->render('nonprofit/breadcrumb.phtml');
+            $this->view->render('project/header.phtml');
+            $this->view->soloProject = true;
+        }
+
+        $this->view->urlName = $project->urlName;
+
+        $this->view->render('nonprofit/footer.phtml');
+        $this->_helper->layout->setLayout('newlayout');
+        $this->_helper->viewRenderer->setRender('volunteerprofile');
+    }
+
+    /**
      * Stop volunteering from a project.
      * Remove it from right_bar. Ussage: User itself and admin.
      */

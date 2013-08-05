@@ -34,6 +34,28 @@ class Brigade_Db_Table_Projects extends Zend_Db_Table_Abstract {
     }
 
     /**
+     * Load information of a specific project.
+     *
+     * @param String $Url Url name of the project to load information.
+     *
+     * @return Information of a project.
+     */
+    public function loadByUrl($Url) {
+        try {
+            $donations = new Brigade_Db_Table_ProjectDonations();
+            $row = $this->fetchRow($this->select()
+                ->from(array('p' => 'projects'), array('p.*'))
+                ->where('p.UrlName = ?', $Url));
+            return !empty($row) ? $row->toArray() : null;
+        } catch (Zend_Db_Adapter_Exception $zdae) {
+            throw $zdae;
+        } catch (Zend_Db_Exception $e) {
+            throw $e;
+        }
+    }
+
+
+    /**
      * Get initiatives for a Group.
      * Is used inside Project controller, index method.
      *
@@ -372,7 +394,7 @@ class Brigade_Db_Table_Projects extends Zend_Db_Table_Abstract {
         $row = $this->fetchRow($this->select()->from("projects", array('UUID() as ProjectId')));
         return strtoupper($row['ProjectId']);
     }
-    
+
     /**
      *
      * @param Group Id
@@ -382,7 +404,7 @@ class Brigade_Db_Table_Projects extends Zend_Db_Table_Abstract {
     public function getProjects($GroupId) {
         return $this->fetchAll($this->select()->from(array('p' => 'projects'), array('p.ProjectId', 'p.Name'))->where("p.GroupId = ?", $GroupId))->toArray();
     }
-    
+
     /**
      *
      * @param Network Id

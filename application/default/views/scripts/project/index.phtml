@@ -203,7 +203,7 @@ $(function() {
             <? }?>
             <div class="programBox">
               <div class="memberImgStyle2"><a href="/<?=$fundraiser->user->urlName?>" title="<?=stripslashes($fundraiser->user->fullName) ?>"><img src="/profile/loadimage/?UserId=<?=$fundraiser->userId?>" alt="" width="55" height="52" /></a></div>
-              <span class="TextStyle06"><strong><a href="/<?=$fundraiser->user->urlName?>"><?=stripslashes($fundraiser->user->fullName) ?></a></strong></span>
+              <span class="TextStyle06"><strong><a href="/<?=$this->project->urlName?>/volunteer/<?=$fundraiser->user->urlName?>/"><?=stripslashes($fundraiser->user->fullName) ?></a></strong></span>
               <div class="programText03" <?= empty($fundraiser->user->aboutMe) ? 'style="background:white"' : ''; ?>>
                 <?=substr(stripslashes($fundraiser->user->aboutMe),0,100)?><? if(strlen($fundraiser->user->aboutMe) > 100) { ?><a href="javascript:;" onclick="toogleDesc(this,'<?=$fundraiser->id?>')">... read more</a><div class="hide <?=$fundraiser->id?>"><?=substr(stripslashes($fundraiser->user->aboutMe),100,strlen(stripslashes($fundraiser->user->aboutMe)))?></div><? } ?>
               </div>

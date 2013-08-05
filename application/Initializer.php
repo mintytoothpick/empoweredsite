@@ -347,6 +347,11 @@ class Initializer extends Zend_Controller_Plugin_Abstract
             );
         $router->addRoute('editproject2Route', $editproject2Route);
 
+        $editproject2Route = new Zend_Controller_Router_Route(':ProjectURL/volunteer/:UserUrl',
+            array('controller'=>'project', 'action'=>'volunteer')
+            );
+        $router->addRoute('editproject2Route', $editproject2Route);
+
         $deleteprojectRoute = new Zend_Controller_Router_Route('project/delete/:ProjectId',
             array('controller'=>'project', 'action'=>'delete')
             );

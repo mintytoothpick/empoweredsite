@@ -390,6 +390,19 @@ class Brigade_Db_Table_Users extends Zend_Db_Table_Abstract {
     }
 
     /**
+     * Return user data by url name.
+     *
+     * @param String $email Email to find the user.
+     *
+     * @return Array Data
+     */
+    public function getUserDataByUrlName($url) {
+        $res = $this->fetchRow($this->select()->where('UrlName = ?', $url));
+
+        return ($res) ? $res : null;
+    }
+
+    /**
      * Return user data by facebook id.
      *
      * @param String $fbid facebookId to find the user.
