@@ -143,6 +143,25 @@ class Brigade_Db_Table_SiteActivities extends Zend_Db_Table_Abstract {
     /** Start Refactor SQL **/
 
     /**
+     * Get all activities for a project and user.
+     *
+     */
+    public function getActivityFeedByProjectAndUser($ProjectId, $UserId, $limit = false) {
+        $feed_criteria = "'Guest Donation', 'User Donation', 'Joined Brigade', 'Uploads', 'File Added', 'Site Updated'";
+        $select = $this->select()
+            ->from(array('sa' => 'site_activities'), array("sa.*","DATE_FORMAT(ActivityDate, '%M %d, %Y') AS Activity_Date"))
+            ->where("ActivityType IN ($feed_criteria)")
+            ->where("SiteId = ?", $ProjectId)
+            ->where("CreatedBy = '$UserId' OR Recipient = '$UserId'");
+        if ($limit) {
+            $select->limit($limit);
+        }
+        $select->order('ActivityDate DESC');
+
+        return $this->fetchAll($select)->toArray();
+    }
+
+    /**
      * Get all activities for a project.
      *
      */

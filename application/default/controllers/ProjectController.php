@@ -1759,6 +1759,8 @@ class ProjectController extends BaseController {
         $this->view->rightbarHelper($project, $volunteer);
         $this->view->headTitle(stripslashes($project->name));
 
+        $this->view->activityFeed = Activity::getByProjectAndUser($project, $user, 5);
+
         if(!empty($project->programId)) {
             $this->view->program  = $project->program;
         }

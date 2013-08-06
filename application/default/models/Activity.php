@@ -137,6 +137,17 @@ class Activity {
         return $list;
     }
 
+    public static function getByProjectAndUser($project, $user, $limit = null) {
+        $SiteActivi = new Brigade_Db_Table_SiteActivities();
+        $Activities = $SiteActivi->getActivityFeedByProjectAndUser($project->id, $user->id, $limit);
+        $list       = array();
+        foreach($Activities as $act) {
+            // create objects
+            $list[] = self::_populateObject($act);
+        }
+        return $list;
+    }
+
     /**
      * Return activities of an specific group.
      *
