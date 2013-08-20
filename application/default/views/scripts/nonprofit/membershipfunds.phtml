@@ -1,3 +1,9 @@
+<script>
+function downloadReport() {
+    location.href = "/reporting/membershiptransfersexport?OrgId=<?=$this->organization->id?>";
+}
+</script>
+
 <div class="wrapper">
    <!-- org header -->
   <?=$this->placeholder('header') ?>
@@ -70,7 +76,8 @@
                 <?php } ?>
             </table>
             <?= $this->paginationControl($this->funds, 'Sliding', 'nonprofit/new_page_selector.phtml', array('param' => 'page')); ?>
-            <br /><br />
+            <br />
+            <a href="javascript:void(0);" class="btn btngreen newbtn" onclick="downloadReport()">Pull Report</a>
         </div>
       </div>
     </div>

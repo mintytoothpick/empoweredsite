@@ -706,6 +706,71 @@ class ReportingController extends BaseController {
     }
 
     /**
+     * Report for transfered membership organization level
+     */
+    public function membershiptransfersexportAction() {
+        if (!$this->view->isAdmin) {
+            $this->_helper->redirector('badaccess', 'error');
+        }
+        $this->_helper->layout()->disableLayout();
+        $this->_helper->viewRenderer->setNoRender();
+        $params = $this->_getAllParams();
+        $org    = Organization::get($params['OrgId']);
+        $funds  = MembershipFund::getListByOrg($org);
+
+
+        header("Content-type: application/x-msdownload");
+        header("Content-Disposition: attachment; filename=membershipreport.xls");
+        header("Pragma: no-cache");
+        header("Expires: 0");
+        $headers = '';
+        $data    = '';
+        $columns = array(
+            'Chapter',
+            'Initiative Destination',
+            'Date',
+            'Made By',
+            'Amount Transfered'
+        );
+        foreach($columns as $column) {
+            $headers .= '"'.$column.'"'."\t";
+        }
+        print $headers ."\n";
+
+        if (count($funds) > 0) {
+            foreach ($funds as $fund) {
+                $line = '';
+                if (count($fund->transfers) > 0) {
+                    // with details
+                    foreach ($fund->transfers as $trans) {
+                        $line .= '"'.stripslashes($fund->group->name).'"'."\t";
+                        $line .= '"'.stripslashes($fund->project->name).'"'."\t";
+                        $line .= '"'.$trans->createdOn.'"'."\t";
+                        $line .= '"'.stripslashes($trans->createdBy->fullName).'"'."\t";
+                        $line .= '"'.$fund->group->currency.number_format($trans->amount,2).'"'."\n";
+                        print str_replace("\r","",$line);
+                        $line = '';
+                    }
+                    $line  = '';
+                    $line .= '"'.stripslashes($fund->group->name).'"'."\t";
+                    $line .= '"'.stripslashes($fund->project->name).'"'."\t";
+                    $line .= '"'.'"'."\t";
+                    $line .= '"'.'"'."\t";
+                    $line .= '"Total Transfered: '.$fund->group->currency.number_format($fund->amount,2).'"'."\n";
+                } else {
+                    // no details
+                    $line .= '"'.stripslashes($fund->group->name).'"'."\t";
+                    $line .= '"'.stripslashes($fund->project->name).'"'."\t";
+                    $line .= '"'.'"'."\t";
+                    $line .= '"'.'"'."\t";
+                    $line .= '"Total Transfered: '.$fund->group->currency.number_format($fund->amount,2).'"'."\n";
+                }
+                print str_replace("\r","",$line);
+            }
+        }
+    }
+
+    /**
      * Report for membership status
      */
     public function membershipsAction() {

@@ -3311,9 +3311,10 @@ class NonprofitController extends BaseController {
         $paginator = Zend_Paginator::factory($this->view->membershipFunds);
         $paginator->setItemCountPerPage($perPage);
         $paginator->setCurrentPageNumber($page);
-        $this->view->funds = $paginator;
-        $_REQUEST['URLName']  = $org->urlName;
-        $_REQUEST['subpage']  = 'membership-funds';
+
+        $this->view->funds   = $paginator;
+        $_REQUEST['URLName'] = $org->urlName;
+        $_REQUEST['subpage'] = 'membership-funds';
 
         $this->renderPlaceHolders();
     }
