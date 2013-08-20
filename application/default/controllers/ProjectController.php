@@ -1512,6 +1512,7 @@ class ProjectController extends BaseController {
                 $user->password   = $this->generatePassword();
                 $user->isActive   = true;
                 $user->firstLogin = true;
+                $user->isDeleted  = false;
                 $user->save();
 
                 // email a notification to the newly added user with the temp password attached
